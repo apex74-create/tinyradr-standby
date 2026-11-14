@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Index C — exit</title>
+<style>
+html,body{margin:0;background:#010804;color:#00ff3b;font-family:"Share Tech Mono",Courier New,monospace}
+body{padding:12px;font-size:12px;line-height:1.5}
+h1{font-size:11px;letter-spacing:.25em;text-transform:uppercase;margin:0 0 8px}
+.bar{height:6px;border:1px solid #0f5;background:#000;margin:8px 0}
+.bar i{display:block;height:100%;width:0;background:#0f5}
+a{color:#0ff;word-break:break-all}
+small{color:#5f8f6f}
+.warn{color:#ffb000}
+</style>
+</head>
+<body>
+<h1>Index C · aperture open</h1>
+<p id="d">Resolving destination&hellip;</p>
+<div class="bar"><i id="b"></i></div>
+<p><a id="m" rel="noreferrer noopener external nofollow" href="#">exit now &rsaquo;</a></p>
+<p class="warn" id="w"></p>
+<small>Once you land and act there, that site knows what you did there. This only stops the
+search itself following you home.</small>
+<script>
+(function () {
+  var raw = location.hash.slice(1), url = "", lite = false;
+  try {
+    var s = raw.replace(/-/g, "+").replace(/_/g, "/");
+    var j = JSON.parse(decodeURIComponent(escape(atob(s))));
+    url = String(j.u || ""); lite = !!j.l;
+  } catch (e) { url = ""; }
+  var ok = /^https:\/\//.test(url);
+  var d = document.getElementById("d"), m = document.getElementById("m");
+  if (!ok) {
+    d.textContent = "No valid destination in this hop.";
+    document.getElementById("w").textContent = "Chain broken — nothing was forwarded.";
+    m.style.display = "none";
+    return;
+  }
+  d.textContent = (lite ? "plain HTML \u00b7 " : "full site \u00b7 ") + url;
+  m.href = url;
+  var bar = document.getElementById("b"), t0 = Date.now(), TICK = 400;
+  var id = setInterval(function () {
+    var f = Math.min(1, (Date.now() - t0) / TICK);
+    bar.style.width = (f * 100).toFixed(0) + "%";
+    if (f >= 1) { clearInterval(id); location.replace(url); }
+  }, 40);
+})();
+</script>
+</body>
+</html>

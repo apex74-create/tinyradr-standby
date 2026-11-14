@@ -1,0 +1,1 @@
+var e=`/assets/hero-wrist-castnet-DP3c8sB6.jpg`;export{e as t};

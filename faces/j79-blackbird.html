@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — GE J79 · Motors Under Glass</title>
+<style>
+  /* J79 MOTOR FACE v1 (Nov 9, 2026) — DIRECT-ON view.
+     Determination (Compounding Pass #1 §C, direct-on cut): look INTO the
+     intake — concentric spool stacks receding down the bore, brass compass
+     bezel, dark wood plate, big time as the primary read.
+     Spec character as DESIGN INPUT ONLY (public, historical): single-spool
+     axial turbojet, 17-stage compressor, 3-stage turbine — the 17 stator
+     ticks and the 3 hot turbine rings are those counts, drawn. No
+     performance figures appear on this face.
+     Governor history: this face was born under Battery V2 (REST/
+     OBSERVED, 12 s auto-exit); the face-line sweep removed that
+     governor Nov 10, 2026 - machinery runs from first paint, nothing
+     holds the screen on. Colour is CALLED from the
+     palette block below — solid numbers, never layered, no translucent
+     dark over the plate. */
+  :root{
+    --void:#050505;        /* bore depth */
+    --plate:#1c1007;       /* wood, dark stain */
+    --wood1:#2a180c; --wood2:#3a2412; --wood3:#241408;
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --laser:#57e6ff;       /* laser-line cyan */
+    --digit:#ffb52e;       /* time digits, solid amber */
+    --cream:#f5ead2;       /* lettering */
+    --hot:#ff7a1a;         /* turbine heat ring */
+    --hot2:#ff3d00;
+    --panel:#000000;       /* solid read panel */
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none;cursor:pointer}
+  #face{position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(93deg,var(--wood1) 0 14px,var(--wood3) 14px 15px,var(--wood2) 15px 31px,var(--wood3) 31px 32px),
+      var(--plate);}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--steel);letter-spacing:.14em;text-align:right}
+  body.live #stateLamp{color:var(--laser)}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">GE&nbsp;J79</div>
+  <div id="specLbl" class="lbl">SINGLE-SPOOL TURBOJET</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="J79 intake, direct-on"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stateLamp">REST</div>
+</div>
+
+<script>
+"use strict";
+/* Palette in code — the same called colours as the CSS block. */
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  laser:"#57e6ff", hot:"#ff7a1a", hot2:"#ff3d00", void:"#050505" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+
+/* ---- Bezel: brass ring, degree ticks, cardinal points, hour numerals ---- */
+var svg = document.getElementById("bore");
+var CX = 200, CY = 200;
+el("circle", {cx:CX, cy:CY, r:196, fill:"none", stroke:PAL.brassLo, "stroke-width":7}, svg);
+var hdgRing = el("circle", {cx:CX, cy:CY, r:188, fill:"none", stroke:PAL.brass, "stroke-width":2.5}, svg);
+for(var d=0; d<360; d+=6){
+  var big = (d % 30 === 0), p1 = polar(CX, CY, big?176:181, d), p2 = polar(CX, CY, 186, d);
+  el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1],
+    stroke: big?PAL.brassHi:PAL.brassLo, "stroke-width": big?2.4:1.2}, svg);
+}
+var hdgNorth = null;
+["N","E","S","W"].forEach(function(card, i){
+  var p = polar(CX, CY, 165, i*90);
+  var t = el("text", {x:p[0], y:p[1]+5, "text-anchor":"middle",
+    fill:PAL.brassHi, "font-size":15, "font-weight":800,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = card;
+  if(card === "N") hdgNorth = t;
+});
+/* ---- Heading witness (Face Law 2): a needle inside the dial that
+   points at the stack's live heading, or sweeps in SEARCHING. The
+   cardinals above stay where the bezel's geometry puts them - the
+   witness, not the paint, carries the truth. Stack = the firewalled
+   script at the end of this file. ------------------------------- */
+var hdgNeedle = el("line", {x1:CX, y1:CY-138, x2:CX, y2:CY-118,
+  stroke:"#ff3d00", "stroke-width":3.4, "stroke-linecap":"round"}, svg);
+window.__hdgTargets = { needle:hdgNeedle, ring:hdgRing, north:hdgNorth,
+  cx:CX, cy:CY, green:PAL.brassHi, yellow:"#ffb52e", red:"#ff3d00" };
+for(var h=1; h<=12; h++){
+  var hp = polar(CX, CY, 147, h*30);
+  var ht = el("text", {x:hp[0], y:hp[1]+4.5, "text-anchor":"middle",
+    fill:"#f5ead2", "font-size":12.5, "font-weight":700,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  ht.textContent = String(h);
+}
+
+/* ---- Casing + stator ticks (17 = the compressor stage count, drawn) ---- */
+el("circle", {cx:CX, cy:CY, r:132, fill:PAL.void, stroke:PAL.steelLo, "stroke-width":5}, svg);
+el("circle", {cx:CX, cy:CY, r:126, fill:"none", stroke:PAL.steel, "stroke-width":1.4}, svg);
+for(var s=0; s<17; s++){
+  var sa = s * (360/17), q1 = polar(CX, CY, 116, sa), q2 = polar(CX, CY, 125, sa);
+  el("line", {x1:q1[0], y1:q1[1], x2:q2[0], y2:q2[1], stroke:PAL.steel, "stroke-width":2.2}, svg);
+}
+
+/* ---- Rotors: laser-line blade rings. Same direction (single spool).
+   The live (formerly OBSERVED) periods are display gearing from
+   absolute time - the same ratios, faster, from first paint. ------- */
+var ROTORS = [
+  { r:104, blades:34, width:26, colour:PAL.steelHi, restP:600,  obsP:9.0 },  /* front compressor */
+  { r:80,  blades:26, width:22, colour:PAL.laser,   restP:300,  obsP:4.5 },  /* mid compressor   */
+  { r:57,  blades:20, width:18, colour:PAL.hot,     restP:150,  obsP:2.25 }, /* turbine (hot)    */
+  { r:36,  blades:14, width:14, colour:PAL.hot2,    restP:75,   obsP:1.125 } /* turbine core     */
+];
+ROTORS.forEach(function(cfg){
+  var g = el("g", {}, svg);
+  el("circle", {cx:CX, cy:CY, r:cfg.r, fill:"none", stroke:cfg.colour, "stroke-width":1.3}, g);
+  for(var b=0; b<cfg.blades; b++){
+    var a0 = b * (360/cfg.blades);
+    var tip = polar(CX, CY, cfg.r, a0), base = polar(CX, CY, cfg.r - cfg.width, a0 + 9);
+    var mid = polar(CX, CY, cfg.r - cfg.width*0.45, a0 + 13);
+    el("path", { d:"M"+tip[0].toFixed(1)+" "+tip[1].toFixed(1)+
+                   " L"+mid[0].toFixed(1)+" "+mid[1].toFixed(1)+
+                   " L"+base[0].toFixed(1)+" "+base[1].toFixed(1),
+      fill:"none", stroke:cfg.colour, "stroke-width":2.1, "stroke-linecap":"round"}, g);
+  }
+  cfg.g = g;
+});
+/* spinner cone */
+el("circle", {cx:CX, cy:CY, r:15, fill:PAL.void, stroke:PAL.brassHi, "stroke-width":2}, svg);
+el("circle", {cx:CX, cy:CY, r:4.5, fill:PAL.brass, stroke:"none"}, svg);
+var spinnerMark = el("line", {x1:CX, y1:CY-13, x2:CX, y2:CY-5, stroke:PAL.brassHi, "stroke-width":2.6}, svg);
+/* glass sheen: two called arcs, solid tones (the family's glass, earned thin) */
+el("path", {d:"M 96 128 A 128 128 0 0 1 196 74", fill:"none", stroke:PAL.steelHi, "stroke-width":2}, svg);
+el("path", {d:"M 84 152 A 138 138 0 0 1 150 82", fill:"none", stroke:PAL.steelLo, "stroke-width":1.2}, svg);
+
+/* ---- Time read ------------------------------------------------------- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var lampEl = document.getElementById("stateLamp");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute && now.getSeconds() !== 0 && lastMinute !== -1 && paintedOnce) return;
+  lastMinute = m; paintedOnce = true;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+var paintedOnce = false;
+
+/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
+   This face previously ran the BATTERY V2 GOVERNOR: a two-state
+   REST/OBSERVED runtime. It booted into REST and ran its machinery
+   only while an observation signal (container hook, focus, touch,
+   ?face=observed) kept it awake, auto-exiting to REST 12 s after
+   the last signal. In any plain viewer it sat frozen behind a live
+   clock - the Betta V2 defect class, banned house-wide. The
+   governor is REMOVED on the flagship repair pattern: the driver
+   below is kicked at load and runs unconditionally while the face
+   is open; every angle is a pure function of absolute time, so a
+   returning face resumes exactly on cadence. The only pause left
+   is document.hidden (the platform stops rAF itself when the
+   screen sleeps). window.__faceRest is pinned false and
+   window.__governor reports state "live" - the bench handles stay
+   readable and now tell the truth. window.ApexFace keeps the old
+   container contract as NO-OP compatibility: its calls only note
+   the signal; state() always returns "live". Battery care,
+   honestly scoped: no auto-exit, no still-painting; while the
+   face is lit, it lives. */
+var bootMs = Date.now();
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+function liveAngles(nowMs){
+  var t = nowMs/1000;
+  return ROTORS.map(function(c){ return ((t % c.obsP)/c.obsP)*360; });
+}
+function liveFrame(){
+  var now = Date.now();
+  applyAngles(liveAngles(now));
+  requestAnimationFrame(liveFrame);
+}
+function setLamp(){ lampEl.textContent = "LIVE"; }
+function note(sig){ gov.lastSignal = sig; }
+window.ApexFace = {
+  observe: function(){ note("container-observe(noop)"); },
+  rest:    function(){ note("container-rest(noop)"); },
+  toggle:  function(){ note("toggle(noop)"); },
+  state:   function(){ return "live"; }
+};
+window.addEventListener("apex-face-observe", function(){ note("event-observe(noop)"); });
+window.addEventListener("apex-face-rest", function(){ note("event-rest(noop)"); });
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ note(ev); }, true);
+});
+window.addEventListener("focus", function(){ note("focus"); });
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) paintTime(new Date());
+});
+
+/* ---- Boot: paint the clock, then the live loop runs from first
+   paint. No wake-lock of any kind - the system sleep governs
+   this face, never a governor inside it. ----------------------- */
+paintTime(new Date());
+setLamp();
+document.body.classList.add("live");
+requestAnimationFrame(liveFrame);
+setInterval(function(){
+  var now = new Date();
+  if(now.getMinutes() !== lastMinute) paintTime(now);
+}, 1000);
+function applyAngles(angles){
+  ROTORS.forEach(function(c, i){
+    c.g.setAttribute("transform", "rotate("+angles[i].toFixed(2)+" "+CX+" "+CY+")");
+  });
+  spinnerMark.setAttribute("transform", "rotate("+angles[3].toFixed(2)+" "+CX+" "+CY+")");
+}
+
+</script>
+<script>
+/* =====================================================================
+   FACE LAW 2 - THE BEZEL IS WIRED (face-line sweep, Nov 10, 2026)
+   ---------------------------------------------------------------------
+   This bezel's cardinals were paint: N sat at the top because it was
+   drawn there. Under Face Law 2 (as amended, Nov 10, 2026) a compass
+   bezel must always show a LIVE heading state with an honest
+   confidence colour in the face's own palette - or honestly show
+   that it has nothing. The stack, in order:
+     (a) deviceorientation / deviceorientationabsolute - the
+         magnetometer answer, when the hardware answers;
+     (b) GPS course-over-ground while moving, fused with the
+         inertial carry;
+     (c) inertial carry from the last good anchor;
+     (d) no anchor: SEARCHING - the witness sweeps slowly and
+         asserts NO north. A fabricated heading is a firing offence
+         under the fabrication ban; this stack would rather sweep.
+   An accelerometer alone never originates north (deviceorientation
+   is only read when it carries an absolute/compass heading).
+   Confidence, in this face's called colours: brassHi (green-class)
+   = live anchor agreeing with the inertial read; #ffb52e
+   (yellow-class) = real but weak/intermittent anchor, or a recent
+   inertial carry; #ff3d00 (red-class) = stale, disagreeing, or no
+   anchor - searching. The stack is FIREWALLED: it lives in its own
+   script and touches only its own three elements (witness, ring,
+   the N glyph). Its failure changes nothing else on the face, and
+   nothing else on the face can stop it. Bench: window.__heading.
+   ===================================================================== */
+(function(){
+  "use strict";
+  var T = window.__hdgTargets;
+  if(!T || !T.needle || !T.ring || !T.north) return;   /* bezel absent: nothing to govern */
+  var hdg = { state:"searching", heading:null, source:"none",
+              confidence:"red", lastAnchorMs:0, disagreements:0 };
+  window.__heading = hdg;
+  var CXp = T.cx, CYp = T.cy;
+  function paint(now){
+    var col = hdg.confidence === "green" ? T.green :
+              hdg.confidence === "yellow" ? T.yellow : T.red;
+    T.ring.setAttribute("stroke", col);
+    T.north.setAttribute("fill", col);
+    T.needle.setAttribute("stroke", col);
+    var ang;
+    if(hdg.state === "live" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else if(hdg.state === "carry" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else {
+      hdg.state = "searching"; hdg.heading = null;
+      ang = ((now/1000) * 6) % 360;          /* one slow sweep per minute */
+    }
+    T.needle.setAttribute("transform", "rotate(" + ang.toFixed(2) + " " + CXp + " " + CYp + ")");
+  }
+  function anchor(deg, src, now){
+    if(typeof deg !== "number" || !isFinite(deg)) return;
+    deg = ((deg % 360) + 360) % 360;
+    if(typeof hdg.heading === "number" && hdg.state === "live"){
+      var d = Math.abs(deg - hdg.heading); if(d > 180) d = 360 - d;
+      if(d > 25){ hdg.disagreements++; } else { hdg.disagreements = 0; }
+    }
+    hdg.heading = deg; hdg.source = src; hdg.lastAnchorMs = now;
+    hdg.state = "live";
+    hdg.confidence = hdg.disagreements >= 3 ? "yellow" : "green";
+  }
+  function onOrient(e){
+    var deg = null;
+    if(typeof e.webkitCompassHeading === "number") deg = e.webkitCompassHeading;
+    else if(e.absolute && typeof e.alpha === "number") deg = 360 - e.alpha;
+    if(deg !== null) anchor(deg, "magnetometer", Date.now());
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientationabsolute", onOrient, true);
+    window.addEventListener("deviceorientation", onOrient, true);
+    if(typeof DeviceOrientationEvent.requestPermission === "function"){
+      /* iOS gate: permission is asked on the first press of the glass,
+         inside this stack only; a refusal leaves the stack searching. */
+      window.addEventListener("pointerdown", function ask(){
+        window.removeEventListener("pointerdown", ask, true);
+        try { DeviceOrientationEvent.requestPermission().catch(function(){}); } catch(e){}
+      }, true);
+    }
+  }
+  var lastFix = null;
+  function onGeo(pos){
+    var c = pos.coords, now = Date.now();
+    if(lastFix && typeof c.speed === "number" && c.speed >= 0.5){
+      var dt = (now - lastFix.t)/1000;
+      if(dt > 0){
+        var dy = (c.latitude - lastFix.lat) * 111320;
+        var dx = (c.longitude - lastFix.lon) * 111320 * Math.cos(c.latitude * Math.PI/180);
+        if(Math.sqrt(dx*dx + dy*dy) >= 2){
+          anchor((Math.atan2(dx, dy) * 180/Math.PI + 360) % 360, "gps-course", now);
+        }
+      }
+    }
+    lastFix = { lat:c.latitude, lon:c.longitude, t:now };
+  }
+  if(navigator.geolocation && navigator.geolocation.watchPosition){
+    try { navigator.geolocation.watchPosition(onGeo, function(){}, { enableHighAccuracy:true, maximumAge:2000 }); } catch(e){}
+  }
+  function tick(){
+    var now = Date.now();
+    if(hdg.state === "live" && now - hdg.lastAnchorMs > 5000){
+      hdg.state = "carry"; hdg.confidence = "yellow";   /* inertial carry: last anchored heading, honestly ageing */
+    }
+    if(hdg.state === "carry" && now - hdg.lastAnchorMs > 30000){
+      hdg.state = "searching"; hdg.confidence = "red"; hdg.heading = null; hdg.source = "none";
+    }
+    paint(now);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

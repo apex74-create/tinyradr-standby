@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX GLASS HOUSE — Aquarium (Betta Hyper-Detail Free Floaters V2)</title>
+<!--
+  APEX GLASS HOUSE — AQUARIUM. Betta Hyper-Detail Free Floaters V2 (Nov 9, 2026).
+
+  SEED: betta-hyperdetail-freefloat-v1-2026-11-09.html — this
+  evening's V1 (four free floaters, three-layer parasol fins,
+  timer-leash fights). V2 carries V1 forward entire, with ONE
+  ordered change — THE TWO RAILS — per the owner's order
+  (Nov 9, 2026, 22:21 EST), given after he watched V1: "they
+  should be able to travel the dotted line though and not just
+  the solid line. It should be turning points equal and opposite
+  that way you get a truly random combat action between the yin
+  and the yang." His reading of the face rides with it: the fish
+  trace their path through the median of the curves, compounded
+  by the outside diameter; the two sides fighting — "like your
+  two sides fighting" — the yin and the yang in combat by
+  geometry, not by dice.
+
+  THE AMENDMENTS (owner, Nov 9, 2026, 22:22–22:23 EST, folded
+  into this same build):
+    A1. THE VICTORY FLASH — YIN WINS / YANG WINS. The principals
+        are NAMED: YIN is the RED fish, YANG is the BLUE fish.
+        When a principal kills the other, THE WHOLE DISC takes
+        the winner's colour in a breathing swell — opacity rides
+        semi-transparent -> transparent -> opaque as the colour
+        fills the disc (his words) — holds a beat at full, then
+        releases back to the line-work figure. The beaten fish
+        respawns ONLY AFTER the flash completes. (Floater kills
+        keep V1's plain edge respawn.)
+    A2. SYMMETRY IS THE RANDOMIZER — his engineering note, the
+        design principle of the motion: "due to the symmetry in
+        the actual moving design, the logic in the routine should
+        be easily symmetric and we should come to a real good
+        randomization." So: ONE rider routine, instanced twice
+        under the disc's half-turn symmetry — the second rider
+        is the first with every signed field negated — and the
+        randomness comes FROM the symmetric motion (phase drift
+        between the riders, choices at the equal-and-opposite
+        turning points), not from a bolted-on dice table.
+    A3. THE HOUSE RNG SEAT + THE TERM BATTLE LEDGER. The switch
+        choices at the turning points (and the returning rider's
+        rail, and the riders' opening phases) are drawn from the
+        house RNG seat — distribution earned by the geometry,
+        unpredictability seated in the house generator: a small
+        deterministic generator, seeded from NO CLOCK — a hash
+        of the stored term record stirred with the keeper-signal
+        count, the face's own history. One stream shared by both
+        mirrored riders through the same routine. And the face
+        keeps a persistent TERM BATTLE record across sessions:
+        YIN WINS · YANG WINS at the disc's edge in their colours,
+        SPAWNS · RESPAWNS in a quiet line under the date — which
+        spawns and respawn count, over a term (his ask). Wins ARE
+        kills for the principals. Persistence is the house's
+        guarded localStorage manner; its grade is NO MEASURE —
+        the wrapper's retention across launches is untested.
+
+  THE TWO RAILS (V2's one change)
+    - The yin-yang figure is TWO NAVIGABLE RAILS for the TWO
+      PRINCIPAL fish, sharing the figure's centre (320,225) and
+      outside diameter (r = 118): the SOLID rail follows the path
+      the wallpaper already drew — the figure's boundary S (top
+      semicircle + the two lobe arcs) — and the DOTTED rail is
+      its complementary curve, the TRUE MEDIAN of the S: the
+      straight diameter crossed by the two lobe radii (right
+      semicircle r59 about (320,166) + diameter descent + left
+      semicircle r59 about (320,284)). The wallpaper now draws
+      both: solid for one, dotted for the other.
+    - TURNING POINTS EQUAL AND OPPOSITE. The rails share exactly
+      two points: the poles T=(320,107) and B=(320,343),
+      diametrically opposite on the figure. A principal rides its
+      rail loop; at each pole pass it may SWITCH to the other
+      rail — the switch is a CHANCE PER PASS (p = 1/2): an
+      unscripted coin at an equal-and-opposite point, so neither
+      fish's circuit is ever a fixed script. The poles are the
+      same pair for both rails, by construction.
+    - COMBAT FROM THE GEOMETRY. There is NO timer and NO dice
+      deciding whether the principals meet: their rails cross at
+      both poles and share the diameter, and because a pole
+      switch can put both fish on the SAME curve travelling
+      EITHER direction, head-on and closing meetings are produced
+      by the paths themselves. When the principals close within
+      the clash distance, the V1 choreography takes them (flare,
+      dash, clash, 25% kill, obliteration, edge respawn) — the
+      encounter is geometry's; only the kill keeps its chance.
+      The respawned principal re-enters free — a floater at the
+      glass — until the tank is quiet, then takes a rail again.
+    - The V1 leash survives ONLY as a floor: it may pair the two
+      FLOATERS, or a floater with a free (respawned) principal.
+      It never pairs a rail rider.
+    - Rail riding honours the motion law: the rails are curves,
+      riding them is arc-true by construction; the heading eases
+      onto and off the rail tangent under the same hard turn cap
+      as free swimming (hero 1.15 rad/s) — measured, never a snap.
+    - At REST the still shows the figure with BOTH rails drawn
+      and the two principals posed ON their rails at the poles,
+      equal and opposite.
+
+  SEED OF V1: betta-yinyang-clock-face-V2-2026-11-08.html — the
+  shipped Glass House V2 (yin-yang circling pair). V1 EVOLVED it
+  per the owner's order (Nov 9, 2026, 21:46 EST): "I want a hyper
+  detailed version of the beta fish… I want some free floaters man
+  and I want them to have some layered, you know, like parasol, a
+  feather dragging behind them, some longer fins that kind of trail
+  around them as they swim… like the old centipede video game or
+  something but with more sweeping arcs, you know no 90s and shit…
+  and maybe they get into a fight every once in a while… and then
+  maybe one of them obliterates and a new one spawns in."
+
+  WHAT CHANGED FROM THE SEED (V1's record, carried)
+    - NO FIXED CIRCUIT — true of V1; V2 restores the circuit as
+      GEOMETRY for the principals only, per the order above. The
+      floaters still swim FREE: pure-pursuit wandering between
+      waypoints, turn rate capped, so every path is a SWEEPING
+      ARC. There is no grid and there are no right angles anywhere
+      in the motion math; the Centipede feel lives only in the
+      TRAILING segmented finnage behind each fish.
+    - HYPER DETAIL = LAYERED FINS. Each fin is drawn THREE times:
+      a deep membrane tint layer, a feather-rib fan layer, and a
+      parasol outer-rib layer — three strata of the fin's OWN
+      palette colour at stepped translucency. Longer fins than V2:
+      caudal, dorsal and anal all run long and trail with phase
+      lag behind the spine wave, so the finnage sweeps and drags
+      as the fish turns. Translucency is earned by the fin render;
+      no dark overlay exists anywhere on this face.
+    - FIGHTS. V1's leash mechanic, now the FLOOR only (floaters,
+      and a floater with a free principal): on a long random
+      leash (45–120 s of OBSERVED time) two eligible fish pick
+      each other out, turn toward each other over sweeping arcs,
+      flare (fin scale up, wave amplitude up), dash, clash once,
+      and separate. The principals' fights come from THE RAILS
+      (see THE TWO RAILS above) — geometry, not the leash.
+    - OBLITERATION + RESPAWN. A quarter of fights end in a kill:
+      the loser bursts into drifting sparks of its own colours
+      and dissolves; after a 3–7 s pause a NEW fish spawns at an
+      edge — fade and scale in, possibly in a fresh palette —
+      and the population holds at four. A respawned PRINCIPAL
+      swims free until the tank is quiet, then re-takes a rail.
+    - CLOCK. Real device time, the seed's hovering digits in the
+      seed's place and size; tick() runs every 200 ms at REST and
+      OBSERVED alike (the seed's discipline). At REST the
+      principals pose ON the rails at the poles; nothing animates
+      at rest.
+
+  THE GLASS HOUSE CRAFT CARRIES (from the seed, unchanged in kind):
+  glow-stepped WIREFRAME line work over OLED black — under-stroke +
+  bright core per fish — depth from LINE, LIGHT and BACKLIGHT GLOW
+  only; strata separated by line weight and brightness steps; NO
+  opaque filled plate as a visible stratum; tint lives INSIDE the
+  wire only. The backlight ADDS light behind each fish; the banned
+  dark sheet subtracted light in front. The sheet stays banned.
+
+  PALETTE — CALLED, solid numbers, never washed or layered dark:
+    Void / grounds:        #000000 (OLED) · star steps #33506b / #57481c
+    Digits (solid paint):  #c8fbff on glow step #0b5563 — never tinted
+    Fish 1 — principal YANG, the BLUE fish (owner's mapping,
+      A1): V2 Fish A's seat, recoloured to a called blue: under
+      #0d3a5c w3.4 · core #57c8ff w1.5 · body tint #1d5f9e @ .17
+      · fin tints #3f8fd2 @ deep .22 / mid .13 / parasol .07
+    Fish 2 — principal YIN, the RED fish (owner's mapping, A1):
+      V2 Fish B's seat, recoloured to a called red: under
+      #5c140d · core #ff5a3c · body tint #9e2414 @ .16 · fin
+      tints #e4572e @ .21 / .12 / .065
+    Fish 3 — floater, UAP cyan: under #0b3f47 · core #22e6ff ·
+      body tint #0f5f73 @ .15 · fin tints #19b8d8 @ .20 / .115 / .06
+    Fish 4 — floater, UAP magenta: under #470b38 · core #ff3df0 ·
+      body tint #73105c @ .15 · fin tints #d819b8 @ .20 / .115 / .06
+    Respawn rotations also draw on: teal core #19f0c8 (under
+      #0b4740, body #0f7363, fin #19d8b8) and violet core #9a6bff
+      (under #2a0b47, body #3d1f73, fin #7a4ae0); amber returns
+      only when its seat is empty (principals keep their colours).
+    Yin-yang wallpaper (line only): ring #1f7a3d · lobes-line
+      #14532a · ticks #0b2417. THE RAILS (V2): the solid rail
+      rides the lobes-line S in #1f7a3d solid; the dotted rail
+      (the median) is drawn in the ring step #1f7a3d, dotted
+      1.5/7 — the figure's two curves in the figure's own greens,
+      no new colours called. Grass greens: #27c24c / #39ff6a /
+      #1f9d43 / #7dff9a. Bubble wire: #3f8fd2. Spark: the dead
+      fish's own core + body tint colours.
+
+  ASSEMBLY ORDER (One-Shot Rule, largest to smallest, as the seed):
+    1. WALLPAPER: OLED void + starfield + oil-slick steps + the
+       yin-yang LINE drawing — V2 draws BOTH rails on it (solid
+       S + dotted median) — + ambient bubbles
+    2. the grass field (neon blades, bottom edge, sway is an
+       OBSERVED spectacle — at rest the blades stand in one pose)
+    3. the fish (backlight field first inside each fish group,
+       then layered finnage, then body tint, then wire)
+    4. the burst layer (obliteration sparks)
+    5. TONE/LIGHT LAST: the hovering digits
+
+  BATTERY V2 LAW (the house contract, as the newest faces carry it):
+    STATIC AT REST — one time-true still pass, no animation loops
+    run at rest; spectacle ONLY WHEN OBSERVED, through the ApexFace
+    hook and its signal family exactly as Merry's Garden carries
+    them (observe / rest / toggle, DOM events, visibility, focus,
+    pointer/touch/key); 12-SECOND AUTO-EXIT from spectacle back to
+    rest; NOTHING holds the screen on — no wake-lock of any kind,
+    the system sleep governs this face.
+    Mechanism note: V2's own driver ran its rAF openly; the V2
+    CONTAINER's observed-hook pattern (Merry's Garden, Nov 9) is
+    the house's current statement of the law and is what this face
+    mirrors — same hook, same signals, same 12 s exit.
+
+  NO fake instruments. Live device time and date only. Zero data
+  calls. ONE FILE, ZERO EXTERNAL REFERENCES. FIT: measure-and-jam
+  (visualViewport > inner > client), design stage 640x480
+  landscape, as the seed. Test pins: ?face=observed boots observed;
+  ?fight=1 forces a fight ~2 s into observation; window.__state
+  and window.__governor expose pose + contract state for the
+  bench. V2 bench handles: window.__rails (the two rail polylines
+  + poles), window.__railState (switch / encounter / fight-origin
+  counters), window.__encounters (the encounter log).
+
+  TIMING BLOCK (house law): V1 — T0 Nov 9, 2026, 21:46 EST ->
+  shipped 21:53 EST. V2 — T0 = this dispatch, Nov 9, 2026,
+  22:21 EST (owner's dotted-line order) -> finished verified
+  product: stamped at ship in the delivery report.
+
+  BUBBLES PASS (owner order, Nov 9, 2026, 22:33 EST: "All we
+  need bubbles in all of the aquarium style routines too") —
+  a DRESSING AMENDMENT; the file stays V2. The seed's five lone
+  bubbles (one per column) become THREE FLOOR STREAMS: anchors
+  at x = 140 / 330 / 508 on the floor line (y = 452, at the
+  grass roots), four bubbles alive per stream, twelve total —
+  a living aquarium, not a soda. Each bubble rises from the
+  floor to the TOP WATERLINE (y = 26), wobbling on a swept
+  path — a sine across the whole rise, never a straight
+  vertical — growing slightly as the pressure drops
+  (r x 1.00 -> 1.45 across the rise), fading out over the last
+  stretch as it pops AT the waterline, and respawns at the
+  floor. Stroke only, the called bubble wire #3f8fd2
+  (stroke-width 1.4) — no fill, no new colour, no wash. The
+  rise runs INSIDE the existing poseGrass pass: observed, the
+  bubbles stream; at REST the same pass parks them mid-rise
+  along their streams (frozen, as the still requires). No
+  second motion system, no second wake source — the ApexFace
+  governor carries them exactly as it carries the grass.
+-->
+<style>
+  html,body{margin:0;padding:0;background:#000;width:100%;height:100%;overflow:hidden}
+  #stage{position:absolute;background:#000;overflow:hidden}
+  svg{display:block}
+  text{font-family:"Courier New",monospace;font-weight:bold}
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="scene" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid meet" width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="glowF">
+    <stop offset="0" stop-color="#0f4d2f" stop-opacity="0.80"/>
+    <stop offset="0.55" stop-color="#093420" stop-opacity="0.36"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+  <path id="blade" d="M0,0 C 8,-30 16,-62 12,-98" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ====== FISH ART — principal wireframe, V2's drawing evolved ======
+       Body/head/tail construction carried from V2's art groups.
+       The FINNAGE is rebuilt in three called layers per fin:
+       deep membrane tint / feather-rib fan / parasol outer ribs,
+       and runs LONGER than V2 so it trails behind the swimmer. -->
+  <g id="finCaudalDeep">
+    <path d="M-50,-5 C-84,-44 -116,-54 -132,-44 C-120,-20 -118,-6 -128,0 C-118,6 -120,20 -132,44 C-116,54 -84,44 -50,5 Z" fill="currentColor" stroke="none"/>
+  </g>
+  <g id="finCaudalMid" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M-50,-5 C-84,-44 -116,-54 -132,-44 C-120,-20 -118,-6 -128,0 C-118,6 -120,20 -132,44 C-116,54 -84,44 -50,5 Z"/>
+    <line x1="-51" y1="0" x2="-124" y2="-41"/><line x1="-51" y1="0" x2="-115" y2="-25"/>
+    <line x1="-51" y1="0" x2="-126" y2="-10"/><line x1="-51" y1="0" x2="-128" y2="0"/>
+    <line x1="-51" y1="0" x2="-126" y2="10"/><line x1="-51" y1="0" x2="-115" y2="25"/>
+    <line x1="-51" y1="0" x2="-124" y2="41"/><line x1="-51" y1="0" x2="-104" y2="-16"/>
+    <line x1="-51" y1="0" x2="-104" y2="16"/>
+  </g>
+  <g id="finCaudalTop" stroke="currentColor" fill="none" stroke-linecap="round">
+    <line x1="-51" y1="0" x2="-130" y2="-43"/><line x1="-51" y1="0" x2="-118" y2="-27"/>
+    <line x1="-51" y1="0" x2="-130" y2="0"/><line x1="-51" y1="0" x2="-118" y2="27"/>
+    <line x1="-51" y1="0" x2="-130" y2="43"/>
+  </g>
+  <g id="finDorsalDeep">
+    <path d="M-34,-16 C-24,-52 6,-68 42,-46 C24,-36 -14,-28 -34,-16 Z" fill="currentColor" stroke="none"/>
+  </g>
+  <g id="finDorsalMid" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M-34,-16 C-24,-52 6,-68 42,-46 C24,-36 -14,-28 -34,-16 Z"/>
+    <line x1="-2" y1="-24" x2="-30" y2="-46"/><line x1="-2" y1="-24" x2="-16" y2="-55"/>
+    <line x1="-2" y1="-24" x2="-2" y2="-58"/><line x1="-2" y1="-24" x2="12" y2="-56"/>
+    <line x1="-2" y1="-24" x2="26" y2="-49"/><line x1="-2" y1="-24" x2="36" y2="-40"/>
+  </g>
+  <g id="finDorsalTop" stroke="currentColor" fill="none" stroke-linecap="round">
+    <line x1="-2" y1="-24" x2="-33" y2="-49"/><line x1="-2" y1="-24" x2="-18" y2="-59"/>
+    <line x1="-2" y1="-24" x2="-1" y2="-62"/><line x1="-2" y1="-24" x2="16" y2="-59"/>
+    <line x1="-2" y1="-24" x2="30" y2="-52"/><line x1="-2" y1="-24" x2="39" y2="-43"/>
+  </g>
+  <g id="finAnalDeep">
+    <path d="M-42,13 C-26,54 -4,78 34,80 C12,54 -18,30 -42,13 Z" fill="currentColor" stroke="none"/>
+  </g>
+  <g id="finAnalMid" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M-42,13 C-26,54 -4,78 34,80 C12,54 -18,30 -42,13 Z"/>
+    <line x1="-8" y1="23" x2="-32" y2="47"/><line x1="-8" y1="23" x2="-18" y2="58"/>
+    <line x1="-8" y1="23" x2="-3" y2="65"/><line x1="-8" y1="23" x2="12" y2="64"/>
+    <line x1="-8" y1="23" x2="24" y2="54"/>
+  </g>
+  <g id="finAnalTop" stroke="currentColor" fill="none" stroke-linecap="round">
+    <line x1="-8" y1="23" x2="-35" y2="50"/><line x1="-8" y1="23" x2="-20" y2="62"/>
+    <line x1="-8" y1="23" x2="-2" y2="69"/><line x1="-8" y1="23" x2="14" y2="68"/>
+    <line x1="-8" y1="23" x2="27" y2="57"/>
+  </g>
+  <g id="finPectDeep">
+    <path d="M20,3 C35,8 42,24 36,40 C26,30 19,16 20,3 Z" fill="currentColor" stroke="none"/>
+  </g>
+  <g id="finPectMid" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M20,3 C35,8 42,24 36,40 C26,30 19,16 20,3 Z"/>
+    <line x1="21" y1="5" x2="35" y2="13"/><line x1="21" y1="5" x2="34" y2="23"/>
+    <line x1="21" y1="5" x2="30" y2="32"/>
+  </g>
+
+  <g id="artBody" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M-52,0 C-40,-22 6,-28 34,-16 C52,-8 58,-2 58,0 C58,2 52,8 34,16 C6,28 -40,22 -52,0 Z"/>
+    <path d="M-50,0 C-16,-3.5 22,-3.5 55,-0.5"/>
+    <path d="M-32,-23 C-28.5,0 -32,23 -32,23"/>
+    <path d="M-8,-27 C-4.5,0 -8,27 -8,27"/>
+    <path d="M16,-25 C19.5,0 16,25 16,25"/>
+    <path d="M36,-16 C39.5,0 36,16 36,16"/>
+    <path d="M-29,-9 A5.5,4.5 0 0 1 -19,-9"/>
+    <path d="M-17,2 A5.5,4.5 0 0 1 -7,2"/>
+    <path d="M-29,11 A5.5,4.5 0 0 1 -19,11"/>
+    <path d="M-7,-13 A5.5,4.5 0 0 1 3,-13"/>
+    <path d="M-5,9 A5.5,4.5 0 0 1 5,9"/>
+    <path d="M5,-4 A5.5,4.5 0 0 1 15,-4"/>
+    <path d="M9,13 A5.5,4.5 0 0 1 19,13"/>
+    <path d="M-43,3 A5.5,4.5 0 0 1 -33,3"/>
+  </g>
+  <path id="tintBody" d="M-52,0 C-40,-22 6,-28 34,-16 C52,-8 58,-2 58,0 C58,2 52,8 34,16 C6,28 -40,22 -52,0 Z" fill="currentColor" stroke="none"/>
+  <g id="artHead" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M31,-14 C25,-6 25,6 31,14"/><path d="M23,-11 C18,-5 18,5 23,11"/>
+    <circle cx="44" cy="-4" r="5.2"/><circle cx="44" cy="-4" r="1.9" fill="currentColor" stroke="none"/><circle cx="46" cy="-6" r="1" fill="#ffffff" stroke="none"/>
+    <path d="M58,0 C55,2 53,3.5 51,5.5"/>
+  </g>
+  <g id="artPectTrail" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M4,19 C14,44 12,62 0,80"/><path d="M14,19 C24,40 22,56 12,70"/>
+  </g>
+
+  <!-- ====== SMALL FLOATER ART — V2's school drawing, finnage lengthened ====== -->
+  <g id="finSchoolDeep">
+    <path d="M-29,-3 C-44,-18 -58,-22 -66,-17 C-59,-7 -58,-2 -64,0 C-58,2 -59,7 -66,17 C-58,22 -44,18 -29,3 Z" fill="currentColor" stroke="none"/>
+  </g>
+  <g id="finSchoolMid" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M-29,-3 C-44,-18 -58,-22 -66,-17 C-59,-7 -58,-2 -64,0 C-58,2 -59,7 -66,17 C-58,22 -44,18 -29,3 Z"/>
+    <path d="M-30,-3 L-62,-15 M-30,0 L-65,0 M-30,3 L-62,15"/>
+  </g>
+  <g id="artSchool" stroke="currentColor" fill="none" stroke-linecap="round">
+    <path d="M-30,0 C-22,-12 4,-15 20,-9 C30,-5 34,-1 34,0 C34,1 30,5 20,9 C4,15 -22,12 -30,0 Z"/>
+    <path d="M-29,0 C-8,-2 16,-2 32,0"/>
+    <path d="M-14,-11 C-6,-20 8,-22 18,-16"/>
+    <path d="M-16,10 C-8,19 4,22 14,18"/>
+    <circle cx="24" cy="-3" r="2.6"/>
+    <path d="M14,-7 C11,-3 11,3 14,7"/>
+  </g>
+  <path id="tintSchool" d="M-30,0 C-22,-12 4,-15 20,-9 C30,-5 34,-1 34,0 C34,1 30,5 20,9 C4,15 -22,12 -30,0 Z" fill="currentColor" stroke="none"/>
+</defs>
+
+<!-- 1. WALLPAPER: OLED void, starfield, oil-slick steps, the yin-yang
+     figure with BOTH of its curves drawn as RAILS (V2: the solid S
+     and the dotted median — the principals ride them), ambient
+     bubbles (posed at rest; rising is observed spectacle) -->
+<rect x="0" y="0" width="640" height="480" fill="#000000"/>
+<g fill="#33506b">
+  <circle cx="42" cy="38" r="1.6"/><circle cx="118" cy="70" r="1.1"/><circle cx="204" cy="30" r="1.4"/>
+  <circle cx="296" cy="58" r="1.0"/><circle cx="388" cy="26" r="1.5"/><circle cx="470" cy="64" r="1.1"/>
+  <circle cx="556" cy="34" r="1.6"/><circle cx="606" cy="86" r="1.0"/><circle cx="66" cy="140" r="1.2"/>
+  <circle cx="150" cy="118" r="0.9"/><circle cx="520" cy="128" r="1.3"/><circle cx="586" cy="176" r="1.0"/>
+  <circle cx="30" cy="220" r="1.3"/><circle cx="96" cy="262" r="0.9"/><circle cx="610" cy="250" r="1.2"/>
+  <circle cx="540" cy="300" r="0.9"/><circle cx="52" cy="330" r="1.1"/><circle cx="150" cy="356" r="1.0"/>
+  <circle cx="430" cy="368" r="1.2"/><circle cx="596" cy="352" r="1.4"/><circle cx="250" cy="392" r="0.9"/>
+  <circle cx="356" cy="404" r="1.1"/><circle cx="486" cy="396" r="1.0"/>
+</g>
+<g fill="#57481c">
+  <circle cx="180" cy="86" r="1.2"/><circle cx="420" cy="96" r="1.0"/><circle cx="330" cy="140" r="0.9"/>
+  <circle cx="88" cy="196" r="1.1"/><circle cx="566" cy="216" r="1.2"/><circle cx="238" cy="330" r="1.0"/>
+</g>
+<g id="slick" fill="none" stroke-width="2">
+  <ellipse data-slick="1" cx="320" cy="-34" rx="310" ry="58" stroke="#16283c"/>
+  <ellipse data-slick="1" cx="212" cy="-44" rx="180" ry="44" stroke="#1d1430"/>
+  <ellipse data-slick="1" cx="452" cy="-40" rx="170" ry="40" stroke="#123528"/>
+  <ellipse data-slick="1" cx="320" cy="516" rx="320" ry="56" stroke="#122e20"/>
+  <ellipse data-slick="1" cx="150" cy="522" rx="190" ry="42" stroke="#182a42"/>
+</g>
+<g id="circuitPaint" fill="none">
+  <circle cx="320" cy="225" r="118" stroke="#14532a" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="192" y1="225" x2="448" y2="225" stroke="#0b2417" stroke-width="1" stroke-dasharray="2 7"/>
+  <line x1="320" y1="97" x2="320" y2="353" stroke="#0b2417" stroke-width="1" stroke-dasharray="2 7"/>
+  <!-- THE SOLID RAIL — the S the wallpaper always drew (the figure's
+       boundary curve: top semicircle + the two lobe arcs) -->
+  <path id="railSolidPath" d="M 320,107 A 118,118 0 0 1 320,343 A 59,59 0 0 1 320,225 A 59,59 0 0 0 320,107 Z" stroke="#1f7a3d" stroke-width="1.8"/>
+  <!-- THE DOTTED RAIL (V2) — the median of the S: the right lobe
+       semicircle, the diameter descent, the left lobe semicircle.
+       Drawn DOTTED, as the owner named it. -->
+  <path id="railDottedPath" d="M 320,107 A 59,59 0 0 1 320,225 L 320,343 A 59,59 0 0 1 320,225 L 320,107 Z" stroke="#1f7a3d" stroke-width="1.6" stroke-dasharray="1.5 7" stroke-linecap="round"/>
+  <circle cx="320" cy="166" r="7" stroke="#1f7a3d" stroke-width="1.2"/>
+  <circle cx="320" cy="284" r="7" stroke="#1f7a3d" stroke-width="1.2"/>
+</g>
+<!-- THE VICTORY FLASH DISC (V2): takes the winner's colour in a
+     breathing swell when a principal wins; opacity 0 at peace.
+     A filled disc ONLY inside the ceremony — the flash colour is
+     light added over the figure, earned by the win, and it
+     releases back to line work when the swell completes. -->
+<circle id="flashDisc" cx="320" cy="225" r="118" fill="#ffffff" opacity="0"/>
+<text id="flashLabelGlow" x="320" y="234" font-size="30" letter-spacing="3" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="6" opacity="0"></text>
+<text id="flashLabel" x="320" y="234" font-size="30" letter-spacing="3" text-anchor="middle" fill="#ffffff" stroke="#02303a" stroke-width="1" opacity="0"></text>
+<g id="bubbles" fill="none" stroke="#3f8fd2" stroke-width="1.4"></g>
+
+<!-- 2. THE GRASS FIELD (posed by the driver; sways only when observed) -->
+<g id="grass"></g>
+
+<!-- 3. THE FISH -->
+<g id="fishLayer"></g>
+
+<!-- 4. THE BURST LAYER -->
+<g id="burstLayer"></g>
+
+<!-- 5. TONE/LIGHT LAST: the hovering digits (the seed's place + size) -->
+<g id="digits">
+  <text id="dateGlow" x="320" y="54" font-size="30" letter-spacing="3" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="6">--- -- --</text>
+  <text id="dateText" x="320" y="54" font-size="30" letter-spacing="3" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="1">--- -- --</text>
+  <text id="ampmGlow" x="92" y="240" font-size="26" letter-spacing="2" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="6"></text>
+  <text id="ampmText" x="92" y="240" font-size="26" letter-spacing="2" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="1"></text>
+  <text id="timeGlow" x="292" y="240" font-size="74" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="9">--:--</text>
+  <text id="timeText" x="292" y="240" font-size="74" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="1.6">--:--</text>
+  <text id="secGlow" x="436" y="240" font-size="36" text-anchor="start" fill="#0b5563" stroke="#0b5563" stroke-width="6">--</text>
+  <text id="secText" x="436" y="240" font-size="36" text-anchor="start" fill="#c8fbff" stroke="#02303a" stroke-width="1">--</text>
+</g>
+
+<!-- 6. THE TERM BATTLE PANEL (V2): the persistent war record —
+     the two sides' win counts at the disc's edge in their called
+     colours (yin red to the left, yang blue to the right), and
+     the term's spawn / respawn counts in one quiet line under
+     the date. Static text: it stands in the still at REST. -->
+<g id="termPanel">
+  <text id="termYinGlow" x="198" y="231" font-size="17" text-anchor="end" fill="#0b5563" stroke="#0b5563" stroke-width="4">YIN 0</text>
+  <text id="termYin" x="198" y="231" font-size="17" text-anchor="end" fill="#ff5a3c" stroke="#02303a" stroke-width="0.7">YIN 0</text>
+  <text id="termYangGlow" x="442" y="231" font-size="17" text-anchor="start" fill="#0b5563" stroke="#0b5563" stroke-width="4">YANG 0</text>
+  <text id="termYang" x="442" y="231" font-size="17" text-anchor="start" fill="#57c8ff" stroke="#02303a" stroke-width="0.7">YANG 0</text>
+  <text id="termCountsGlow" x="320" y="82" font-size="14" letter-spacing="2" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="4">TERM · SPAWNS 0 · RESPAWNS 0</text>
+  <text id="termCounts" x="320" y="82" font-size="14" letter-spacing="2" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="0.7">TERM · SPAWNS 0 · RESPAWNS 0</text>
+</g>
+</svg>
+</div>
+<script>
+(function(){
+"use strict";
+var NS="http://www.w3.org/2000/svg";
+function $(id){return document.getElementById(id);}
+function mk(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function use(parent,href,color,width,opacity){var u=mk("use",{href:href},parent);
+  if(color)u.setAttribute("color",color);
+  if(width)u.setAttribute("stroke-width",width);
+  if(opacity!==undefined)u.setAttribute("opacity",opacity);
+  return u;}
+function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+function angNorm(a){while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a;}
+function sstep(x){if(x<=0)return 0;if(x>=1)return 1;return x*x*x*(x*(x*6-15)+10);}
+
+/* ================= FIT — the seed's measure-and-jam ================= */
+var stage=$("stage"), scene=$("scene");
+function layout(){
+  var vv=window.visualViewport;
+  var W=Math.floor(vv?vv.width:window.innerWidth);
+  var H=Math.floor(vv?vv.height:window.innerHeight);
+  if(!W||!H){W=document.documentElement.clientWidth||640;H=document.documentElement.clientHeight||480;}
+  var S=Math.min(W/640,H/480);
+  var sw=Math.round(640*S), sh=Math.round(480*S);
+  stage.style.width=sw+"px"; stage.style.height=sh+"px";
+  stage.style.left=Math.floor((W-sw)/2)+"px"; stage.style.top=Math.floor((H-sh)/2)+"px";
+  scene.style.width=sw+"px"; scene.style.height=sh+"px";
+  window.__fit={W:W,H:H,stageW:sw,stageH:sh,S:+S.toFixed(3)};
+}
+layout();
+window.addEventListener("resize",layout);
+if(window.visualViewport)window.visualViewport.addEventListener("resize",layout);
+
+/* ================= THE CLOCK — the seed's tick, every 200 ms ========= */
+var DAYS=["SU","MO","TU","WE","TH","FR","SA"];
+function pad(n){return (n<10?"0":"")+n;}
+function setPair(a,b,v){var e1=$(a),e2=$(b); if(e1)e1.textContent=v; if(e2)e2.textContent=v;}
+function tick(){
+  var d=new Date(), h=d.getHours(), ap=h>=12?"PM":"AM"; h=h%12; if(h===0)h=12;
+  setPair("dateGlow","dateText",DAYS[d.getDay()]+" "+pad(d.getMonth()+1)+"-"+pad(d.getDate()));
+  setPair("timeGlow","timeText",h+":"+pad(d.getMinutes()));
+  setPair("secGlow","secText",pad(d.getSeconds()));
+  setPair("ampmGlow","ampmText",ap);
+}
+tick(); setInterval(tick,200);
+
+/* ================= PALETTES — called, solid numbers =================
+   under/core/body/fin per fish; opacities are the fin strata:
+   body opacity, then fin deep / mid / parasol. Rotation includes
+   the two principals' colours — in V2 those seats are the
+   owner's named pair (YANG blue, YIN red); a principal NEVER
+   changes colours, seat or side, even across a respawn. */
+var PALETTES=[
+ {name:"yangblue",  under:"#0d3a5c", core:"#57c8ff", body:"#1d5f9e", fin:"#3f8fd2", bOp:0.17, fOp:[0.22,0.13,0.07]},
+ {name:"yinred",    under:"#5c140d", core:"#ff5a3c", body:"#9e2414", fin:"#e4572e", bOp:0.16, fOp:[0.21,0.12,0.065]},
+ {name:"uapcyan",   under:"#0b3f47", core:"#22e6ff", body:"#0f5f73", fin:"#19b8d8", bOp:0.15, fOp:[0.20,0.115,0.06]},
+ {name:"uapmagenta",under:"#470b38", core:"#ff3df0", body:"#73105c", fin:"#d819b8", bOp:0.15, fOp:[0.20,0.115,0.06]},
+ {name:"uapteal",   under:"#0b4740", core:"#19f0c8", body:"#0f7363", fin:"#19d8b8", bOp:0.15, fOp:[0.20,0.115,0.06]},
+ {name:"uapviolet", under:"#2a0b47", core:"#9a6bff", body:"#3d1f73", fin:"#7a4ae0", bOp:0.15, fOp:[0.20,0.115,0.06]}
+];
+
+/* ================= THE TWO RAILS (V2) =================
+   The yin-yang figure carries TWO closed curves, sharing its
+   centre C=(320,225) and its outside radius 118:
+     SOLID  — the figure's boundary S, the path the wallpaper
+              always drew: top semicircle r118 T->B, right lobe
+              r59 B->M, left lobe r59 M->T.
+     DOTTED — the median of the S: right lobe r59 T->M, the
+              diameter M->B, left lobe r59 B->M, the diameter
+              M->T. Drawn dotted on the wallpaper, as named.
+   The curves share exactly two points: the POLES T=(320,107)
+   and B=(320,343) — diametrically opposite, TURNING POINTS
+   EQUAL AND OPPOSITE. At a pole, and only at a pole, a rider
+   may pass from one rail to the other.
+   Each rail is precomputed as an arc-length polyline of legs;
+   a leg knows its endpoints, its length, and which pole waits
+   at each end (pole-holding legs: the diameter legs of the
+   dotted rail, and the top-semicircle ends of the solid rail). */
+function buildRail(legs){
+  var pts=[], lens=[], total=0, i, j, n;
+  for(i=0;i<legs.length;i++){
+    var L=legs[i], steps=Math.max(4,Math.round(L.len/6)), seg=[];
+    for(j=0;j<=steps;j++){
+      var th=L.a0+(L.a1-L.a0)*j/steps;
+      seg.push({x:L.cx+Math.cos(th)*(L.len/2), y:L.cy+Math.sin(th)*(L.len/2)});
+    }
+    lens.push(L.len); total+=L.len;
+    if(i===0)for(j=0;j<seg.length;j++)pts.push(seg[j]);
+    else for(j=1;j<seg.length;j++)pts.push(seg[j]);
+  }
+  var cum=[0];
+  for(i=1;i<pts.length;i++){
+    var dx=pts[i].x-pts[i-1].x, dy=pts[i].y-pts[i-1].y;
+    cum.push(cum[i-1]+Math.sqrt(dx*dx+dy*dy));
+  }
+  total=cum[cum.length-1];
+  function sAt(x,y){
+    var bi=0, bd=1e12;
+    for(var i2=0;i2<pts.length;i2++){
+      var ddx=pts[i2].x-x, ddy=pts[i2].y-y, dd=ddx*ddx+ddy*ddy;
+      if(dd<bd){ bd=dd; bi=i2; }
+    }
+    return cum[bi];
+  }
+  function posAt(s){
+    s=((s%total)+total)%total;
+    var lo=0, hi=cum.length-1;
+    while(lo<hi-1){ var mid=(lo+hi)>>1; if(cum[mid]<=s)lo=mid; else hi=mid; }
+    var segL=cum[hi]-cum[lo]||1, fr=(s-cum[lo])/segL;
+    var p0=pts[lo], p1=pts[hi];
+    return {x:p0.x+(p1.x-p0.x)*fr, y:p0.y+(p1.y-p0.y)*fr,
+            a:Math.atan2(p1.y-p0.y,p1.x-p0.x)};
+  }
+  return {pts:pts, total:total, posAt:posAt, sAt:sAt, legs:legs};
+}
+var RAIL_T={x:320,y:107}, RAIL_B={x:320,y:343};
+var RAILS={
+  solid:buildRail([
+    {cx:320,cy:225,len:236,a0:-Math.PI/2,a1:Math.PI/2,poleA:"T",poleB:"B"},  /* top semicircle T->B */
+    {cx:320,cy:284,len:118,a0:Math.PI/2,a1:-Math.PI/2,poleA:"B",poleB:"M"},  /* right lobe B->M */
+    {cx:320,cy:166,len:118,a0:Math.PI/2,a1:Math.PI*1.5,poleA:"M",poleB:"T"}  /* left lobe M->T */
+  ]),
+  dotted:buildRail([
+    {cx:320,cy:166,len:118,a0:-Math.PI/2,a1:Math.PI/2,poleA:"T",poleB:"M"},  /* right lobe T->M */
+    {cx:320,cy:284,len:118,a0:-Math.PI/2,a1:Math.PI/2,poleA:"M",poleB:"B"},  /* left lobe M->B */
+    {cx:320,cy:225,len:236,a0:Math.PI*1.5,a1:Math.PI/2,poleA:"B",poleB:"T"}  /* diameter straight B->T */
+  ])
+};
+window.__rails={solid:RAILS.solid, dotted:RAILS.dotted, poles:{T:RAIL_T, B:RAIL_B}};
+window.__railPoles={
+  solid:{T:RAILS.solid.sAt(320,107), B:RAILS.solid.sAt(320,343)},
+  dotted:{T:RAILS.dotted.sAt(320,107), B:RAILS.dotted.sAt(320,343)}
+};
+
+/* ================= THE FISH — construction =================
+   Layer order inside each fish, largest to smallest: backlight,
+   anal finnage, caudal finnage (tail segment), body tint, body
+   wire (under + core), dorsal finnage, head + pectoral + trail.
+   Fins carry three called layers: DEEP tint fill, MID feather-rib
+   fan, TOP parasol ribs — translucency earned by the render. */
+var fishLayer=$("fishLayer"), burstLayer=$("burstLayer");
+function finTriple(parent,deepId,midId,topId,pal,lag){
+  var g=mk("g",{},parent);
+  var deep=mk("g",{},g); use(deep,deepId,pal.fin,null,pal.fOp[0]);
+  var mid=mk("g",{},g);  use(mid,midId,pal.fin,1.1,pal.fOp[1]);
+  var top=null;
+  if(topId){ top=mk("g",{},g); use(top,topId,pal.core,0.9,pal.fOp[2]); }
+  return {g:g,deep:deep,mid:mid,top:top,lag:lag};
+}
+function buildFish(f){
+  var pal=f.pal, root=mk("g",{},fishLayer); f.root=root;
+  f.glow=mk("ellipse",{cx:-4,cy:0,rx:f.kind==="hero"?128:64,ry:f.kind==="hero"?70:36,fill:"url(#glowF)"},root);
+  var body=mk("g",{},root); f.bodyG=body;
+  if(f.kind==="hero"){
+    f.finA=finTriple(body,"#finAnalDeep","#finAnalMid","#finAnalTop",pal,1.35);
+    f.finA.g.setAttribute("transform-origin","-8px 22px");
+    var tail=mk("g",{},body); f.tailG=tail;
+    f.finC=finTriple(tail,"#finCaudalDeep","#finCaudalMid","#finCaudalTop",pal,1.8);
+    f.finC.g.setAttribute("transform-origin","-51px 0px");
+    use(body,"#tintBody",pal.body,null,pal.bOp);
+    use(body,"#artBody",pal.under,3.4);
+    use(body,"#artBody",pal.core,1.5);
+    f.finD=finTriple(body,"#finDorsalDeep","#finDorsalMid","#finDorsalTop",pal,1.1);
+    f.finD.g.setAttribute("transform-origin","-2px -23px");
+    var head=mk("g",{},body); f.headG=head;
+    use(head,"#artHead",pal.under,3.4);
+    use(head,"#artHead",pal.core,1.5);
+    f.finP=finTriple(head,"#finPectDeep","#finPectMid",null,pal,0.7);
+    f.finP.g.setAttribute("transform-origin","21px 5px");
+    use(head,"#artPectTrail",pal.core,1.1,0.5);
+  } else {
+    f.finA=null; f.finD=null; f.finP=null;
+    var tail2=mk("g",{},body); f.tailG=tail2;
+    f.finC={g:tail2,deep:null,mid:null,top:null,lag:1.8};
+    var td=mk("g",{},tail2); use(td,"#finSchoolDeep",pal.fin,null,pal.fOp[0]);
+    var tm=mk("g",{},tail2); use(tm,"#finSchoolMid",pal.fin,1.0,pal.fOp[1]);
+    tail2.setAttribute("transform-origin","-30px 0px");
+    use(body,"#tintSchool",pal.body,null,pal.bOp);
+    use(body,"#artSchool",pal.under,2.6);
+    use(body,"#artSchool",pal.core,1.2);
+    f.headG=null;
+  }
+}
+function setFishTransform(f){
+  var sc=f.scale*(f.spawnS<1?0.55+0.45*f.spawnS:1);
+  f.root.setAttribute("transform","translate("+f.x.toFixed(1)+" "+f.y.toFixed(1)+") rotate("+(f.head*180/Math.PI).toFixed(1)+") scale("+(f.flip?-sc:sc).toFixed(3)+" "+sc.toFixed(3)+")");
+  f.root.setAttribute("opacity",f.dead?0:(f.spawnS<1?(0.25+0.75*f.spawnS):1).toFixed(2));
+}
+/* the wave — the seed's pure function, exposed for the bench */
+function waveAt(w){ return {head:3.0*Math.sin(w), body:5.5*Math.sin(w-0.7), tail:13.0*Math.sin(w-1.5)}; }
+window.__wave=function(t,sp){ return waveAt(t*(1.2+2.1*sp)); };
+function poseFish(f,t){
+  var amp=1+1.1*f.flare;
+  var spd=clamp(f.speed/(f.kind==="hero"?26:16),0.4,2.2);
+  var wv=waveAt(f.w);
+  var bodyA=wv.body*amp, headA=(wv.head-5*f.flare)*amp*0.6, tailA=wv.tail*amp;
+  f.bodyG.setAttribute("transform","rotate("+bodyA.toFixed(2)+" 0 0)");
+  if(f.headG)f.headG.setAttribute("transform","rotate("+headA.toFixed(2)+" 26 0)");
+  f.tailG.setAttribute("transform","rotate("+tailA.toFixed(2)+(f.kind==="hero"?" -40 0":" 0 0")+")");
+  var fins=[[f.finD,1.15],[f.finA,1.25],[f.finC,1.05],[f.finP,1.5]];
+  for(var i=0;i<fins.length;i++){
+    var F=fins[i][0]; if(!F)continue;
+    var sw=Math.sin(f.w*0.62-F.lag)*5*amp*fins[i][1];
+    var sc=1+0.55*f.flare;
+    F.g.setAttribute("transform","rotate("+sw.toFixed(2)+") scale("+sc.toFixed(3)+")");
+    if(F.deep)F.deep.setAttribute("opacity",(0.85+0.3*f.flare).toFixed(2));
+    if(F.mid)F.mid.setAttribute("opacity",(0.85+0.3*f.flare).toFixed(2));
+    if(F.top)F.top.setAttribute("opacity",(0.8+0.45*f.flare).toFixed(2));
+  }
+  f.wv={head:+(wv.head*amp).toFixed(2),body:+(wv.body*amp).toFixed(2),tail:+(wv.tail*amp).toFixed(2)};
+}
+
+/* ================= GRASS + BUBBLES (posed; observed animates) ======= */
+var GRASS_COLS=["#27c24c","#39ff6a","#1f9d43","#7dff9a"];
+var blades=[]; window.__blades=blades;
+(function(){
+  var g=$("grass");
+  for(var i=0;i<23;i++){
+    var wrap=mk("g",{},g);
+    use(wrap,"#blade",GRASS_COLS[i%4],null);
+    var sc=[1.15,0.8,1.3,0.95,1.2,0.75,1.35,0.9,1.1,0.7,1.25,0.85][i%12]*(i%3===2?-1:1);
+    var bx=16+i*28;
+    wrap.setAttribute("transform","translate("+bx+" 484) scale("+sc+" "+Math.abs(sc)+")");
+    blades.push({g:wrap,x:bx,sx:sc,sy:Math.abs(sc),ph:i*1.37,amp:3.4+((i*7)%10)/4});
+  }
+  var b=$("bubbles");
+  /* BUBBLES PASS (Nov 9, 2026, 22:33 EST): three floor streams —
+     anchors on the floor line among the grass roots; four bubbles
+     alive per stream, twelve total. Each bubble rides a stream
+     phase p in [0,1): floor y=452 -> top waterline y=26, wobbling
+     on a swept sine, radius growing x1.00 -> x1.45 across the
+     rise, fading out over the last stretch as it pops AT the
+     waterline, then respawning at the floor. Speeds are plain
+     Math.random (dressing, deliberately NOT the house seat —
+     the seat feeds the war, never the weather). */
+  var STREAM_X=[140,330,508];
+  for(var s=0;s<3;s++)for(var k=0;k<4;k++){
+    var c=mk("circle",{cx:0,cy:0,r:3},b);
+    window.__bubbles=window.__bubbles||[];
+    window.__bubbles.push({el:c,sx:STREAM_X[s],p:k/4+Math.random()*0.18,
+      sp:0.028+Math.random()*0.022,r0:2.1+Math.random()*1.7,
+      wob:4+Math.random()*4,ph:Math.random()*6.283});
+  }
+})();
+window.__PALETTES=PALETTES; window.__buildFish=buildFish; window.__poseFish=poseFish;
+window.__setFishTransform=setFishTransform; window.__poseGrass=poseGrass; window.__poseSlick=poseSlick;
+window.__mk=mk; window.__fishLayer=fishLayer; window.__burstLayer=burstLayer;
+window.__PALETTES=PALETTES; window.__buildFish=buildFish; window.__poseFish=poseFish;
+window.__setFishTransform=setFishTransform; window.__poseGrass=poseGrass; window.__poseSlick=poseSlick;
+})();
+function poseGrass(t,animate){
+  for(var i=0;i<blades.length;i++){
+    var bl=blades[i];
+    var rot=animate?Math.sin(t*0.9+bl.ph)*bl.amp:Math.sin(bl.ph)*2;
+    bl.g.setAttribute("transform","translate("+bl.x+" 484) scale("+bl.sx+" "+bl.sy+") rotate("+rot.toFixed(2)+")");
+  }
+  var bs=window.__bubbles||[];
+  for(var j=0;j<bs.length;j++){
+    var bb=bs[j];
+    /* BUBBLES PASS: advance the phase only while observed; the
+       rest pose (poseGrass(0,false)) freezes each bubble where
+       its stream phase stands — parked mid-rise in the still.
+       dt = the governor's frame estimate (~1/60 s at 60 Hz),
+       the same convention __stepFish runs on. */
+    if(animate)bb.p=(bb.p+bb.sp/60)%1;
+    var p=bb.p, y=452-426*p,
+        x=bb.sx+Math.sin(p*6.283+bb.ph)*bb.wob,
+        op=p<0.06?(0.75*p/0.06):(p>0.9?0.75*(1-p)/0.1:0.75);
+    bb.el.setAttribute("cx",x.toFixed(1)); bb.el.setAttribute("cy",y.toFixed(1));
+    bb.el.setAttribute("r",(bb.r0*(1+0.45*p)).toFixed(2));
+    bb.el.setAttribute("opacity",(animate?op:0.4).toFixed(2));
+  }
+}
+/* the oil slick breathes between its called steps — observed only */
+var SLICKS=[["#16283c","#17352a","#201a38"],["#1d1430","#16283c","#17352a"],["#123528","#1d1430","#16283c"],["#122e20","#16283c","#201a38"],["#182a42","#122e20","#1d1430"]];
+var blades=window.__blades;
+var slickEls=document.querySelectorAll("[data-slick]");
+function poseSlick(t){
+  for(var i=0;i<slickEls.length;i++){
+    var cyc=SLICKS[i], k=(Math.sin(t*0.24+i*1.7)+1)/2;
+    slickEls[i].setAttribute("stroke",k<0.5?cyc[0]:(k<0.8?cyc[1]:cyc[2]));
+  }
+}
+</script>
+<script>
+var obsElapsed=0;
+var PALETTES=window.__PALETTES, buildFish=window.__buildFish, poseFish=window.__poseFish,
+    setFishTransform=window.__setFishTransform, mk=window.__mk,
+    fishLayer=window.__fishLayer, burstLayer=window.__burstLayer,
+    RAILS=window.__rails,
+    fishes=window.__fishes;
+(function(){
+"use strict";
+function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+function angNorm(a){while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a;}
+function sstep(x){if(x<=0)return 0;if(x>=1)return 1;return x*x*x*(x*(x*6-15)+10);}
+var T={x:0,y:0,w:0};
+
+/* random waypoint INSIDE the margins — the fish never chase the glass */
+function pickWaypoint(f){
+  f.wx=T.x=90+Math.random()*460; f.wy=T.y=110+Math.random()*260; return f;
+}
+
+/* ================= THE RAIL RIDE (V2) =================
+   A rail rider advances its arc length at the v1 hero cruise
+   speed (direction dir = ±1); its body is PINNED to the rail —
+   no lateral drift can ever open between the fish and its curve,
+   which is what makes head-on meetings exact events of the
+   paths. Heading eases toward the rail tangent under the same
+   hard turn cap as free swimming (hero 1.15 rad/s; ×1.7 in a
+   fight) — never a snap. Pole passes are detected by the
+   crossing of a pole arc position; each pass rolls the switch
+   coin (p = 1/2): an unscripted choice at an equal-and-opposite
+   point. */
+var railStats={switches:0, encounters:0, geoFights:0, leashFights:0, polePasses:0,
+               tally:{yin:{wins:0,losses:0}, yang:{wins:0,losses:0}}};
+var encounters=[];
+window.__railState=railStats;
+window.__encounters=encounters;
+
+/* ================= THE TERM BATTLE LEDGER (V2, amendment 3) =====
+   A persistent war record across sessions: YIN WINS · YANG WINS ·
+   SPAWNS · RESPAWNS, kept in the same guarded localStorage
+   manner as the house's other faces — every read and write in
+   try/catch; absent or throwing storage degrades to in-session
+   counts, never a crash. Persistence grade: NO MEASURE (the
+   watch wrapper's retention across launches is untested). */
+var TERM_KEY="apexBetta.term.v2";
+var term={yinWins:0, yangWins:0, spawns:0, respawns:0, sigs:0, seeded:0};
+var termRaw="";
+try{
+  termRaw=window.localStorage.getItem(TERM_KEY)||"";
+  if(termRaw){
+    var tp=JSON.parse(termRaw);
+    for(var tk in term)if(typeof tp[tk]==="number")term[tk]=tp[tk];
+  }
+}catch(e){ termRaw=""; }
+window.__term=term;
+window.__termSave=function(){
+  try{ window.localStorage.setItem(TERM_KEY,JSON.stringify(term)); }catch(e){}
+};
+railStats.tally.yin.wins=term.yinWins;  railStats.tally.yin.losses=term.yangWins;
+railStats.tally.yang.wins=term.yangWins; railStats.tally.yang.losses=term.yinWins;
+
+/* ================= THE HOUSE RNG SEAT (V2, amendment 3) =========
+   A small deterministic generator, written plainly: a 32-bit
+   mulberry step. It seats ONLY the unpredictability the design
+   calls for — the switch coin at the turning points, the rail a
+   returning principal takes, the riders' opening phases. The
+   GEOMETRY earns the distribution of meetings; this generator
+   only shuffles which equal-and-opposite choice is taken. Its
+   seed comes from no clock: an FNV hash of the stored term
+   record, stirred with the count of keeper signals the face has
+   received across its life — the face's own history is its
+   entropy. ONE stream, shared by both mirrored riders through
+   the same routine: there is no per-side stream that could tilt
+   the war. */
+function fnv1a(str){ var h=0x811c9dc5; for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,0x01000193); } return h>>>0; }
+var rngState=(fnv1a(termRaw||"apex-betta-maiden")^Math.imul((term.sigs|0)+1,0x9E3779B9))>>>0;
+if(!rngState)rngState=0x2545F491;
+var RNG_SEED=rngState;
+function hrng(){
+  rngState=(rngState+0x6D2B79F5)>>>0;
+  var t=rngState;
+  t=Math.imul(t^(t>>>15),t|1);
+  t^=t+Math.imul(t^(t>>>7),t|61);
+  return ((t^(t>>>14))>>>0)/4294967296;
+}
+window.__hrng=hrng;
+window.__rngInfo={seed:RNG_SEED, seat:"house"};
+function railPos(f){ return RAILS[f.rail].posAt(f.rs); }
+function railDist(s1,s2,tot){ var d=Math.abs(s1-s2)%tot; return d>tot/2?tot-d:d; }
+function stepRailFish(f,dt,t){
+  var rail=RAILS[f.rail], tot=rail.total;
+  f.rs=(f.rs+f.dir*f.speed*dt+tot)%tot;
+  var pNow=railPos(f);
+  /* POLE PASSES ARE FIELD EVENTS: a crossing of y=225 — the
+     figure's own equator, the median of its rotation — inside
+     the poles' x-gate (|x-320| < 34, the lobe eyes' own span).
+     Both rails cross the equator exactly at the poles, so a
+     pass is a pass on either curve, by construction equal and
+     opposite. The count is of ZONE ENTRIES: one per crossing,
+     never twice for one pass. */
+  var zoneNow=pNow.y<225?0:1;
+  if(f.poleZone===undefined)f.poleZone=zoneNow;
+  if(zoneNow!==f.poleZone){
+    if(Math.abs(pNow.x-320)<34){
+      railStats.polePasses++; f.statPoles++;
+      /* THE SWITCH COIN — drawn from the house RNG seat, one
+         shared stream for both mirrored riders (see the seat) */
+      if(hrng()<0.5){
+        var from=f.rail, poleName=(zoneNow===0?"T":"B");
+        f.rail=(f.rail==="solid")?"dotted":"solid";
+        f.rs=window.__railPoles[f.rail][poleName];
+        railStats.switches++; f.statSwitches++;
+        encounters.push({t:+t.toFixed(1),type:"switch",fish:f.side,from:from,to:f.rail,pole:poleName});
+      }
+    }
+    f.poleZone=zoneNow;
+  }
+  f.rsPrev=f.rs;
+  var p=railPos(f);
+  f.x=p.x; f.y=p.y;
+  var des=p.a+(f.dir<0?Math.PI:0);
+  var dh=angNorm(des-f.head);
+  var maxTurn=1.15*dt*(1+2.2*sstep(clamp((Math.abs(dh)-0.9)/1.4,0,1)));
+  f.head+=clamp(dh,-maxTurn,maxTurn);
+  var want=f.cruise*(1-0.45*Math.min(1,Math.abs(dh)/1.2));
+  f.speed+=(want-f.speed)*Math.min(1,dt*2.2);
+  f.vx=Math.cos(f.head)*f.speed; f.vy=Math.sin(f.head)*f.speed;
+  f.flip=(Math.cos(f.head)<0);
+  f.w+=dt*(1.2+2.1*clamp(f.speed/26,0.3,2.4));
+  f.flare+=(0-f.flare)*Math.min(1,dt*2.5);
+  poseFish(f,t);
+  setFishTransform(f);
+}
+function stepFish(f,dt,t){
+  if(f.dead)return;
+  if(f.spawnS<1)f.spawnS=Math.min(1,f.spawnS+dt/2.2);
+  var mode=f.mode, tx, ty, wantSpeed;
+  var fight=window.__fight;
+  var base=f.kind==="hero"?26:16;
+  if(mode==="rail"&&!fight){ stepRailFish(f,dt,t); return; }
+  if(mode==="retake"&&!fight){
+    /* a principal off its rail (respawned, or knocked clear by a
+       fight) swims for the NEAREST pole; at the pole it takes a
+       rail again — which rail drawn from the house seat — and
+       the ride resumes. Until then it steers free, below. */
+    var dTp=Math.sqrt((f.x-320)*(f.x-320)+(f.y-107)*(f.y-107));
+    var dBt=Math.sqrt((f.x-320)*(f.x-320)+(f.y-343)*(f.y-343));
+    var poleN=(dTp<dBt)?"T":"B";
+    if(Math.min(dTp,dBt)<26){
+      f.rail=hrng()<0.5?"solid":"dotted";
+      f.rs=window.__railPoles[f.rail][poleN]; f.rsPrev=f.rs;
+      f.mode="rail";
+      encounters.push({t:+t.toFixed(1),type:"retake",fish:f.side,rail:f.rail,pole:poleN});
+      stepRailFish(f,dt,t); return;
+    }
+    f.wx=320; f.wy=(poleN==="T")?107:343;
+  }
+  if(mode==="fight"&&fight&&fight.a&&fight.b){
+    var foe=(fight.a===f)?fight.b:fight.a;
+    if(fight.phase==="approach"){
+      /* charge point: past the foe's nose, along its heading —
+         they sweep THROUGH each other, never stop nose to nose */
+      tx=foe.x+Math.cos(foe.head)*70; ty=foe.y+Math.sin(foe.head)*70;
+      wantSpeed=base*2.5;
+    } else if(fight.phase==="clash"){
+      tx=f.x+Math.cos(f.head)*140; ty=f.y+Math.sin(f.head)*140; wantSpeed=base*1.8;
+    } else {
+      tx=f.x+Math.cos(f.head)*170; ty=f.y+Math.sin(f.head)*170; wantSpeed=base*1.7;
+    }
+    f.flare+= ((fight.phase==="retreat"?0.25:1)-f.flare)*Math.min(1,dt*4);
+  } else {
+    tx=f.wx; ty=f.wy;
+    var dxw=tx-f.x, dyw=ty-f.y;
+    if(mode!=="retake"&&(Math.sqrt(dxw*dxw+dyw*dyw)<46||f.wpT<=0)){ pickWaypoint(f); f.wpT=9+Math.random()*10; tx=f.wx; ty=f.wy; }
+    f.wpT-=dt;
+    wantSpeed=base*(0.82+0.3*Math.sin(t*0.11+f.ph));
+    f.flare+=(0-f.flare)*Math.min(1,dt*2.5);
+  }
+  /* cornered at the glass: when the steering saturates and the
+     target sits BEHIND the fish, add the turn-bias arc the seed
+     applies at the margins (angNorm pull toward the field) so
+     pursuit near the walls sweeps out instead of grazing along
+     them — V2 restored this from the seed's free-swim law; V1
+     dropped it and its floaters ground the glass in long sims */
+  if(Math.abs(dh)>1.2&&mode!=="fight"){
+    if(f.x<120||f.y<130)f.head+=angNorm(Math.PI/4-f.head)*dt*1.4;
+    if(f.x>520)f.head+=angNorm(Math.PI*0.75-f.head)*dt*1.4;
+    if(f.y>390)f.head+=angNorm(-Math.PI/2-f.head)*dt*1.4;
+  }
+  var des=Math.atan2(ty-f.y,tx-f.x);
+  var dh=angNorm(des-f.head);
+  var maxTurn=(f.kind==="hero"?1.15:1.35)*dt*(mode==="fight"?1.7:1);
+  f.head+=clamp(dh,-maxTurn,maxTurn);
+  var spT=wantSpeed*(1-0.45*Math.min(1,Math.abs(dh)/1.2));
+  f.speed+=(spT-f.speed)*Math.min(1,dt*2.2);
+  f.x+=Math.cos(f.head)*f.speed*dt;
+  f.y+=Math.sin(f.head)*f.speed*dt;
+  f.vx=Math.cos(f.head)*f.speed; f.vy=Math.sin(f.head)*f.speed;
+  /* soft margins — steer back in over an arc, never a bounce */
+  var mX=74,mTop=92,mBot=404;
+  if(f.x<mX)f.head+=angNorm(0-f.head)*dt*1.6;
+  if(f.x>640-mX)f.head+=angNorm(Math.PI-f.head)*dt*1.6;
+  if(f.y<mTop)f.head+=angNorm(Math.PI/2-f.head)*dt*1.6;
+  if(f.y>mBot)f.head+=angNorm(-Math.PI/2-f.head)*dt*1.6;
+  f.x=clamp(f.x,26,614); f.y=clamp(f.y,60,436);
+  f.flip=(Math.cos(f.head)<0);
+  f.w+=dt*(1.2+2.1*clamp(f.speed/base,0.3,2.4));
+  poseFish(f,t);
+  setFishTransform(f);
+}
+
+/* ---- obliteration: a burst of the fish's own colours ---- */
+var bursts=[];
+function obliterate(f){
+  f.dead=true; f.root.setAttribute("opacity",0);
+  var parts=[];
+  for(var i=0;i<26;i++){
+    var c=mk("circle",{r:(1.2+Math.random()*2.2).toFixed(1),fill:i%3?f.pal.core:f.pal.fin,opacity:0.95},burstLayer);
+    var a=Math.random()*Math.PI*2, sp=14+Math.random()*44;
+    parts.push({el:c,x:f.x,y:f.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-6,life:0,max:1.5+Math.random()*1.3});
+  }
+  /* a few fin-shard strokes, dragging like feathers as they fade */
+  for(var j=0;j<7;j++){
+    var L=mk("line",{x1:0,y1:0,x2:-(14+Math.random()*20),y2:(Math.random()*16-8),stroke:f.pal.fin,"stroke-width":1.4,opacity:0.8},burstLayer);
+    var a2=Math.random()*Math.PI*2, sp2=10+Math.random()*30;
+    parts.push({el:L,x:f.x,y:f.y,vx:Math.cos(a2)*sp2,vy:Math.sin(a2)*sp2,life:0,max:1.9+Math.random()*1.2,spin:(Math.random()*70-35)});
+  }
+  bursts.push({parts:parts,t:0});
+  window.__respawnAt=obsElapsed+3+Math.random()*4;
+  window.__pendingRespawn=f;
+}
+function stepBursts(dt){
+  for(var bi=bursts.length-1;bi>=0;bi--){
+    var B=bursts[bi]; B.t+=dt; var alive=false;
+    for(var i=0;i<B.parts.length;i++){
+      var p=B.parts[i]; p.life+=dt;
+      if(p.life>=p.max){ p.el.setAttribute("opacity",0); continue; }
+      alive=true;
+      p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=0.985; p.vy=p.vy*0.985+3.5*dt;
+      var op=(1-p.life/p.max)*0.95;
+      p.el.setAttribute("transform","translate("+p.x.toFixed(1)+" "+p.y.toFixed(1)+(p.spin?" rotate("+(p.spin*p.life).toFixed(1)+")":"")+")");
+      p.el.setAttribute("opacity",op.toFixed(2));
+    }
+    if(!alive){ for(var k=0;k<B.parts.length;k++)B.parts[k].el.remove(); bursts.splice(bi,1); }
+  }
+}
+function doRespawn(){
+  var f=window.__pendingRespawn; window.__pendingRespawn=null; if(!f)return;
+  var seatIdx=PALETTES.indexOf(f.pal);
+  var used={}; fishes.forEach(function(o){ if(o!==f&&!o.dead)used[o.pal.name]=1; });
+  var cands=PALETTES.filter(function(p){return !used[p.name];});
+  /* a principal keeps its own palette seat if the draw allows */
+  if(seatIdx<2 && cands.indexOf(f.pal)>=0 && Math.random()<0.5){ /* keep */ }
+  else if(cands.length){ f.pal=cands[Math.floor(Math.random()*cands.length)]; }
+  /* V2: a principal NEVER changes colours — yin stays red, yang
+     stays blue, seat and side alike (the owner's mapping) */
+  if(f.side)f.pal=(f.side==="yin")?PALETTES[1]:PALETTES[0];
+  var old=f.root; var parent=old.parentNode;
+  var nf={kind:f.kind, scale:f.scale, pal:f.pal, x:0,y:0, head:0, speed:10, w:Math.random()*6,
+          flare:0, mode:"roam", dead:false, spawnS:0, wpT:5, ph:f.ph};
+  /* V2: the principal's seat survives its death — the new fish
+     keeps the side, its colour, and its rail state fields; it
+     re-enters FREE at an edge and takes a rail when the tank is
+     quiet (stepFish carries it). Floaters unchanged from V1. */
+  if(f.side){ nf.side=f.side; nf.role="principal"; nf.rail=null; nf.mode="retake";
+    nf.cruise=f.cruise; nf.dir=f.dir; nf.statPoles=0; nf.statSwitches=0; nf.vx=0; nf.vy=0;
+    nf.yin=f.yin; nf.yang=f.yang; nf.mirror=f.mirror; nf.hex=f.hex; }
+  var side=Math.floor(Math.random()*4);
+  if(side===0){nf.x=54; nf.y=130+Math.random()*220; nf.head=0.5-Math.random()*0.6;}
+  else if(side===1){nf.x=586; nf.y=130+Math.random()*220; nf.head=Math.PI-0.5+Math.random()*0.6;}
+  else if(side===2){nf.x=140+Math.random()*360; nf.y=104; nf.head=Math.PI/2+(Math.random()-0.5)*0.7;}
+  else {nf.x=140+Math.random()*360; nf.y=392; nf.head=-Math.PI/2+(Math.random()-0.5)*0.7;}
+  pickWaypoint(nf);
+  buildFish(nf);
+  fishes[fishes.indexOf(f)]=nf;
+  old.remove();
+  poseFish(nf,0); setFishTransform(nf);
+  /* the Term Battle ledger counts every return to the water */
+  term.spawns++; term.respawns++;
+  window.__termSave();
+  if(window.__updateTerm)window.__updateTerm();
+}
+
+/* fishes is bound after the roster exists; rebind lazily inside stepFight */
+/* ---- the fight director: V2 splits its two origins ----
+   GEOMETRY is the principals' headline: when both ride rails
+   (or one rides and the other swims free toward the figure) and
+   their paths close within the clash distance, the encounter
+   itself starts the fight — no timer, no dice on WHETHER they
+   meet. Cooldown 12 s after any fight; re-arm 20 s.
+   THE LEASH survives as a FLOOR for the floaters only (and a
+   free principal): it may pair two floaters, or a floater with
+   a free principal — it NEVER pairs a rail rider. */
+window.__fight=null; window.__nextFightAt=45+Math.random()*75; window.__respawnAt=-1; window.__pendingRespawn=null;
+window.__fightOrigin=null;
+var PIN_FIGHT=/[?&]fight=1/.test(window.location.search);
+/* the VICTORY FLASH bookkeeping (V2 amendment): a principal kill
+   fires the disc flash in the winner's colour; the beaten
+   principal's respawn clock starts only when the flash ends. */
+window.__flash=null;
+window.__deferredRespawn={f:null,due:0};
+var fightCooldownUntil=0, fightArmedAt=0, fightPhaseTick=0;
+function princip(f){ return f.role==="principal"; }
+function stepFight(dt){
+  if(!fishes&&window.__fishes)fishes=window.__fishes;
+  var fight=window.__fight;
+  if(!fight){
+    /* -- geometric encounters: the paths themselves decide.
+       The probe runs at HALF RATE — each frame it reads the
+       riders exactly as the previous frame left them (the
+       mirrored routine is single-phase: the probe is not a
+       second pass over the school; the sim proved the geometry
+       produces the meetings at this rate) -- */
+    fightPhaseTick++;
+    var probeNow=(fightPhaseTick%2===0);
+    if(probeNow&&obsElapsed>=fightArmedAt){
+      var P=fishes.filter(function(f){return princip(f)&&!f.dead;});
+      if(P.length===2){
+        var p0=P[0], p1=P[1];
+        var d01=Math.sqrt((p0.x-p1.x)*(p0.x-p1.x)+(p0.y-p1.y)*(p0.y-p1.y));
+        if(d01<52){
+          /* a rage meeting starts a fight now; a grazing pass
+             (low closing speed) is logged as an encounter and the
+             two swim on — the geometry produced the meeting, the
+             temper of the paths decides the combat (the v1 clash
+             distance is 52: inside it, a fight; a pass at an
+             angle can cross 52 without the charge connecting) */
+          var rvx=(p0.vx||0)-(p1.vx||0), rvy=(p0.vy||0)-(p1.vy||0);
+          var closing=Math.sqrt(rvx*rvx+rvy*rvy);
+          if(closing>30){
+            window.__fight=fight={a:p0,b:p1,phase:"clash",t:0,geo:true};
+            window.__fightOrigin="geometry";
+            railStats.encounters++;
+            railStats.geoFights++;
+            encounters.push({t:+obsElapsed.toFixed(1),type:"geo-fight",a:p0.pal.name,b:p1.pal.name,d:+d01.toFixed(0),closing:+closing.toFixed(0)});
+            p0.mode="fight"; p1.mode="fight";
+            return;
+          } else if(!window.__grazeCd||obsElapsed>window.__grazeCd){
+            window.__grazeCd=obsElapsed+4;
+            railStats.encounters++;
+            encounters.push({t:+obsElapsed.toFixed(1),type:"graze",a:p0.pal.name,b:p1.pal.name,d:+d01.toFixed(0),closing:+closing.toFixed(0)});
+          }
+        }
+      }
+    }
+    /* -- the leash floor: floaters (+ free principal) only -- */
+    if(obsElapsed>=window.__nextFightAt){
+      var eligible=fishes.filter(function(f){return !f.dead&&!(princip(f)&&f.mode==="rail");});
+      if(eligible.length>=2){
+        var i=Math.floor(Math.random()*eligible.length), j;
+        do{ j=Math.floor(Math.random()*eligible.length); }while(j===i);
+        window.__fight=fight={a:eligible[i], b:eligible[j], phase:"approach", t:0, geo:false};
+        window.__fightOrigin="leash";
+        railStats.leashFights++;
+        fight.a.mode="fight"; fight.b.mode="fight";
+      } else window.__nextFightAt=obsElapsed+20;
+    }
+    return;
+  }
+  fight.t+=dt;
+  var a=fight.a, b=fight.b;
+  if(a.dead||b.dead){ endFight(false); return; }
+  var d=Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
+  if(fight.phase==="approach"&&(d<52||fight.t>7)){ fight.phase="clash"; fight.t=0; }
+  else if(fight.phase==="clash"&&fight.t>0.55){
+    if(Math.random()<0.25){
+      var loser=Math.random()<0.5?a:b, winner=(loser===a)?b:a;
+      var bothP=princip(a)&&princip(b);
+      endFight(true);
+      /* principal-vs-principal kill: the winner takes the tally
+         and the DISC; the flash runs; the beaten principal
+         respawns only when the flash completes. A kill in any
+         mixed fight keeps the v1 behaviour whole. */
+      if(bothP){
+        railStats.tally[winner.side].wins++;
+        railStats.tally[loser.side].losses++;
+        term.yinWins=railStats.tally.yin.wins;
+        term.yangWins=railStats.tally.yang.wins;
+        window.__termSave();
+        if(window.__updateTerm)window.__updateTerm();
+        window.__flash={side:winner.side,color:winner.pal.core,t:0,dur:3.6,
+          label:(winner.side==="yin"?"YIN WINS":"YANG WINS")};
+        window.__deferredRespawn.f=loser;
+      }
+      obliterate(loser);
+      if(bothP){ window.__respawnAt=-1; window.__pendingRespawn=null; }
+      return;
+    }
+    fight.phase="retreat"; fight.t=0;
+  }
+  else if(fight.phase==="retreat"&&fight.t>1.5){ endFight(false); }
+}
+function endFight(kill){
+  var fight=window.__fight; if(!fight)return;
+  [fight.a,fight.b].forEach(function(f){
+    if(f.dead)return;
+    if(princip(f)){
+      /* a principal returns to its rail once clear of the clash —
+         it re-takes the rail at the next pole, on the blend */
+      if(f.mode!=="rail"){ f.mode="retake"; f.retakeAt=Infinity; f.rail=null; }
+      f.wpT=2+Math.random()*4;
+    } else { f.mode="roam"; f.wpT=2+Math.random()*4; pickWaypoint(f); }
+  });
+  window.__fight=null;
+  window.__nextFightAt=obsElapsed+45+Math.random()*75;
+  fightCooldownUntil=obsElapsed+12;
+  fightArmedAt=obsElapsed+20;
+}
+
+/* ---- THE VICTORY FLASH (V2, amendment 1) ----
+   When a principal wins a principal fight, the whole disc takes
+   the winner's colour in a breathing swell: the fill rides
+   semi-transparent -> transparent -> opaque (the owner's words)
+   as the colour floods the disc, holds a beat at full, then
+   releases back to the line-work figure. A few seconds, start to
+   finish. The beaten principal's respawn clock starts ONLY when
+   the flash completes — the ceremony is paid in full before the
+   tank refills. The flash advances only while OBSERVED (the
+   governor calls this with frame dt); at REST its envelope
+   freezes and the still poses it mid-swell — never broken. */
+function flashEnv(k){
+  /* k in [0,1]: dip to near-transparent early (the colour first
+     THINS as it spreads), swell to opaque, hold, release */
+  if(k<0.16){ var u=k/0.16; return 0.55-0.45*u; }        /* ~0.55 -> 0.10 */
+  if(k<0.50){ var v=(k-0.16)/0.34; return 0.10+0.90*sstep(v); }
+  if(k<0.78){ return 1; }
+  var w=(k-0.78)/0.22; return 1-sstep(w);
+}
+function paintFlash(){
+  var disc=document.getElementById("flashDisc"), lab=document.getElementById("flashLabel"),
+      labG=document.getElementById("flashLabelGlow");
+  var fl=window.__flash;
+  if(!disc)return;
+  if(!fl){ disc.setAttribute("opacity",0); if(lab)lab.setAttribute("opacity",0); if(labG)labG.setAttribute("opacity",0); return; }
+  var k=fl.t/fl.dur, breath=0.92+0.08*Math.sin(fl.t*4.2);
+  var op=flashEnv(k)*breath;
+  disc.setAttribute("fill",fl.color);
+  disc.setAttribute("opacity",op.toFixed(3));
+  var lop=(k<0.2?0:Math.min(1,(k-0.2)/0.2))*(k>0.8?Math.max(0,1-(k-0.8)/0.2):1);
+  if(lab){ lab.textContent=fl.label; lab.setAttribute("fill",fl.color); lab.setAttribute("opacity",lop.toFixed(2)); }
+  if(labG){ labG.textContent=fl.label; labG.setAttribute("opacity",(lop*0.9).toFixed(2)); }
+}
+function stepFlash(dt){
+  var fl=window.__flash; if(!fl)return;
+  fl.t+=dt;
+  if(fl.t>=fl.dur){
+    window.__flash=null;
+    /* the ceremony is complete: NOW the beaten fish may return */
+    var dr=window.__deferredRespawn;
+    if(dr.f){ window.__pendingRespawn=dr.f; window.__respawnAt=obsElapsed+0.4; dr.f=null; }
+  }
+  paintFlash();
+}
+window.__stepFlash=stepFlash;
+window.__paintFlash=paintFlash;
+
+/* expose the bench handles the driver needs */
+window.__fightStep=stepFight; window.__stepFish=stepFish; window.__stepBursts=stepBursts;
+window.__doRespawn=doRespawn; window.__respawnState=function(){return {at:window.__respawnAt,pending:!!window.__pendingRespawn};};
+window.__pickWaypoint=pickWaypoint;
+window.__fightState=function(){var f=window.__fight;return f?{phase:f.phase,t:+f.t.toFixed(2)}:null;};
+window.__setNextFight=function(v){ window.__nextFightAt=v; };
+window.__obsElapsed=function(){ return obsElapsed; };
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var PALETTES=window.__PALETTES, buildFish=window.__buildFish, poseFish=window.__poseFish,
+    setFishTransform=window.__setFishTransform, pickWaypoint=window.__pickWaypoint,
+    poseGrass=window.__poseGrass, poseSlick=window.__poseSlick;
+/* ================= THE SCHOOL — two riders + two floaters ======
+   THE MIRROR (V2, the owner's symmetry principle): ONE rider
+   definition, instanced twice under the half-turn symmetry of
+   the disc — rotation by PI about the centre (320,225), written
+   here as (yin, yang) = (+1,+1) and its transform (-1,-1). The
+   SAME code path steps both riders; the second is the first with
+   every signed field negated. Nothing about either side is
+   hand-written separately: yang rides the geometry as yin does,
+   mirrored — the system is exactly fair between the two sides,
+   and the war's randomness is the symmetric motion itself: the
+   phase drift between the riders, and the choices the house
+   seat shuffles at the equal-and-opposite turning points.
+     YANG = the BLUE fish (PALETTES[0]), solid rail, dir -1.
+     YIN  = the RED fish (PALETTES[1]), dotted rail, dir +1 —
+   the owner's mapping (Nov 9, 2026, 22:22 EST). Each rider is
+   the other rotated half a turn: position negated about the
+   centre, heading negated, arc length on its own rail measured
+   from its own pole — mirror images in one routine.
+   The floaters (school art, UAP cyan + magenta) swim free as V1. */
+function rider(side){
+  var m=(side==="yang")?-1:1;
+  return {
+    kind:"hero", role:"principal", side:side, mirror:m,
+    scale:0.92, pal:(side==="yang")?PALETTES[0]:PALETTES[1],
+    rail:(side==="yang")?"solid":"dotted",
+    x:320, y:(m<0)?107:343, head:(m<0)?-Math.PI/2:Math.PI/2,
+    rs:0, rsPrev:0, dir:-m, cruise:22,
+    yin:m, yang:m, hex:m,
+    statPoles:0, statSwitches:0, vx:0, vy:0,
+    speed:22, w:0, flare:0, mode:"rail", dead:false, spawnS:1,
+    wpT:6, ph:0, retakeAt:Infinity
+  };
+}
+var fishes=[
+ rider("yang"),
+ rider("yin"),
+ {kind:"school",  scale:1.0,  pal:PALETTES[2], x:150, y:330, head:-0.5,  speed:13, w:1.1, flare:0, mode:"roam", dead:false, spawnS:1, wpT:5, ph:4.0},
+ {kind:"school",  scale:0.88, pal:PALETTES[3], x:492, y:150, head:2.6,   speed:13, w:3.3, flare:0, mode:"roam", dead:false, spawnS:1, wpT:7, ph:5.3}
+];
+/* seat the riders on their rails, at their own poles; their
+   opening phases drawn from the house seat — shared stream */
+var RP=window.__railPoles, HR=window.__hrng;
+fishes.forEach(function(f){
+  if(f.role==="principal"){
+    f.rs=RP[f.rail][f.mirror<0?"T":"B"]; f.rsPrev=f.rs;
+    f.ph=HR()*6.283; f.w=HR()*6.283;
+    var p=window.__rails[f.rail].posAt(f.rs); f.x=p.x; f.y=p.y;
+  }
+  pickWaypoint(f); buildFish(f); poseFish(f,0); setFishTransform(f);
+});
+window.__fishes=fishes;
+
+/* ================= THE TERM BATTLE PANEL =================
+   The counts stand on the face, in the still and in motion
+   alike; the record itself is kept by the motion script. */
+var term=window.__term;
+if(!term.seeded){ term.seeded=1; if(term.spawns<4)term.spawns=4; window.__termSave(); }
+function setT(a,b,v){ var e1=document.getElementById(a), e2=document.getElementById(b); if(e1)e1.textContent=v; if(e2)e2.textContent=v; }
+function updateTerm(){
+  setT("termYinGlow","termYin","YIN "+term.yinWins);
+  setT("termYangGlow","termYang","YANG "+term.yangWins);
+  setT("termCountsGlow","termCounts","TERM · SPAWNS "+term.spawns+" · RESPAWNS "+term.respawns);
+}
+window.__updateTerm=updateTerm;
+updateTerm();
+
+/* ================= BATTERY V2 GOVERNOR — the house contract =========
+   Mirrors Merry's Garden (Nov 9) exactly in mechanism: REST still /
+   OBSERVED spectacle, the ApexFace hook, the same signal family,
+   12 s auto-exit, no wake-lock of any kind. */
+var REST="rest", OBSERVED="observed";
+var state=REST, raf=0, exitTimer=0, obsStart=0, lastMs=-1;
+var gov={state:"rest", enters:0, rests:0, lastSignal:"boot"};
+window.__governor=gov;
+window.__faceRest=true;
+function stillPass(){
+  /* one time-true still pass (V2): the riders posed ON their
+     rails — the frozen ride re-seats them exactly on the curve;
+     a rider caught off-rail (or a floater) poses where it swims.
+     The victory flash, if the face rested mid-ceremony, poses
+     its envelope frozen — the disc in the winner's colour,
+     mid-swell, never a broken state. Grass in one pose, bubbles
+     parked. No loop runs at REST. */
+  fishes.forEach(function(f){
+    if(f.dead)return;
+    if(f.mode==="rail"&&window.__rails){
+      var p=window.__rails[f.rail].posAt(f.rs); f.x=p.x; f.y=p.y;
+    }
+    poseFish(f,0); setFishTransform(f);
+  });
+  if(window.__paintFlash)window.__paintFlash();
+  updateTerm();
+  poseGrass(0,false); poseSlick(0);
+}
+function obsFrame(nowMs){
+  if(state!==OBSERVED)return;
+  var dt=0;
+  if(lastMs>=0)dt=Math.min(0.05,(nowMs-lastMs)/1000);
+  lastMs=nowMs;
+  obsElapsed=(nowMs-obsStart)/1000;
+  var t=obsElapsed;
+  window.__fightStep(dt);
+  for(var i=0;i<fishes.length;i++)window.__stepFish(fishes[i],dt,t);
+  window.__stepBursts(dt);
+  if(window.__stepFlash)window.__stepFlash(dt);
+  var rs=window.__respawnState();
+  if(rs.pending&&rs.at>0&&t>=rs.at)window.__doRespawn();
+  poseGrass(t,true); poseSlick(t);
+  refreshState(t);
+  raf=requestAnimationFrame(obsFrame);
+}
+function refreshState(t){
+  var st={t:+t.toFixed(2), state:state, fish:[], fight:window.__fightState(),
+          rails:window.__railState, flash:window.__flash?{side:window.__flash.side,t:+window.__flash.t.toFixed(2)}:null,
+          term:{yin:term.yinWins, yang:term.yangWins, spawns:term.spawns, respawns:term.respawns}};
+  fishes.forEach(function(f){
+    st.fish.push({pal:f.pal.name, kind:f.kind, side:f.side||null, rail:f.rail||null,
+      x:+f.x.toFixed(0), y:+f.y.toFixed(0),
+      head:+(f.head*180/Math.PI).toFixed(0), flare:+f.flare.toFixed(2),
+      dead:f.dead, spawn:+f.spawnS.toFixed(2), mode:f.mode});
+  });
+  window.__state=st;
+}
+function setLamp(){ /* this face carries no lamp element; state rides window.__governor */ }
+function observe(sig){
+  /* every keeper signal joins the face's history — the count is
+     part of the house seat's seed, so the war never replays */
+  term.sigs++; window.__termSave();
+  if(state!==OBSERVED){
+    state=OBSERVED; obsStart=performance.now(); lastMs=-1; obsElapsed=0;
+    gov.state="observed"; gov.enters++; window.__faceRest=false;
+    if(window.__pinFight){ window.__setNextFight(2); window.__pinFight=false; }
+    raf=requestAnimationFrame(obsFrame);
+  }
+  gov.lastSignal=sig||"signal";
+  if(exitTimer)clearTimeout(exitTimer);
+  exitTimer=setTimeout(function(){ rest("auto-exit"); },12000);   /* 12 s auto-exit */
+}
+function rest(sig){
+  if(state===REST){ gov.lastSignal=sig||gov.lastSignal; stillPass(); return; }
+  state=REST;
+  gov.state="rest"; gov.rests++; gov.lastSignal=sig||"signal";
+  window.__faceRest=true;
+  if(raf)cancelAnimationFrame(raf); raf=0;
+  if(exitTimer){ clearTimeout(exitTimer); exitTimer=0; }
+  obsElapsed=0;
+  stillPass();                            /* one time-true still pass */
+}
+function toggle(){ (state===OBSERVED)?rest("toggle"):observe("toggle"); }
+window.ApexFace={
+  observe:function(){ observe("container-observe"); },
+  rest:function(){ rest("container-rest"); },
+  toggle:toggle,
+  state:function(){ return state; }
+};
+window.__pinFight=/[?&]fight=1/.test(window.location.search);
+window.addEventListener("apex-face-observe",function(){ observe("event-observe"); });
+window.addEventListener("apex-face-rest",function(){ rest("event-rest"); });
+window.addEventListener("focus",function(){ if(!document.hidden)observe("focus"); });
+window.addEventListener("blur",function(){ rest("blur"); });
+window.addEventListener("pointerdown",function(){ observe("pointer"); },true);
+window.addEventListener("touchstart",function(){ observe("touch"); },true);
+window.addEventListener("keydown",function(){ observe("key"); },true);
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden){ rest("hidden"); }
+  else if(document.hasFocus&&document.hasFocus()){ observe("visible"); }
+  else { stillPass(); }
+});
+
+/* ---- Boot: REST still pass. The clock's own 200 ms interval (part
+   1) is the only timer that runs at rest. No wake-lock. ---- */
+stillPass(); refreshState(0);
+if(/[?&]face=observed/.test(location.search))observe("boot-param");
+})();
+</script>
+</body>
+</html>

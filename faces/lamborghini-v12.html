@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Lamborghini V12 · Motors Under Glass</title>
+<style>
+  /* LAMBORGHINI GLASS-COVER V12 FACE v2 (Nov 13, 2026) — VERTEX STORE
+     REPAIR. Family: Motors Under Glass (the CAR hero). House-drawn
+     interpretation only — no badges, no logos, no traced body lines.
+     Backdrop is this motor's own: a dark gunmetal engine-bay plate.
+
+     v2 answers the owner's on-site field report, defect for defect:
+       1. ROTATION: the face now OPENS on the crankshaft-end view and
+          TURNS up to the top view (the motor tips over in the frame),
+          then holds the top view as the working face. A tap turns
+          between the two views at any time.
+       2. THE YELLOW LINE: a spark line now runs from the crank centre
+          to the cylinder that is firing, stepping through the firing
+          order once per second like the counter of a second hand,
+          with a spark dot and halo seated on the firing trumpet.
+       3. HANDS: real hour / minute / second hands ride above the
+          glass, drawn as tapered hands over the hour numerals — the
+          v1 glass-sheen diagonals that read as stray crossed lines
+          are REMOVED.
+       4. LAYERS, bottom to top: bay plate · bezel + numerals · the
+          motor (end or top view) · glass · spark line · hands ·
+          read panel. Nothing else overlays anything else.
+     BEHAVIOUR (owner's Vertex amendment, Nov 13, 2026): the engine
+     AUTO-STARTS when the face is shown — touch is never the ignition.
+     It runs for the host window's timeout, then puts itself to sleep
+     (lamp: AT REST, still frame posed on the clock-true cylinder);
+     hidden faces sleep at once. Touch only turns the view. The run
+     length is read from the host window, in this order: a
+     window.__faceTimeoutMs / __faceTimeoutSec value set by the host,
+     a ?timeout= (seconds) or ?timeoutMs= in the address, and only
+     when the host supplies nothing, a 30 s fallback — the owner's
+     own example figure. The digital clock and the weather line are
+     fittings, not engine motion: the clock keeps its one-write-a-
+     second paint in every state, as on every sibling face.
+     Colour CALLED from the palette — solids, never layered. */
+  :root{
+    --void:#060607;        /* bay depth */
+    --plate:#101114;       /* gunmetal bay plate */
+    --seam:#1d1f24;        /* bay seams */
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --alloy:#c8ccd2;       /* cast alloy covers */
+    --alloy-lo:#7d838c;
+    --laser:#57e6ff;
+    --digit:#ffb52e;
+    --cream:#f5ead2;
+    --pulse:#ff7a1a;       /* firing pulse */
+    --spark:#ffd92e;       /* the yellow spark line */
+    --panel:#000000;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none;cursor:pointer}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #wxLine{font-size:2.2vmin;color:var(--steel);letter-spacing:.16em;margin-top:0.5vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--steel);letter-spacing:.14em;text-align:right}
+  body.live #stateLamp{color:var(--laser)}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">LAMBORGHINI&nbsp;V12</div>
+  <div id="specLbl" class="lbl">CRANKSHAFT END · 60° V12</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="V12 engine, end view turning to top view under a glass cover, with clock hands"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div><div id="wxLine">SKY — · —</div></div>
+  <div id="stateLamp">REST</div>
+</div>
+
+<script>
+"use strict";
+/* Palette in code — the same called colours as the CSS block. */
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  alloy:"#c8ccd2", alloyLo:"#7d838c", laser:"#57e6ff",
+  pulse:"#ff7a1a", spark:"#ffd92e", cream:"#f5ead2",
+  seam:"#1d1f24", void:"#060607" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+function rotPt(x, y, cx, cy, deg){
+  var a = deg * Math.PI/180, dx = x-cx, dy = y-cy;
+  return [cx + dx*Math.cos(a) - dy*Math.sin(a),
+          cy + dx*Math.sin(a) + dy*Math.cos(a)];
+}
+function clamp01(v){ return v<0 ? 0 : (v>1 ? 1 : v); }
+function easeIO(t){ t = clamp01(t); return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2, 2)/2; }
+
+var svg = document.getElementById("bore");
+var CX = 200, CY = 200;
+
+/* ---- Bay plate seams (this motor's own backdrop) -------------------- */
+[-120, -40, 40, 120].forEach(function(off){
+  el("line", {x1:CX+off, y1:56, x2:CX+off, y2:344, stroke:PAL.seam, "stroke-width":2}, svg);
+});
+
+/* ---- Bezel: brass ring, degree ticks, cardinal points, hour numerals
+   (the mariner treatment rides every face in this series). ---------- */
+el("circle", {cx:CX, cy:CY, r:196, fill:"none", stroke:PAL.brassLo, "stroke-width":7}, svg);
+var hdgRing = el("circle", {cx:CX, cy:CY, r:188, fill:"none", stroke:PAL.brass, "stroke-width":2.5}, svg);
+for(var d=0; d<360; d+=6){
+  var big = (d % 30 === 0), p1 = polar(CX, CY, big?176:181, d), p2 = polar(CX, CY, 186, d);
+  el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1],
+    stroke: big?PAL.brassHi:PAL.brassLo, "stroke-width": big?2.4:1.2}, svg);
+}
+var hdgNorth = null;
+["N","E","S","W"].forEach(function(card, i){
+  var p = polar(CX, CY, 165, i*90);
+  var t = el("text", {x:p[0], y:p[1]+5, "text-anchor":"middle",
+    fill:PAL.brassHi, "font-size":15, "font-weight":800,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = card;
+  if(card === "N") hdgNorth = t;
+});
+/* ---- Heading witness (Face Law 2): a needle inside the dial that
+   points at the stack's live heading, or sweeps in SEARCHING. The
+   cardinals above stay where the bezel's geometry puts them - the
+   witness, not the paint, carries the truth. Stack = the firewalled
+   script at the end of this file. ------------------------------- */
+var hdgNeedle = el("line", {x1:CX, y1:CY-138, x2:CX, y2:CY-118,
+  stroke:"#ff3d00", "stroke-width":3.4, "stroke-linecap":"round"}, svg);
+window.__hdgTargets = { needle:hdgNeedle, ring:hdgRing, north:hdgNorth,
+  cx:CX, cy:CY, green:PAL.brassHi, yellow:"#ffb52e", red:"#ff3d00" };
+for(var h=1; h<=12; h++){
+  var hp = polar(CX, CY, 147, h*30);
+  var ht = el("text", {x:hp[0], y:hp[1]+4.5, "text-anchor":"middle",
+    fill:"#f5ead2", "font-size":12.5, "font-weight":700,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  ht.textContent = String(h);
+}
+
+/* =====================================================================
+   THE STAGE — one group carries the idle tremor; inside it the two
+   views of the same motor. The stage tips the motor over: END view
+   (crankshaft end) flattens away around its crank axis while the TOP
+   view flattens in around the dial centre. view.mix is the tip:
+   0 = end view, 1 = top view.
+   ===================================================================== */
+var stage = el("g", {}, svg);
+var viewEnd = el("g", {}, stage);
+var viewTop = el("g", {}, stage);
+var specEl = document.getElementById("specLbl");
+
+/* ---- END VIEW: the crankshaft end of the V12. Crank pulley low in
+   the frame, the two banks rising off the crank centre at the 60°
+   V (±30° off the vertical), six cylinder heads per bank, valve
+   covers outboard, the airbox across the top. ---------------------- */
+var ENDC = { x:200, y:258 };               /* crank centre, end view */
+var ENDHEADS = [];                          /* abs centre per cylinder */
+var pulsesEnd = [];
+(function buildEnd(){
+  /* airbox + intake runner down the valley */
+  el("rect", {x:168, y:38, width:64, height:24, rx:8, fill:"none",
+    stroke:PAL.brass, "stroke-width":2.2}, viewEnd);
+  el("line", {x1:ENDC.x, y1:62, x2:ENDC.x, y2:180, stroke:PAL.brassLo, "stroke-width":2.4}, viewEnd);
+  /* valve covers, drawn in bank-tilted frames */
+  [-1, 1].forEach(function(sign){
+    var g = el("g", {transform:"rotate("+(sign*30)+" "+ENDC.x+" "+ENDC.y+")"}, viewEnd);
+    el("rect", {x:ENDC.x+sign*30-12, y:64, width:24, height:168, rx:10,
+      fill:"none", stroke:PAL.alloyLo, "stroke-width":3}, g);
+  });
+  /* six heads per bank along the V arms; cylinder 1 (and 7) at the
+     far end of the arm, 6 (and 12) down by the crank — the same
+     numbering the top view carries. */
+  [-1, 1].forEach(function(sign){
+    for(var k=0; k<6; k++){
+      var dist = 206 - k*24;
+      var hx = ENDC.x + sign*0.5*dist, hy = ENDC.y - 0.8660254*dist;
+      el("circle", {cx:hx, cy:hy, r:13, fill:PAL.void, stroke:PAL.steelHi, "stroke-width":2}, viewEnd);
+      el("circle", {cx:hx, cy:hy, r:6, fill:"none", stroke:PAL.steelLo, "stroke-width":1.4}, viewEnd);
+      var pu = el("circle", {cx:hx, cy:hy, r:17, fill:"none",
+        stroke:PAL.pulse, "stroke-width":2.4, opacity:"0.12"}, viewEnd);
+      pulsesEnd.push(pu); ENDHEADS.push({x:hx, y:hy});
+    }
+  });
+  /* crank pulley: rim, belt groove, bolt circle, hub */
+  el("circle", {cx:ENDC.x, cy:ENDC.y, r:64, fill:PAL.void, stroke:PAL.alloy, "stroke-width":3}, viewEnd);
+  el("circle", {cx:ENDC.x, cy:ENDC.y, r:56, fill:"none", stroke:PAL.steelLo, "stroke-width":1.6}, viewEnd);
+  for(var b=0; b<6; b++){
+    var bp = polar(ENDC.x, ENDC.y, 36, b*60);
+    el("circle", {cx:bp[0], cy:bp[1], r:3.6, fill:PAL.alloy, stroke:"none"}, viewEnd);
+  }
+  el("circle", {cx:ENDC.x, cy:ENDC.y, r:13, fill:PAL.void, stroke:PAL.brass, "stroke-width":2.2}, viewEnd);
+  el("circle", {cx:ENDC.x, cy:ENDC.y, r:3.5, fill:PAL.brassHi, stroke:"none"}, viewEnd);
+})();
+/* the spark dot for the end view — the firing head wears it there */
+var endDot = el("circle", {cx:ENDC.x, cy:ENDC.y, r:5, fill:PAL.spark, stroke:"none"}, viewEnd);
+
+/* ---- TOP VIEW: the v1 motor, kept — two banks angled ±20° off the
+   spine, plenum spines, six intake trumpets per bank, cast valve
+   covers outboard, throttle bodies on the spine, the glass over
+   all of it. The v1 sheen diagonals are GONE (defect 3: they read
+   as stray crossed lines over the whole dial). -------------------- */
+var pulses = [];
+var TRUMPETS = [];                          /* abs centre per cylinder */
+function bank(sign){
+  var g = el("g", {transform:"rotate("+(sign*20)+" "+CX+" "+CY+")"}, viewTop);
+  /* valve cover, outboard — ends just past the last trumpet row so
+     the two banks meet at a sump instead of scissoring across it */
+  el("rect", {x:CX+sign*62-16, y:100, width:32, height:192, rx:10,
+    fill:"none", stroke:PAL.alloyLo, "stroke-width":3}, g);
+  for(var b=0; b<6; b++){
+    var by = 116 + b*34;
+    el("circle", {cx:CX+sign*62, cy:by, r:3, fill:PAL.alloy, stroke:"none"}, g);
+  }
+  /* plenum spine */
+  el("rect", {x:CX+sign*30-11, y:92, width:22, height:204, rx:9,
+    fill:"none", stroke:PAL.steel, "stroke-width":2.4}, g);
+  /* six intake trumpets + their firing pulses */
+  for(var c=0; c<6; c++){
+    var ty = 108 + c*34, lx = CX+sign*30;
+    el("circle", {cx:lx, cy:ty, r:10.5, fill:PAL.void, stroke:PAL.steelHi, "stroke-width":2}, g);
+    el("circle", {cx:lx, cy:ty, r:5, fill:"none", stroke:PAL.steelLo, "stroke-width":1.4}, g);
+    var pu = el("circle", {cx:lx, cy:ty, r:13.5, fill:"none",
+      stroke:PAL.pulse, "stroke-width":2.4, opacity:"0.15"}, g);
+    pulses.push(pu);
+    var abs = rotPt(lx, ty, CX, CY, sign*20);
+    TRUMPETS.push({x:abs[0], y:abs[1]});
+  }
+  return g;
+}
+bank(-1); bank(1);
+/* throttle bodies on the spine */
+el("circle", {cx:CX, cy:118, r:9, fill:PAL.void, stroke:PAL.brass, "stroke-width":2.2}, viewTop);
+el("circle", {cx:CX, cy:282, r:9, fill:PAL.void, stroke:PAL.brass, "stroke-width":2.2}, viewTop);
+el("line", {x1:CX, y1:127, x2:CX, y2:273, stroke:PAL.brassLo, "stroke-width":2.4}, viewTop);
+/* the glass cover: panel outline + brass fasteners, no sheen lines */
+el("rect", {x:78, y:64, width:244, height:272, rx:26, fill:"none",
+  stroke:PAL.steelHi, "stroke-width":2.2}, viewTop);
+el("rect", {x:86, y:72, width:228, height:256, rx:21, fill:"none",
+  stroke:PAL.steelLo, "stroke-width":1.1}, viewTop);
+[[92,78],[308,78],[92,322],[308,322]].forEach(function(pt){
+  el("circle", {cx:pt[0], cy:pt[1], r:5.5, fill:"none", stroke:PAL.brass, "stroke-width":2}, viewTop);
+  el("circle", {cx:pt[0], cy:pt[1], r:1.8, fill:PAL.brassHi, stroke:"none"}, viewTop);
+});
+/* ---- THE YELLOW LINE (defect 2): crank centre to the firing
+   trumpet, with its spark dot + halo seated on the trumpet. It is
+   re-aimed every painted frame from the firing order below. ------- */
+var sparkLine = el("line", {x1:CX, y1:CY, x2:CX, y2:CY, stroke:PAL.spark,
+  "stroke-width":3.6, "stroke-linecap":"round", opacity:"0.95"}, viewTop);
+var sparkHalo = el("circle", {cx:CX, cy:CY, r:10.5, fill:"none",
+  stroke:PAL.spark, "stroke-width":1.6, opacity:"0.55"}, viewTop);
+var sparkDot = el("circle", {cx:CX, cy:CY, r:5.5, fill:PAL.spark, stroke:"none"}, viewTop);
+
+/* ---- HANDS (defect 3): tapered hour and minute hands in cream
+   with a void edge, a laser second hand with a counterweight, and
+   a brass cap — riding ABOVE the glass, turning on the dial centre
+   against the hour numerals that were always painted on the bezel. */
+var hands = el("g", {}, svg);
+var hourHand = el("path", {d:"M -7.5 16 L 0 -82 L 7.5 16 Z",
+  fill:PAL.cream, stroke:PAL.void, "stroke-width":1.2}, hands);
+var minHand = el("path", {d:"M -5.5 18 L 0 -124 L 5.5 18 Z",
+  fill:PAL.cream, stroke:PAL.void, "stroke-width":1.2}, hands);
+var secHand = el("g", {}, hands);
+el("line", {x1:0, y1:36, x2:0, y2:-136, stroke:PAL.laser, "stroke-width":2}, secHand);
+el("circle", {cx:0, cy:30, r:5.5, fill:PAL.laser, stroke:"none"}, secHand);
+el("circle", {cx:CX, cy:CY, r:8.5, fill:PAL.brass, stroke:PAL.void, "stroke-width":1.4}, hands);
+el("circle", {cx:CX, cy:CY, r:3.2, fill:PAL.void, stroke:"none"}, hands);
+function paintHands(now, smooth){
+  var s = now.getSeconds() + (smooth ? now.getMilliseconds()/1000 : 0);
+  var m = now.getMinutes() + s/60;
+  var h = (now.getHours() % 12) + m/60;
+  hourHand.setAttribute("transform", "translate("+CX+" "+CY+") rotate("+(h*30).toFixed(2)+")");
+  minHand.setAttribute("transform", "translate("+CX+" "+CY+") rotate("+(m*6).toFixed(2)+")");
+  secHand.setAttribute("transform", "translate("+CX+" "+CY+") rotate("+(s*6).toFixed(2)+")");
+}
+
+/* ---- Firing: the classic Lamborghini 60° V12 order
+   1-7-4-10-2-8-6-12-3-9-5-11, one cylinder per wall-clock second —
+   the counter-of-a-second-hand cadence the owner asked for. A pure
+   function of absolute time: any frame, live or posed, shows the
+   cylinder that is truly due. -------------------------------------- */
+var FIRING = [0, 6, 3, 9, 1, 7, 5, 11, 2, 8, 4, 10];
+function firingIndex(nowMs){ return FIRING[Math.floor(nowMs/1000) % 12]; }
+function paintFiring(nowMs){
+  var k = firingIndex(nowMs), i;
+  for(i=0; i<12; i++){
+    pulses[i].setAttribute("opacity", i===k ? "1" : "0.15");
+    pulsesEnd[i].setAttribute("opacity", i===k ? "1" : "0.12");
+  }
+  var t = TRUMPETS[k];
+  sparkLine.setAttribute("x2", t.x.toFixed(1)); sparkLine.setAttribute("y2", t.y.toFixed(1));
+  sparkHalo.setAttribute("cx", t.x.toFixed(1)); sparkHalo.setAttribute("cy", t.y.toFixed(1));
+  sparkDot.setAttribute("cx", t.x.toFixed(1)); sparkDot.setAttribute("cy", t.y.toFixed(1));
+  var e = ENDHEADS[k];
+  endDot.setAttribute("cx", e.x.toFixed(1)); endDot.setAttribute("cy", e.y.toFixed(1));
+}
+
+/* ---- The tip between views ----------------------------------------- */
+var view = { mix:0, from:0, to:0, animStart:-1, animDur:2400 };
+function viewDest(){ return view.animStart >= 0 ? view.to : view.mix; }
+function applyMix(m){
+  view.mix = m;
+  var endP = easeIO(clamp01(m*2));            /* end tips away first  */
+  var topP = easeIO(clamp01((m-0.45)/0.55));  /* top settles in after */
+  var endSy = 1 - 0.8*endP, topSy = 0.2 + 0.8*topP;
+  viewEnd.setAttribute("transform",
+    "translate("+CX+" 262) scale(1 "+endSy.toFixed(3)+") translate("+(-CX)+" -262)");
+  viewEnd.setAttribute("opacity", String(1 - clamp01((m-0.1)/0.45)));
+  viewTop.setAttribute("transform",
+    "translate("+CX+" "+CY+") scale(1 "+topSy.toFixed(3)+") translate("+(-CX)+" "+(-CY)+")");
+  viewTop.setAttribute("opacity", String(clamp01((m-0.3)/0.5)));
+  specEl.textContent = m < 0.5 ? "CRANKSHAFT END · 60° V12" : "THE MOTOR UNDER GLASS";
+}
+function turnTo(to, dur){
+  view.from = view.mix; view.to = to;
+  view.animDur = dur || 2200; view.animStart = Date.now();
+}
+
+/* ---- Time read (digital fitting, as on every sibling face) --------- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute) return;
+  lastMinute = m;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+
+/* =====================================================================
+   RUN-WINDOW GOVERNOR (owner's Vertex amendment, Nov 13, 2026)
+   ---------------------------------------------------------------------
+   History, honestly kept: v1 of this face shipped in the depot APK
+   with the BATTERY V2 governor — REST until touched, 12 s auto-exit
+   after the last touch. That is the exact behaviour the owner
+   field-reported as the fault ("starts when I touch the screen and
+   doesn't stay running"). The Nov 10 face-line sweep removed that
+   governor from the web faces for the same reason. THIS governor is
+   the owner's own replacement spec, and it inverts the old one:
+     · AUTO-START — the engine ignites when the face is SHOWN (boot,
+       a return to visibility, or the container's observe signal).
+       Touch never starts it.
+     · WINDOW-BOUND RUN — it runs for the host window's timeout,
+       read by resolveTimeoutMs() below, and at expiry the action
+       stops and the face sleeps. Nothing of the engine animates in
+       the background: hidden faces sleep immediately.
+     · TOUCH = PLAY — a tap turns the view (end ↔ top). It does not
+       start, extend, or restart the run window.
+   The run length comes from the host window, in order: (1) a
+   window.__faceTimeoutMs / __faceTimeoutSec the host set before
+   this file's scripts ran; (2) ?timeout= (seconds) or ?timeoutMs=
+   in the address the host loaded; (3) only when the host supplies
+   nothing, 30000 ms — the owner's example figure, a fallback, not
+   a hidden constant of behaviour: window.__governor.timeoutMs
+   reports the resolved value and its source to any bench that asks.
+   ===================================================================== */
+function resolveTimeoutMs(){
+  if(typeof window.__faceTimeoutMs === "number" && window.__faceTimeoutMs > 0)
+    return { ms:Math.floor(window.__faceTimeoutMs), source:"host-global-ms" };
+  if(typeof window.__faceTimeoutSec === "number" && window.__faceTimeoutSec > 0)
+    return { ms:Math.floor(window.__faceTimeoutSec*1000), source:"host-global-sec" };
+  var q = location.search || "", mt = /[?&]timeoutMs=(\d+)/.exec(q), ts = /[?&]timeout=(\d+)/.exec(q);
+  if(mt) return { ms:parseInt(mt[1], 10), source:"address-timeoutMs" };
+  if(ts) return { ms:parseInt(ts[1], 10)*1000, source:"address-timeout" };
+  return { ms:30000, source:"fallback-30s" };
+}
+var RESOLVED = resolveTimeoutMs();
+var TIMEOUT_MS = RESOLVED.ms;
+var lampEl = document.getElementById("stateLamp");
+var eng = { mode:"rest", runStart:0, enters:0, rests:0, lastSignal:"boot" };
+var gov = { state:"rest", enters:0, rests:0, lastSignal:"boot",
+            timeoutMs:TIMEOUT_MS, timeoutSource:RESOLVED.source };
+window.__governor = gov;
+window.__faceRest = true;
+function syncGov(){
+  gov.state = eng.mode; gov.enters = eng.enters; gov.rests = eng.rests;
+  gov.lastSignal = eng.lastSignal;
+  window.__faceRest = (eng.mode !== "live");
+}
+var rafId = 0;
+function paintStill(){
+  stage.setAttribute("transform", "translate(0 0)");
+  paintFiring(Date.now());
+  paintHands(new Date(), false);
+}
+function startRun(sig){
+  eng.mode = "live"; eng.enters++; eng.lastSignal = sig;
+  eng.runStart = Date.now();
+  lampEl.textContent = "LIVE";
+  document.body.classList.add("live");
+  /* every run opens on the crankshaft end and turns up to the top */
+  view.animStart = -1; applyMix(0);
+  turnTo(1, 2400);
+  syncGov();
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(frame);
+}
+function sleep(sig){
+  eng.lastSignal = sig;
+  if(eng.mode !== "rest"){ eng.mode = "rest"; eng.rests++; }
+  lampEl.textContent = "AT REST";
+  document.body.classList.remove("live");
+  cancelAnimationFrame(rafId); rafId = 0;
+  /* a sleep that lands mid-turn settles the view it was turning to —
+     the rest pose is never a half-tipped motor. */
+  if(view.animStart >= 0){ view.mix = view.to; view.animStart = -1; applyMix(view.mix); }
+  paintStill();
+  syncGov();
+}
+function frame(){
+  if(eng.mode !== "live") return;
+  var now = Date.now();
+  if(now - eng.runStart >= TIMEOUT_MS){ sleep("window-timeout"); return; }
+  if(view.animStart >= 0){
+    var p = (now - view.animStart) / view.animDur;
+    if(p >= 1){ view.mix = view.to; view.animStart = -1; applyMix(view.mix); }
+    else applyMix(view.from + (view.to - view.from) * easeIO(p));
+  }
+  var el = now - eng.runStart;
+  var tx = Math.sin(el/47)*0.6, ty = Math.cos(el/39)*0.5;
+  stage.setAttribute("transform", "translate("+tx.toFixed(2)+" "+ty.toFixed(2)+")");
+  paintFiring(now);
+  paintHands(new Date(), true);
+  rafId = requestAnimationFrame(frame);
+}
+/* Touch = play: turn the view. Never ignition, never a window reset. */
+function cycleView(){
+  var to = viewDest() === 1 ? 0 : 1;
+  if(eng.mode === "live"){ turnTo(to, 1800); eng.lastSignal = "touch-view"; }
+  else {
+    view.animStart = -1; applyMix(to);
+    paintStill(); eng.lastSignal = "touch-view-rest";
+  }
+  syncGov();
+}
+document.getElementById("face").addEventListener("pointerdown", function(){ cycleView(); });
+/* Sleep when unobserved; auto-start when shown again. */
+document.addEventListener("visibilitychange", function(){
+  if(document.hidden) sleep("hidden");
+  else { paintTime(new Date()); startRun("visible"); }
+});
+/* Container contract — observe/rest now drive the run window itself;
+   toggle turns the view (it is the programmatic tap). */
+window.ApexFace = {
+  observe: function(){ startRun("container-observe"); },
+  rest:    function(){ sleep("container-rest"); },
+  toggle:  function(){ cycleView(); },
+  state:   function(){ return eng.mode; }
+};
+window.addEventListener("apex-face-observe", function(){ startRun("event-observe"); });
+window.addEventListener("apex-face-rest", function(){ sleep("event-rest"); });
+/* Bench handles, in the face-line style: they report, they do not lie. */
+window.__lambo = {
+  state: function(){ return eng.mode; },
+  view: function(){ return view.animStart >= 0 ? "turning" :
+    (view.mix === 1 ? "top" : (view.mix === 0 ? "end" : "mid")); },
+  timeoutMs: function(){ return TIMEOUT_MS; },
+  timeoutSource: function(){ return RESOLVED.source; },
+  firing: function(){ return firingIndex(Date.now()) + 1; },
+  cycleView: cycleView,
+  start: function(){ startRun("bench"); },
+  sleep: function(){ sleep("bench"); }
+};
+
+/* ---- Boot: paint the fittings, pose the still, then IGNITE on
+   show — no touch, no signal, the run opens by itself. ------------ */
+paintTime(new Date());
+applyMix(0);
+paintStill();
+startRun("boot");
+/* The fittings' own slow tick: the digital read, and the hands
+   posed per second while the engine sleeps. */
+setInterval(function(){
+  var now = new Date();
+  paintTime(now);
+  if(eng.mode !== "live") paintHands(now, false);
+}, 1000);
+
+</script>
+<script>
+/* =====================================================================
+   FACE LAW 2 - THE BEZEL IS WIRED (face-line sweep, Nov 10, 2026)
+   ---------------------------------------------------------------------
+   This bezel's cardinals were paint: N sat at the top because it was
+   drawn there. Under Face Law 2 (as amended, Nov 10, 2026) a compass
+   bezel must always show a LIVE heading state with an honest
+   confidence colour in the face's own palette - or honestly show
+   that it has nothing. The stack, in order:
+     (a) deviceorientation / deviceorientationabsolute - the
+         magnetometer answer, when the hardware answers;
+     (b) GPS course-over-ground while moving, fused with the
+         inertial carry;
+     (c) inertial carry from the last good anchor;
+     (d) no anchor: SEARCHING - the witness sweeps slowly and
+         asserts NO north. A fabricated heading is a firing offence
+         under the fabrication ban; this stack would rather sweep.
+   An accelerometer alone never originates north (deviceorientation
+   is only read when it carries an absolute/compass heading).
+   Confidence, in this face's called colours: brassHi (green-class)
+   = live anchor agreeing with the inertial read; #ffb52e
+   (yellow-class) = real but weak/intermittent anchor, or a recent
+   inertial carry; #ff3d00 (red-class) = stale, disagreeing, or no
+   anchor - searching. The stack is FIREWALLED: it lives in its own
+   script and touches only its own three elements (witness, ring,
+   the N glyph). Its failure changes nothing else on the face, and
+   nothing else on the face can stop it. Bench: window.__heading.
+   ===================================================================== */
+(function(){
+  "use strict";
+  var T = window.__hdgTargets;
+  if(!T || !T.needle || !T.ring || !T.north) return;   /* bezel absent: nothing to govern */
+  var hdg = { state:"searching", heading:null, source:"none",
+              confidence:"red", lastAnchorMs:0, disagreements:0 };
+  window.__heading = hdg;
+  var CXp = T.cx, CYp = T.cy;
+  function paint(now){
+    var col = hdg.confidence === "green" ? T.green :
+              hdg.confidence === "yellow" ? T.yellow : T.red;
+    T.ring.setAttribute("stroke", col);
+    T.north.setAttribute("fill", col);
+    T.needle.setAttribute("stroke", col);
+    var ang;
+    if(hdg.state === "live" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else if(hdg.state === "carry" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else {
+      hdg.state = "searching"; hdg.heading = null;
+      ang = ((now/1000) * 6) % 360;          /* one slow sweep per minute */
+    }
+    T.needle.setAttribute("transform", "rotate(" + ang.toFixed(2) + " " + CXp + " " + CYp + ")");
+  }
+  function anchor(deg, src, now){
+    if(typeof deg !== "number" || !isFinite(deg)) return;
+    deg = ((deg % 360) + 360) % 360;
+    if(typeof hdg.heading === "number" && hdg.state === "live"){
+      var d = Math.abs(deg - hdg.heading); if(d > 180) d = 360 - d;
+      if(d > 25){ hdg.disagreements++; } else { hdg.disagreements = 0; }
+    }
+    hdg.heading = deg; hdg.source = src; hdg.lastAnchorMs = now;
+    hdg.state = "live";
+    hdg.confidence = hdg.disagreements >= 3 ? "yellow" : "green";
+  }
+  function onOrient(e){
+    var deg = null;
+    if(typeof e.webkitCompassHeading === "number") deg = e.webkitCompassHeading;
+    else if(e.absolute && typeof e.alpha === "number") deg = 360 - e.alpha;
+    if(deg !== null) anchor(deg, "magnetometer", Date.now());
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientationabsolute", onOrient, true);
+    window.addEventListener("deviceorientation", onOrient, true);
+    if(typeof DeviceOrientationEvent.requestPermission === "function"){
+      /* iOS gate: permission is asked on the first press of the glass,
+         inside this stack only; a refusal leaves the stack searching. */
+      window.addEventListener("pointerdown", function ask(){
+        window.removeEventListener("pointerdown", ask, true);
+        try { DeviceOrientationEvent.requestPermission().catch(function(){}); } catch(e){}
+      }, true);
+    }
+  }
+  var lastFix = null;
+  function onGeo(pos){
+    var c = pos.coords, now = Date.now();
+    if(lastFix && typeof c.speed === "number" && c.speed >= 0.5){
+      var dt = (now - lastFix.t)/1000;
+      if(dt > 0){
+        var dy = (c.latitude - lastFix.lat) * 111320;
+        var dx = (c.longitude - lastFix.lon) * 111320 * Math.cos(c.latitude * Math.PI/180);
+        if(Math.sqrt(dx*dx + dy*dy) >= 2){
+          anchor((Math.atan2(dx, dy) * 180/Math.PI + 360) % 360, "gps-course", now);
+        }
+      }
+    }
+    lastFix = { lat:c.latitude, lon:c.longitude, t:now };
+  }
+  if(navigator.geolocation && navigator.geolocation.watchPosition){
+    try { navigator.geolocation.watchPosition(onGeo, function(){}, { enableHighAccuracy:true, maximumAge:2000 }); } catch(e){}
+  }
+  function tick(){
+    var now = Date.now();
+    if(hdg.state === "live" && now - hdg.lastAnchorMs > 5000){
+      hdg.state = "carry"; hdg.confidence = "yellow";   /* inertial carry: last anchored heading, honestly ageing */
+    }
+    if(hdg.state === "carry" && now - hdg.lastAnchorMs > 30000){
+      hdg.state = "searching"; hdg.confidence = "red"; hdg.heading = null; hdg.source = "none";
+    }
+    paint(now);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+<script>
+  /* ---- WEATHER FITTING: the sibling faces' pattern, lifted from
+     apex-weather — one small Open-Meteo JSON fetch on load for the
+     house coordinates (Johannesburg, MI), refresh every 15 minutes,
+     painted as one plain-text line in the read panel. A failed fetch
+     keeps the last paint; the line never blocks the face. --------- */
+  var WX_URL = 'https://api.open-meteo.com/v1/forecast?latitude=44.98096&longitude=-84.49608'
+    + '&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m'
+    + '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDetroit&forecast_days=1';
+  var WX_CODES = {0:'CLEAR',1:'MOSTLY CLEAR',2:'PARTLY CLOUDY',3:'OVERCAST',45:'FOG',48:'FOG',
+    51:'DRIZZLE',53:'DRIZZLE',55:'DRIZZLE',56:'FREEZING DRIZZLE',57:'FREEZING DRIZZLE',
+    61:'RAIN',63:'RAIN',65:'HEAVY RAIN',66:'FREEZING RAIN',67:'FREEZING RAIN',
+    71:'SNOW',73:'SNOW',75:'HEAVY SNOW',77:'SNOW GRAINS',80:'SHOWERS',81:'SHOWERS',82:'VIOLENT SHOWERS',
+    85:'SNOW SHOWERS',86:'SNOW SHOWERS',95:'THUNDERSTORM',96:'T-STORM + HAIL',99:'T-STORM + HAIL'};
+  var WX_DIRS = ['N','NE','E','SE','S','SW','W','NW'];
+  function paintWx() {
+    var x = new XMLHttpRequest();
+    x.open('GET', WX_URL, true);
+    x.onreadystatechange = function() {
+      if (x.readyState !== 4 || x.status !== 200) return;
+      try {
+        var j = JSON.parse(x.responseText), c = j.current;
+        var dir = WX_DIRS[Math.round(c.wind_direction_10m / 45) % 8];
+        document.getElementById('wxLine').textContent =
+          Math.round(c.temperature_2m) + '° ' + (WX_CODES[c.weather_code] || '—')
+          + ' · WIND ' + dir + ' ' + Math.round(c.wind_speed_10m)
+          + ' · FEELS ' + Math.round(c.apparent_temperature) + '°';
+      } catch (e) { /* keep last paint */ }
+    };
+    x.send();
+  }
+  paintWx();
+  setInterval(paintWx, 900000);
+</script>
+</body>
+</html>

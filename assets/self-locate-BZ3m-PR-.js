@@ -1,0 +1,1 @@
+var e=!1,t=new Set;function n(){if(!e&&typeof window<`u`){e=!0;try{window.localStorage.removeItem(`apex.self.fix`)}catch{}}return null}function r(e){return t.add(e),()=>{t.delete(e)}}export{r as n,n as t};

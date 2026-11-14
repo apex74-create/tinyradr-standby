@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Store Navigator — GPS-Denied Customer Positioning</title>
+<!--
+  APEX STORE NAVIGATOR — customer walks in, scans the entrance QR,
+  prices load, and the store can locate them indoors (no GPS).
+  Patent Pending · E027/E028/E029 · © 2026 Apex Air Solutions, LLC
+-->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#000;color:#0f0;font-family:'Courier New',monospace;padding:12px;}
+  .hdr{border:1px solid #0f0;padding:12px;margin-bottom:12px;}
+  .hdr h1{font-size:18px;letter-spacing:2px;color:#0ff;}
+  .hdr .sub{font-size:11px;opacity:.8;margin-top:4px;}
+  #view{width:100%;height:40vh;background:#000;border:1px solid #0f0;display:block;}
+  .panel{border:1px solid #0f0;padding:12px;background:#020;margin-top:12px;}
+  .panel h2{font-size:12px;letter-spacing:2px;color:#0ff;border-bottom:1px solid #040;padding-bottom:4px;margin-bottom:8px;}
+  .btn{width:100%;min-height:56px;margin-top:10px;background:#000;color:#0f0;border:2px solid #0f0;
+       font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;}
+  .btn:active{background:#0f0;color:#000;}
+  .btn.primary{border-color:#0ff;color:#0ff;}
+  .btn.big{min-height:72px;font-size:20px;}
+  ul.list{list-style:none;margin-top:10px;max-height:180px;overflow-y:auto;}
+  ul.list li{border:1px solid #030;padding:8px;margin-bottom:4px;font-size:13px;display:flex;justify-content:space-between;}
+  ul.list li .p{color:#ff0;}
+  .note{font-size:12px;opacity:.7;margin-top:8px;line-height:1.6;}
+  .badge{display:inline-block;padding:4px 10px;border:1px solid #0f0;font-size:12px;margin-top:6px;}
+  .badge.on{color:#0f0;border-color:#0f0;} .badge.off{color:#f80;border-color:#f80;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ STORE NAVIGATOR ◢</h1>
+  <div class="sub">Scan the entrance QR → prices load → you're findable indoors (no GPS)</div>
+  <div class="sub" id="posLine">Position: not started</div>
+</div>
+
+<canvas id="view" width="800" height="340"></canvas>
+
+<div class="panel">
+  <button class="btn primary big" id="enterBtn">▶ I JUST WALKED IN — SCAN ENTRANCE QR</button>
+  <div id="anchorBadge"></div>
+  <div class="note">The entrance QR tells the store exactly where the door is. From there the radio signals track you indoors where GPS can't reach.</div>
+</div>
+
+<div class="panel">
+  <h2>STORE PRICE LIST</h2>
+  <div class="note">Loaded from the store's anchor file.</div>
+  <ul class="list" id="priceList"><li>— scan entrance QR to load —</li></ul>
+</div>
+
+<div class="panel">
+  <h2>NEAR YOU</h2>
+  <ul class="list" id="nearList"><li>— nothing nearby yet —</li></ul>
+</div>
+
+<script src="../apex-dash/tristar-routing.js"></script>
+<script src="../apex-ar-core/engine-dispatch.js"></script>
+<script src="../apex-ar-glasses/superposition-dom.js"></script>
+<script src="../apex-ar-glasses/zero-slam.js"></script>
+<script src="../apex-ar-core/anchor-engine.js"></script>
+<script src="../apex-ar-core/tag-store.js"></script>
+<script src="../apex-ar-core/scanner-input.js"></script>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('view'), ctx=canvas.getContext('2d');
+  let pose={x:0,y:0,z:0,heading:0,conf:0,source:'INIT'};
+  let entered=false;
+
+  function draw(){
+    requestAnimationFrame(draw);
+    const w=canvas.width,h=canvas.height;
+    ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+    /* shopper at center */
+    ctx.fillStyle='#0ff';ctx.beginPath();ctx.arc(w/2,h/2,6,0,7);ctx.fill();
+    ctx.strokeStyle='#0ff';ctx.beginPath();ctx.arc(w/2,h/2,14,0,7);ctx.stroke();
+    /* nearby price tags */
+    const yaw=-(pose.heading||0)*Math.PI/180, f=(w/2)/Math.tan(35*Math.PI/180);
+    TagStore.all().forEach((t)=>{
+      const rx=t.x-pose.x,ry=t.y-pose.y;
+      const X=rx*Math.cos(yaw)-ry*Math.sin(yaw),Z=rx*Math.sin(yaw)+ry*Math.cos(yaw)+0.001;
+      if(Z<0.1)return;
+      const sx=(X/Z)*f+w/2,sy=h/2-(t.z||0)*20;
+      ctx.fillStyle='#0f0';ctx.font='12px monospace';
+      ctx.fillText((t.name||t.sku)+(t.price?' $'+t.price.toFixed(2):''),sx+8,sy);
+      ctx.fillStyle='#ff0';ctx.fillRect(sx,sy-8,5,5);
+    });
+  }
+  draw();
+
+  window.addEventListener('apexPoseUpdate',(e)=>{pose=e.detail;
+    document.getElementById('posLine').textContent='Position: '+pose.source+' · '+Math.round((pose.conf||0)*100)+'% sure';
+    if(entered)renderNear();
+  });
+
+  document.getElementById('enterBtn').addEventListener('click',function(){
+    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().catch(function(){});}
+    if(window.SuperpositionEngine&&SuperpositionEngine.init){try{SuperpositionEngine.init();}catch(e){}}
+    ZeroSLAM.start();ScannerInput.start();
+    const t=prompt('Scan / paste the entrance QR code text:');
+    if(t){
+      const a=AnchorEngine.scan(t);
+      const badge=document.getElementById('anchorBadge');
+      badge.textContent='';
+      const b=document.createElement('span');
+      if(a){b.className='badge on'; b.textContent='● ANCHORED at '+a.label;}
+      else{b.className='badge off'; b.textContent='● QR not recognized — using radio only';}
+      badge.appendChild(b); entered=true;
+      renderPrices();
+    }
+    this.textContent='● INSIDE STORE';this.disabled=true;
+  });
+
+  /* price list = all tags the store placed (loaded from shared TagStore/anchors) */
+  function renderPrices(){
+    const ul=document.getElementById('priceList');ul.innerHTML='';
+    const items=TagStore.all();
+    if(!items.length){ul.innerHTML='<li>— no store items loaded —</li>';return;}
+    items.forEach((t)=>{
+      const li=document.createElement('li');
+      const name=document.createElement('span');
+      name.textContent=(t.name||t.sku)+(t.aisle?' · Aisle '+t.aisle:'');
+      const price=document.createElement('span');
+      price.className='p';
+      price.textContent=(t.price?'$'+t.price.toFixed(2):'');
+      li.appendChild(name); li.appendChild(price);
+      ul.appendChild(li);
+    });
+  }
+
+  function renderNear(){
+    const ul=document.getElementById('nearList');ul.innerHTML='';
+    const near=TagStore.near(pose.x,pose.y,4);
+    if(!near.length){ul.innerHTML='<li>— nothing within ~4 m —</li>';return;}
+    near.forEach((t)=>{
+      const li=document.createElement('li');
+      const name=document.createElement('span');
+      name.textContent=(t.name||t.sku);
+      const price=document.createElement('span');
+      price.className='p';
+      price.textContent=(t.price?'$'+t.price.toFixed(2):'');
+      li.appendChild(name); li.appendChild(price);
+      ul.appendChild(li);
+    });
+  }
+  window.addEventListener('apexTagUpdate',renderPrices);
+})();
+</script>
+</body>
+</html>

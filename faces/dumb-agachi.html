@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Dumb Agachi · Virtual Pony Watch Face</title>
+<!--
+  APEX — DUMB AGACHI FACE v1 (Nov 9, 2026).
+  Pony + -gachi, the owner's coinage (Nov 9, 21:47–21:48 EST): Wally
+  said the house needs a Tamagotchi watch face; the owner's answer —
+  "You know I want a Dumb Agachi" — and his concept in substance: "a
+  little digital character that you feed and take care of and shit
+  and he gets bigger and does shit." So: a small pony lives on the
+  watch face. You feed it, play with it, pet it. It grows —
+  FOAL → YEARLING → FULL-GROWN — and it does things: blinks, flicks
+  its tail, twitches an ear, prances, eats, droops when neglected,
+  and perks back up when fed. A kind face: neglect makes him droopy,
+  never dead.
+
+  NAME: the coinage is the owner's, and his own TYPED spelling —
+  "Dumb Agachi," two words (Nov 9, 2026) — governs over every
+  dictation garble that came before it (the run passed through
+  "Ponegachi" and "Dumagachi" on the way; this file was renamed
+  and its references corrected on his spelling, Nov 9, 2026).
+  The DARK EDITION (dumb-agachi-dark-face-v1-2026-11-09.html)
+  carries the cycle this kind face spares him — death, the
+  electron, and the RUNAWAY + REDEMPTION design, which is a JOINT
+  RULING of the owner and HOLLY (Hollywood), the house's
+  authority on Pokémon / virtual-pet design.
+
+  LINEAGE: built in the Apex Glass House face family on the pattern
+  of the Betta Yin-Yang V2 (guarded driver, honest stills) and
+  Merry's Garden (the current Battery V2 statement + ApexFace hook).
+  Clean line art, colours CALLED from the palette block below —
+  warm stable colours on a dark plate, solid numbers, never washed,
+  no translucent dark over the plate.
+
+  NEEDS: HUNGER · MOOD · ENERGY, three meters under the pony. Needs
+  drift with REAL elapsed time — computed from Date.now() deltas
+  whenever the face wakes, observes, or ticks the minute, never from
+  animation frames, so the pony gets hungry while the watch sleeps.
+  FEED raises hunger, PLAY raises mood, PET raises mood a little.
+  Growth = accumulated care (feeds + plays + pets) plus elapsed days.
+
+  PERSISTENCE — BEST EFFORT, HONESTLY GRADED: state (start stamp,
+  care count, need levels, last-seen stamp) is saved to localStorage
+  under a guard — every read and write sits inside try/catch, and if
+  storage is absent or throws, the face runs fully in-session and
+  loses nothing but the memory between launches. Whether the watch
+  wrapper keeps localStorage across launches is UNTESTED: persistence
+  is graded NO MEASURE in the build report and claimed nowhere here.
+
+  Governor history: this face was born under Battery V2 (REST/
+  OBSERVED, 12 s auto-exit); the face-line sweep removed that
+  governor Nov 10, 2026 - the spectacle runs from first paint,
+  nothing holds the screen on. Colour is CALLED
+  from the palette block below — solid numbers, never layered, no
+  translucent dark over the plate.
+-->
+<style>
+  :root{
+    --void:#0a0605;        /* outer dark */
+    --plate:#1d1008;       /* dark stable-brown plate */
+    --plate2:#2a180c;      /* plate, second tone */
+    --panel:#120a05;       /* solid read panel */
+    --hay:#f2c14e;         /* hay gold — name, accents */
+    --straw:#ffe9a8;       /* pale straw — digits, pale lines */
+    --cream:#fdf3d8;       /* cream lettering */
+    --coat:#e8a06a;        /* pony coat line */
+    --coatdeep:#c96f35;    /* coat, deep tone */
+    --mane:#8a4b2a;        /* mane + tail line */
+    --muzzle:#f6cfa5;      /* muzzle line */
+    --hoof:#7a5c3e;        /* hoof line */
+    --grass:#7fb069;       /* stable grass green — meters */
+    --heart:#ff6b81;       /* heart pink-red — pet beat */
+    --warn:#e4572e;        /* warn orange — empty meter */
+    --dim:#a68a64;         /* dim tan — meter shells, stage pips */
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none;cursor:pointer}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #nameLbl{top:1.6vmin;font-size:3.6vmin;color:var(--hay)}
+  #stateLamp{position:absolute;right:2.6vmin;top:2.0vmin;font-size:2.0vmin;
+    color:var(--dim);letter-spacing:.14em;text-align:right;z-index:4}
+  body.live #stateLamp{color:var(--hay)}
+  #clockPanel{position:absolute;left:50%;top:6.0vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--hay);border-radius:1.6vmin;
+    padding:0.6vmin 4vmin 1vmin;text-align:center;z-index:3}
+  #clock{font-size:10.5vmin;font-weight:800;color:var(--straw);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.4vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.5vmin}
+  #stageLine{position:absolute;top:22.5vmin;width:100%;text-align:center;
+    font-size:2.6vmin;font-weight:700;letter-spacing:.3em;color:var(--straw);z-index:3}
+  #ponyWrap{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
+    width:92vmin;height:62vmin;z-index:2}
+  svg{width:100%;height:100%;display:block}
+  /* Need meters: three solid-shell bars under the pony. */
+  #meters{position:absolute;left:50%;bottom:11.5vmin;transform:translateX(-50%);
+    width:84vmin;z-index:3}
+  .mRow{display:flex;align-items:center;margin-top:1.1vmin}
+  .mName{width:17vmin;font-size:2.3vmin;font-weight:700;letter-spacing:.16em;color:var(--cream)}
+  .mShell{flex:1;height:2.6vmin;border:2px solid var(--dim);border-radius:1.3vmin;
+    background:var(--panel);overflow:hidden}
+  .mFill{height:100%;width:50%}
+  /* Care buttons: real tap targets while observed. */
+  #care{position:absolute;left:50%;bottom:2.2vmin;transform:translateX(-50%);
+    width:88vmin;display:flex;justify-content:space-between;z-index:4}
+  .cBtn{flex:1;margin:0 1vmin;padding:1.5vmin 0;text-align:center;
+    font-size:2.9vmin;font-weight:800;letter-spacing:.18em;color:var(--panel);
+    background:var(--hay);border:2px solid var(--straw);border-radius:2vmin}
+  .cBtn small{display:block;font-size:1.9vmin;font-weight:700;letter-spacing:.12em}
+  .cBtn:active{background:var(--straw)}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="nameLbl" class="lbl">DUMB AGACHI</div>
+  <div id="stateLamp">REST</div>
+  <div id="clockPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stageLine">· FOAL ·</div>
+  <div id="ponyWrap"><svg id="ponySvg" viewBox="0 0 460 310" aria-label="Dumb Agachi: a small line-art pony you feed and care for"></svg></div>
+  <div id="meters">
+    <div class="mRow"><div class="mName">HUNGER</div><div class="mShell"><div class="mFill" id="mHunger"></div></div></div>
+    <div class="mRow"><div class="mName">MOOD</div><div class="mShell"><div class="mFill" id="mMood"></div></div></div>
+    <div class="mRow"><div class="mName">ENERGY</div><div class="mShell"><div class="mFill" id="mEnergy"></div></div></div>
+  </div>
+  <div id="care">
+    <div class="cBtn" id="btnFeed">FEED<small>HAY</small></div>
+    <div class="cBtn" id="btnPlay">PLAY<small>PRANCE</small></div>
+    <div class="cBtn" id="btnPet">PET<small>SCRITCH</small></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* Palette in code — the same called colours as the CSS block. */
+var PAL = { void:"#0a0605", plate:"#1d1008", plate2:"#2a180c", panel:"#120a05",
+  hay:"#f2c14e", straw:"#ffe9a8", cream:"#fdf3d8", coat:"#e8a06a",
+  coatdeep:"#c96f35", mane:"#8a4b2a", muzzle:"#f6cfa5", hoof:"#7a5c3e",
+  grass:"#7fb069", heart:"#ff6b81", warn:"#e4572e", dim:"#a68a64" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+
+/* ---- Persistence: guarded localStorage, best effort -------------------
+   Every touch sits in try/catch. If storage is absent or throws, `store`
+   stays null and the face runs fully in-session. Wrapper persistence
+   across launches is untested — NO MEASURE, claimed nowhere. */
+var SKEY = "dumb-agachi-v1";
+var store = null;
+try {
+  var probe = "__dumbAgachi_probe__";
+  window.localStorage.setItem(probe, "1");
+  window.localStorage.removeItem(probe);
+  store = window.localStorage;
+} catch(e){ store = null; }
+function saveState(){
+  if(!store) return;
+  try {
+    store.setItem(SKEY, JSON.stringify({
+      born: P.born, care: P.care, hunger: P.hunger, mood: P.mood,
+      energy: P.energy, seen: Date.now()
+    }));
+  } catch(e){ /* storage full/blocked: in-session state carries on */ }
+}
+function loadState(){
+  if(!store) return null;
+  try {
+    var raw = store.getItem(SKEY);
+    if(!raw) return null;
+    var s = JSON.parse(raw);
+    if(!s || typeof s.born !== "number") return null;
+    return s;
+  } catch(e){ return null; }
+}
+
+/* ---- The pony's state --------------------------------------------------
+   Needs are 0..100. Drift rates are per real hour, applied from
+   Date.now() deltas: hunger -6/h, mood -4/h, energy -3/h (energy
+   partly returns while the face RESTs unseen — a pony naps). */
+var DAY = 86400000;
+var P = { born: Date.now(), care: 0, hunger: 80, mood: 75, energy: 85, seen: Date.now() };
+(function init(){
+  var s = loadState();
+  if(s){
+    P.born = s.born; P.care = s.care || 0;
+    P.hunger = num(s.hunger, 80); P.mood = num(s.mood, 75); P.energy = num(s.energy, 85);
+    P.seen = (typeof s.seen === "number") ? s.seen : Date.now();
+  }
+  function num(v, d){ return (typeof v === "number" && isFinite(v)) ? v : d; }
+})();
+function clamp(v){ return v < 0 ? 0 : (v > 100 ? 100 : v); }
+function drift(){
+  var now = Date.now();
+  var hrs = (now - P.seen) / 3600000;
+  if(hrs <= 0){ P.seen = now; return; }
+  P.hunger = clamp(P.hunger - 6 * hrs);
+  P.mood   = clamp(P.mood   - 4 * hrs);
+  P.energy = clamp(P.energy - 3 * hrs);   /* sweep repair: the REST top-up died with the governor - the pony lives (and tires) at the plain rate now */
+  P.seen = now;
+}
+/* Growth: care points AND days both count. FOAL at birth; YEARLING at
+   12 care or day 2; FULL-GROWN at 40 care or day 5. */
+function stageOf(){
+  var days = Math.floor((Date.now() - P.born) / DAY);
+  if(P.care >= 40 || days >= 5) return 2;
+  if(P.care >= 12 || days >= 2) return 1;
+  return 0;
+}
+var STAGE_NAMES = ["FOAL", "YEARLING", "FULL-GROWN"];
+var STAGE_SCALE = [0.78, 0.90, 1.0];
+
+/* ---- Build the pony: clean line art, local coords, faces right ---------
+   Ground at y=272. Groups are posed by JS: bodyBob (whole pony),
+   headG (nod/tilt), earG (twitch/droop), tailG (swish), legs (trot),
+   eyeOpen/eyeShut (blink), heartG + feedG (interaction props). */
+var svg = document.getElementById("ponySvg");
+/* stable ground line + a few grass tufts, called colours */
+el("line", {x1:18, y1:272, x2:442, y2:272, stroke:PAL.dim, "stroke-width":2}, svg);
+for(var gt=0; gt<7; gt++){
+  var gx = 36 + gt*62;
+  el("path", {d:"M"+gx+" 272 q-3 -12 -8 -16 M"+gx+" 272 q0 -13 2 -18 M"+gx+" 272 q3 -11 9 -15",
+    fill:"none", stroke:PAL.grass, "stroke-width":1.8}, svg);
+}
+var pony = el("g", {}, svg);            /* stage scale + placement */
+var bob  = el("g", {}, pony);           /* idle bob / prance bounce */
+/* tail, behind the body */
+var tailG = el("g", {}, bob);
+el("path", {d:"M-96 -118 C -122 -104 -128 -74 -118 -44 C -112 -66 -108 -88 -104 -104 Z",
+  fill:"none", stroke:PAL.mane, "stroke-width":3}, tailG);
+el("path", {d:"M-100 -112 C -116 -96 -120 -72 -114 -52",
+  fill:"none", stroke:PAL.mane, "stroke-width":1.6}, tailG);
+/* legs: front pair + back pair, each pivots at the hip for the trot */
+function makeLeg(x, far){
+  var g = el("g", {}, bob);
+  var c = far ? PAL.coatdeep : PAL.coat, w = far ? 2.2 : 3;
+  el("line", {x1:x, y1:-84, x2:x, y2:-14, stroke:c, "stroke-width":w}, g);
+  el("path", {d:"M"+(x-6)+" -14 L"+(x+8)+" -14 L"+(x+8)+" -7 L"+(x-6)+" -7 Z",
+    fill:"none", stroke:PAL.hoof, "stroke-width":2}, g);
+  return g;
+}
+var legFL = makeLeg(52, false), legFR = makeLeg(68, true);
+var legBL = makeLeg(-72, false), legBR = makeLeg(-56, true);
+/* body */
+el("path", {d:"M-98 -104 C -100 -140 -70 -156 -30 -158 L 44 -158 C 82 -156 98 -138 96 -110 C 94 -88 70 -80 30 -80 L -40 -80 C -76 -80 -96 -86 -98 -104 Z",
+  fill:"none", stroke:PAL.coat, "stroke-width":3.4}, bob);
+el("path", {d:"M-84 -146 C -40 -152 40 -152 84 -142",
+  fill:"none", stroke:PAL.coatdeep, "stroke-width":1.6}, bob);   /* topline construction */
+/* neck + head */
+var headG = el("g", {}, bob);
+el("path", {d:"M58 -148 C 76 -160 88 -172 94 -190",
+  fill:"none", stroke:PAL.coat, "stroke-width":3}, headG);        /* neck line */
+el("path", {d:"M66 -138 C 84 -140 96 -146 104 -156",
+  fill:"none", stroke:PAL.coatdeep, "stroke-width":1.6}, headG);
+var skull = el("g", {}, headG);
+skull.setAttribute("transform", "translate(112 -196)");
+el("path", {d:"M-16 -16 C -18 -34 2 -44 20 -38 C 40 -32 48 -16 50 2 L 58 20 C 60 28 54 34 44 34 L 6 32 C -8 30 -14 8 -16 -16 Z",
+  fill:"none", stroke:PAL.coat, "stroke-width":3.2}, skull);      /* head + muzzle */
+el("circle", {cx:40, cy:16, r:3, fill:"none", stroke:PAL.muzzle, "stroke-width":2}, skull); /* nostril */
+el("path", {d:"M8 30 Q 26 36 44 30", fill:"none", stroke:PAL.muzzle, "stroke-width":1.8}, skull); /* mouth */
+/* ear: pivots for twitch; droop pose rotates it down/back */
+var earG = el("g", {}, skull);
+el("path", {d:"M-4 -34 C -8 -50 -4 -60 2 -66 C 8 -56 8 -44 4 -34 Z",
+  fill:"none", stroke:PAL.coat, "stroke-width":2.6}, earG);
+el("path", {d:"M0 -40 C -1 -50 1 -56 3 -60",
+  fill:"none", stroke:PAL.coatdeep, "stroke-width":1.4}, earG);
+/* forelock + mane down the neck */
+el("path", {d:"M-10 -38 C -20 -52 -18 -64 -10 -70 C -6 -58 -4 -48 -6 -38 Z",
+  fill:"none", stroke:PAL.mane, "stroke-width":2.4}, skull);
+el("path", {d:"M52 -178 C 40 -160 38 -140 46 -120 M60 -168 C 48 -152 46 -134 52 -118",
+  fill:"none", stroke:PAL.mane, "stroke-width":2.4}, headG);
+/* eye: open group and shut line, blink swaps them */
+var eyeOpen = el("g", {}, skull);
+el("circle", {cx:16, cy:-12, r:4.6, fill:PAL.panel, stroke:PAL.coat, "stroke-width":1.6}, eyeOpen);
+el("circle", {cx:17.5, cy:-13.5, r:1.6, fill:PAL.straw, stroke:"none"}, eyeOpen);
+var eyeShut = el("path", {d:"M9 -12 Q 16 -8 23 -12", fill:"none",
+  stroke:PAL.coatdeep, "stroke-width":2.2}, skull);
+eyeShut.setAttribute("visibility", "hidden");
+/* heart prop (PET beat) and hay prop (FEED), hidden at rest */
+var heartG = el("g", {visibility:"hidden"}, bob);
+el("path", {d:"M0 6 C -14 -8 -10 -22 0 -14 C 10 -22 14 -8 0 6 Z",
+  fill:"none", stroke:PAL.heart, "stroke-width":2.6},
+  (function(){ var h = el("g", {}, heartG); h.setAttribute("transform","translate(128 -238)"); return h; })());
+var feedG = el("g", {visibility:"hidden"}, bob);
+(function(){
+  var fg = el("g", {}, feedG); fg.setAttribute("transform", "translate(176 -34)");
+  for(var s=0; s<5; s++){
+    var sx = -16 + s*8;
+    el("path", {d:"M"+sx+" 0 C "+(sx-3)+" -14 "+(sx+2)+" -22 "+(sx+5)+" -30",
+      fill:"none", stroke:PAL.hay, "stroke-width":2}, fg);
+  }
+  el("path", {d:"M-20 0 L24 0", stroke:PAL.mane, "stroke-width":2.4}, fg);
+})();
+function pose(){
+  var st = stageOf();
+  var sc = STAGE_SCALE[st];
+  pony.setAttribute("transform",
+    "translate(230 272) scale("+sc+") translate(0 -272) translate(0 118)");
+}
+
+/* ---- Meters + stage line ---------------------------------------------- */
+var mH = document.getElementById("mHunger"), mM = document.getElementById("mMood"),
+    mE = document.getElementById("mEnergy");
+var stageEl = document.getElementById("stageLine");
+function paintMeters(){
+  drift();
+  function bar(elm, v){
+    elm.style.width = v.toFixed(0) + "%";
+    elm.style.background = v <= 20 ? PAL.warn : PAL.grass;
+  }
+  bar(mH, P.hunger); bar(mM, P.mood); bar(mE, P.energy);
+  stageEl.textContent = "· " + STAGE_NAMES[stageOf()] + " ·";
+  pose();
+}
+
+/* ---- Poses: idle life, neglect droop, interaction beats ---------------- */
+var fx = { feedUntil: 0, playUntil: 0, heartUntil: 0, act: "" };
+function droopy(){ return P.hunger <= 15; }
+function applyPose(t, now){
+  var sec = t / 1000;
+  var droop = droopy();
+  /* body: gentle bob; prance bounce while playing; slow sag when droopy */
+  var bobY = Math.sin(sec * 2.0) * (droop ? 1.2 : 2.4);
+  var headNod = Math.sin(sec * 2.0 - 0.5) * (droop ? 1.5 : 3);
+  var tailSw = Math.sin(sec * 1.6) * (droop ? 5 : 12);
+  var earRot = droop ? 38 : 0;
+  if(fx.act === "play" && now < fx.playUntil){
+    var u = 1 - (fx.playUntil - now) / 1600;               /* 0..1 over the beat */
+    bobY -= Math.abs(Math.sin(u * Math.PI * 4)) * 14;      /* prance hops */
+    headNod += Math.sin(u * Math.PI * 4) * 5;
+    tailSw += Math.sin(sec * 9) * 8;
+    setLegs(Math.sin(u * Math.PI * 8) * 16);
+  } else if(fx.act === "feed" && now < fx.feedUntil){
+    headNod = 16 + Math.sin(sec * 7) * 5;                  /* head down, munching */
+    setLegs(0);
+  } else {
+    setLegs(0);
+  }
+  /* ear twitch: a quick flick every ~4 s of observed time */
+  var tw = (sec % 4); if(tw < 0.18) earRot += -14 * Math.sin(tw / 0.18 * Math.PI);
+  bob.setAttribute("transform", "translate(0 "+bobY.toFixed(1)+")");
+  headG.setAttribute("transform", "rotate("+headNod.toFixed(1)+" 58 -140)");
+  earG.setAttribute("transform", "rotate("+earRot.toFixed(1)+" 0 -36)");
+  tailG.setAttribute("transform", "rotate("+tailSw.toFixed(1)+" -100 -110)");
+  /* blink: shut for 0.12 s in every ~3.4 s */
+  var bl = (sec % 3.4) < 0.12;
+  eyeOpen.setAttribute("visibility", bl ? "hidden" : "visible");
+  eyeShut.setAttribute("visibility", bl ? "visible" : "hidden");
+  /* props */
+  heartG.setAttribute("visibility", (now < fx.heartUntil) ? "visible" : "hidden");
+  feedG.setAttribute("visibility", (fx.act === "feed" && now < fx.feedUntil) ? "visible" : "hidden");
+}
+function setLegs(swing){
+  legFL.setAttribute("transform", "rotate("+swing.toFixed(1)+" 52 -84)");
+  legBR.setAttribute("transform", "rotate("+swing.toFixed(1)+" -56 -84)");
+  legFR.setAttribute("transform", "rotate("+(-swing).toFixed(1)+" 68 -84)");
+  legBL.setAttribute("transform", "rotate("+(-swing).toFixed(1)+" -72 -84)");
+}
+
+/* ---- Care actions --------------------------------------------------------
+   FEED: hunger +28 (big), mood +4, care +1, eats for 1.8 s.
+   PLAY: mood +22, energy -6, care +1, prances for 1.6 s.
+   PET:  mood +9, care +1, heart beat 1.2 s. Small, kind, repeatable. */
+function doCare(kind){
+  drift();
+  var now = Date.now();
+  if(kind === "feed"){ P.hunger = clamp(P.hunger + 28); P.mood = clamp(P.mood + 4);
+    fx.act = "feed"; fx.feedUntil = now + 1800; }
+  if(kind === "play"){ P.mood = clamp(P.mood + 22); P.energy = clamp(P.energy - 6);
+    fx.act = "play"; fx.playUntil = now + 1600; }
+  if(kind === "pet"){ P.mood = clamp(P.mood + 9); fx.heartUntil = now + 1200; }
+  P.care += 1;
+  P.seen = now;
+  saveState();
+  paintMeters();
+}
+document.getElementById("btnFeed").addEventListener("pointerdown", function(e){ e.stopPropagation(); doCare("feed"); });
+document.getElementById("btnPlay").addEventListener("pointerdown", function(e){ e.stopPropagation(); doCare("play"); });
+document.getElementById("btnPet").addEventListener("pointerdown", function(e){ e.stopPropagation(); doCare("pet"); });
+
+/* ---- Time read ---------------------------------------------------------- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var lampEl = document.getElementById("stateLamp");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1, paintedOnce = false;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute && now.getSeconds() !== 0 && lastMinute !== -1 && paintedOnce) return;
+  lastMinute = m; paintedOnce = true;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+
+/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
+   This face previously ran the BATTERY V2 GOVERNOR (mirrored from
+   the Glass House family): REST still / OBSERVED spectacle, ApexFace
+   hook, 12 s auto-exit. In any plain viewer the pony sat frozen
+   behind a live clock - the Betta V2 defect class, banned
+   house-wide. The governor is REMOVED on the flagship repair
+   pattern: applyPose runs from first paint, unconditionally,
+   while the face is open. window.__faceRest is pinned false and
+   window.__governor reports state "live"; window.ApexFace keeps
+   the old container contract as NO-OP compatibility (state()
+   always returns "live"). Care buttons feed/play/pet exactly as
+   before - they never needed the governor's permission. */
+function stillPass(){
+  /* one time-true still pass: pony stands posed at its growth stage,
+     ears up unless he is hungry-droopy, eyes open. No loop at REST. */
+  bob.setAttribute("transform", "translate(0 0)");
+  headG.setAttribute("transform", "rotate("+(droopy() ? 6 : 0)+" 58 -140)");
+  earG.setAttribute("transform", "rotate("+(droopy() ? 38 : 0)+" 0 -36)");
+  tailG.setAttribute("transform", "rotate(0 -100 -110)");
+  setLegs(0);
+  eyeOpen.setAttribute("visibility", "visible");
+  eyeShut.setAttribute("visibility", "hidden");
+  heartG.setAttribute("visibility", "hidden");
+  feedG.setAttribute("visibility", "hidden");
+  pose();
+}
+/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
+   This face previously ran the BATTERY V2 GOVERNOR: a two-state
+   REST/OBSERVED runtime. It booted into REST and ran its machinery
+   only while an observation signal (container hook, focus, touch,
+   ?face=observed) kept it awake, auto-exiting to REST 12 s after
+   the last signal. In any plain viewer it sat frozen behind a live
+   clock - the Betta V2 defect class, banned house-wide. The
+   governor is REMOVED on the flagship repair pattern: the driver
+   below is kicked at load and runs unconditionally while the face
+   is open; every angle is a pure function of absolute time, so a
+   returning face resumes exactly on cadence. The only pause left
+   is document.hidden (the platform stops rAF itself when the
+   screen sleeps). window.__faceRest is pinned false and
+   window.__governor reports state "live" - the bench handles stay
+   readable and now tell the truth. window.ApexFace keeps the old
+   container contract as NO-OP compatibility: its calls only note
+   the signal; state() always returns "live". Battery care,
+   honestly scoped: no auto-exit, no still-painting; while the
+   face is lit, it lives. */
+var bootMs = Date.now();
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+window.__dumbAgachi = P;
+function animateFrame(){
+  var now = Date.now();
+  applyPose(now - bootMs, now);
+  requestAnimationFrame(animateFrame);
+}
+function setLamp(){ lampEl.textContent = "LIVE"; }
+function note(sig){ gov.lastSignal = sig; }
+window.ApexFace = {
+  observe: function(){ note("container-observe(noop)"); },
+  rest:    function(){ note("container-rest(noop)"); },
+  toggle:  function(){ note("toggle(noop)"); },
+  state:   function(){ return "live"; }
+};
+window.addEventListener("apex-face-observe", function(){ note("event-observe(noop)"); });
+window.addEventListener("apex-face-rest", function(){ note("event-rest(noop)"); });
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ note(ev); }, true);
+});
+window.addEventListener("focus", function(){ note("focus"); });
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden){ paintTime(new Date()); drift(); paintMeters(); }
+});
+
+/* ---- Boot: paint once, then the live loop runs from first paint.
+   Needs drift is computed on wake/minute from real timestamps,
+   never from frames. No wake-lock - the system sleep governs. --- */
+drift();
+paintTime(new Date());
+paintMeters();
+setLamp();
+saveState();
+document.body.classList.add("live");
+requestAnimationFrame(animateFrame);
+setInterval(function(){
+  var now = new Date();
+  if(now.getMinutes() !== lastMinute){ paintTime(now); drift(); paintMeters(); }
+}, 1000);
+</script>
+</body>
+</html>

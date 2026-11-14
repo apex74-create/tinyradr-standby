@@ -1,0 +1,16 @@
+{
+  "id": "/shield",
+  "name": "Apex Signal Shield",
+  "short_name": "Signal Shield",
+  "description": "Separate Shield map, Tremor trail and local Bruce serial monitor.",
+  "start_url": "/shield",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#020b08",
+  "theme_color": "#020b08",
+  "icons": [
+    { "src": "/icons/shield-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/shield-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

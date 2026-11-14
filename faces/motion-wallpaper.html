@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>House Library · Entry #1 — Glint Chasing Screen Mesh (Motion Wallpaper)</title>
+<!--
+  =====================================================================
+  HOUSE LIBRARY · STYLIZING WING · ENTRY #1
+  "GLINT CHASING SCREEN MESH" — a motion-wallpaper routine.
+
+  This file is the FIRST ENTRY of the house's own in-house library for
+  stylizing: an original house rewrite of a motion effect, written to
+  REPLACE outside library calls for this effect. Outside library calls
+  are what gets a repo popped on a hack, so the house calls its own
+  library instead. This routine is 100% original house code: zero
+  external calls, zero borrowed library code, no CDN, nothing loaded
+  from outside — it IS the replacement for an outside call, so it cannot
+  contain one. Any house build may call it.
+
+  WHAT IT DOES, in the owner's words: a GLINT CHASING A SCREEN MESH.
+  A sparkle-glint travels the lines of a grid (the mesh) and pops
+  anime-bright where it passes — "POP — sparkle. Anime." (Holly's words
+  for it, Nov 8, 2026; this routine was extracted from her V16 build
+  correction, where the sparkle moved off the panels and onto the grid
+  wallpaper behind them.)
+
+  THE CONFIG BLOCK BELOW IS THE LIBRARY CALL INTERFACE. The parameters
+  ARE the call: squares/density, pattern, colors, speed. A build "calls"
+  this routine by copying it in with its own parameters set — that is
+  the house pattern until a served library exists.
+
+  THE SQUARES ARE DETERMINABLE TO THE BUILD. Density is per-build: the
+  build names its target square count across the screen (the owner's
+  scale: about 1,000 squares on one screen, 10,000 on another, 100,000
+  on another) and the routine derives the cell size from the screen it
+  lands on — same routine, a 1,000-square coarse chase on one screen, a
+  100,000-square fine shimmer on another. Change the size of the mesh
+  and you change the look of it: fine mesh reads as shimmer-dust,
+  coarse mesh reads as bold chasing blocks.
+
+  THE PATTERN IS VARIABLE AND SELECTABLE:
+    'sweep'    — glints ride the horizontal lines, one direction
+    'diagonal' — glints chase down the mesh diagonals
+    'bezel'    — glints run around the bezel edge of the screen
+    'scatter'  — a mix of all three, popping anywhere
+    'chase'    — glints ride lines either direction (the default)
+    'apex-bezel' — NO glints: the APEX BEZEL screen flash
+      (cb-screen-flash) + rim chase — the exact rainbow routine from
+      Encrypted CB, canonical home apex74-create/tinyradr
+      src/styles.css (component src/components/ApexBezel.tsx),
+      copied verbatim into this file below. A recreated wash was
+      ruled wrong by the owner on Nov 8, 2026 and never shipped; this
+      is the real routine. In builds it plays in the background ONLY
+      — never over the boxes in front where the person's
+      information is.
+
+  DOCUMENTED INSTANCE — HOLLY'S PAGE, STUDY BUILD V19 (Nov 8, 2026):
+  her first-iteration square-screen geometry, unchanged: plain empty
+  square cells at 24px. The treatment was confirmed by the owner the
+  same night as the "APEX SCENARIO" INSTANCE: field OLED BLACK
+  #000000 (true black, the space color), the wire mesh in GREEN —
+  lit green wire lines rgba(46,255,123,.55) standing off the black
+  as a floating matrix (one fixed layer drifting by transform
+  alone) — with amber and cayenne as the scenario's accent heats
+  where accents belong. (Her uploads showed the earlier shipped
+  treatment — a dark-green field with blue lines; the confirmed
+  treatment going forward is green wire on OLED black.)
+
+  PERSONALIZATION — the finished-product set, and it belongs to the
+  PERSON, never to the routine: (1) a CHARACTER PICTURE rides the
+  wallpaper as a swappable element — the routine accepts whatever
+  character picture the build or the person supplies; NO character is
+  baked into the routine (not everyone wants a dragon chasing its tail).
+  (2) THE PERSON'S NAME in the star plate — \u2605 NAME \u2605 — up where the
+  stars are. (3) THE COMPANION'S NAME. (4) THE COMPANION'S STATS —
+  game-style star values the person sets; always their game values,
+  never readings. All four live in the PERSONALIZATION block of the call
+  below, and in this standalone page the person can also set all four
+  right on the page (the small SET YOURS button, bottom right) — saved
+  on the device, nowhere else.
+
+  COST: one fixed canvas, one animation loop, nothing tied to scroll,
+  nothing repainting panels. It pauses itself when the page is hidden,
+  and when the screen asks for reduced motion it draws one still
+  picture — the mesh with one resting glint — and stops.
+  =====================================================================
+-->
+<style>
+  html,body{ margin:0; padding:0; height:100%; background:#04070f; overflow:hidden; }
+  #ghMesh{ position:fixed; inset:0; display:block; }
+  /* THE APEX BEZEL SCREEN FLASH + RIM CHASE — the house's canonical
+     rainbow routine, copied verbatim from apex74-create/tinyradr
+     src/styles.css (component src/components/ApexBezel.tsx). In this
+     standalone routine page the frame displays only when the pattern
+     is 'apex-bezel'. Parameters exactly as the source: rim palette,
+     135deg diagonal flash at 7-17% colour strength, 8s cycle, flash
+     on ~32%-48% of each cycle, rim chase at opacity .28 in sequence,
+     reduced motion kills it. */
+  .gh-bezel-bg{
+    --rim-red: oklch(0.68 0.24 22);
+    --rim-orange: oklch(0.79 0.18 55);
+    --rim-yellow: oklch(0.91 0.18 95);
+    --rim-green: oklch(0.82 0.2 155);
+    --rim-cyan: oklch(0.82 0.15 210);
+    --rim-violet: oklch(0.69 0.2 300);
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    display: none;
+  }
+  .gh-bezel-bg::before {
+    content: "";
+    position: absolute;
+    z-index: 31;
+    inset: 3px;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(135deg,
+      transparent 35%,
+      color-mix(in oklab, var(--rim-red) 7%, transparent) 41%,
+      color-mix(in oklab, var(--rim-orange) 13%, transparent) 45%,
+      color-mix(in oklab, var(--rim-yellow) 17%, transparent) 48%,
+      color-mix(in oklab, var(--rim-green) 16%, transparent) 51%,
+      color-mix(in oklab, var(--rim-cyan) 14%, transparent) 54%,
+      color-mix(in oklab, var(--rim-violet) 9%, transparent) 58%,
+      transparent 65%);
+    background-size: 260% 260%;
+    animation: cb-screen-flash 8s linear infinite;
+  }
+  .gh-bezel-bg::after {
+    content: "";
+    position: absolute;
+    z-index: 30;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    pointer-events: none;
+    border-radius: 2px;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent 0%, var(--rim-red) 43%, var(--rim-yellow) 48%, var(--rim-green) 51%, var(--rim-cyan) 54%, var(--rim-violet) 57%, transparent 100%);
+    background-size: 35% 100%;
+    background-repeat: no-repeat;
+    animation: cb-rim-top 8s linear infinite;
+  }
+  .cb-rim-chase {
+    position: absolute;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, var(--rim-red) 40%, var(--rim-yellow) 46%, var(--rim-green) 50%, var(--rim-cyan) 54%, var(--rim-violet) 60%, transparent);
+    background-repeat: no-repeat;
+    border-radius: 2px;
+  }
+  .cb-rim-left, .cb-rim-right {
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-size: 100% 25%;
+    background-image: linear-gradient(180deg, transparent, var(--rim-red) 40%, var(--rim-yellow) 46%, var(--rim-green) 50%, var(--rim-cyan) 54%, var(--rim-violet) 60%, transparent);
+  }
+  .cb-rim-left { left: 0; animation: cb-rim-left 8s linear infinite; }
+  .cb-rim-right { right: 0; animation: cb-rim-right 8s linear infinite; }
+  .cb-rim-bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-size: 35% 100%;
+    animation: cb-rim-bottom 8s linear infinite;
+  }
+  @keyframes cb-rim-top {
+    0%, 2% { opacity: 0; background-position: 150% 0; }
+    3% { opacity: .28; }
+    14% { opacity: .28; }
+    16%, 100% { opacity: 0; background-position: -50% 0; }
+  }
+  @keyframes cb-rim-left {
+    0%, 14% { opacity: 0; background-position: 0 -35%; }
+    16% { opacity: .28; }
+    29% { opacity: .28; }
+    31%, 100% { opacity: 0; background-position: 0 135%; }
+  }
+  @keyframes cb-rim-bottom {
+    0%, 51% { opacity: 0; background-position: -50% 0; }
+    53% { opacity: .28; }
+    64% { opacity: .28; }
+    66%, 100% { opacity: 0; background-position: 150% 0; }
+  }
+  @keyframes cb-rim-right {
+    0%, 64% { opacity: 0; background-position: 0 135%; }
+    66% { opacity: .28; }
+    79% { opacity: .28; }
+    81%, 100% { opacity: 0; background-position: 0 -35%; }
+  }
+  @keyframes cb-screen-flash {
+    0%, 30% { opacity: 0; background-position: 100% 100%; }
+    32% { opacity: 1; }
+    45% { opacity: 1; }
+    48%, 100% { opacity: 0; background-position: 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gh-bezel-bg::before, .gh-bezel-bg::after, .cb-rim-chase { animation: none; opacity: 0; }
+  }
+  #persPlate{ position:fixed; top:14px; left:0; right:0; text-align:center; display:none;
+    font-family:Georgia,'Times New Roman',serif; color:#ffd76a; font-size:22px; letter-spacing:.14em; pointer-events:none; }
+  #persCard{ position:fixed; left:12px; bottom:34px; display:none; align-items:center; gap:10px; pointer-events:none; }
+  #persCard img{ max-height:120px; max-width:120px; object-fit:contain; }
+  #persCard .who{ font-family:Georgia,'Times New Roman',serif; color:#e6dcff; font-size:15px; line-height:1.5; }
+  #persCard .who .st{ color:#b7a8d9; font-size:13px; }
+  #persBtn{ position:fixed; right:10px; bottom:8px; background:rgba(20,16,40,.85); color:#c9a6ff;
+    border:1px solid rgba(201,166,255,.5); border-radius:8px; padding:6px 10px; font-size:12px; letter-spacing:.08em; }
+  #persPanel{ position:fixed; right:10px; bottom:44px; width:250px; display:none; background:rgba(8,10,24,.96);
+    border:1px solid rgba(201,166,255,.5); border-radius:10px; padding:12px; color:#e6dcff;
+    font-family:Georgia,'Times New Roman',serif; font-size:13px; }
+  #persPanel label{ display:block; margin-top:8px; color:#b7a8d9; }
+  #persPanel input[type=text]{ width:100%; box-sizing:border-box; margin-top:3px; background:#0d1330; color:#fff;
+    border:1px solid rgba(201,166,255,.4); border-radius:6px; padding:6px; }
+  #persPanel button{ margin-top:10px; width:100%; background:#241a4d; color:#e6dcff; border:1px solid rgba(201,166,255,.5);
+    border-radius:6px; padding:7px; }
+  .caption{ position:fixed; left:0; right:0; bottom:10px; text-align:center;
+    font-family:Georgia,'Times New Roman',serif; color:rgba(183,168,217,.55);
+    font-size:12px; letter-spacing:.18em; pointer-events:none; }
+</style>
+</head>
+<body>
+<canvas id="ghMesh" aria-hidden="true"></canvas>
+<div class="apex-bezel cb-bezel gh-bezel-bg" id="ghBezel" aria-hidden="true"><span class="cb-rim-chase cb-rim-left"></span><span class="cb-rim-chase cb-rim-right"></span><span class="cb-rim-chase cb-rim-bottom"></span></div>
+<div id="persPlate"></div>
+<div id="persCard"><img id="persImg" alt=""><div class="who"><div id="persComp"></div><div class="st" id="persStats"></div></div></div>
+<div class="caption">HOUSE LIBRARY · ENTRY #1 — GLINT CHASING SCREEN MESH</div>
+<button id="persBtn" type="button">SET YOURS</button>
+<div id="persPanel">
+  <label>Your name (star plate)<input type="text" id="inName" placeholder="your name"></label>
+  <label>Companion's name<input type="text" id="inComp" placeholder="companion name"></label>
+  <label>Companion's picture<input type="file" id="inPic" accept="image/*"></label>
+  <label>Stats — one per line, like: Flight 4<input type="text" id="inStats" placeholder="Flight 4"></label>
+  <button id="persSave" type="button">SAVE MINE</button>
+  <button id="persClear" type="button">CLEAR MINE</button>
+</div>
+<script>
+(function(){
+  /* ===== THE LIBRARY CALL — set these parameters per build ===== */
+  var GH_MESH = {
+    squares:   10000,                 /* density: target squares across the screen (1,000 coarse · 10,000 mid · 100,000 fine) */
+    pattern:   'chase',               /* 'sweep' | 'diagonal' | 'bezel' | 'scatter' | 'chase' | 'apex-bezel' */
+    gridColor: 'rgba(30,58,138,.9)',  /* the mesh lines */
+    glint:     '#c9a6ff',             /* the sparkle that chases the mesh */
+    pop:       '#ffffff',             /* the white heart of each pop */
+    speed:     1.0,                   /* chase speed multiplier */
+    sparkles:  30                     /* how many pops are alive at once */
+  };
+  /* ===== PERSONALIZATION — the person's own four (defaults: none set) =====
+     symbolMark: the mark at the top of the person's page — their
+     identity mark, changeable like an icon at the top of a chat;
+     a picture the build/person supplies (address or data),
+     swappable, never baked in. characterPicture: a picture the build/person supplies (address or
+     data) — swappable, never baked in. personName renders in the star
+     plate. companionName is the companion's own name. stats are the
+     person's game values: [{ label:'Flight', stars:4 }] — set by them,
+     labelled as game values, never readings. */
+  var GH_PERSON = {
+    personName:       '',
+    companionName:    '',
+    characterPicture: '',
+    symbolMark:       '',
+    stats:            []
+  };
+  /* ===== the routine (house code — do not fetch, do not replace) ===== */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cvs = document.getElementById('ghMesh');
+  if (!cvs || !cvs.getContext) { return; }
+  var ctx = cvs.getContext('2d');
+  var W = 0, H = 0, cell = 24, cols = 0, rows = 0, T = 0, sparks = [], raf = null;
+  function hexA(hex, a){
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  function size(){
+    var nw = window.innerWidth, nh = window.innerHeight;
+    if (nw === W && nh === H) { return; }
+    W = nw; H = nh;
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    cvs.width = Math.round(W * dpr); cvs.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cell = Math.max(6, Math.sqrt((W * H) / Math.max(100, GH_MESH.squares)));
+    cols = Math.ceil(W / cell); rows = Math.ceil(H / cell);
+  }
+  function drawGrid(){
+    ctx.strokeStyle = GH_MESH.gridColor; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var x = 0.5; x <= W; x += cell) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+    for (var y = 0.5; y <= H; y += cell) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+    ctx.stroke();
+  }
+  function newSpark(edge){
+    var s = { ph: Math.random() }, kind = Math.random();
+    if (GH_MESH.pattern === 'bezel' || (GH_MESH.pattern === 'scatter' && kind < 0.35)) {
+      s.mode = 'bezel';
+      s.side = (Math.random() * 4) | 0;
+      s.u = edge ? (s.side % 2 === 0 ? 0 : 1) : Math.random(); s.v = 1;
+    } else if (GH_MESH.pattern === 'sweep' || (GH_MESH.pattern === 'scatter' && kind < 0.65)) {
+      s.mode = 'h'; s.j = (Math.random() * (rows + 1)) | 0;
+      s.x = edge ? -2 : Math.random() * cols; s.v = 0.8 + Math.random() * 0.9;
+    } else if (GH_MESH.pattern === 'diagonal' || GH_MESH.pattern === 'scatter') {
+      s.mode = 'd'; s.k = (Math.random() * (cols + rows + 1)) | 0;
+      s.t = edge ? 0 : Math.random(); s.v = 0.5 + Math.random() * 0.7;
+    } else { /* chase: riding one axis-aligned line, either direction */
+      if (Math.random() < 0.5) { s.mode = 'h'; s.j = (Math.random() * (rows + 1)) | 0; s.x = Math.random() * cols; s.v = (0.8 + Math.random() * 0.9) * (Math.random() < 0.5 ? 1 : -1); }
+      else { s.mode = 'v'; s.i = (Math.random() * (cols + 1)) | 0; s.y = Math.random() * rows; s.v = (0.8 + Math.random() * 0.9) * (Math.random() < 0.5 ? 1 : -1); }
+    }
+    return s;
+  }
+  function pos(s){
+    if (s.mode === 'h') { return [s.x * cell, s.j * cell]; }
+    if (s.mode === 'v') { return [s.i * cell, s.y * cell]; }
+    if (s.mode === 'd') { var i2 = Math.min(s.k, Math.floor(s.t * (cols + rows))); return [i2 * cell, (s.k - i2) * cell]; }
+    var per = 2 * (cols + rows), u = s.u * per, i3, j3;
+    if (u < cols) { i3 = u; j3 = 0; } else if (u < cols + rows) { i3 = cols; j3 = u - cols; }
+    else if (u < 2 * cols + rows) { i3 = cols - (u - cols - rows); j3 = rows; }
+    else { i3 = 0; j3 = rows - (u - 2 * cols - rows); }
+    return [i3 * cell, j3 * cell];
+  }
+  function frame(){
+    raf = requestAnimationFrame(frame);
+    T += GH_MESH.speed;
+    ctx.clearRect(0, 0, W, H);
+    drawGrid();
+    var reach = 3.2;
+    for (var n = 0; n < sparks.length; n++) {
+      var s = sparks[n];
+      if (s.mode === 'h') { s.x += s.v * GH_MESH.speed; if (s.x < -3 || s.x > cols + 3) { sparks[n] = newSpark(true); continue; } }
+      else if (s.mode === 'v') { s.y += s.v * GH_MESH.speed; if (s.y < -3 || s.y > rows + 3) { sparks[n] = newSpark(true); continue; } }
+      else if (s.mode === 'd') { s.t += (s.v * GH_MESH.speed) / (cols + rows) * 8; if (s.t > 1.05) { sparks[n] = newSpark(true); continue; } }
+      else { s.u += (s.v * GH_MESH.speed) / (cols + rows) * 0.5; if (s.u > 1) { s.u -= 1; } }
+      var p = pos(s), px = p[0], py = p[1], i, j, d, a;
+      /* the glint wakes the mesh lines around it, fading with distance */
+      ctx.lineWidth = 1;
+      for (i = Math.max(0, Math.floor(px / cell) - 3); i <= Math.min(cols, Math.ceil(px / cell) + 3); i++) {
+        d = Math.abs(i * cell - px) / cell; a = 0.5 * Math.max(0, 1 - d / reach);
+        if (a > 0.02) { ctx.strokeStyle = hexA(GH_MESH.glint, a); ctx.beginPath(); ctx.moveTo(i * cell, Math.max(0, py - reach * cell)); ctx.lineTo(i * cell, Math.min(H, py + reach * cell)); ctx.stroke(); }
+      }
+      for (j = Math.max(0, Math.floor(py / cell) - 3); j <= Math.min(rows, Math.ceil(py / cell) + 3); j++) {
+        d = Math.abs(j * cell - py) / cell; a = 0.5 * Math.max(0, 1 - d / reach);
+        if (a > 0.02) { ctx.strokeStyle = hexA(GH_MESH.glint, a); ctx.beginPath(); ctx.moveTo(Math.max(0, px - reach * cell), j * cell); ctx.lineTo(Math.min(W, px + reach * cell), j * cell); ctx.stroke(); }
+      }
+      /* the pop itself: a four-point anime star at the crossing */
+      var tw = 0.75 + 0.25 * Math.sin(T * 0.35 + s.ph * 6.283), R = cell * 0.62 * tw;
+      ctx.strokeStyle = hexA(GH_MESH.glint, 0.95); ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(px - R, py); ctx.lineTo(px + R, py);
+      ctx.moveTo(px, py - R); ctx.lineTo(px, py + R);
+      ctx.moveTo(px - R * 0.4, py - R * 0.4); ctx.lineTo(px + R * 0.4, py + R * 0.4);
+      ctx.moveTo(px - R * 0.4, py + R * 0.4); ctx.lineTo(px + R * 0.4, py - R * 0.4);
+      ctx.stroke();
+      ctx.fillStyle = GH_MESH.pop;
+      ctx.beginPath(); ctx.arc(px, py, Math.max(1.4, cell * 0.09), 0, 6.2832); ctx.fill();
+    }
+  }
+  function start(){ if (!raf && !reduce) { raf = requestAnimationFrame(frame); } }
+  function stop(){ if (raf) { cancelAnimationFrame(raf); raf = null; } }
+  size();
+  /* the still picture first: the mesh, and one resting glint */
+  drawGrid();
+  var rp = [W * 0.32, H * 0.3]; rp[0] = Math.round(rp[0] / cell) * cell; rp[1] = Math.round(rp[1] / cell) * cell;
+  ctx.fillStyle = GH_MESH.pop; ctx.beginPath(); ctx.arc(rp[0], rp[1], 2, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = hexA(GH_MESH.glint, 0.9); ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(rp[0] - cell * 0.6, rp[1]); ctx.lineTo(rp[0] + cell * 0.6, rp[1]);
+  ctx.moveTo(rp[0], rp[1] - cell * 0.6); ctx.lineTo(rp[0], rp[1] + cell * 0.6); ctx.stroke();
+  /* 'apex-bezel': the rainbow reflection is the CSS layer's job — switch
+     it on; the canvas keeps only the plain grid, no glints ride it. */
+  if (GH_MESH.pattern === 'apex-bezel') {
+    var rb = document.getElementById('ghBezel');
+    if (rb) { rb.style.display = 'block'; }
+    if (reduce) { return; }
+    document.addEventListener('visibilitychange', function(){ if (document.hidden) { stop(); } else { start(); } });
+    window.addEventListener('resize', function(){ size(); });
+    start();
+    return;
+  }
+  if (reduce) { return; }  /* reduced motion: the still picture is the whole show */
+  for (var q = 0; q < GH_MESH.sparkles; q++) { sparks.push(newSpark(false)); }
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) { stop(); } else { start(); } });
+  window.addEventListener('resize', function(){ size(); });
+  start();
+})();
+
+  /* ===== personalization: render + on-page setting (house code) ===== */
+  (function(){
+    var KEY = 'ghMesh.pers.v1';
+    var pers = { personName: GH_PERSON.personName || '', companionName: GH_PERSON.companionName || '', characterPicture: GH_PERSON.characterPicture || '', stats: GH_PERSON.stats || [] };
+    try { var sv = JSON.parse(localStorage.getItem(KEY)); if (sv) { for (var k in pers) { if (sv[k] != null) pers[k] = sv[k]; } } } catch(e){}
+    function stars(n){ var s=''; for (var i=0;i<5;i++){ s += (i<n ? '\u2605' : '\u2606'); } return s; }
+    function render(){
+      var plate = document.getElementById('persPlate');
+      plate.style.display = pers.personName ? 'block' : 'none';
+      plate.textContent = pers.personName ? ('\u2605 ' + pers.personName + ' \u2605') : '';
+      var card = document.getElementById('persCard');
+      var has = pers.characterPicture || pers.companionName || (pers.stats && pers.stats.length);
+      card.style.display = has ? 'flex' : 'none';
+      var img = document.getElementById('persImg');
+      img.style.display = pers.characterPicture ? 'block' : 'none';
+      if (pers.characterPicture) img.src = pers.characterPicture;
+      document.getElementById('persComp').textContent = pers.companionName || '';
+      document.getElementById('persStats').textContent = (pers.stats || []).map(function(s){ return s.label + ' ' + stars(s.stars); }).join(' \u00B7 ');
+      document.getElementById('inName').value = pers.personName || '';
+      document.getElementById('inComp').value = pers.companionName || '';
+      document.getElementById('inStats').value = (pers.stats || []).map(function(s){ return s.label + ' ' + s.stars; }).join('\n');
+    }
+    render();
+    var panel = document.getElementById('persPanel');
+    document.getElementById('persBtn').addEventListener('click', function(){ panel.style.display = (panel.style.display === 'block') ? 'none' : 'block'; });
+    document.getElementById('inPic').addEventListener('change', function(){
+      var f = this.files && this.files[0]; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function(){ var img = new Image(); img.onload = function(){ var mx = 320, w = img.width, h = img.height; if (w > mx || h > mx) { var r = mx / Math.max(w, h); w = Math.round(w * r); h = Math.round(h * r); } var cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(img, 0, 0, w, h); pers.characterPicture = cv.toDataURL('image/png'); render(); }; img.src = rd.result; };
+      rd.readAsDataURL(f);
+    });
+    document.getElementById('persSave').addEventListener('click', function(){
+      pers.personName = document.getElementById('inName').value.trim().toUpperCase();
+      pers.companionName = document.getElementById('inComp').value.trim();
+      pers.stats = document.getElementById('inStats').value.split('\n').map(function(line){ var m = line.trim().match(/^(.*?)\s+(\d)\s*$/); return m ? { label: m[1], stars: Math.max(0, Math.min(5, parseInt(m[2], 10))) } : null; }).filter(Boolean);
+      try { localStorage.setItem(KEY, JSON.stringify(pers)); } catch(e){}
+      render();
+    });
+    document.getElementById('persClear').addEventListener('click', function(){
+      pers = { personName:'', companionName:'', characterPicture:'', stats:[] };
+      try { localStorage.removeItem(KEY); } catch(e){}
+      render();
+    });
+  })();
+</script>
+</body>
+</html>

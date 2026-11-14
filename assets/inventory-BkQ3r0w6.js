@@ -1,0 +1,1 @@
+import{t as e}from"./link-De8nA1so.js";import{t}from"./jsx-runtime-NZYk81nU.js";var n=t(),r=()=>(0,n.jsxs)(`main`,{className:`min-h-app px-4 py-6 text-[11px] text-alert`,children:[`The inventory could not be loaded right now.`,` `,(0,n.jsx)(e,{to:`/store`,className:`underline`,children:`Open the store`}),`.`]});export{r as errorComponent};

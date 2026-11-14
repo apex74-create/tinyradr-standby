@@ -1,0 +1,25 @@
+{
+  "name": "Apex Wrist CB",
+  "short_name": "Wrist CB",
+  "description": "Wrist push-to-talk CB radio on the Apex channel bus.",
+  "start_url": "/lcb.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/icons/wristcb-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/wristcb-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "servers": [
+    {
+      "id": "nyc-1",
+      "name": "New York",
+      "city": "New York",
+      "country": "USA",
+      "lat": 40.7128,
+      "lng": -74.0060,
+      "gateState": "open",
+      "region": "North America",
+      "timezone": "UTC-5"
+    },
+    {
+      "id": "lon-1",
+      "name": "London",
+      "city": "London",
+      "country": "UK",
+      "lat": 51.5074,
+      "lng": -0.1278,
+      "gateState": "open",
+      "region": "Europe",
+      "timezone": "UTC+0"
+    },
+    {
+      "id": "tok-1",
+      "name": "Tokyo",
+      "city": "Tokyo",
+      "country": "Japan",
+      "lat": 35.6762,
+      "lng": 139.6503,
+      "gateState": "open",
+      "region": "Asia",
+      "timezone": "UTC+9"
+    },
+    {
+      "id": "syd-1",
+      "name": "Sydney",
+      "city": "Sydney",
+      "country": "Australia",
+      "lat": -33.8688,
+      "lng": 151.2093,
+      "gateState": "open",
+      "region": "Oceania",
+      "timezone": "UTC+10"
+    },
+    {
+      "id": "fra-1",
+      "name": "Frankfurt",
+      "city": "Frankfurt",
+      "country": "Germany",
+      "lat": 50.1109,
+      "lng": 8.6821,
+      "gateState": "open",
+      "region": "Europe",
+      "timezone": "UTC+1"
+    },
+    {
+      "id": "sin-1",
+      "name": "Singapore",
+      "city": "Singapore",
+      "country": "Singapore",
+      "lat": 1.3521,
+      "lng": 103.8198,
+      "gateState": "open",
+      "region": "Asia",
+      "timezone": "UTC+8"
+    },
+    {
+      "id": "tor-1",
+      "name": "Toronto",
+      "city": "Toronto",
+      "country": "Canada",
+      "lat": 43.6532,
+      "lng": -79.3832,
+      "gateState": "open",
+      "region": "North America",
+      "timezone": "UTC-5"
+    },
+    {
+      "id": "ams-1",
+      "name": "Amsterdam",
+      "city": "Amsterdam",
+      "country": "Netherlands",
+      "lat": 52.3676,
+      "lng": 4.9041,
+      "gateState": "open",
+      "region": "Europe",
+      "timezone": "UTC+1"
+    },
+    {
+      "id": "bkk-1",
+      "name": "Bangkok",
+      "city": "Bangkok",
+      "country": "Thailand",
+      "lat": 13.7563,
+      "lng": 100.5018,
+      "gateState": "open",
+      "region": "Asia",
+      "timezone": "UTC+7"
+    },
+    {
+      "id": "sfo-1",
+      "name": "San Francisco",
+      "city": "San Francisco",
+      "country": "USA",
+      "lat": 37.7749,
+      "lng": -122.4194,
+      "gateState": "open",
+      "region": "North America",
+      "timezone": "UTC-8"
+    },
+    {
+      "id": "mum-1",
+      "name": "Mumbai",
+      "city": "Mumbai",
+      "country": "India",
+      "lat": 19.0760,
+      "lng": 72.8777,
+      "gateState": "open",
+      "region": "Asia",
+      "timezone": "UTC+5:30"
+    },
+    {
+      "id": "dub-1",
+      "name": "Dubai",
+      "city": "Dubai",
+      "country": "UAE",
+      "lat": 25.2048,
+      "lng": 55.2708,
+      "gateState": "open",
+      "region": "Middle East",
+      "timezone": "UTC+4"
+    },
+    {
+      "id": "mel-1",
+      "name": "Melbourne",
+      "city": "Melbourne",
+      "country": "Australia",
+      "lat": -37.8136,
+      "lng": 144.9631,
+      "gateState": "open",
+      "region": "Oceania",
+      "timezone": "UTC+10"
+    },
+    {
+      "id": "ber-1",
+      "name": "Berlin",
+      "city": "Berlin",
+      "country": "Germany",
+      "lat": 52.5200,
+      "lng": 13.4050,
+      "gateState": "open",
+      "region": "Europe",
+      "timezone": "UTC+1"
+    },
+    {
+      "id": "sao-1",
+      "name": "São Paulo",
+      "city": "São Paulo",
+      "country": "Brazil",
+      "lat": -23.5505,
+      "lng": -46.6333,
+      "gateState": "open",
+      "region": "South America",
+      "timezone": "UTC-3"
+    },
+    {
+      "id": "hkg-1",
+      "name": "Hong Kong",
+      "city": "Hong Kong",
+      "country": "Hong Kong",
+      "lat": 22.3193,
+      "lng": 114.1694,
+      "gateState": "open",
+      "region": "Asia",
+      "timezone": "UTC+8"
+    }
+  ],
+  "metadata": {
+    "totalServers": 16,
+    "lastUpdated": "2026-05-18T00:00:00Z",
+    "version": "1.0.0",
+    "description": "Global public server registry for TriStar routing. No domain purchase required. Choose any server and route through it using the TriStar Triangle Thought Process Engine."
+  }
+}

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — Waterfall BLOCKS · Fall + Die</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#020403; }
+  body { font-family:ui-monospace,Menlo,Consolas,monospace; overflow:hidden; }
+  #stage { position:absolute; left:0; top:0; overflow:hidden; background:#020403; }
+  #fall { position:absolute; left:0; top:0; display:flex; justify-content:space-evenly; }
+  #fall .col { writing-mode:vertical-rl; white-space:nowrap; }
+  .vignette { position:absolute; left:0; top:0; background:radial-gradient(ellipse at center, rgba(0,0,0,.18) 40%, rgba(0,0,0,.82) 100%); }
+  #face { position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .brand { color:#39ff6a; font-weight:700; text-shadow:0 0 14px rgba(57,255,106,.55); }
+  #clock { color:#eaffef; font-weight:800; line-height:1; text-shadow:0 0 10px rgba(57,255,106,.9), 0 0 42px rgba(57,255,106,.45); font-variant-numeric:tabular-nums; }
+  #sec { color:#6ea8d8; font-weight:700; text-shadow:0 0 12px rgba(110,168,216,.6); font-variant-numeric:tabular-nums; }
+  #date { color:#8fd9a4; }
+  #tally { color:#a9e8bb; font-variant-numeric:tabular-nums; }
+  #scope { white-space:nowrap; letter-spacing:0; }
+  #scope .pos { color:#39ff6a; } #scope .neg { color:#6ea8d8; } #scope .zero { color:#2c5c3e; }
+  #lean { color:#ffc95c; font-variant-numeric:tabular-nums; text-shadow:0 0 8px rgba(255,201,92,.35); }
+  .panel { color:#cfe9d6; font-variant-numeric:tabular-nums; text-align:center; }
+  .panel .hd { color:#39ff6a; font-weight:700; letter-spacing:.18em; }
+  .panel .band { color:#5f7f6b; }
+  #blkstrip { white-space:nowrap; letter-spacing:0; }
+  #blkstrip .pos { color:#39ff6a; } #blkstrip .neg { color:#6ea8d8; } #blkstrip .zero { color:#2c5c3e; } #blkstrip .wide { color:#ffc95c; }
+  #diecall { color:#ffc95c; text-shadow:0 0 8px rgba(255,201,92,.35); }
+  .strip { position:absolute; left:0; text-align:center; color:#3f6b4d; width:100%; }
+</style></head>
+<body>
+<div id="stage">
+  <div id="fall"></div>
+  <div class="vignette"></div>
+  <div id="face">
+    <div class="brand">APEX</div>
+    <div id="clock">--:--</div>
+    <div id="sec">--</div>
+    <div id="date">—</div>
+    <div id="tally">1 — · 0 —</div>
+    <div id="scope"></div>
+    <div id="lean">—</div>
+    <div class="panel" id="fallpanel"></div>
+    <div id="blkstrip"></div>
+    <div class="panel" id="diepanel"></div>
+    <div id="diecall"></div>
+  </div>
+  <div class="strip">LIVE FALL · BLOCKS = 1,000 DRAWS PER MEASURE · DIE BUILT FROM THE FALL'S OWN BITS · FOUNDED OCT 31, 2026</div>
+</div>
+<script>
+  // BLOCKS — the owner's block-statistics gauge (Nov 7, 2026, 01:17 EST):
+  // every 1,000 draws of the fall becomes ONE measurement. Count how the blocks
+  // lean (over 50% one way or the other), how wide they swing against the fair
+  // band, and clock the drop rate so ranges scale to wall time. The DIE panel
+  // spends the same gas: faces are drawn from the fall's own bits (3 bits per
+  // fall, 1-6 kept, 0 and 7 re-drawn) — all physics removed, only the stream.
+  // Referee lines are printed on the face: a fair fall's blocks hug the band;
+  // a bent stream shows as counts living outside it. History alone gives the
+  // next fall NO MEASURE — only a measured bent stream earns a call.
+  var stage = document.getElementById('stage');
+  var fallEl = document.getElementById('fall');
+  var faceEl = document.getElementById('face');
+  var W = 0, H = 0, streams = [], ones = 0, zeros = 0, built = false;
+  var shades = ['#39ff6a', '#27c452', '#166b32', '#0b3d1d'];
+  var BLOCKS = '▁▂▃▄▅▆▇█';
+  var hist = [], HISTN = 56;
+  // --- block state: the fall ---
+  var BLKSIZE = 1000, blkOnes = 0, blkCount = 0, blkLean1 = 0, blkLean0 = 0, blkEven = 0, blkWide = 0, lastBlk = null;
+  var blkHist = [], BLKHISTN = 40;
+  var FAIRLO = 468, FAIRHI = 532; // 1,000 draws, fair band ~95 of 100 blocks
+  // --- die state: built from the fall's bits ---
+  var bitQ = [], dieFaces = [0,0,0,0,0,0,0], dieBlk = [0,0,0,0,0,0,0], dieBlkN = 0, dieBlocks = 0, lastDieBlk = null;
+  var DIEBLK = 600, DIELO = 82, DIEHI = 118; // per face per 600 falls, fair band
+  // --- rate clock ---
+  var rateCount = 0, ratePerSec = 0, rateT0 = Date.now();
+  function measure() {
+    var vv = window.visualViewport;
+    W = Math.floor(vv ? vv.width : window.innerWidth);
+    H = Math.floor(vv ? vv.height : window.innerHeight);
+    if (!W || !H) { W = document.documentElement.clientWidth || 300; H = document.documentElement.clientHeight || 400; }
+  }
+  function bit() {
+    var b = Math.random() > 0.5 ? 1 : 0;
+    if (b) ones++; else zeros++;
+    rateCount++;
+    // fall block accounting
+    if (b) blkOnes++;
+    blkCount++;
+    if (blkCount >= BLKSIZE) closeBlock();
+    // die: queue the bit, spend in threes
+    bitQ.push(b);
+    while (bitQ.length >= 3) {
+      var v = bitQ[0] * 4 + bitQ[1] * 2 + bitQ[2];
+      bitQ.splice(0, 3);
+      if (v >= 1 && v <= 6) castDie(v);
+    }
+    return b;
+  }
+  function closeBlock() {
+    var o = blkOnes, z = BLKSIZE - o;
+    lastBlk = o;
+    if (o > 500) blkLean1++; else if (o < 500) blkLean0++; else blkEven++;
+    if (o < FAIRLO || o > FAIRHI) blkWide++;
+    blkHist.push(o); if (blkHist.length > BLKHISTN) blkHist.shift();
+    blkOnes = 0; blkCount = 0;
+  }
+  function castDie(face) {
+    dieFaces[face]++; dieBlk[face]++; dieBlkN++;
+    if (dieBlkN >= DIEBLK) {
+      lastDieBlk = dieBlk.slice();
+      dieBlocks++;
+      dieBlk = [0,0,0,0,0,0,0]; dieBlkN = 0;
+    }
+  }
+  function render(st) {
+    var html = '';
+    for (var i = 0; i < st.chars.length; i++) html += (i === 0) ? '<b style="color:#b6ffd0;font-weight:400">' + st.chars[i] + '</b>' : st.chars[i];
+    st.el.innerHTML = html;
+  }
+  function layout() {
+    measure();
+    stage.style.width = W + 'px'; stage.style.height = H + 'px';
+    fallEl.style.width = W + 'px'; fallEl.style.height = H + 'px';
+    faceEl.style.width = W + 'px'; faceEl.style.height = H + 'px';
+    var vg = document.querySelector('.vignette'); vg.style.width = W + 'px'; vg.style.height = H + 'px';
+    var fallFont = Math.max(9, Math.floor(H * 0.024));
+    document.querySelector('.brand').style.fontSize = Math.floor(H * 0.030) + 'px';
+    document.querySelector('.brand').style.letterSpacing = Math.floor(W * 0.06) + 'px';
+    document.getElementById('clock').style.fontSize = Math.floor(Math.min(W * 0.30, H * 0.20)) + 'px';
+    document.getElementById('sec').style.fontSize = Math.floor(H * 0.046) + 'px';
+    document.getElementById('date').style.fontSize = Math.floor(H * 0.032) + 'px';
+    document.getElementById('date').style.marginTop = Math.floor(H * 0.014) + 'px';
+    document.getElementById('tally').style.fontSize = Math.floor(H * 0.028) + 'px';
+    document.getElementById('tally').style.marginTop = Math.floor(H * 0.012) + 'px';
+    var sc = document.getElementById('scope');
+    sc.style.fontSize = Math.floor(H * 0.042) + 'px';
+    sc.style.marginTop = Math.floor(H * 0.008) + 'px';
+    var ln = document.getElementById('lean');
+    ln.style.fontSize = Math.floor(H * 0.028) + 'px';
+    ln.style.marginTop = Math.floor(H * 0.006) + 'px';
+    var fp = document.getElementById('fallpanel');
+    fp.style.fontSize = Math.floor(H * 0.026) + 'px';
+    fp.style.marginTop = Math.floor(H * 0.014) + 'px';
+    fp.style.lineHeight = '1.5';
+    var bs = document.getElementById('blkstrip');
+    bs.style.fontSize = Math.floor(H * 0.034) + 'px';
+    var dp = document.getElementById('diepanel');
+    dp.style.fontSize = Math.floor(H * 0.026) + 'px';
+    dp.style.marginTop = Math.floor(H * 0.010) + 'px';
+    dp.style.lineHeight = '1.5';
+    var dc = document.getElementById('diecall');
+    dc.style.fontSize = Math.floor(H * 0.028) + 'px';
+    dc.style.marginTop = Math.floor(H * 0.006) + 'px';
+    var strip = document.querySelector('.strip');
+    strip.style.fontSize = Math.floor(H * 0.020) + 'px';
+    strip.style.bottom = Math.floor(H * 0.014) + 'px';
+    fallEl.innerHTML = ''; streams = [];
+    var cols = Math.max(10, Math.floor(W / (fallFont * 1.5)));
+    var len = Math.max(20, Math.floor(H / (fallFont * 1.1)));
+    for (var c = 0; c < cols; c++) {
+      var col = document.createElement('div');
+      col.className = 'col';
+      col.style.fontSize = fallFont + 'px'; col.style.lineHeight = '1.5'; col.style.letterSpacing = '0.35em';
+      col.style.color = shades[c % shades.length];
+      col.style.opacity = (0.3 + (c % 5) * 0.11).toFixed(2);
+      fallEl.appendChild(col);
+      var s = []; for (var i = 0; i < len; i++) s.push(bit());
+      streams.push({ el: col, chars: s, speed: 1 + (c % 3), tick: 0 });
+    }
+    streams.forEach(render);
+    built = true;
+  }
+  function drawScope() {
+    var gap = ones - zeros;
+    hist.push(gap); if (hist.length > HISTN) hist.shift();
+    var scale = 10;
+    for (var i = 0; i < hist.length; i++) scale = Math.max(scale, Math.abs(hist[i]));
+    var html = '';
+    for (var j = 0; j < hist.length; j++) {
+      var v = hist[j], lvl = Math.round(Math.abs(v) / scale * 7);
+      if (v > 0) html += '<span class="pos">' + BLOCKS[lvl] + '</span>';
+      else if (v < 0) html += '<span class="neg">' + BLOCKS[lvl] + '</span>';
+      else html += '<span class="zero">▁</span>';
+    }
+    document.getElementById('scope').innerHTML = html;
+    var total = ones + zeros;
+    var pct = total ? (ones / total * 100) : 50;
+    document.getElementById('lean').textContent = '1s ' + pct.toFixed(1) + '% · GAP ' + (gap >= 0 ? '+' : '') + gap.toLocaleString('en-US');
+  }
+  function drawPanels() {
+    var now = Date.now();
+    if (now - rateT0 >= 1000) { ratePerSec = Math.round(rateCount * 1000 / (now - rateT0)); rateCount = 0; rateT0 = now; }
+    var blkClock = ratePerSec ? (BLKSIZE / ratePerSec).toFixed(1) : '—';
+    var nBlk = blkLean1 + blkLean0 + blkEven;
+    var fp = '<span class="hd">FALL BLOCKS · 1,000</span><br>';
+    if (lastBlk !== null) fp += 'LAST ' + lastBlk + ' / ' + (BLKSIZE - lastBlk) + ' · BLOCKS ' + nBlk + ' · OVER-50 → 1s ×' + blkLean1 + ' · 0s ×' + blkLean0 + (blkEven ? ' · EVEN ×' + blkEven : '') + ' · WIDE ×' + blkWide + '<br>';
+    fp += 'IN BLOCK ' + blkCount + '/1,000 · 1s ' + (blkCount ? (blkOnes / blkCount * 100).toFixed(1) : '—') + '% · RATE ~' + ratePerSec + '/s · BLOCK ≈ ' + blkClock + 's<br>';
+    fp += '<span class="band">FAIR BAND 468–532 · ~95 OF 100 FAIR BLOCKS LAND INSIDE</span>';
+    document.getElementById('fallpanel').innerHTML = fp;
+    var bh = '';
+    for (var j = 0; j < blkHist.length; j++) {
+      var o = blkHist[j], off = o - 500, lvl = Math.min(7, Math.round(Math.abs(off) / 32 * 7));
+      var cls = (o < FAIRLO || o > FAIRHI) ? 'wide' : (off > 0 ? 'pos' : (off < 0 ? 'neg' : 'zero'));
+      bh += '<span class="' + cls + '">' + BLOCKS[lvl] + '</span>';
+    }
+    document.getElementById('blkstrip').innerHTML = bh || '—';
+    var tot = dieFaces[1] + dieFaces[2] + dieFaces[3] + dieFaces[4] + dieFaces[5] + dieFaces[6];
+    var dp = '<span class="hd">DIE BLOCKS · 600 FALLS</span><br>';
+    if (lastDieBlk) {
+      var parts = [];
+      for (var f = 1; f <= 6; f++) parts.push(f + ':' + lastDieBlk[f]);
+      dp += 'LAST BLOCK ' + parts.join('  ') + '<br>';
+    }
+    var tparts = [];
+    for (var g = 1; g <= 6; g++) tparts.push(g + ':' + dieFaces[g]);
+    dp += 'SESSION ' + tot.toLocaleString('en-US') + ' FALLS · ' + tparts.join('  ') + '<br>';
+    dp += '<span class="band">FAIR PER FACE PER BLOCK 82–118 · NEXT FALL FROM HISTORY ALONE: NO MEASURE</span>';
+    document.getElementById('diepanel').innerHTML = dp;
+    // THE CALL — only a measured bent stream earns one; session measure, 3-sigma wide.
+    var call = '';
+    if (tot >= 600) {
+      var mean = tot / 6, sd = Math.sqrt(tot * (1 / 6) * (5 / 6)), worst = null, worstZ = 0;
+      for (var k = 1; k <= 6; k++) {
+        var z = (dieFaces[k] - mean) / sd;
+        if (Math.abs(z) > Math.abs(worstZ)) { worstZ = z; worst = k; }
+      }
+      if (Math.abs(worstZ) >= 3) call = 'MEASURED LEAN: FACE ' + worst + (worstZ > 0 ? ' RUNNING HOT' : ' RUNNING COLD') + ' · ' + dieFaces[worst] + ' OF ' + tot + ' (' + (dieFaces[worst] / tot * 100).toFixed(1) + '% vs 16.7% FAIR)';
+      else call = 'STREAM MEASURES FAIR — NO FACE OUTSIDE 3 SIGMA · NO CALL';
+    }
+    document.getElementById('diecall').textContent = call;
+  }
+  layout();
+  window.addEventListener('resize', layout);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', layout);
+  setInterval(function () {
+    if (!built) return;
+    for (var k = 0; k < streams.length; k++) {
+      var st = streams[k];
+      if (++st.tick % st.speed) continue;
+      st.chars.pop(); st.chars.unshift(bit()); render(st);
+    }
+    document.getElementById('tally').textContent = '1 · ' + ones.toLocaleString('en-US') + ' — 0 · ' + zeros.toLocaleString('en-US');
+  }, 130);
+  setInterval(drawScope, 1000);
+  setInterval(drawPanels, 1000);
+  function tick() {
+    var d = new Date(), h = d.getHours() % 12; if (h === 0) h = 12;
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    document.getElementById('clock').textContent = h + ':' + p(d.getMinutes());
+    document.getElementById('sec').textContent = ':' + p(d.getSeconds()) + (d.getHours() >= 12 ? ' PM' : ' AM');
+    document.getElementById('date').textContent = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body></html>

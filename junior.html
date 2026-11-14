@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Companion · Watch</title>
+<meta name="description" content="Wrist companion: paired private channel, voice in, text out, shared map.">
+<meta property="og:title" content="Apex Companion · Junior Device">
+<meta property="og:description" content="Private paired-device voice reception, text and opt-in shared positions.">
+<meta property="og:type" content="website"><meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="/junior.webmanifest">
+<link rel="icon" href="/icons/wristcb-192.png"><link rel="apple-touch-icon" href="/icons/wristcb-192.png">
+<style>
+html,body{margin:0;height:100%;background:#000;color:#ffb000;font:14px/1.2 monospace;overflow:hidden}
+#map{position:fixed;inset:0;overflow:hidden;background:#111}#map:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.45);pointer-events:none}
+.dot{position:absolute;transform:translate(-50%,-50%);min-width:14px;height:14px;border-radius:7px;background:#ffb000;border:2px solid #000;font-size:10px;color:#000;padding:0 3px;line-height:14px;white-space:nowrap}
+.dot.peer{background:#3cf}
+.attr{position:absolute;right:2px;bottom:0;font-size:8px;color:#aaa}
+.nomap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#555}
+#ui{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-sizing:border-box;pointer-events:none}
+#ui>*{pointer-events:auto}
+#top{background:rgba(0,0,0,.7);padding:4px 6px;border-radius:6px;font-size:12px}
+#last{display:block;color:#fff;margin-top:2px}
+#mid{display:flex;flex-direction:column;gap:6px}
+button{font:inherit;background:#000;color:#ffb000;border:2px solid #ffb000;border-radius:8px;padding:10px}
+#big{font-size:20px;padding:16px}
+#found button{width:100%;margin-top:4px;border-color:#3cf;color:#3cf}
+#bar{display:flex;gap:4px;background:rgba(0,0,0,.8);padding:4px;border-radius:8px}
+#txt{flex:1;min-width:0;font:inherit;background:#111;color:#fff;border:1px solid #ffb000;border-radius:6px;padding:8px}
+#row{display:flex;gap:4px}#row button{flex:1;padding:6px;font-size:11px}
+#role{display:flex;gap:4px}#role button{flex:1;padding:6px;font-size:10px;border-color:#555;color:#888}
+#role button.on{border-color:#3cf;color:#3cf}
+</style><link rel="stylesheet" href="/companion-layout.css?v=4"></head><body>
+<div id="map"></div>
+<div id="ui">
+  <div>
+    <div id="top"><span id="st">STARTING…</span><span id="last">&nbsp;</span></div>
+    <div id="bar"><input id="txt" placeholder="Text back…" enterkeyhint="send"><button id="send">SEND</button></div>
+  </div>
+  <div id="mid">
+    <button id="pairtoggle" style="padding:6px;font-size:11px">PAIR A DEVICE ▾</button>
+    <div id="pairpanel" style="display:none">
+      <div id="role"><button id="rwatch">I'M THE COMPANION</button><button id="rparent">I'M THE PARENT</button></div>
+      <button id="big">SEARCH</button>
+      <div id="found"></div>
+    </div>
+  </div>
+  <div>
+    <button id="talk" style="width:100%">HOLD TO TALK</button>
+    <div id="row"><button id="spot">SHARE MY SPOT</button><button id="cb" onclick="location.href='https://encryptedcb.com/lcb.html'">CB</button><button id="unp">UNPAIR</button></div>
+  </div>
+</div>
+<script src="/companion-range.js?v=2"></script>
+<script src="/companion-local.js?v=1"></script>
+<script src="/companion-core.js?v=7"></script>
+<script src="/companion-voice.js?v=1"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},mine=null,peer=null,actx=null,geo=null,lastSent=0;
+var draw=CompMap($("map"));
+var voice=CompVoice($("talk"),last);
+function redraw(){CompRange.spots(mine,peer);draw([mine&&{lat:mine.lat,lon:mine.lon,label:"ME"},peer&&{lat:peer.lat,lon:peer.lon,cls:"peer",label:(Comp.paired()||{}).peerCall||"PEER"}],CompRange.mapKm())}
+window.addEventListener('comp-range-change',redraw);window.addEventListener('resize',redraw);
+function last(t){$("last").textContent=t}
+function ui(){var p=Comp.paired();$("mid").style.display=p?"none":"flex";$("bar").style.visibility="visible";$("txt").placeholder=p?"Text back…":"Pair first, then text…";$("unp").style.display=p?"block":"none"}
+$("pairtoggle").onclick=function(){var pn=$("pairpanel"),open=pn.style.display!=="none";pn.style.display=open?"none":"block";$("pairtoggle").textContent=open?"PAIR A DEVICE ▾":"PAIR A DEVICE ▴"};
+function ac(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state!=="running")actx.resume()}catch(e){}return actx}
+function beep(f,t){var c=ac();if(!c)return;var o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.12;o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.08)}
+document.addEventListener("pointerdown",function(){ac()},true);
+Comp.init({role:"watch",on:{
+  status:function(s){$("st").textContent=s},
+  found:function(p){$("found").innerHTML="";var d=document.createElement("button");d.textContent="PAIR "+p.call+" · CODE "+p.code;d.onclick=function(){d.textContent="PAIRING…";Comp.pairWith(p.id)};$("found").appendChild(d)},
+  paired:function(){$("found").innerHTML="";ui();last("PAIRED — tap SHARE MY SPOT")},
+  text:function(o){last(o.call+": "+o.body);var c=ac();c&&beep(1200,c.currentTime+.02)},
+  voice:voice.receive,
+  pos:function(o){peer=o;redraw()}
+}}).then(ui);
+$("big").onclick=function(){Comp.search()};
+function setRole(r){Comp.setRole(r);$("rwatch").className=r==="watch"?"on":"";$("rparent").className=r==="parent"?"on":""}
+$("rwatch").onclick=function(){setRole("watch")};$("rparent").onclick=function(){setRole("parent")};setRole("watch");
+$("unp").onclick=function(){Comp.unpair();peer=null;ui();redraw()};
+function sendTxt(){var v=$("txt").value.trim();if(!v)return;Comp.send("text",{body:v}).then(function(ok){last(ok?"SENT: "+v:"NOT SENT · OFFLINE")});$("txt").value=""}
+$("send").onclick=sendTxt;$("txt").addEventListener("keydown",function(e){if(e.key==="Enter")sendTxt()});
+$("spot").onclick=function(){
+  if(geo!==null){navigator.geolocation.clearWatch(geo);geo=null;$("spot").textContent="SHARE MY SPOT";return}
+  if(!navigator.geolocation){last("NO GPS IN THIS BROWSER");return}
+  $("spot").textContent="STOP SHARING";
+  geo=navigator.geolocation.watchPosition(function(p){mine={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};redraw();
+    mine.at=Date.now();CompRange.spots(mine,peer);if(Date.now()-lastSent>30000){lastSent=Date.now();Comp.send("pos",mine)}},function(e){last("GPS: "+e.message)},{enableHighAccuracy:true,maximumAge:15000});
+};
+redraw();
+})();
+</script>
+</body></html>

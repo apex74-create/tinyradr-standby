@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#04070a" />
+    <title>Apex Shield — Watch Radar</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; width: 100%; height: 100%; overflow: hidden;
+        background: #000; color: #8ef7c6; font-family: monospace;
+        touch-action: manipulation;
+      }
+      body { position: fixed; inset: 0; }
+      #radar { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #04070a; }
+      #bar {
+        position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+        display: flex; gap: 4px; padding: 4px;
+        background: rgba(4, 7, 10, 0.85);
+      }
+      #bar a {
+        flex: 1; height: 34px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid #1f6b52; background: rgba(0, 255, 136, 0.07);
+        color: #8ef7c6; text-decoration: none; font-size: 9px; font-weight: bold;
+      }
+      #bar a:active { background: #173822; color: #fff; }
+      #tag {
+        position: absolute; top: 2px; left: 4px; z-index: 2;
+        font-size: 8px; letter-spacing: 2px; color: #00ff88;
+        text-shadow: 0 0 6px #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="tag">APEX SHIELD · TREMOR RADAR</div>
+    <iframe
+      id="radar"
+      src="https://radrmapz.lovable.app"
+      title="Tremor Map Engine"
+      allow="geolocation; fullscreen"
+    ></iframe>
+    <div id="bar">
+      <a href="https://encryptedcb.com/watch.html" rel="external">FACE</a>
+      <a href="https://encryptedcb.com/lcb.html" rel="external">CB RADIO</a>
+    </div>
+  </body>
+</html>

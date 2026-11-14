@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Floating Notes — AR Sticky Notes in Space</title>
+<!--
+  APEX FLOATING NOTES — leave a note hanging in space. It's there when you come back.
+  Patent Pending · E026/E027/E028/E029/E032 · © 2026 Apex Air Solutions, LLC
+  Single-file. No frameworks. Big buttons. Plain words.
+-->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#000;color:#0f0;font-family:'Courier New',monospace;padding:12px;}
+  .hdr{border:1px solid #0f0;padding:12px;margin-bottom:12px;}
+  .hdr h1{font-size:18px;letter-spacing:2px;color:#0ff;}
+  .hdr .sub{font-size:11px;opacity:.8;margin-top:4px;}
+  #view{width:100%;height:46vh;background:#000;border:1px solid #0f0;display:block;}
+  .panel{border:1px solid #0f0;padding:12px;background:#020;margin-top:12px;}
+  .btn{width:100%;min-height:56px;margin-top:10px;background:#000;color:#0f0;border:2px solid #0f0;
+       font-family:inherit;font-size:16px;letter-spacing:1px;cursor:pointer;border-radius:6px;}
+  .btn:active{background:#0f0;color:#000;}
+  .btn.primary{border-color:#0ff;color:#0ff;}
+  .btn.big{min-height:72px;font-size:20px;}
+  input,select{width:100%;background:#000;border:1px solid #0f0;color:#0f0;font-family:inherit;
+               font-size:16px;padding:12px;margin-top:8px;min-height:48px;}
+  label{font-size:13px;display:block;margin-top:10px;letter-spacing:1px;}
+  .note{font-size:12px;opacity:.7;margin-top:8px;line-height:1.6;}
+  ul.list{list-style:none;margin-top:10px;max-height:180px;overflow-y:auto;}
+  ul.list li{border:1px solid #030;padding:10px;margin-bottom:6px;font-size:14px;
+             display:flex;justify-content:space-between;align-items:center;}
+  ul.list li .rm{color:#f44;font-size:20px;padding:4px 10px;cursor:pointer;}
+  .count{color:#ff0;font-size:14px;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ FLOATING NOTES ◢</h1>
+  <div class="sub">Leave a note hanging in space. It stays put when you come back.</div>
+  <div class="sub" id="posLine">Position: not started</div>
+</div>
+
+<canvas id="view" width="800" height="360"></canvas>
+
+<div class="panel">
+  <button class="btn primary big" id="startBtn">▶ START (tap once)</button>
+
+  <label for="noteText">Your note</label>
+  <input id="noteText" type="text" placeholder="e.g. Don't leave the toaster plugged in" autocomplete="off">
+
+  <button class="btn" id="voiceBtn">🎤 SAY IT</button>
+
+  <label for="arrow">Point an arrow at it? (optional)</label>
+  <select id="arrow">
+    <option value="">— no arrow —</option>
+    <option value="down">▼ point down</option>
+    <option value="left">◀ point left</option>
+    <option value="right">▶ point right</option>
+    <option value="up">▲ point up</option>
+  </select>
+
+  <button class="btn primary" id="dropBtn">📌 DROP NOTE HERE</button>
+
+  <div class="count" id="countLine">0 notes placed</div>
+  <ul class="list" id="noteList"></ul>
+
+  <div class="note">
+    To leave a note for someone ("brush your teeth 😊" over the toothbrush),
+    stand in front of the thing, say or type the note, pick an arrow, tap DROP NOTE HERE.
+    It hangs there until you delete it.
+  </div>
+</div>
+
+<div style="display:none;">
+  <span data-ar-node="here">here</span><span data-ar-node="left">left</span>
+  <span data-ar-node="right">right</span><span data-ar-node="up">up</span><span data-ar-node="down">down</span>
+</div>
+
+<script src="../apex-dash/tristar-routing.js"></script>
+<script src="../apex-ar-core/engine-dispatch.js"></script>
+<script src="../apex-ar-glasses/superposition-dom.js"></script>
+<script src="../apex-ar-glasses/zero-slam.js"></script>
+<script src="../apex-ar-core/helical-lock.js"></script>
+<script src="../apex-ar-core/anchor-engine.js"></script>
+<script src="../apex-ar-core/tag-store.js"></script>
+<script src="../apex-ar-core/voice-input.js"></script>
+<script>
+(function(){
+  'use strict';
+  SuperpositionDOM.init(document);
+  const canvas=document.getElementById('view'),ctx=canvas.getContext('2d');
+  let pose={x:0,y:0,z:0,heading:0,conf:0,source:'INIT'};
+
+  function draw(){
+    requestAnimationFrame(draw);
+    const w=canvas.width,h=canvas.height;
+    ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle='#030';ctx.lineWidth=1;ctx.beginPath();
+    ctx.moveTo(w/2-16,h/2);ctx.lineTo(w/2+16,h/2);
+    ctx.moveTo(w/2,h/2-16);ctx.lineTo(w/2,h/2+16);ctx.stroke();
+
+    const yaw=-(pose.heading||0)*Math.PI/180, f=(w/2)/Math.tan(35*Math.PI/180);
+    TagStore.all().forEach((t)=>{
+      const rx=t.x-pose.x,ry=t.y-pose.y;
+      const X=rx*Math.cos(yaw)-ry*Math.sin(yaw),Z=rx*Math.sin(yaw)+ry*Math.cos(yaw)+0.001;
+      if(Z<0.1)return;
+      const sx=(X/Z)*f+w/2, sy=h/2-(t.z||0)*20;
+      const sc=Math.max(0.5,Math.min(1.5,2/Z));
+      ctx.font=Math.round(14*sc)+'px monospace';
+      ctx.fillStyle='#0f0'; ctx.fillText(t.name,sx+10,sy);
+      ctx.strokeStyle='#ff0';ctx.lineWidth=2;ctx.strokeRect(sx,sy-14*sc,8,8);
+      if(t.arrow==='down') ctx.fillText('▼',sx,sy+16*sc);
+      if(t.arrow==='up')   ctx.fillText('▲',sx,sy-20*sc);
+      if(t.arrow==='left') ctx.fillText('◀',sx-16*sc,sy);
+      if(t.arrow==='right')ctx.fillText('▶',sx+20*sc,sy);
+    });
+  }
+  draw();
+
+  window.addEventListener('apexPoseUpdate',(e)=>{pose=e.detail;
+    document.getElementById('posLine').textContent='Position: '+pose.source+' · '+Math.round((pose.conf||0)*100)+'% sure';
+  });
+
+  document.getElementById('startBtn').addEventListener('click',function(){
+    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().catch(function(){});}
+    if(window.SuperpositionEngine&&SuperpositionEngine.init){try{SuperpositionEngine.init();}catch(e){}}
+    ZeroSLAM.start();this.textContent='● RUNNING';this.disabled=true;
+  });
+
+  const voiceBtn=document.getElementById('voiceBtn');
+  voiceBtn.addEventListener('click',function(){
+    if(!VoiceInput.isSupported()){document.getElementById('noteText').placeholder='Voice not available — type instead';return;}
+    if(VoiceInput.isListening()){VoiceInput.stop();this.textContent='🎤 SAY IT';}
+    else{VoiceInput.start((m)=>{if(m.final)document.getElementById('noteText').value=m.text;});this.textContent='● LISTENING… tap to stop';}
+  });
+
+  document.getElementById('dropBtn').addEventListener('click',()=>{
+    const text=document.getElementById('noteText').value.trim();
+    if(!text){document.getElementById('noteText').focus();return;}
+    const arrow=document.getElementById('arrow').value||null;
+    const h=(pose.heading||0)*Math.PI/180;
+    const x=(pose.x||0)+Math.sin(h)*1.0, y=(pose.y||0)+Math.cos(h)*1.0;
+    const tag=TagStore.add({name:text,x,y,z:0,arrow});
+    HelicalLock.placeAt(x,y,0,{tagId:tag.id,name:tag.name});  /* O(1) recall */
+    document.getElementById('noteText').value='';
+  });
+
+  function renderList(){
+    const ul=document.getElementById('noteList');ul.innerHTML='';
+    TagStore.all().forEach((t)=>{
+      const li=document.createElement('li');
+      const s=document.createElement('span');s.textContent=t.name;
+      const rm=document.createElement('span');rm.className='rm';rm.textContent='✕';
+      rm.setAttribute('role','button');rm.setAttribute('aria-label','Delete note '+t.name);
+      rm.addEventListener('click',()=>TagStore.remove(t.id));
+      li.appendChild(s);li.appendChild(rm);ul.appendChild(li);
+    });
+    document.getElementById('countLine').textContent=TagStore.all().length+' note'+(TagStore.all().length===1?'':'s')+' placed';
+  }
+  window.addEventListener('apexTagUpdate',renderList);renderList();
+})();
+</script>
+</body>
+</html>

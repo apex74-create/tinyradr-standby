@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#000000">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — UAP ISS EDITION (the website wallpaper, the clock in the black hole, the station overhead)</title>
+<!--
+  APEX — UAP ISS EDITION (Nov 12, 2026). Owner's order (Nov 11,
+  22:49 EST): an ISS edition of the UAP face carrying REAL ISS
+  readout data (a real NASA-station readout) + simple weather as
+  standard fittings, the comms suite riding in the background.
+  Feeds show an honest NO FEED / NO MEASURE state when
+  unreachable — never simulated data presented as real.
+
+  THE PLATE IS V1, UNTOUCHED IN SUBSTANCE: the isawauap.com
+  wallpaper drawn live on canvas (the "LASER BETTAFISH" sky —
+  black hole swallowing spiral galaxies, triangle UAP, saucers,
+  the little green mantis, shooting stars), the analog clock set
+  INTO the black hole, and the big digital readout in the site's
+  own card low on the glass. Scene, palette, layout and clock are
+  V1's own (uap-hero-face.html, from the site's build of record
+  isawauap-live-wallpaper-2026-11-09.html). This edition ADDS
+  three fittings; it changes no scene number.
+
+  THE ISS PANEL (this edition's subject): a site-card panel on
+  the left glass carrying the International Space Station's real
+  position, fetched live in-page from wheretheiss.at
+  (https://api.wheretheiss.at/v1/satellites/25544 — ISS, NORAD
+  25544): latitude, longitude, altitude, velocity, visibility,
+  footprint, and the fix time. The panel NAMES its source on its
+  face. Refreshed every 5 s, timeout-bounded. If a fetch fails
+  or returns nothing usable, the panel reads "ISS — NO FEED" in
+  words and shows NO coordinates — a stale fix is never
+  presented as live; only its time survives, labelled LAST FIX.
+
+  THE WEATHER LINE (top strip): the house Enphase prediction
+  call, the same failure-isolated pattern the estate's faces use
+  (own script block, async, 8 s timeout, try/catch throughout):
+  the prediction engine's today / peak / confidence from
+  tinyradr.com's public forecast endpoint (Camp Apex
+  44.98,-84.60). On any failure the strip reads
+  "WEATHER — NO MEASURE". Never simulated weather.
+
+  THE COMMS DOORS (quiet background only): three small labelled
+  chips low on the right glass — CB · GUARD · CAST NET — present
+  as the background layer, not the subject of the face. They are
+  drawn labels on the canvas plate (no handlers), set clear of
+  the bottom band: the BOTTOM NO-FLY ZONE law holds — no
+  actionable element sits in the bottom band where Android's
+  three-button navigation lands; the chips end 20 px above the
+  digital card and well above the band, and nothing on this
+  face is a button.
+
+  TIME BASE: V1's monotonic sweep law — displayed time is an
+  accumulated base advanced by rAF deltas CLAMPED to 50 ms;
+  a gap over 500 ms re-primes ONE nominal 16.7 ms step; raw rAF
+  timestamps never drive the hands.
+
+  MOTION FROM FIRST PAINT — no REST / observe governor.
+  Battery care is a DIM-ONLY overlay after 60 s idle (motion
+  never stops); any touch or tap wakes it. The feed fittings
+  dim with the face.
+
+  BENCH SURFACE: window.__uaphero carries V1's fields plus
+  { issMode, issText, wxText }; window.__iss carries the ISS
+  feed state { mode, lat, lon, alt, vel, vis, foot, ts,
+  lastTs }; window.__wx carries the weather feed state
+  { mode, text, today, peak, peakDate, conf, source }.
+-->
+<style>
+  :root{
+    --void:#000000; --ink:#ffffff; --cyan:#22e6ff; --teal:#19f0c8;
+    --magenta:#ff3df0; --green:#52ff5e; --amber:#ffb52e; --violet:#9a6bff;
+    --card:#05070a; --line:#1d3a44;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--void);width:100%;height:100%;overflow:hidden}
+  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--void)}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="sky" width="400" height="400" aria-hidden="true"></canvas></div>
+<script>
+(function(){
+  "use strict";
+
+  /* ============ THE SITE'S PALETTE (isawauap.com, verbatim) ============ */
+  var PAL = { cyan:"#22e6ff", teal:"#19f0c8", magenta:"#ff3df0",
+              green:"#52ff5e", amber:"#ffb52e", violet:"#9a6bff", white:"#ffffff" };
+  var CARD = "#05070a", LINE = "#1d3a44";
+  var DIMTXT = "#7fa3ad";
+
+  /* ============ SQUARE LAYOUT (V1's numbers, plus this edition's) ============ */
+  var LAYOUT = {
+    holeX: 288, holeY: 102, holeR: 54,      /* the black hole = the clock */
+    bigX: 74,  bigY: 104,  bigR: 92,        /* magenta galaxy, upper left */
+    smallX: 206, smallY: 256, smallR: 58,   /* cyan galaxy, centre low */
+    plateX: 200, plateY: 371, plateW: 196, plateH: 50,  /* digital card */
+    issX: 8,   issY: 194,  issW: 200, issH: 106,        /* ISS panel, left glass */
+    doorsY: 312, doorsH: 20                            /* comms chips, right glass */
+  };
+
+  var cv = document.getElementById("sky"), ctx = cv.getContext("2d");
+  var W = 400, H = 400;
+  (function fit(){
+    var s = Math.min(window.innerWidth||W, window.innerHeight||H);
+    if (s > 0 && s !== W) { cv.style.width = s+"px"; cv.style.height = s+"px"; }
+  })();
+
+  /* ============ WEBSITE WALLPAPER CODE (from here to the CLOCK
+     banner, the scene is the site's own build, carried verbatim
+     except the LAYOUT placements named above) ============ */
+
+  /* starfield */
+  var stars=[];
+  function seedStars(){
+    stars=[];
+    var n = Math.floor(W*H/4500);
+    for(var i=0;i<n;i++) stars.push({x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*1.3+0.3, p:Math.random()*6.28, s:0.4+Math.random()*1.2});
+  }
+
+  /* a spiral galaxy: neon wireframe arms of dots, rotating as one body */
+  function Galaxy(x,y,R,arms,colour,dir,speed){
+    this.x=x; this.y=y; this.R=R; this.arms=arms; this.colour=colour;
+    this.dir=dir; this.speed=speed; this.a=Math.random()*6.28; this.pts=[];
+    for(var a=0;a<arms;a++) for(var i=0;i<46;i++){
+      var t=i/46, ang=a*(6.28/arms)+t*3.4, rad=t*R;
+      this.pts.push({ang:ang, rad:rad, sz:2.2*(1-t)+0.5, off:Math.random()*4-2});
+    }
+  }
+  Galaxy.prototype.draw=function(dt){
+    this.a += this.dir*this.speed*dt;
+    ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.a);
+    ctx.fillStyle=this.colour; ctx.shadowColor=this.colour; ctx.shadowBlur=6;
+    for(var i=0;i<this.pts.length;i++){ var p=this.pts[i];
+      ctx.beginPath();
+      ctx.arc(Math.cos(p.ang)*p.rad+p.off, Math.sin(p.ang)*p.rad*0.62+p.off, p.sz, 0, 6.29);
+      ctx.fill(); }
+    ctx.restore();
+    ctx.save(); ctx.translate(this.x,this.y);
+    var g=ctx.createRadialGradient(0,0,0,0,0,this.R*0.22);
+    g.addColorStop(0,"rgba(255,255,255,0.9)"); g.addColorStop(1,"rgba(255,255,255,0)");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,this.R*0.22,0,6.29); ctx.fill();
+    ctx.restore();
+  };
+
+  /* the black hole: event horizon + swirling accretion ring, upper right.
+     Two small galaxies spiral inward toward it and respawn at the rim. */
+  var hole={x:0,y:0,R:64,spin:0};
+  function drawHole(dt,t){
+    hole.x=LAYOUT.holeX; hole.y=LAYOUT.holeY; hole.R=LAYOUT.holeR; hole.spin+=dt*0.7;
+    ctx.save(); ctx.translate(hole.x,hole.y);
+    var glow=ctx.createRadialGradient(0,0,hole.R*0.4,0,0,hole.R*3.1);
+    glow.addColorStop(0,"rgba(154,107,255,0.34)");
+    glow.addColorStop(0.55,"rgba(255,61,240,0.10)");
+    glow.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,hole.R*3.1,0,6.29); ctx.fill();
+    ctx.rotate(hole.spin);
+    for(var ring=0; ring<3; ring++){
+      ctx.beginPath();
+      ctx.strokeStyle = ring===1 ? PAL.amber : PAL.violet;
+      ctx.lineWidth = 2.4-ring*0.5; ctx.shadowColor=ctx.strokeStyle; ctx.shadowBlur=10;
+      var rr=hole.R*(1.18+ring*0.30);
+      ctx.ellipse(0,0,rr,rr*0.34,(ring%2? -0.22:0.22), ring*1.3, ring*1.3+4.4);
+      ctx.stroke();
+    }
+    ctx.rotate(-hole.spin*2.3);
+    ctx.fillStyle=PAL.white; ctx.shadowColor=PAL.magenta; ctx.shadowBlur=8;
+    for(var i=0;i<26;i++){ var an=i/26*6.28, rad=hole.R*(1.5+((i*37)%40)/60);
+      ctx.beginPath(); ctx.arc(Math.cos(an)*rad, Math.sin(an)*rad*0.34, 1.6, 0, 6.29); ctx.fill(); }
+    ctx.restore();
+    ctx.save(); ctx.translate(hole.x,hole.y);
+    ctx.fillStyle="#000"; ctx.shadowColor=PAL.violet; ctx.shadowBlur=22;
+    ctx.beginPath(); ctx.arc(0,0,hole.R*0.82,0,6.29); ctx.fill();
+    ctx.shadowBlur=0; ctx.strokeStyle=PAL.white; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.arc(0,0,hole.R*0.82,0,6.29); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* a galaxy being swallowed: spirals in toward the hole, respawns wide */
+  function Swallowed(x,y){
+    this.reset=function(){ this.th=Math.random()*6.28; this.d=340+Math.random()*160;
+      this.g=new Galaxy(0,0,42,2,PAL.teal,1,0.25); };
+    this.reset(); this.d=200+Math.random()*300;
+  }
+  Swallowed.prototype.draw=function(dt){
+    this.d-=dt*16; this.th+=dt*0.55;
+    if(this.d<86) this.reset();
+    var x=hole.x+Math.cos(this.th)*this.d, y=hole.y+Math.sin(this.th)*this.d*0.62;
+    ctx.save(); ctx.translate(x,y);
+    var s=Math.max(0.25, this.d/420); ctx.scale(s,s); ctx.translate(-x,-y);
+    this.g.x=x; this.g.y=y; this.g.draw(dt);
+    ctx.restore();
+  };
+
+  /* triangle UAP: neon wireframe triangle, three corner lights, beam.
+     Flies back and forth across the sky, banking at the turns. */
+  var tri={x:120,y:150,vx:64,dir:1,beam:0};
+  function drawTri(dt,t){
+    tri.x+=tri.vx*tri.dir*dt;
+    if(tri.x>W-90){tri.dir=-1} if(tri.x<90){tri.dir=1}
+    var y=tri.y+Math.sin(t*0.7)*16, x=tri.x;
+    tri.beam=(Math.sin(t*0.45)>0.55)?1:0;
+    ctx.save(); ctx.translate(x,y); ctx.scale(tri.dir,1);
+    if(tri.beam){ var bg=ctx.createLinearGradient(0,10,0,120);
+      bg.addColorStop(0,"rgba(34,230,255,0.30)"); bg.addColorStop(1,"rgba(34,230,255,0)");
+      ctx.fillStyle=bg; ctx.beginPath();
+      ctx.moveTo(-8,10); ctx.lineTo(8,10); ctx.lineTo(30,120); ctx.lineTo(-30,120);
+      ctx.closePath(); ctx.fill(); }
+    ctx.strokeStyle=PAL.cyan; ctx.lineWidth=2; ctx.shadowColor=PAL.cyan; ctx.shadowBlur=12;
+    ctx.beginPath(); ctx.moveTo(0,-20); ctx.lineTo(30,14); ctx.lineTo(-30,14); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-9); ctx.lineTo(14,8); ctx.lineTo(-14,8); ctx.closePath(); ctx.stroke();
+    var cols=[PAL.magenta,PAL.amber,PAL.green];
+    [[0,-20],[30,14],[-30,14]].forEach(function(p,i){
+      ctx.fillStyle=cols[i]; ctx.shadowColor=cols[i];
+      ctx.beginPath(); ctx.arc(p[0],p[1],3.4+Math.sin(t*5+i)*0.8,0,6.29); ctx.fill(); });
+    ctx.restore();
+  }
+
+  /* saucer: neon wireframe ellipse + dome, drifting slow, lights blinking */
+  function Saucer(x,y,c,s){ this.x=x; this.y=y; this.c=c; this.s=s; this.ph=Math.random()*6.28; }
+  Saucer.prototype.draw=function(dt,t){
+    this.x+=dt*9*this.s; if(this.x>W+70) this.x=-70; if(this.x<-70) this.x=W+70;
+    var y=this.y+Math.sin(t*0.9+this.ph)*7;
+    ctx.save(); ctx.translate(this.x,y);
+    ctx.strokeStyle=this.c; ctx.lineWidth=1.8; ctx.shadowColor=this.c; ctx.shadowBlur=10;
+    ctx.beginPath(); ctx.ellipse(0,0,34,9,0,0,6.29); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(0,-6,15,8,0,3.14,6.29); ctx.stroke();
+    for(var i=-2;i<=2;i++){ ctx.fillStyle=(Math.sin(t*4+i)>0)?PAL.amber:PAL.magenta;
+      ctx.shadowColor=ctx.fillStyle; ctx.beginPath(); ctx.arc(i*11,3,2.2,0,6.29); ctx.fill(); }
+    ctx.restore();
+  };
+
+  /* little green mantis being: neon pictograph on a wireframe rock, lower left.
+     Thin body, big triangular head, long arms — one arm waves. */
+  function drawMantis(t){
+    var x=W*0.10, y=H*0.80;
+    ctx.save(); ctx.translate(x,y);
+    ctx.strokeStyle=PAL.violet; ctx.lineWidth=1.6; ctx.shadowColor=PAL.violet; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.ellipse(0,44,74,16,0,0,6.29); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(0,40,50,10,0,0,6.29); ctx.stroke();
+    ctx.strokeStyle=PAL.green; ctx.shadowColor=PAL.green; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(0,38); ctx.lineTo(0,4); ctx.stroke();            /* body */
+    ctx.beginPath(); ctx.moveTo(0,34); ctx.lineTo(-11,46); ctx.lineTo(-13,58); ctx.stroke(); /* leg L */
+    ctx.beginPath(); ctx.moveTo(0,34); ctx.lineTo(11,46); ctx.lineTo(13,58); ctx.stroke();  /* leg R */
+    ctx.beginPath(); ctx.moveTo(0,12); ctx.lineTo(-16,2); ctx.lineTo(-22,10); ctx.stroke(); /* arm L */
+    var wv=Math.sin(t*2.2)*7;                                                        /* waving arm */
+    ctx.beginPath(); ctx.moveTo(0,12); ctx.lineTo(16,-2+wv); ctx.lineTo(23,-12+wv); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-16); ctx.lineTo(11,-2); ctx.lineTo(-11,-2); ctx.closePath(); ctx.stroke(); /* head */
+    ctx.fillStyle=PAL.green;
+    ctx.beginPath(); ctx.ellipse(-5,-8,3.4,2.1,-0.5,0,6.29); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(5,-8,3.4,2.1,0.5,0,6.29); ctx.fill();
+    ctx.restore();
+  }
+
+  /* shooting stars */
+  var meteors=[];
+  function spawnMeteor(){ meteors.push({x:Math.random()*W*0.8+W*0.15, y:Math.random()*H*0.3,
+    vx:-(260+Math.random()*220), vy:150+Math.random()*120, life:1}); }
+  setInterval(function(){ if(!document.hidden && Math.random()<0.6) spawnMeteor(); }, 2600);
+
+  var big=new Galaxy(0,0,LAYOUT.bigR,3,PAL.magenta,-1,0.05);
+  var small=new Galaxy(0,0,LAYOUT.smallR,2,PAL.cyan,1,0.08);
+  var swallowed=new Swallowed();
+  var saucers=[new Saucer(200,110,PAL.teal,1), new Saucer(600,300,PAL.magenta,-1), new Saucer(420,90,PAL.violet,1)];
+  saucers[1].x=320; saucers[2].x=240;
+
+  /* ============ THE CLOCK — set into the black hole ============ */
+  var epoch0 = Date.now();       /* wall time at first paint */
+  var acc = 0;                   /* accumulated monotonic ms (sweep law) */
+  var lastNow = -1;
+  var bench = { ready:false, frames:0, holeX:LAYOUT.holeX, holeY:LAYOUT.holeY,
+                holeR:LAYOUT.holeR, digital:"", secondAngle:0, minuteAngle:0,
+                hourAngle:0, dimmed:false, issMode:"PENDING", issText:"", wxText:"" };
+  window.__uaphero = bench;
+
+  function pad2(n){ return (n<10?"0":"")+n; }
+
+  function drawClock(tNow){
+    var h=tNow.getHours(), m=tNow.getMinutes(), s=tNow.getSeconds()+tNow.getMilliseconds()/1000;
+    var sA=(s/60)*6.2831853, mA=((m+s/60)/60)*6.2831853, hA=(((h%12)+m/60)/12)*6.2831853;
+    bench.digital = pad2(h)+":"+pad2(m)+":"+pad2(Math.floor(s));
+    bench.secondAngle=sA; bench.minuteAngle=mA; bench.hourAngle=hA;
+
+    var cx=LAYOUT.holeX, cy=LAYOUT.holeY, R=LAYOUT.holeR;
+    ctx.save(); ctx.translate(cx,cy);
+    /* tick ring inside the horizon: 12 ticks, quarters longer */
+    ctx.strokeStyle=PAL.white; ctx.shadowColor=PAL.white; ctx.shadowBlur=4;
+    for(var i=0;i<12;i++){
+      var a=i/12*6.2831853, q=(i%3===0);
+      ctx.lineWidth=q?3:1.8;
+      ctx.beginPath();
+      ctx.moveTo(Math.sin(a)*R*0.66, -Math.cos(a)*R*0.66);
+      ctx.lineTo(Math.sin(a)*R*(q?0.80:0.76), -Math.cos(a)*R*(q?0.80:0.76));
+      ctx.stroke();
+    }
+    /* hands on the centre post */
+    function hand(ang,len,w,col){
+      ctx.save(); ctx.rotate(ang);
+      ctx.strokeStyle=col; ctx.shadowColor=col; ctx.shadowBlur=7; ctx.lineWidth=w;
+      ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(0,len*0.16); ctx.lineTo(0,-len); ctx.stroke();
+      ctx.restore();
+    }
+    hand(hA, R*0.40, 5.5, PAL.white);
+    hand(mA, R*0.60, 4, PAL.cyan);
+    hand(sA, R*0.68, 2, PAL.amber);
+    /* the centre post pin */
+    ctx.fillStyle=PAL.white; ctx.shadowColor=PAL.violet; ctx.shadowBlur=9;
+    ctx.beginPath(); ctx.arc(0,0,4.2,0,6.29); ctx.fill();
+    ctx.restore();
+
+    /* the digital card — the site's own card, low on the glass */
+    var px=LAYOUT.plateX-LAYOUT.plateW/2, py=LAYOUT.plateY-LAYOUT.plateH/2;
+    ctx.save();
+    ctx.fillStyle=CARD; ctx.strokeStyle=LINE; ctx.lineWidth=1.5; ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.rect(px,py,LAYOUT.plateW,LAYOUT.plateH); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=PAL.teal; ctx.shadowColor=PAL.teal; ctx.shadowBlur=8;
+    ctx.font="800 34px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(bench.digital, LAYOUT.plateX, LAYOUT.plateY+1);
+    ctx.restore();
+  }
+
+  /* ============ THE FITTINGS — weather strip, ISS panel, comms doors.
+     Drawn from the feed states (window.__wx / window.__iss) that the
+     two isolated scripts below maintain. This block only READS those
+     states; a dead feed changes its own slot's words, nothing else. */
+  function fixTime(ts){
+    if (typeof ts !== "number" || !isFinite(ts)) return "--:--:--";
+    var d = new Date(ts*1000);
+    return pad2(d.getUTCHours())+":"+pad2(d.getUTCMinutes())+":"+pad2(d.getUTCSeconds())+"Z";
+  }
+  function sgn(n, dec){ return (n>=0?"+":"")+n.toFixed(dec); }
+
+  function drawFeeds(){
+    /* --- the weather strip, top centre --- */
+    var wx = window.__wx || null;
+    var wtxt = (wx && typeof wx.text === "string" && wx.text) ? wx.text : "WEATHER \u2014 NO MEASURE";
+    bench.wxText = wtxt;
+    ctx.save();
+    ctx.font="600 11px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillStyle = (wx && wx.mode==="LIVE") ? PAL.teal : PAL.amber;
+    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 6;
+    ctx.fillText(wtxt, 200, 17);
+    ctx.restore();
+
+    /* --- the ISS panel, left glass --- */
+    var ix=LAYOUT.issX, iy=LAYOUT.issY, iw=LAYOUT.issW, ih=LAYOUT.issH;
+    var iss = window.__iss || { mode:"PENDING" };
+    bench.issMode = iss.mode || "PENDING";
+    ctx.save();
+    ctx.fillStyle=CARD; ctx.strokeStyle=LINE; ctx.lineWidth=1.5; ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.rect(ix,iy,iw,ih); ctx.fill(); ctx.stroke();
+    var tx = ix+10, ty = iy+19;
+    ctx.textAlign="left"; ctx.textBaseline="middle";
+    /* head: the panel's state, in words */
+    var head, headCol;
+    if (iss.mode==="LIVE"){ head="ISS \u2014 LIVE"; headCol=PAL.teal; }
+    else if (iss.mode==="NOFEED"){ head="ISS \u2014 NO FEED"; headCol=PAL.amber; }
+    else { head="ISS \u2014 ACQUIRING"; headCol=PAL.amber; }
+    bench.issText = head;
+    ctx.font="700 12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+    ctx.fillStyle=headCol; ctx.shadowColor=headCol; ctx.shadowBlur=6;
+    ctx.fillText(head, tx, ty);
+    ctx.shadowBlur=0;
+    /* data lines: only from a live, validated fix */
+    ctx.font="11px ui-monospace,Menlo,Consolas,monospace";
+    if (iss.mode==="LIVE"){
+      ctx.fillStyle=PAL.white;
+      ctx.fillText("LAT "+sgn(iss.lat,3)+"\u00b0  LON "+sgn(iss.lon,3)+"\u00b0", tx, ty+17);
+      ctx.fillStyle=PAL.cyan;
+      ctx.fillText("ALT "+iss.alt.toFixed(1)+" KM"+(typeof iss.foot==="number" ? "  FOOT "+Math.round(iss.foot)+" KM" : ""), tx, ty+33);
+      ctx.fillText("VEL "+Math.round(iss.vel)+" KM/H"+(iss.vis ? "  \u00b7 "+String(iss.vis).toUpperCase() : ""), tx, ty+49);
+    } else {
+      ctx.fillStyle=PAL.white;
+      ctx.fillText("NO LIVE FIX", tx, ty+17);
+    }
+    /* the source, named on the panel's face, and the fix time */
+    ctx.font="9px ui-monospace,Menlo,Consolas,monospace";
+    ctx.fillStyle=DIMTXT;
+    ctx.fillText("SRC WHERETHEISS.AT \u00b7 NORAD 25544", tx, ty+66);
+    if (iss.mode==="LIVE") ctx.fillText("FIX "+fixTime(iss.ts), tx, ty+79);
+    else if (iss.lastTs) ctx.fillText("LAST FIX "+fixTime(iss.lastTs), tx, ty+79);
+    ctx.restore();
+
+    /* --- the comms doors: quiet background chips, right glass.
+       Drawn labels only — no handlers, nothing actionable, and
+       clear of the bottom band (no-fly zone law). --- */
+    var labels=["CB","GUARD","CAST NET"], widths=[36,62,80], gap=8;
+    var total=widths[0]+widths[1]+widths[2]+gap*2, dx=392-total;
+    ctx.save();
+    ctx.font="600 10px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    for (var k=0;k<3;k++){
+      ctx.fillStyle=CARD; ctx.strokeStyle=LINE; ctx.lineWidth=1; ctx.shadowBlur=0;
+      ctx.beginPath(); ctx.rect(dx, LAYOUT.doorsY, widths[k], LAYOUT.doorsH); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=DIMTXT;
+      ctx.fillText(labels[k], dx+widths[k]/2, LAYOUT.doorsY+LAYOUT.doorsH/2+0.5);
+      dx += widths[k]+gap;
+    }
+    ctx.restore();
+  }
+
+  /* ============ DIM-ONLY idle overlay (battery care) ============ */
+  var lastTouch = performance.now();
+  function wake(){ lastTouch = performance.now(); }
+  window.addEventListener("pointerdown", wake, {passive:true});
+  window.addEventListener("touchstart", wake, {passive:true});
+
+  /* ============ FRAME LOOP — scene first, then the clock, then the fittings ============ */
+  var last=performance.now();
+  function frame(now){
+    var dt=Math.min(0.05,(now-last)/1000); last=now;
+    var t=now/1000;
+
+    /* monotonic sweep-law time base for the clock */
+    if (lastNow < 0) lastNow = now;
+    var d = now - lastNow; lastNow = now;
+    if (d > 500) d = 16.7; else if (d > 50) d = 50; else if (d < 0) d = 0;
+    acc += d;
+    var tNow = new Date(epoch0 + acc);
+
+    ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){ var st=stars[i];
+      ctx.globalAlpha=0.45+0.4*Math.sin(t*st.s+st.p);
+      ctx.fillStyle=PAL.white; ctx.fillRect(st.x,st.y,st.r,st.r); }
+    ctx.globalAlpha=1;
+    big.x=LAYOUT.bigX; big.y=LAYOUT.bigY; big.draw(dt);
+    small.x=LAYOUT.smallX; small.y=LAYOUT.smallY; small.draw(dt);
+    drawHole(dt,t);
+    swallowed.draw(dt);
+    drawTri(dt,t);
+    for(var j=0;j<saucers.length;j++) saucers[j].draw(dt,t);
+    drawMantis(t);
+    for(var mm=meteors.length-1;mm>=0;mm--){ var me=meteors[mm];
+      me.x+=me.vx*dt; me.y+=me.vy*dt; me.life-=dt*0.9;
+      if(me.life<=0){ meteors.splice(mm,1); continue; }
+      var grad=ctx.createLinearGradient(me.x,me.y,me.x-me.vx*0.14,me.y-me.vy*0.14);
+      grad.addColorStop(0,"rgba(255,255,255,"+(0.9*me.life)+")");
+      grad.addColorStop(1,"rgba(255,255,255,0)");
+      ctx.strokeStyle=grad; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(me.x,me.y);
+      ctx.lineTo(me.x-me.vx*0.14, me.y-me.vy*0.14); ctx.stroke(); }
+
+    drawClock(tNow);
+    drawFeeds();
+
+    bench.dimmed = (now - lastTouch > 60000);
+    if (bench.dimmed){
+      ctx.fillStyle="rgba(0,0,0,0.45)"; ctx.fillRect(0,0,W,H);
+    }
+    bench.frames++; bench.ready = true;
+    requestAnimationFrame(frame);
+  }
+  seedStars();
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* ================= THE ISS CALL (ISS edition, Nov 12, 2026) =================
+   The station's real position from wheretheiss.at — the public
+   ISS tracker API (https://api.wheretheiss.at/v1/satellites/25544,
+   ISS = NORAD 25544). FAILURE-ISOLATED BY CONSTRUCTION: this block
+   is its own <script>, the fetch is async and timeout-bounded
+   (6 s), every step sits in try/catch, and the worst case writes
+   mode "NOFEED" into window.__iss and nothing else — the face
+   then reads "ISS — NO FEED" and shows no coordinates. A value
+   is LIVE only when it arrived in the latest successful fetch;
+   on failure the coordinates are cleared (only the last fix's
+   TIME is kept, labelled LAST FIX by the face). Refreshed every
+   5 s while the face lives. */
+(function(){
+  "use strict";
+  var ISS_URL="https://api.wheretheiss.at/v1/satellites/25544";
+  function fail(){
+    try{
+      var p=window.__iss||{};
+      window.__iss={mode:"NOFEED",lat:null,lon:null,alt:null,vel:null,vis:null,
+                    foot:null,ts:null,lastTs:(p.lastTs||p.ts||null)};
+    }catch(e){}
+  }
+  function issFetch(){
+    try{
+      if(!window.fetch){ fail(); return; }
+      var ctl=("AbortController" in window)?new AbortController():null;
+      var to=ctl?setTimeout(function(){ try{ctl.abort();}catch(e){} },6000):null;
+      fetch(ISS_URL,{cache:"no-store",signal:ctl?ctl.signal:undefined}).then(function(res){
+        if(to)clearTimeout(to);
+        if(!res.ok) throw new Error("iss "+res.status);
+        return res.json();
+      }).then(function(j){
+        try{
+          var lat=+j.latitude, lon=+j.longitude, alt=+j.altitude,
+              vel=+j.velocity, ts=+j.timestamp;
+          if(!isFinite(lat)||!isFinite(lon)||!isFinite(alt)||!isFinite(vel)||!isFinite(ts)){ fail(); return; }
+          if(Math.abs(lat)>90||Math.abs(lon)>180){ fail(); return; }
+          window.__iss={mode:"LIVE",lat:lat,lon:lon,alt:alt,vel:vel,
+            vis:(typeof j.visibility==="string")?j.visibility:null,
+            foot:(typeof j.footprint==="number")?j.footprint:null,
+            ts:ts,lastTs:ts};
+        }catch(e){ fail(); }
+      }).catch(function(){ if(to)clearTimeout(to); fail(); });
+    }catch(e){ fail(); }
+  }
+  window.__iss={mode:"PENDING",lat:null,lon:null,alt:null,vel:null,vis:null,foot:null,ts:null,lastTs:null};
+  issFetch();
+  setInterval(issFetch, 5000);
+})();
+</script>
+<script>
+/* ================= THE ENPHASE CALL (house pattern, Nov 8) =================
+   The prediction engine's own outputs, read from the Enphase
+   application's public endpoint (the same wave-collapse synthesis
+   tinyradr.com/forecast displays; coordinates are the app's own
+   published site, Camp Apex 44.98,-84.60). FAILURE-ISOLATED BY
+   CONSTRUCTION: this block is its own <script>, the fetch is
+   async and timeout-bounded (8 s), every step sits in try/catch,
+   and the worst case writes "WEATHER — NO MEASURE" into its own
+   slot only. It defines no globals the clock or the scene read.
+   Refreshed every 15 minutes while the face lives. */
+(function(){
+  "use strict";
+  var WX_URL="https://tinyradr.com/api/public/forecast?lat=44.98&lon=-84.60";
+  function blank(){
+    try{ window.__wx={mode:"NOFEED",text:"WEATHER \u2014 NO MEASURE",today:null,peak:null,peakDate:null,conf:null,source:null}; }catch(e){}
+  }
+  function wxFetch(){
+    try{
+      if(!window.fetch){ blank(); return; }
+      var ctl=("AbortController" in window)?new AbortController():null;
+      var to=ctl?setTimeout(function(){ try{ctl.abort();}catch(e){} },8000):null;
+      fetch(WX_URL,{cache:"no-store",signal:ctl?ctl.signal:undefined}).then(function(res){
+        if(to)clearTimeout(to);
+        if(!res.ok) throw new Error("wx "+res.status);
+        return res.json();
+      }).then(function(j){
+        try{
+          var md=j&&j.metadata, tl=j&&j.timeline;
+          if(!md||!tl||!tl.length||typeof tl[0].temp!=="number") { blank(); return; }
+          var conf=(typeof md.confidence_score==="number")?Math.round(md.confidence_score*100)+"%":"--";
+          var peak=(typeof md.peak_intensity==="number")?Math.round(md.peak_intensity):null;
+          var txt="PREDICTION ENGINE \u00b7 TODAY "+Math.round(tl[0].temp)+"\u00b0F";
+          if(peak!==null&&md.peak_date) txt+=" \u00b7 PEAK "+peak+"\u00b0 "+String(md.peak_date).slice(5);
+          txt+=" \u00b7 CONF "+conf;
+          window.__wx={mode:"LIVE",text:txt,today:tl[0].temp,peak:md.peak_intensity,
+                       peakDate:md.peak_date,conf:md.confidence_score,source:j.source||null};
+        }catch(e){ blank(); }
+      }).catch(function(){ if(to)clearTimeout(to); blank(); });
+    }catch(e){ blank(); }
+  }
+  window.__wx={mode:"PENDING",text:"WEATHER \u2014 NO MEASURE",today:null,peak:null,peakDate:null,conf:null,source:null};
+  wxFetch();
+  setInterval(wxFetch, 15*60*1000);
+})();
+</script>
+</body>
+</html>

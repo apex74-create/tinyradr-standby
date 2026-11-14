@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — Waterfall LIVE · SCOPE</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#020403; }
+  body { font-family:ui-monospace,Menlo,Consolas,monospace; overflow:hidden; }
+  #stage { position:absolute; left:0; top:0; overflow:hidden; background:#020403; }
+  #fall { position:absolute; left:0; top:0; display:flex; justify-content:space-evenly; }
+  #fall .col { writing-mode:vertical-rl; white-space:nowrap; }
+  .vignette { position:absolute; left:0; top:0; background:radial-gradient(ellipse at center, rgba(0,0,0,.18) 40%, rgba(0,0,0,.80) 100%); }
+  #face { position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .brand { color:#39ff6a; font-weight:700; text-shadow:0 0 14px rgba(57,255,106,.55); }
+  #clock { color:#eaffef; font-weight:800; line-height:1; text-shadow:0 0 10px rgba(57,255,106,.9), 0 0 42px rgba(57,255,106,.45); font-variant-numeric:tabular-nums; }
+  #sec { color:#6ea8d8; font-weight:700; text-shadow:0 0 12px rgba(110,168,216,.6); font-variant-numeric:tabular-nums; }
+  #date { color:#8fd9a4; }
+  #tally { color:#a9e8bb; font-variant-numeric:tabular-nums; }
+  #scope { white-space:nowrap; letter-spacing:0; }
+  #scope .pos { color:#39ff6a; } #scope .neg { color:#6ea8d8; } #scope .zero { color:#2c5c3e; }
+  #lean { color:#ffc95c; font-variant-numeric:tabular-nums; text-shadow:0 0 8px rgba(255,201,92,.35); }
+  .strip { position:absolute; left:0; text-align:center; color:#3f6b4d; width:100%; }
+</style></head>
+<body>
+<div id="stage">
+  <div id="fall"></div>
+  <div class="vignette"></div>
+  <div id="face">
+    <div class="brand">APEX</div>
+    <div id="clock">--:--</div>
+    <div id="sec">--</div>
+    <div id="date">—</div>
+    <div id="tally">1 — · 0 —</div>
+    <div id="scope"></div>
+    <div id="lean">—</div>
+  </div>
+  <div class="strip">LIVE FALL · SCOPE = THE GAP WAVE (1s − 0s) · FOUNDED OCT 31, 2026</div>
+</div>
+<script>
+  // SCOPE: the owner's gauge. The wave is the running GAP (ones minus zeros),
+  // sampled once a second. Green blocks = ones heavy, steel = zeros heavy,
+  // block height = how heavy. Under it, the LEAN line: the live split.
+  var stage = document.getElementById('stage');
+  var fallEl = document.getElementById('fall');
+  var faceEl = document.getElementById('face');
+  var W = 0, H = 0, streams = [], ones = 0, zeros = 0, built = false;
+  var shades = ['#39ff6a', '#27c452', '#166b32', '#0b3d1d'];
+  var BLOCKS = '▁▂▃▄▅▆▇█';
+  var hist = [], HISTN = 56;
+  function measure() {
+    var vv = window.visualViewport;
+    W = Math.floor(vv ? vv.width : window.innerWidth);
+    H = Math.floor(vv ? vv.height : window.innerHeight);
+    if (!W || !H) { W = document.documentElement.clientWidth || 300; H = document.documentElement.clientHeight || 400; }
+  }
+  function bit() { var b = Math.random() > 0.5 ? 1 : 0; if (b) ones++; else zeros++; return b; }
+  function render(st) {
+    var html = '';
+    for (var i = 0; i < st.chars.length; i++) html += (i === 0) ? '<b style="color:#b6ffd0;font-weight:400">' + st.chars[i] + '</b>' : st.chars[i];
+    st.el.innerHTML = html;
+  }
+  function layout() {
+    measure();
+    stage.style.width = W + 'px'; stage.style.height = H + 'px';
+    fallEl.style.width = W + 'px'; fallEl.style.height = H + 'px';
+    faceEl.style.width = W + 'px'; faceEl.style.height = H + 'px';
+    var vg = document.querySelector('.vignette'); vg.style.width = W + 'px'; vg.style.height = H + 'px';
+    var fallFont = Math.max(9, Math.floor(H * 0.024));
+    document.querySelector('.brand').style.fontSize = Math.floor(H * 0.038) + 'px';
+    document.querySelector('.brand').style.letterSpacing = Math.floor(W * 0.06) + 'px';
+    document.getElementById('clock').style.fontSize = Math.floor(Math.min(W * 0.34, H * 0.26)) + 'px';
+    document.getElementById('sec').style.fontSize = Math.floor(H * 0.058) + 'px';
+    document.getElementById('date').style.fontSize = Math.floor(H * 0.040) + 'px';
+    document.getElementById('date').style.marginTop = Math.floor(H * 0.022) + 'px';
+    document.getElementById('tally').style.fontSize = Math.floor(H * 0.034) + 'px';
+    document.getElementById('tally').style.marginTop = Math.floor(H * 0.020) + 'px';
+    var sc = document.getElementById('scope');
+    sc.style.fontSize = Math.floor(H * 0.052) + 'px';
+    sc.style.marginTop = Math.floor(H * 0.012) + 'px';
+    var ln = document.getElementById('lean');
+    ln.style.fontSize = Math.floor(H * 0.034) + 'px';
+    ln.style.marginTop = Math.floor(H * 0.008) + 'px';
+    var strip = document.querySelector('.strip');
+    strip.style.fontSize = Math.floor(H * 0.023) + 'px';
+    strip.style.bottom = Math.floor(H * 0.018) + 'px';
+    fallEl.innerHTML = ''; streams = [];
+    var cols = Math.max(10, Math.floor(W / (fallFont * 1.5)));
+    var len = Math.max(20, Math.floor(H / (fallFont * 1.1)));
+    for (var c = 0; c < cols; c++) {
+      var col = document.createElement('div');
+      col.className = 'col';
+      col.style.fontSize = fallFont + 'px'; col.style.lineHeight = '1.5'; col.style.letterSpacing = '0.35em';
+      col.style.color = shades[c % shades.length];
+      col.style.opacity = (0.3 + (c % 5) * 0.11).toFixed(2);
+      fallEl.appendChild(col);
+      var s = []; for (var i = 0; i < len; i++) s.push(bit());
+      streams.push({ el: col, chars: s, speed: 1 + (c % 3), tick: 0 });
+    }
+    streams.forEach(render);
+    built = true;
+  }
+  function drawScope() {
+    var gap = ones - zeros;
+    hist.push(gap); if (hist.length > HISTN) hist.shift();
+    var scale = 10;
+    for (var i = 0; i < hist.length; i++) scale = Math.max(scale, Math.abs(hist[i]));
+    var html = '';
+    for (var j = 0; j < hist.length; j++) {
+      var v = hist[j], lvl = Math.round(Math.abs(v) / scale * 7);
+      if (v > 0) html += '<span class="pos">' + BLOCKS[lvl] + '</span>';
+      else if (v < 0) html += '<span class="neg">' + BLOCKS[lvl] + '</span>';
+      else html += '<span class="zero">▁</span>';
+    }
+    document.getElementById('scope').innerHTML = html;
+    var total = ones + zeros;
+    var pct = total ? (ones / total * 100) : 50;
+    document.getElementById('lean').textContent = '1s ' + pct.toFixed(1) + '% · GAP ' + (gap >= 0 ? '+' : '') + gap.toLocaleString('en-US');
+  }
+  layout();
+  window.addEventListener('resize', layout);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', layout);
+  setInterval(function () {
+    if (!built) return;
+    for (var k = 0; k < streams.length; k++) {
+      var st = streams[k];
+      if (++st.tick % st.speed) continue;
+      st.chars.pop(); st.chars.unshift(bit()); render(st);
+    }
+    document.getElementById('tally').textContent = '1 · ' + ones.toLocaleString('en-US') + ' — 0 · ' + zeros.toLocaleString('en-US');
+  }, 130);
+  setInterval(drawScope, 1000);
+  function tick() {
+    var d = new Date(), h = d.getHours() % 12; if (h === 0) h = 12;
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    document.getElementById('clock').textContent = h + ':' + p(d.getMinutes());
+    document.getElementById('sec').textContent = ':' + p(d.getSeconds()) + (d.getHours() >= 12 ? ' PM' : ' AM');
+    document.getElementById('date').textContent = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body></html>

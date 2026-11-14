@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-NZYk81nU.js";var t=e(),n=()=>(0,t.jsx)(`main`,{className:`min-h-app px-4 py-6 text-[11px] text-muted-foreground`,children:`Nothing here.`});export{n as notFoundComponent};

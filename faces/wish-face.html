@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#010403">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — WISH FACE · Hierographic</title>
+<!--
+  APEX — WISH FACE · Hierographic Series (Nov 11, 2026).
+  Package Scope Inspector BUILD ORDER BO-5: the Wish Picker on the
+  wrist. THE TEAM LAW (owner): the face tells time and carries the
+  day's wish; the picker app and the results board are the working
+  surfaces. This face is the CARE surface in miniature — the Wish
+  Picker's real purpose (owner, Nov 7, 2026) is a daily schedule
+  and something to anticipate for Merry Pearson: the seal at
+  17:17, the draws at 19:29, the grade in the evening.
+
+  ENGINE: inherited from the Hierographic engine (Globe Tracker,
+  Series 01, via The 19 / Cast Net) — big Casio readout (house
+  DSEG7 embed, SIL OFL 1.1, zero external calls; hollow digits,
+  OLED-black hearts, bright green stroke, on a solid chip), the
+  one-pulse-per-second trace with millisecond shimmer, ONE
+  wireframe patrol drone with lock bracket / trail / tag, Apex
+  glyph edging, honest GPS line, Apex Frame worn by default
+  (FRAME ON/OFF), DIM-ONLY overlay after 60 s idle. Motion from
+  first paint — no REST/OBSERVED governor anywhere.
+
+  TWO READOUTS — the owner's options (the BO-2a pattern): DIGITAL
+  (default), the Casio readout; HANDS, analog hands swept on the
+  real clock from the centre post pin (Face Law 1). The READOUT
+  button switches; the two readings never show at once. The hands
+  are drawn by the MONOTONIC SWEEP LAW (Scope Sweep Fix, Nov 11,
+  2026): hand angles come from wall-clock time advanced ONLY by
+  real frame deltas, each clamped to 50 ms; a gap over 500 ms
+  re-primes with one nominal 16.7 ms step; raw rAF timestamps are
+  never read as time, so a throttled WebView can never teleport a
+  hand or run it backwards.
+
+  SHAPE IS BAKED AT PURCHASE (owner's ruling, Nov 10, 20:28 EST):
+  the single SHAPE constant below is the whole mechanism — no
+  in-face shape buttons. This file is the SQUARE build.
+
+  ================================================================
+  THE WISH LAYER — and its honesty contract
+  ================================================================
+  The face reads ONE source: the house feed, wish-results.json —
+  the same cross-checked file the results board reads (in
+  production the copy at https://tinyradr.com/wish/wish-results.json,
+  written only by the wish-picker-grade run after the official
+  Michigan numbers were checked against two sources). The face
+  fetches it on load and every 60 s. Feed URL resolution:
+  ?feed= override (bench), else a sibling wish-results.json when
+  the face is served from /wish/, else the canonical tinyradr
+  URL. THE FACE DOES NO ARITHMETIC ON THE DRAW: every number it
+  shows is copied from the feed, and every grade word comes from
+  the feed's "grades" block — computed by the house grader
+  (grade.py) from the sealed picks and the checked draws.
+
+  What the wish layer shows, top to bottom:
+   * THE SEALED SET — the night named by the feed's date, the
+     games' own numbers from the feed's "sealed" block (the same
+     picks the seal text carried at 17:17). A game the feed does
+     not seal that night is simply not listed — never invented.
+   * THE NEXT FIXED POINT — the day's rhythm counted in real
+     time: NEXT — SEAL 17:17 / DRAW 19:29 / GRADE 20:47 (the
+     grade run's scheduled hour, of record), then tomorrow's
+     seal. These are SCHEDULE, printed as schedule — the face
+     never claims a draw has happened because the clock passed.
+   * LAST GRADED — the latest night's computed grades, in the
+     board's everyday-man words: for each game its main-draw line
+     AND its Double Play line, Double Play always present for the
+     games that carry one (Fantasy 5, Powerball). A WIN shows its
+     computed prize ("You won $7.00 on the Double Play"); NO WIN
+     is stated plainly. "NO WIN" is never softened and never
+     hidden. THE NOV 8 LESSON IS STRUCTURAL HERE: Day 1's $7
+     lived in the Powerball Double Play drawing the main-draw
+     grade never checked; Day 2's $2 lived in the Fantasy 5
+     Double Play drawing this board family originally had no row
+     for. A face that silently skips Double Play repeats that
+     defect, so this face cannot: the rows render from the
+     grades block, and when the block is absent the face says
+     NOT GRADED — it does not improvise a grade of its own.
+
+  STATE HONESTY (the feed states, in words, always labelled):
+   * LIVE — the feed was fetched this session: the panel header
+     reads the feed's own night ("LAST GRADED — NIGHT OF …").
+   * STALE — the feed cannot be reached now: the last known feed
+     this session (or the one stored by the native container)
+     is shown under the words "LAST KNOWN — FEED UNREACHABLE",
+     with its date. It never poses as tonight's live state.
+   * EMPTY — no feed has ever been seen: the panel says "WISH —
+     NOT POSTED YET" and shows no numbers at all. An empty face
+     is an honest face.
+   * NOT GRADED — a feed arrived without a grades block (or a
+     game's Double Play row inside it is missing): the words
+     NOT GRADED stand where the grade would be. The publisher
+     refuses ungraded Double Play numbers, so this state should
+     never occur from the house feed; the face names it anyway,
+     because naming it is the whole point.
+
+  STORAGE: the native container may persist the last feed at the
+  bench handle (window.__wishStore) and seed it back; the web
+  build stores nothing beyond the session and claims nothing
+  more. Bench handles: window.__wish (the wish layer's state),
+  window.__wishBench { applyFeed(feed), goOffline() }.
+
+  NO PLATE hangs on this face: the wish panel is the picture —
+  the numbers Merry is watching are the art. The engine's
+  frame, pulse, drone and glyphs carry the house idiom around
+  them. SQUARE build (shape-at-purchase).
+
+  PALETTE — CALLED COLOURS ONLY, solid tones, never washed:
+  void #010403, chip #020a06, drone green #39ff8e, trail
+  #7dffb0, pulse #46ffb4, shimmer #baffd9, glyph #2bd97c,
+  brand #baffd9, amber #ffb52e (win lines + frame trim), sky
+  #8fc7e8 (not-posted / last-known words), GPS text #9fe8c0,
+  fault red #ff4d4d, white #f2fff7.
+-->
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#010403;}
+  #stage{position:absolute;left:0;top:0;overflow:hidden;}
+  #world{position:absolute;left:0;top:0;width:100%;height:100%;z-index:2;}
+  canvas.fx{position:absolute;left:0;top:0;display:block;}
+  #dim{position:absolute;left:0;top:0;width:100%;height:100%;background:#000;opacity:0;pointer-events:none;transition:opacity .8s ease;z-index:7;}
+  .hud{position:absolute;z-index:4;color:#baffd9;}
+  #topbar{left:0;top:0;width:100%;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;}
+  #brand{margin:10px 0 0 14px;}
+  #brandWord{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:21px;letter-spacing:7px;color:#baffd9;text-shadow:0 1px 6px #000,0 0 2px #000;}
+  #brandSub{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;letter-spacing:3px;color:#2bd97c;margin-top:2px;text-shadow:0 1px 4px #000;}
+  #dateBox{margin:12px 14px 0 0;text-align:right;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:2px;color:#9fe8c0;text-shadow:0 1px 4px #000;}
+  #clockChip{position:absolute;left:50%;transform:translateX(-50%);top:10.5%;z-index:4;background:#020a06;border:1px solid rgba(57,255,142,.55);padding:6px 14px 7px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.65);}
+  #clock{font-family:"ApexDigital","Courier New",monospace;font-size:64px;line-height:1;color:#000;-webkit-text-stroke:2.6px #39ff8e;paint-order:stroke fill;letter-spacing:2px;white-space:nowrap;text-shadow:0 0 9px rgba(57,255,142,.40);}
+  #secLine{margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:4px;color:#7dffb0;}
+  #analogChip{position:absolute;left:50%;transform:translateX(-50%);top:9.5%;z-index:4;background:#020a06;border:1px solid rgba(57,255,142,.55);box-shadow:0 2px 14px rgba(0,0,0,.65);display:none;line-height:0;}
+  #analogSvg{display:block;}
+  #gpsLine{position:absolute;left:50%;transform:translateX(-50%);top:30.5%;z-index:4;background:rgba(2,10,6,.82);border:1px solid rgba(57,255,142,.28);padding:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:2px;color:#9fe8c0;white-space:nowrap;}
+  /* THE WISH PANEL — the sealed set, the next fixed point, and
+     the last graded night, in the board's plain words. Compact
+     segment-style rows (monospace, the house readout idiom) —
+     the numbers are the picture on this face. */
+  #wishPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:5.4%;z-index:4;width:88%;background:rgba(2,10,6,.90);border:1px solid rgba(57,255,142,.40);padding:7px 12px 8px;text-align:center;}
+  #wishHead{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:3px;color:#2bd97c;white-space:nowrap;overflow:hidden;}
+  #wishHead.stale{color:#8fc7e8;}
+  #wishNext{margin-top:4px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;letter-spacing:2px;color:#baffd9;white-space:nowrap;}
+  #wishNext b{color:#ffb52e;font-weight:700;}
+  #wishSealed{margin-top:5px;border-top:1px solid rgba(57,255,142,.22);padding-top:4px;}
+  #wishGrades{margin-top:4px;}
+  .wgame{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:1px;color:#9fe8c0;white-space:nowrap;overflow:hidden;line-height:1.5;}
+  .wgame b{color:#baffd9;font-weight:700;letter-spacing:1.5px;}
+  .wgrade{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:.5px;color:#e8f2e9;white-space:nowrap;overflow:hidden;line-height:1.5;}
+  .wgrade .dp{color:#9fe8c0;}
+  .wgrade .win{color:#ffb52e;font-weight:700;}
+  .wgrade .ng{color:#8fc7e8;font-weight:700;letter-spacing:1.5px;}
+  #wishTotal{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;letter-spacing:1.5px;color:#ffb52e;font-weight:700;margin-top:2px;white-space:nowrap;}
+  #wishEmpty{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;letter-spacing:2px;color:#8fc7e8;font-weight:700;margin-top:5px;white-space:nowrap;}
+  /* NOTE (bench finding, BO-2a, carried): the wish panel carries
+     NO box-shadow — a soft black shadow quantises to the case
+     colour and muddies the frame census; a labelled panel needs
+     no shadow to read. The readout chips keep theirs. */
+  #fault{position:absolute;left:4%;top:5%;width:92%;z-index:8;display:none;background:#ff4d4d;color:#f2fff7;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:13px;text-align:center;padding:6px 0;letter-spacing:1px;}
+  #frameBtn{position:absolute;right:10px;bottom:10px;z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  #frameBtn:active{color:#baffd9;}
+  #readoutBtn{position:absolute;left:10px;bottom:10px;z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  #readoutBtn:active{color:#baffd9;}
+  @font-face { font-family:"ApexDigital"; src:url(data:font/woff2;base64,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) format("woff2"); font-weight:700; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="caseSvg" viewBox="0 0 512 512" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;left:0;top:0;z-index:1;pointer-events:none;"></svg>
+  <div id="world">
+    <canvas id="fx" class="fx"></canvas>
+    <div id="topbar" class="hud">
+      <div id="brand"><div id="brandWord">APEX</div><div id="brandSub">WISH · PICKER</div></div>
+      <div id="dateBox">—</div>
+    </div>
+    <div id="clockChip"><div id="clock">00:00</div><div id="secLine">SEC 00 · 000 MS</div></div>
+    <div id="analogChip"><svg id="analogSvg" viewBox="0 0 120 120" width="104" height="104" aria-hidden="true">
+      <circle cx="60" cy="60" r="57" fill="none" stroke="rgba(57,255,142,.55)" stroke-width="1.5"/>
+      <g id="analogTicks"></g>
+      <line id="handH" x1="60" y1="60" x2="60" y2="30" stroke="#baffd9" stroke-width="5" stroke-linecap="round"/>
+      <line id="handM" x1="60" y1="60" x2="60" y2="16" stroke="#39ff8e" stroke-width="3.4" stroke-linecap="round"/>
+      <line id="handS" x1="60" y1="68" x2="60" y2="10" stroke="#ffb52e" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="60" cy="60" r="4.5" fill="#020a06" stroke="#39ff8e" stroke-width="2"/>
+    </svg></div>
+    <div id="gpsLine">GPS — NO FIX</div>
+    <div id="wishPanel">
+      <div id="wishHead">WISH PICKER — TONIGHT'S SEAL</div>
+      <div id="wishNext">NEXT — <b>SEAL 17:17</b></div>
+      <div id="wishEmpty">WISH — NOT POSTED YET</div>
+      <div id="wishSealed"></div>
+      <div id="wishGrades"></div>
+      <div id="wishTotal" style="display:none"></div>
+    </div>
+    <button id="readoutBtn" type="button" aria-label="Toggle readout — digital or hands">READOUT · DIGITAL</button>
+  </div>
+  <svg id="trimSvg" viewBox="0 0 512 512" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;left:0;top:0;z-index:6;pointer-events:none;"></svg>
+  <div id="dim"></div>
+  <div id="fault"></div>
+  <button id="frameBtn" type="button" aria-label="Toggle Apex Frame">FRAME ON</button>
+</div>
+<script>
+"use strict";
+/* ================================================================
+   THE SHAPE — BAKED AT PACKAGING, chosen at purchase.
+   This one constant is the whole shape mechanism. The store
+   build flips it; the app carries no shape control at all.
+   ================================================================ */
+var SHAPE = "square"; /* "square" | "round" | "rectangle" */
+
+var PAL = {
+  void:"#010403", chip:"#020a06",
+  drone:"#39ff8e", trail:"#7dffb0", tag:"#baffd9",
+  pulse:"#46ffb4", shimmer:"#baffd9",
+  glyph:"#2bd97c", gps:"#9fe8c0",
+  fault:"#ff4d4d", white:"#f2fff7"
+};
+
+var stage = document.getElementById("stage");
+var world = document.getElementById("world");
+var cv = document.getElementById("fx");
+var ctx = cv.getContext("2d");
+var clockEl = document.getElementById("clock");
+var secEl = document.getElementById("secLine");
+var dateEl = document.getElementById("dateBox");
+var gpsEl = document.getElementById("gpsLine");
+
+var VW = 0, VH = 0;
+var frameInset = 0, frameInsetY = 0;
+function innerW(){ return Math.max(1, VW - frameInset * 2); }
+function innerH(){ return Math.max(1, VH - frameInsetY * 2); }
+
+/* ================================================================
+   THE MONOTONIC SWEEP LAW (Scope Sweep Fix, Nov 11, 2026) — the
+   time source for everything that sweeps, the analog hands above
+   all. sweepNow starts from the real wall clock at boot, then
+   advances ONLY by real frame deltas, each clamped to 50 ms; a
+   gap over 500 ms re-primes with one nominal 16.7 ms step. The
+   raw rAF timestamp is never read as time: a throttled or warped
+   delivery can cost the hands a frame, never a teleport, and
+   they can never run backwards.
+   ================================================================ */
+var sweepNow = Date.now(), sweepPrev = -1;
+function sweepAdvance(){
+  var t = performance.now();
+  if (sweepPrev < 0){ sweepPrev = t; return; }
+  var sd = t - sweepPrev; sweepPrev = t;
+  sweepNow += sd > 500 ? 16.7 : Math.min(50, Math.max(0, sd));
+}
+
+/* ---------------- sizing ---------------- */
+function sizeStage(){
+  var nVW = Math.max(1, Math.round(Math.min(window.innerWidth, window.innerHeight)));
+  var nVH = nVW;
+  var moved = (nVW !== VW || nVH !== VH);
+  VW = nVW; VH = nVH;
+  stage.style.width = VW + "px"; stage.style.height = VH + "px";
+  document.documentElement.style.height = VH + "px";
+  document.body.style.height = VH + "px";
+  world.style.height = VH + "px";
+  cv.width = innerW(); cv.height = innerH();
+  cv.style.left = frameInset + "px"; cv.style.top = frameInsetY + "px";
+  cv.style.width = innerW() + "px"; cv.style.height = innerH() + "px";
+  layoutHud();
+  if (moved) seedDrone();
+}
+function layoutHud(){
+  var m = Math.min(VW, VH);
+  clockEl.style.fontSize = Math.round(m * 0.125) + "px";
+}
+var resizeTimer = 0;
+window.addEventListener("resize", function(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(sizeStage, 120);
+});
+
+/* ---------------- glyphs — sparse house marks down the left edge ---------------- */
+function drawGlyphs(){
+  var W = innerW(), H = innerH();
+  var gx = Math.max(10, W * 0.035);
+  ctx.strokeStyle = PAL.glyph; ctx.globalAlpha = 0.55; ctx.lineWidth = 1.2;
+  var marks = ["eye", "arcs", "diamond", "ring"];
+  for (var i = 0; i < 4; i++){
+    var gy = H * (0.34 + i * 0.115), s = Math.max(6, W * 0.013);
+    ctx.beginPath();
+    if (marks[i] === "eye"){
+      ctx.moveTo(gx, gy - s); ctx.lineTo(gx + s, gy + s*0.8); ctx.lineTo(gx - s, gy + s*0.8);
+      ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(gx, gy + s*0.25, s*0.30, 0, 6.2832); ctx.stroke();
+    } else if (marks[i] === "arcs"){
+      for (var a = 1; a <= 3; a++){
+        ctx.beginPath(); ctx.arc(gx - s*0.7, gy + s*0.7, a * s * 0.42, -1.25, -0.32); ctx.stroke();
+      }
+      ctx.fillStyle = PAL.glyph;
+      ctx.beginPath(); ctx.arc(gx - s*0.7, gy + s*0.7, 1.4, 0, 6.2832); ctx.fill();
+    } else if (marks[i] === "diamond"){
+      ctx.moveTo(gx, gy - s); ctx.lineTo(gx + s*0.72, gy); ctx.lineTo(gx, gy + s); ctx.lineTo(gx - s*0.72, gy);
+      ctx.closePath(); ctx.stroke();
+    } else {
+      ctx.arc(gx, gy, s*0.62, 0, 6.2832); ctx.stroke();
+      ctx.beginPath(); ctx.arc(gx, gy, s*0.22, 0, 6.2832); ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ---------------- ONE wireframe patrol drone ---------------- */
+var drone = null;
+function seedDrone(){
+  var W = innerW(), H = innerH();
+  drone = { cx: 0.68*W, cy: 0.44*H, rx: 0.13*W, ry: 0.055*H, sp: 0.55, ph: 0.0,
+            x: 0, y: 0, vx: 0, vy: 0, trail: [] };
+}
+function dronePos(d, t){
+  return [ d.cx + d.rx * Math.sin(d.sp * t + d.ph),
+           d.cy + d.ry * Math.sin(2 * d.sp * t + d.ph * 1.7) ];
+}
+function drawDrone(d, t, nowMs){
+  var W = innerW();
+  var s = Math.max(9, W * 0.021);
+  var x = d.x, y = d.y;
+  var bank = Math.max(-0.45, Math.min(0.45, d.vx * 0.0016));
+  ctx.lineWidth = 1;
+  for (var i = 1; i < d.trail.length; i++){
+    var a = i / d.trail.length;
+    ctx.strokeStyle = PAL.trail; ctx.globalAlpha = 0.05 + 0.20 * a;
+    ctx.beginPath();
+    ctx.moveTo(d.trail[i-1][0], d.trail[i-1][1]);
+    ctx.lineTo(d.trail[i][0], d.trail[i][1]);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(bank);
+  ctx.strokeStyle = PAL.drone; ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.moveTo(0, -s*0.45); ctx.lineTo(s*0.55, 0); ctx.lineTo(0, s*0.45); ctx.lineTo(-s*0.55, 0);
+  ctx.closePath(); ctx.stroke();
+  var arms = [[-1,-1],[1,-1],[-1,1],[1,1]];
+  for (var k = 0; k < 4; k++){
+    var ax = arms[k][0] * s, ay = arms[k][1] * s * 0.72;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ax, ay); ctx.stroke();
+    var rr = s * 0.34 * (1 + 0.10 * Math.sin(nowMs * 0.05 + k * 1.7));
+    ctx.beginPath(); ctx.ellipse(ax, ay, rr, rr * 0.36, 0, 0, 6.2832); ctx.stroke();
+  }
+  ctx.fillStyle = PAL.drone;
+  ctx.beginPath(); ctx.arc(0, 0, Math.max(1.2, s * 0.10), 0, 6.2832); ctx.fill();
+  ctx.restore();
+  /* tracking lock — corner brackets that ride the craft */
+  var b = s * 1.9, bl = s * 0.55;
+  ctx.strokeStyle = PAL.drone; ctx.lineWidth = 1.4;
+  var cs = [[-1,-1],[1,-1],[-1,1],[1,1]];
+  for (var c = 0; c < 4; c++){
+    var px = x + cs[c][0] * b, py = y + cs[c][1] * b;
+    ctx.beginPath();
+    ctx.moveTo(px - cs[c][0] * bl, py);
+    ctx.lineTo(px, py);
+    ctx.lineTo(px, py - cs[c][1] * bl);
+    ctx.stroke();
+  }
+  ctx.fillStyle = PAL.tag;
+  ctx.font = "600 " + Math.max(8, Math.round(W * 0.020)) + "px ui-monospace,Menlo,monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("TRK-01", x, y - b - 6);
+  ctx.textAlign = "left";
+}
+
+/* ---------------- the pulse — one per second, phase-locked ---------------- */
+function drawPulse(now, nowMs){
+  var W = innerW(), H = innerH();
+  var x0 = W * 0.06, x1 = W * 0.94;
+  var yBase = H * 0.545, amp = H * 0.045;
+  var secFrac = (now.getSeconds() % 60) / 60 +
+                (now.getMilliseconds() / 1000) / 60;
+  var phase = secFrac * 6.2832;
+  var msFrac = now.getMilliseconds() / 1000;
+  ctx.strokeStyle = "rgba(70,255,180,.28)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x0, yBase); ctx.lineTo(x1, yBase); ctx.stroke();
+  ctx.strokeStyle = PAL.pulse; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (var px = x0; px <= x1; px += 3){
+    var f = (px - x0) / (x1 - x0);
+    var y = yBase
+      - Math.sin(f * 6.2832 - phase) * amp
+      - Math.sin(f * 12.566 - phase * 2) * amp * 0.32
+      + Math.sin(f * 51.0 - msFrac * 25.13) * amp * 0.10;
+    if (px === x0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+  }
+  ctx.stroke();
+  var hx = x0 + ((nowMs / 1000) % 4) / 4 * (x1 - x0);
+  var hf = (hx - x0) / (x1 - x0);
+  var hy = yBase
+    - Math.sin(hf * 6.2832 - phase) * amp
+    - Math.sin(hf * 12.566 - phase * 2) * amp * 0.32
+    + Math.sin(hf * 51.0 - msFrac * 25.13) * amp * 0.10;
+  ctx.fillStyle = PAL.shimmer;
+  ctx.beginPath(); ctx.arc(hx, hy, 2.6, 0, 6.2832); ctx.fill();
+}
+
+/* ---------------- the clock readouts ---------------- */
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+function fmt2(n){ return (n < 10 ? "0" : "") + n; }
+function fmt3(n){ return (n < 10 ? "00" : n < 100 ? "0" : "") + n; }
+var lastClockStr = "", lastDateStr = "", lastSecMs = -1;
+function drawClock(now){
+  var cs = fmt2(now.getHours()) + ":" + fmt2(now.getMinutes());
+  if (cs !== lastClockStr){ clockEl.textContent = cs; lastClockStr = cs; }
+  var sm = now.getSeconds() * 1000 + now.getMilliseconds();
+  if (sm !== lastSecMs){
+    secEl.textContent = "SEC " + fmt2(now.getSeconds()) + " · " + fmt3(now.getMilliseconds()) + " MS";
+    lastSecMs = sm;
+  }
+  var ds = DAYS[now.getDay()] + " " + MONS[now.getMonth()] + " " + fmt2(now.getDate());
+  if (ds !== lastDateStr){ dateEl.textContent = ds; lastDateStr = ds; }
+}
+
+/* analog ticks, built once */
+(function(){
+  var g = document.getElementById("analogTicks");
+  if (!g) return;
+  var NS = "http://www.w3.org/2000/svg";
+  for (var i = 0; i < 60; i++){
+    var big = (i % 5 === 0);
+    var a = i * Math.PI / 30, r1 = big ? 50 : 53.5, r2 = 56;
+    var ln = document.createElementNS(NS, "line");
+    ln.setAttribute("x1", (60 + r1 * Math.sin(a)).toFixed(1));
+    ln.setAttribute("y1", (60 - r1 * Math.cos(a)).toFixed(1));
+    ln.setAttribute("x2", (60 + r2 * Math.sin(a)).toFixed(1));
+    ln.setAttribute("y2", (60 - r2 * Math.cos(a)).toFixed(1));
+    ln.setAttribute("stroke", "#2bd97c");
+    ln.setAttribute("stroke-width", big ? 2.4 : 1.2);
+    g.appendChild(ln);
+  }
+})();
+
+/* THE HANDS READOUT (Face Law 1): hour, minute and second hands
+   on the centre post pin — and they read SWEEP TIME, the
+   monotonic sweep clock above, never the raw rAF timestamp.
+   The sweep was seeded from the wall clock at boot and advances
+   only by the law's clamped deltas, so the hands are the real
+   clock, warp-proof. */
+var readoutMode = "digital";
+function drawAnalog(){
+  if (readoutMode !== "hands") return;
+  var d = new Date(sweepNow);
+  var s = d.getSeconds() + d.getMilliseconds() / 1000;
+  var m = d.getMinutes() + s / 60;
+  var h = (d.getHours() % 12) + m / 60;
+  var set = function(id, deg){
+    var el = document.getElementById(id);
+    if (el) el.setAttribute("transform", "rotate(" + deg.toFixed(2) + " 60 60)");
+  };
+  set("handH", h * 30); set("handM", m * 6); set("handS", s * 6);
+}
+function applyReadout(){
+  var dig = document.getElementById("clockChip");
+  var ana = document.getElementById("analogChip");
+  var btn = document.getElementById("readoutBtn");
+  if (readoutMode === "hands"){
+    dig.style.display = "none"; ana.style.display = "block";
+    btn.textContent = "READOUT · HANDS";
+  } else {
+    dig.style.display = "block"; ana.style.display = "none";
+    btn.textContent = "READOUT · DIGITAL";
+  }
+  window.__readout = { mode: readoutMode };
+}
+window.__toggleReadout = function(){
+  readoutMode = (readoutMode === "digital") ? "hands" : "digital";
+  applyReadout(); noteInteract();
+};
+(function(){
+  var btn = document.getElementById("readoutBtn");
+  if (btn) btn.addEventListener("click", function(ev){
+    ev.stopPropagation(); window.__toggleReadout();
+  });
+})();
+applyReadout();
+
+/* ---------------- GPS — a line, never a gate ---------------- */
+var gpsState = { mode: "none" };
+if (navigator.geolocation){
+  gpsState.mode = "seeking";
+  gpsEl.textContent = "GPS — SEEKING";
+  try {
+    navigator.geolocation.watchPosition(function(p){
+      gpsState = { mode: "fix",
+        lat: p.coords.latitude, lon: p.coords.longitude,
+        acc: Math.round(p.coords.accuracy || 0) };
+    }, function(){
+      if (gpsState.mode !== "fix"){ gpsState = { mode: "denied" }; }
+    }, { enableHighAccuracy: false, maximumAge: 30000, timeout: 20000 });
+  } catch (e) { gpsState = { mode: "none" }; }
+}
+function drawGps(){
+  var txt;
+  if (gpsState.mode === "fix"){
+    txt = "GPS " + gpsState.lat.toFixed(3) + ", " + gpsState.lon.toFixed(3) +
+          " ±" + gpsState.acc + "M";
+  } else if (gpsState.mode === "seeking"){ txt = "GPS — SEEKING"; }
+  else { txt = "GPS — NO FIX"; }
+  if (gpsEl.textContent !== txt) gpsEl.textContent = txt;
+}
+
+/* ================================================================
+   THE WISH LAYER — see the header for the full honesty contract.
+   One source (the checked house feed), no arithmetic of its own,
+   every state labelled in words.
+   ================================================================ */
+var GAME_ORDER = ["fantasy5", "daily3", "daily4", "powerball", "megaMillions"];
+var GAME_SHORT = { fantasy5: "F5", daily3: "D3", daily4: "D4",
+                   powerball: "PB", megaMillions: "MM" };
+var GAME_NAME = { fantasy5: "Fantasy 5", daily3: "Daily 3", daily4: "Daily 4",
+                  powerball: "Powerball", megaMillions: "Mega Millions" };
+/* games that carry a Double Play drawing in Michigan — their
+   rows are never optional on this face (the Nov 8 lesson) */
+var DP_GAMES = { fantasy5: true, powerball: true };
+
+var wishState = { feed: null, live: false, source: "none" };
+/* the native container's store: { load() -> feed|null, save(feed) }.
+   The web build's default is session memory only. */
+window.__wishStore = window.__wishStore || {
+  _f: null,
+  load: function(){ return this._f; },
+  save: function(f){ this._f = f; }
+};
+
+function feedUrl(){
+  try {
+    var q = new URLSearchParams(window.location.search).get("feed");
+    if (q) return q;
+  } catch (e) {}
+  if (/\/wish\//.test(window.location.pathname)) return "wish-results.json";
+  return "https://tinyradr.com/wish/wish-results.json";
+}
+
+function validFeed(f){
+  return !!f && typeof f === "object" &&
+         typeof f.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(f.date) &&
+         typeof f.games === "object" && f.games !== null;
+}
+function applyFeed(f, live){
+  if (!validFeed(f)) return false;
+  wishState.feed = f; wishState.live = !!live;
+  wishState.source = live ? "live" : "last-known";
+  if (live){ try { window.__wishStore.save(f); } catch (e) {} }
+  renderWish();
+  return true;
+}
+function goStale(){
+  wishState.live = false;
+  wishState.source = wishState.feed ? "last-known" : "none";
+  renderWish();
+}
+function fetchWish(){
+  var url = feedUrl();
+  if (!window.fetch){ goStale(); return; }
+  fetch(url, { cache: "no-store" }).then(function(r){
+    if (!r.ok) throw new Error("feed " + r.status);
+    return r.json();
+  }).then(function(f){
+    if (!applyFeed(f, true)) goStale();
+  }).catch(function(){ goStale(); });
+}
+
+/* the day's fixed points — SCHEDULE, of record: the seal text
+   at 17:17, the draws at 19:29, the grade run at 20:47. The
+   countdown is clock arithmetic on labelled schedule; it never
+   claims any of them happened. */
+var FIXED = [ { t: 17*60 + 17, label: "SEAL 17:17" },
+              { t: 19*60 + 29, label: "DRAW 19:29" },
+              { t: 20*60 + 47, label: "GRADE 20:47" } ];
+function nextFixed(now){
+  var mins = now.getHours() * 60 + now.getMinutes();
+  for (var i = 0; i < FIXED.length; i++)
+    if (mins < FIXED[i].t) return { label: FIXED[i].label, inMin: FIXED[i].t - mins };
+  return { label: "SEAL 17:17", inMin: (24 * 60 - mins) + FIXED[0].t, tomorrow: true };
+}
+
+function fmtNums(a){ return a.join("-"); }
+function fmtSealed(game, v){
+  if (Array.isArray(v)) return fmtNums(v);
+  if (typeof v === "string") return v;
+  if (v && Array.isArray(v.whites)) return fmtNums(v.whites) + " + " + v.bonus;
+  return null;
+}
+function nightWord(dateStr){
+  var p = dateStr.split("-");
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  return DAYS[d.getDay()] + " " + MONS[d.getMonth()] + " " + fmt2(d.getDate());
+}
+function money(x){ return "$" + Number(x).toFixed(2); }
+
+/* one grade row -> the board's everyday-man words. The words are
+   built ONLY from the grader's computed fields (its drawn set,
+   its match, its prize, its result) — the face copies, it does
+   not compute. */
+function rowWords(game, row, isDP){
+  if (!row) return null;
+  var dp = isDP ? "Double Play" : null;
+  if (row.status === "missing")
+    return { ng: true, text: (dp ? dp + ": " : "") + "NOT GRADED" };
+  if (row.status === "no-drawing") return null; /* said once, by omission rule below */
+  if (row.status !== "graded") return { ng: true, text: (dp ? dp + ": " : "") + "NOT GRADED" };
+  var head = "";
+  if (Array.isArray(row.drawn)) head = fmtNums(row.drawn);
+  else if (row.drawn && Array.isArray(row.drawn.whites))
+    head = fmtNums(row.drawn.whites) + " + " + row.drawn.bonus;
+  else if (typeof row.drawn === "string") head = row.drawn;
+  var res = String(row.result || "");
+  if (res.indexOf("WIN") === 0){
+    var prize = (typeof row.prize === "number") ? money(row.prize) : String(row.prize);
+    return { win: true,
+             text: (dp ? "You won " + prize + " on the Double Play"
+                       : "You won " + prize) + (head ? " · " + head : "") };
+  }
+  if (res.indexOf("HIT") === 0)
+    return { text: (dp ? dp + ": " : "") + "hit — " + head + " · prize " + row.prize };
+  if (res.indexOf("MATCH") === 0)
+    return { text: (dp ? dp + ": " : "") + "a match — " + head + " · prize " + row.prize };
+  return { text: (dp ? dp + ": " : "") + "no win" + (head ? " · " + head : "") };
+}
+
+function renderWish(){
+  var headEl = document.getElementById("wishHead");
+  var sealEl = document.getElementById("wishSealed");
+  var gradEl = document.getElementById("wishGrades");
+  var totEl = document.getElementById("wishTotal");
+  var empEl = document.getElementById("wishEmpty");
+  var f = wishState.feed;
+  sealEl.innerHTML = ""; gradEl.innerHTML = "";
+  totEl.style.display = "none";
+  if (!f){
+    headEl.textContent = "WISH PICKER — TONIGHT'S SEAL";
+    headEl.className = "";
+    empEl.style.display = "block";
+    empEl.textContent = "WISH — NOT POSTED YET";
+    return;
+  }
+  empEl.style.display = "none";
+  var stale = !wishState.live;
+  headEl.textContent = (stale ? "LAST KNOWN · " : "LAST GRADED · ") +
+                       nightWord(f.date).toUpperCase() +
+                       (stale ? " · FEED UNREACHABLE" : "");
+  headEl.className = stale ? "stale" : "";
+  /* the sealed set — the feed's own sealed block, verbatim */
+  var sealed = f.sealed || {};
+  GAME_ORDER.forEach(function(g){
+    if (!(g in sealed)) return;
+    var txt = fmtSealed(g, sealed[g]);
+    if (txt === null) return;
+    var div = document.createElement("div");
+    div.className = "wgame"; div.id = "wseal-" + g;
+    div.innerHTML = "<b>" + GAME_SHORT[g] + "</b> " + txt;
+    sealEl.appendChild(div);
+  });
+  /* the graded rows — from the feed's computed grades block */
+  var grades = f.grades;
+  if (!grades || !grades.games){
+    var ng = document.createElement("div");
+    ng.className = "wgrade"; ng.id = "wgrades-none";
+    ng.innerHTML = "<span class='ng'>NOT GRADED</span>";
+    gradEl.appendChild(ng);
+    return;
+  }
+  GAME_ORDER.forEach(function(g){
+    var block = grades.games[g];
+    if (!block) return;
+    [ ["main", false], ["doublePlay", true] ].forEach(function(pair){
+      var w = rowWords(g, block[pair[0]], pair[1]);
+      if (!w) return;
+      var div = document.createElement("div");
+      div.className = "wgrade"; div.id = "wgrade-" + g + (pair[1] ? "-dp" : "-main");
+      if (w.win) div.innerHTML = "<span class='win'>" + w.text + "</span>";
+      else if (w.ng) div.innerHTML = "<span class='ng'>" + w.text + "</span>";
+      else div.innerHTML = (pair[1] ? "<span class='dp'>" + GAME_SHORT[g] + " DP</span> · " : "<b>" + GAME_SHORT[g] + "</b> · ") + w.text;
+      gradEl.appendChild(div);
+    });
+    /* the Double Play row is structural: a DP game whose grades
+       block carries no DP row at all still gets its words */
+    if (DP_GAMES[g] && !("doublePlay" in block)){
+      var miss = document.createElement("div");
+      miss.className = "wgrade"; miss.id = "wgrade-" + g + "-dp";
+      miss.innerHTML = "<span class='ng'>Double Play: NOT GRADED</span>";
+      gradEl.appendChild(miss);
+    }
+  });
+  var total = grades.totals && grades.totals.prizeTotal;
+  if (typeof total === "number" && total > 0){
+    totEl.textContent = "WON " + money(total) + " THAT NIGHT";
+    totEl.style.display = "block";
+  }
+}
+
+var lastNextStr = "";
+function drawNext(now){
+  var nf = nextFixed(now);
+  var txt = "NEXT — " + nf.label + (nf.inMin >= 60
+    ? " · IN " + Math.floor(nf.inMin / 60) + "H " + fmt2(nf.inMin % 60) + "M"
+    : " · IN " + nf.inMin + "M");
+  if (txt !== lastNextStr){
+    document.getElementById("wishNext").innerHTML =
+      "NEXT — <b>" + nf.label + "</b>" + txt.slice(txt.indexOf(" ·"));
+    lastNextStr = txt;
+  }
+}
+
+/* bench handles */
+window.__wishBench = {
+  applyFeed: function(f){ return applyFeed(f, true); },
+  goOffline: function(){ goStale(); }
+};
+
+/* seed from the container's store (the last known feed), then
+   reach for the live one; re-check every 60 s while worn */
+(function(){
+  var stored = null;
+  try { stored = window.__wishStore.load(); } catch (e) {}
+  if (stored && validFeed(stored)){ wishState.feed = stored; wishState.source = "last-known"; }
+  renderWish();
+  fetchWish();
+  setInterval(fetchWish, 60000);
+})();
+
+/* ================================================================
+   THE APEX FRAME — apex-frame v1 (the engine family's frame,
+   geometry ported from the condensed engine face via Betta
+   V3.1): case metal exists ONLY as hollow rings (outer case
+   minus glass window, even-odd), so the glass is genuinely open;
+   FRAME ON seats the whole world into the glass by ONE uniform
+   transform. Case under the world, trim over it.
+   ================================================================ */
+(function(){
+  var K = 512 / 640;
+  function ringPath(cx, cy, w, h, r){
+    function rect(x, y, ww, hh, rr){
+      return "M" + (x+rr) + "," + y + "H" + (x+ww-rr) +
+        "Q" + (x+ww) + "," + y + " " + (x+ww) + "," + (y+rr) +
+        "V" + (y+hh-rr) + "Q" + (x+ww) + "," + (y+hh) + " " + (x+ww-rr) + "," + (y+hh) +
+        "H" + (x+rr) + "Q" + x + "," + (y+hh) + " " + x + "," + (y+hh-rr) +
+        "V" + (y+rr) + "Q" + x + "," + y + " " + (x+rr) + "," + y + "Z";
+    }
+    return rect(cx-w/2, cy-h/2, w, h, r) + " " + rect(cx-w/2+14*K*2, cy-h/2+14*K*2, w-28*K*2, h-28*K*2, r*0.7);
+  }
+  var glass = { x: 256 - (640*0.5 - 78) * K, w: (640 - 156) * K };
+  var insetFrac = 78 / 640;
+  var caseSvg = document.getElementById("caseSvg");
+  var trimSvg = document.getElementById("trimSvg");
+  var NS = "http://www.w3.org/2000/svg";
+  function buildFrame(){
+    var casePath = document.createElementNS(NS, "path");
+    casePath.setAttribute("d", ringPath(256, 256, 512, 512, 64));
+    casePath.setAttribute("fill", "#0a0c0e");
+    casePath.setAttribute("fill-rule", "evenodd");
+    caseSvg.appendChild(casePath);
+    var trim = document.createElementNS(NS, "path");
+    trim.setAttribute("d", ringPath(256, 256, 512 - 20, 512 - 20, 56));
+    trim.setAttribute("fill", "none");
+    trim.setAttribute("stroke", "#ffb52e");
+    trim.setAttribute("stroke-width", "2");
+    trim.setAttribute("opacity", "0.65");
+    trimSvg.appendChild(trim);
+    [[40,40],[472,40],[40,472],[472,472]].forEach(function(p){
+      var bolt = document.createElementNS(NS, "circle");
+      bolt.setAttribute("cx", p[0]); bolt.setAttribute("cy", p[1]); bolt.setAttribute("r", 5);
+      bolt.setAttribute("fill", "#12351f"); bolt.setAttribute("stroke", "#ffb52e"); bolt.setAttribute("stroke-width", "1.4");
+      trimSvg.appendChild(bolt);
+    });
+  }
+  var frameOn = true;
+  function applyFrame(){
+    var S = Math.min(VW, VH) || 512;
+    if (frameOn){
+      frameInset = Math.round(S * insetFrac); frameInsetY = frameInset;
+      var sc = (S - frameInset * 2) / S;
+      world.style.transformOrigin = "50% 50%";
+      world.style.transform = "scale(" + sc + ")";
+    } else {
+      frameInset = 0; frameInsetY = 0;
+      world.style.transform = "";
+    }
+    var btn = document.getElementById("frameBtn");
+    if (btn) btn.textContent = frameOn ? "FRAME ON" : "FRAME OFF";
+    window.__apexFrame = { on: frameOn, inset: frameInset };
+    sizeStage();
+  }
+  window.__toggleFrame = function(){ frameOn = !frameOn; applyFrame(); };
+  var btn = document.getElementById("frameBtn");
+  if (btn) btn.addEventListener("click", function(ev){ ev.stopPropagation(); window.__toggleFrame(); });
+  window.__applyFrame = applyFrame;
+  buildFrame();
+})();
+
+/* ---------------- dim-only battery care ---------------- */
+var lastInteract = performance.now();
+function noteInteract(){ lastInteract = performance.now(); }
+var dimEl = document.getElementById("dim");
+setInterval(function(){
+  dimEl.style.opacity = ((performance.now() - lastInteract) > 60000) ? "0.45" : "0";
+}, 1000);
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ noteInteract(); }, true);
+});
+window.addEventListener("focus", function(){ noteInteract(); });
+document.addEventListener("visibilitychange", function(){ if (!document.hidden) noteInteract(); });
+
+/* ================================================================
+   THE ALWAYS-LIVE DRIVER — no governor, no REST, no observe
+   gate. Motion from first paint; battery care is the dim only.
+   ================================================================ */
+var state = "live", raf = 0, driverStart = 0, lastMs = -1, elapsed = 0;
+window.__faceRest = false;
+window.__driverFault = null;
+function refreshBench(now){
+  window.__wish = {
+    shape: SHAPE,
+    clock: fmt2(now.getHours()) + ":" + fmt2(now.getMinutes()) + ":" + fmt2(now.getSeconds()),
+    phase: +(((now.getSeconds() % 60) + now.getMilliseconds() / 1000) / 60).toFixed(4),
+    readout: readoutMode,
+    gps: gpsState.mode,
+    frameOn: window.__apexFrame ? window.__apexFrame.on : null,
+    feedSource: wishState.source,
+    feedDate: wishState.feed ? wishState.feed.date : null,
+    next: lastNextStr,
+    sweepMs: Math.round(sweepNow),
+    rest: window.__faceRest
+  };
+  window.__state = { t: +elapsed.toFixed(2), state: state,
+                     driverFault: window.__driverFault, clock: window.__wish.clock };
+}
+function frameBody(nowMs){
+  if (cv.width !== innerW() || cv.height !== innerH()) sizeStage();
+  sweepAdvance();
+  var now = new Date();
+  var t = nowMs / 1000;
+  ctx.clearRect(0, 0, innerW(), innerH());
+  drawGlyphs();
+  if (drone){
+    var p = dronePos(drone, t);
+    drone.vx = (p[0] - drone.x) * 60; drone.vy = (p[1] - drone.y) * 60;
+    drone.x = p[0]; drone.y = p[1];
+    drone.trail.push([drone.x, drone.y]);
+    if (drone.trail.length > 26) drone.trail.shift();
+    drawDrone(drone, t, nowMs);
+  }
+  drawPulse(now, nowMs);
+  drawAnalog();
+  drawClock(now);
+  drawGps();
+  drawNext(now);
+  refreshBench(now);
+}
+var faultEl = document.getElementById("fault");
+function frame(nowMs){
+  if (lastMs < 0){ lastMs = nowMs; driverStart = nowMs; }
+  elapsed = (nowMs - driverStart) / 1000;
+  try { frameBody(nowMs); }
+  catch (err){
+    window.__driverFault = { message: String(err && err.message || err), t: +elapsed.toFixed(2) };
+    faultEl.textContent = "DRIVER FAULT — " + window.__driverFault.message;
+    faultEl.style.display = "block";
+    if (raf) cancelAnimationFrame(raf); raf = 0;
+    return;
+  }
+  raf = requestAnimationFrame(frame);
+}
+window.ApexFace = {
+  observe: function(){ noteInteract(); },
+  rest: function(){ noteInteract(); },
+  toggle: function(){ noteInteract(); },
+  state: function(){ return "live"; }
+};
+
+/* ---- Boot: size from measured pixels, seat the frame, seed the
+   patrol, THE DRIVER STARTS NOW, unconditionally — first paint
+   already has the drone in the air and the pulse running. */
+sizeStage();
+if (window.__applyFrame) window.__applyFrame();
+seedDrone();
+raf = requestAnimationFrame(frame);
+</script>
+</body>
+</html>

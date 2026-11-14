@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Index B — phase 2 of 3</title>
+<style>
+html,body{margin:0;background:#010804;color:#00ff3b;font-family:"Share Tech Mono",Courier New,monospace}
+body{padding:12px;font-size:12px;line-height:1.5}
+h1{font-size:11px;letter-spacing:.25em;text-transform:uppercase;margin:0 0 8px}
+.bar{height:6px;border:1px solid #0f5;background:#000;margin:8px 0}
+.bar i{display:block;height:100%;width:0;background:#0f5}
+a{color:#0ff}
+small{color:#5f8f6f}
+</style>
+</head>
+<body>
+<h1>Index B · strip session</h1>
+<p>Second leg. No app context, no service-worker scope, no permission prompts.</p>
+<div class="bar"><i id="b"></i></div>
+<p><a id="m" href="./c.html">continue manually &rsaquo;</a></p>
+<small>If scripting is blocked, the manual link keeps the same no-referrer exit.</small>
+<script>
+(function () {
+  var p = location.hash.slice(1);
+  var next = "./c.html" + (p ? "#" + p : "");
+  document.getElementById("m").href = next;
+  var bar = document.getElementById("b"), t0 = Date.now(), TICK = 400;
+  var id = setInterval(function () {
+    var f = Math.min(1, (Date.now() - t0) / TICK);
+    bar.style.width = (f * 100).toFixed(0) + "%";
+    if (f >= 1) { clearInterval(id); location.replace(next); }
+  }, 40);
+})();
+</script>
+</body>
+</html>

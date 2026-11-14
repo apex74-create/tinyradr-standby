@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Inventory Assist — AR SKU Tagger</title>
+<!--
+  APEX INVENTORY ASSIST — walk, scan, call it off, tag hangs in space.
+  Patent Pending · E026–E033 · © 2026 Apex Air Solutions, LLC
+  Single-file. No frameworks. Big buttons. Plain words.
+-->
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; color:#0f0; font-family:'Courier New',monospace; padding:12px; }
+  .hdr { border:1px solid #0f0; padding:12px; margin-bottom:12px; }
+  .hdr h1 { font-size:18px; letter-spacing:2px; color:#0ff; }
+  .hdr .sub { font-size:11px; opacity:.8; margin-top:4px; }
+  .grid { display:grid; grid-template-columns:1fr; gap:12px; }
+  @media (min-width:900px){ .grid { grid-template-columns:2fr 1fr; } }
+  #view { width:100%; height:44vh; background:#000; border:1px solid #0f0; display:block; }
+  .panel { border:1px solid #0f0; padding:12px; background:#020; }
+  .panel h2 { font-size:12px; letter-spacing:2px; color:#0ff; border-bottom:1px solid #040;
+              padding-bottom:4px; margin-bottom:8px; }
+  .btn { width:100%; min-height:56px; margin-top:10px; background:#000; color:#0f0;
+         border:2px solid #0f0; font-family:inherit; font-size:16px; cursor:pointer; border-radius:6px; }
+  .btn:active { background:#0f0; color:#000; }
+  .btn.primary { border-color:#0ff; color:#0ff; }
+  .btn.big { min-height:72px; font-size:20px; }
+  input,select { width:100%; background:#000; border:1px solid #0f0; color:#0f0;
+                 font-family:inherit; font-size:16px; padding:12px; margin-top:8px; min-height:48px; }
+  label { font-size:13px; display:block; margin-top:10px; letter-spacing:1px; }
+  .row { display:flex; gap:8px; } .row>*{flex:1;}
+  .stat { display:flex; justify-content:space-between; font-size:12px; padding:4px 0;
+          border-bottom:1px solid #030; }
+  .stat .k{opacity:.7;} .stat .v{color:#0ff;}
+  ul.list{list-style:none;margin-top:10px;max-height:160px;overflow-y:auto;}
+  ul.list li{border:1px solid #030;padding:8px;margin-bottom:4px;font-size:13px;
+             display:flex;justify-content:space-between;align-items:center;}
+  ul.list li .rm{color:#f44;font-size:18px;padding:2px 8px;cursor:pointer;}
+  .count{color:#ff0;font-size:14px;margin-top:8px;}
+  .note{font-size:12px;opacity:.7;margin-top:8px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ INVENTORY ASSIST ◢</h1>
+  <div class="sub">Scan it · Say it · It hangs in space · It's there when you come back</div>
+  <div class="sub" id="posLine">Position: not started</div>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>AR VIEW</h2>
+    <canvas id="view" width="800" height="400"></canvas>
+    <button class="btn primary big" id="startBtn">▶ START (tap once)</button>
+    <div class="note">Scan a QR on the shelf to snap your position. Then scan a barcode and say the item — the tag hangs where you're standing.</div>
+  </div>
+
+  <div class="panel">
+    <h2>TAG AN ITEM</h2>
+    <div class="stat"><span class="k">Last scan</span><span class="v" id="lastScan">—</span></div>
+    <div class="stat"><span class="k">Helical address</span><span class="v" id="helixAddr">—</span></div>
+
+    <label for="sku">SKU / code</label>
+    <input id="sku" type="text" placeholder="scan or type" autocomplete="off">
+    <label for="name">Item name (say it or type it)</label>
+    <input id="name" type="text" placeholder="e.g. Smoked Ribs" autocomplete="off">
+    <div class="row">
+      <div><label for="qty">Qty</label><input id="qty" type="number" min="0" value="1" inputmode="numeric"></div>
+      <div><label for="price">Price $</label><input id="price" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+    </div>
+    <label for="aisle">Aisle / zone</label>
+    <input id="aisle" type="text" placeholder="e.g. 07" autocomplete="off">
+
+    <div class="row">
+      <button class="btn" id="voiceBtn">🎤 SAY NAME</button>
+      <button class="btn" id="scanBtn">📷 SCAN QR</button>
+    </div>
+    <button class="btn primary" id="tagBtn">📌 DROP TAG HERE</button>
+
+    <div class="count" id="countLine">0 tags</div>
+    <ul class="list" id="tagList"></ul>
+    <button class="btn" id="exportBtn">⬇ EXPORT INVENTORY (JSON)</button>
+  </div>
+</div>
+
+<div style="display:none;">
+  <span data-ar-node="here">here</span>
+</div>
+
+<script src="../apex-dash/tristar-routing.js"></script>
+<script src="../apex-ar-core/engine-dispatch.js"></script>
+<script src="../apex-ar-glasses/superposition-dom.js"></script>
+<script src="../apex-ar-glasses/zero-slam.js"></script>
+<script src="../apex-ar-core/tristar-deep.js"></script>
+<script src="../apex-ar-core/helical-lock.js"></script>
+<script src="../apex-ar-core/anchor-engine.js"></script>
+<script src="../apex-ar-core/tag-store.js"></script>
+<script src="../apex-ar-core/scanner-input.js"></script>
+<script src="../apex-ar-core/voice-input.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  SuperpositionDOM.init(document);
+  const canvas = document.getElementById('view');
+  const ctx = canvas.getContext('2d');
+  let pose = { x:0,y:0,z:0,heading:0,conf:0,source:'INIT' };
+
+  /* ── AR view: draw persistent SKU tags locked by helical address ── */
+  function draw() {
+    requestAnimationFrame(draw);
+    const w=canvas.width,h=canvas.height;
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle='#030'; ctx.beginPath();
+    ctx.moveTo(w/2-16,h/2); ctx.lineTo(w/2+16,h/2);
+    ctx.moveTo(w/2,h/2-16); ctx.lineTo(w/2,h/2+16); ctx.stroke();
+
+    const yaw=-(pose.heading||0)*Math.PI/180;
+    const f=(w/2)/Math.tan(35*Math.PI/180);
+    TagStore.all().forEach((t)=>{
+      const rx=t.x-pose.x, ry=t.y-pose.y;
+      const X=rx*Math.cos(yaw)-ry*Math.sin(yaw);
+      const Z=rx*Math.sin(yaw)+ry*Math.cos(yaw)+0.001;
+      if(Z<0.1) return;
+      const sx=(X/Z)*f+w/2, sy=h/2-(t.z||0)*20;
+      const sc=Math.max(0.5,Math.min(1.5,2/Z));
+      ctx.font='bold '+Math.round(13*sc)+'px monospace';
+      ctx.fillStyle='#0f0';
+      ctx.fillText((t.name||t.sku||'?')+(t.price?' $'+t.price.toFixed(2):''), sx+10, sy);
+      ctx.strokeStyle='#0ff'; ctx.lineWidth=2; ctx.strokeRect(sx, sy-12*sc, 8, 8);
+      if(t.qty!==null&&t.qty!==undefined){ ctx.fillStyle='#ff0'; ctx.fillText('×'+t.qty, sx+10, sy+14*sc); }
+    });
+  }
+  draw();
+
+  /* ── pose + helical address ── */
+  window.addEventListener('apexPoseUpdate',(e)=>{ pose=e.detail;
+    document.getElementById('posLine').textContent='Position: '+pose.source+' · '+Math.round((pose.conf||0)*100)+'% sure';
+    const a=HelicalLock.helixAddress(pose.x,pose.y,pose.z);
+    document.getElementById('helixAddr').textContent=a.key.slice(0,18)+'…';
+  });
+
+  /* ── start ── */
+  document.getElementById('startBtn').addEventListener('click',function(){
+    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().catch(function(){});}
+    if(window.SuperpositionEngine&&SuperpositionEngine.init){try{SuperpositionEngine.init();}catch(e){}}
+    ZeroSLAM.start(); ScannerInput.start();
+    this.textContent='● RUNNING'; this.disabled=true;
+  });
+
+  /* ── scanner fills SKU; QR anchor snaps position ── */
+  ScannerInput.onScan((s)=>{
+    document.getElementById('lastScan').textContent=s.text;
+    /* if it's a known QR anchor, re-anchor; else treat as SKU */
+    const anchor=AnchorEngine.scan(s.text);
+    if(anchor){
+      document.getElementById('aisle').value=anchor.label.replace(/\D/g,'')||anchor.id;
+    } else {
+      document.getElementById('sku').value=s.sku;
+    }
+  });
+  document.getElementById('scanBtn').addEventListener('click',()=>{
+    const t=prompt('Scan or paste the QR / barcode text:');
+    if(t) ScannerInput.simulate(t);
+  });
+
+  /* ── voice fills the item name ── */
+  document.getElementById('voiceBtn').addEventListener('click',function(){
+    if(!VoiceInput.isSupported()){document.getElementById('name').placeholder='Voice unavailable — type';return;}
+    if(VoiceInput.isListening()){VoiceInput.stop();this.textContent='🎤 SAY NAME';}
+    else{VoiceInput.start((m)=>{if(m.final)document.getElementById('name').value=m.text;});this.textContent='● LISTENING…';}
+  });
+
+  /* ── drop a persistent tag at current spot ── */
+  document.getElementById('tagBtn').addEventListener('click',()=>{
+    const name=document.getElementById('name').value.trim();
+    const sku=document.getElementById('sku').value.trim()||null;
+    if(!name&&!sku){document.getElementById('name').focus();return;}
+    const h=(pose.heading||0)*Math.PI/180;
+    const x=(pose.x||0)+Math.sin(h)*1.0, y=(pose.y||0)+Math.cos(h)*1.0;
+    const tag=TagStore.add({
+      sku, name:name||sku, x, y, z:0,
+      qty:parseFloat(document.getElementById('qty').value)||null,
+      price:parseFloat(document.getElementById('price').value)||null,
+      aisle:document.getElementById('aisle').value.trim()||null,
+    });
+    /* register with the helical lock for O(1) recall */
+    HelicalLock.placeAt(x,y,0,{ tagId:tag.id, sku:tag.sku, name:tag.name });
+    document.getElementById('name').value=''; document.getElementById('sku').value='';
+    document.getElementById('qty').value='1'; document.getElementById('price').value='0';
+  });
+
+  /* ── list + delete + export ── */
+  function render(){
+    const ul=document.getElementById('tagList'); ul.innerHTML='';
+    TagStore.all().forEach((t)=>{
+      const li=document.createElement('li');
+      const s=document.createElement('span');
+      s.textContent=(t.name||t.sku)+(t.aisle?' · A'+t.aisle:'')+(t.qty?' ×'+t.qty:'');
+      const rm=document.createElement('span'); rm.className='rm'; rm.textContent='✕';
+      rm.setAttribute('role','button'); rm.setAttribute('aria-label','Delete '+(t.name||t.sku));
+      rm.addEventListener('click',()=>TagStore.remove(t.id));
+      li.appendChild(s); li.appendChild(rm); ul.appendChild(li);
+    });
+    document.getElementById('countLine').textContent=TagStore.all().length+' tag'+(TagStore.all().length===1?'':'s');
+  }
+  window.addEventListener('apexTagUpdate',render); render();
+
+  document.getElementById('exportBtn').addEventListener('click',()=>{
+    const blob=new Blob([TagStore.exportJSON()],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='apex-inventory-'+Date.now()+'.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  });
+})();
+</script>
+</body>
+</html>

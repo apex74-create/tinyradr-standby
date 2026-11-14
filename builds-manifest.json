@@ -1,0 +1,97 @@
+{
+  "app": {
+    "name": "Apex Signal",
+    "liveUrl": "https://tinyradr.lovable.app",
+    "supportUrl": "https://tinyradr.lovable.app/diag",
+    "privacyUrl": "https://tinyradr.lovable.app/privacy",
+    "contentUrl": "https://tinyradr.lovable.app/content"
+  },
+  "channels": [
+    {
+      "key": "pwa",
+      "title": "Live PWA",
+      "kind": "pwa",
+      "description": "Open the deployed Lovable PWA and install from the browser today.",
+      "url": "https://tinyradr.lovable.app",
+      "available": true,
+      "access": "public",
+      "note": "Best path for testing on watch, phone, and tablet while store wrappers track the same deployment."
+    },
+    {
+      "key": "play",
+      "title": "Google Play",
+      "kind": "play",
+      "description": "Trusted Web Activity wrapper for Play Store rollout.",
+      "url": "",
+      "available": false,
+      "access": "unavailable",
+      "note": "Publish the first Play listing URL after uploading the signed .aab and asset links."
+    },
+    {
+      "key": "apk",
+      "title": "Direct Android APK",
+      "kind": "apk",
+      "description": "Signed downloadable Android package for direct install outside the store.",
+      "url": "",
+      "available": false,
+      "access": "unavailable",
+      "note": "No signed APK is published yet. Upload an artifact and rerun npm run release:manifest."
+    }
+  ],
+  "builds": [
+    {
+      "version": "1.0.0-solo",
+      "name": "Solo Miner v1.0.0",
+      "description": "Initial release with solo miner mode, geometric validation, and point man reference.",
+      "releasedAt": "2026-09-01",
+      "features": [
+        "Solo mode",
+        "Geometric validation",
+        "Point man reference",
+        "Enhanced trust scores"
+      ],
+      "releaseNotes": "Initial release with solo miner mode. Supports self-validation of positioning using geometric patterns and bearing angle consistency checks. Includes point man reference node tracking for solo operations.",
+      "directDownload": {
+        "label": "Solo Miner APK",
+        "kind": "apk",
+        "url": "/builds/1.0.0-solo/tinyradr-solo.apk",
+        "filePath": "public/builds/1.0.0-solo/tinyradr-solo.apk",
+        "available": false,
+        "access": "unavailable",
+        "priceUsd": 9.99,
+        "sizeBytes": null,
+        "sizeLabel": "pending upload",
+        "sha256": null,
+        "note": "Missing public/builds/1.0.0-solo/tinyradr-solo.apk. Upload the signed artifact and rerun npm run release:manifest.",
+        "updatedAt": null
+      }
+    },
+    {
+      "version": "0.9.0",
+      "name": "Squad Mode v0.9.0",
+      "description": "Classic multi-companion trilateration mode.",
+      "releasedAt": "2026-08-15",
+      "features": [
+        "4+ companion support",
+        "Real RSSI triangulation",
+        "WebHID control"
+      ],
+      "releaseNotes": "Original release supporting multi-companion trilateration mode. Connect companion devices for GPS-independent positioning via RSSI signal strength.",
+      "directDownload": {
+        "label": "Squad Mode APK",
+        "kind": "apk",
+        "url": "/builds/0.9.0/tinyradr-squad.apk",
+        "filePath": "public/builds/0.9.0/tinyradr-squad.apk",
+        "available": false,
+        "access": "unavailable",
+        "priceUsd": 4.99,
+        "sizeBytes": null,
+        "sizeLabel": "pending upload",
+        "sha256": null,
+        "note": "Missing public/builds/0.9.0/tinyradr-squad.apk. Upload the signed artifact and rerun npm run release:manifest.",
+        "updatedAt": null
+      }
+    }
+  ],
+  "latest": "1.0.0-solo"
+}

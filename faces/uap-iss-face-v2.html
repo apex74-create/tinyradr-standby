@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#000000">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — UAP ISS EDITION V2 · OVERHEAD PASS (the globe turns, the station stays in view, the arch is a cuckoo)</title>
+<!--
+  APEX — UAP ISS EDITION V2 · OVERHEAD PASS — ARCH REBUILD (Nov 13, 2026).
+
+  Owner's spec, in his order and his metaphors (Nov 13, 2026, 03:15–03:18 EST):
+  "I want to fly over arctic and I want to see the far side of the fucking
+  earth when I can't see it so I want to see that motherfucker coming up on
+  the arch graphic till it's dead overhead in my location — it should be
+  that way based on location for anybody." · "Should be like a global
+  positioning graphic. Where it arcs over and when it gets in your
+  hemisphere that's when you start to see it — equator line, then it
+  starts its march until it's overhead." · "Or like a globe that spins in
+  space and shows its location. Like the ISS is always in view but the
+  globe is moving. That's how you do it." · "The Arch only lights up at
+  the top of the picture when that bitch is really passing overhead and
+  you're going to see it." · "It's like a cuckoo clock for the ISS."
+
+  THE TWO LAYERS, TWO RULES:
+  1. THE GLOBE (universal layer — every viewer, always): an orthographic
+     globe in space, drawn on canvas. The view is centred on the station's
+     subpoint, so the ISS is ALWAYS IN VIEW at the disc's centre while the
+     Earth turns beneath it — the graticule, the bold equator, the ±51.6°
+     latitude limits of the station's road, the arctic circles, the real
+     footprint circle and the propagated ground track all move with the
+     REAL track (live telemetry + the propagation below), never a
+     decorative free-spin. The station is plotted even when it is on the
+     far side of the Earth from you — that is the point of the layer.
+  2. THE ARCH (personal layer — relational, gated): a band across the TOP
+     of the container, where the title banner would go. It is a property
+     of the relation between the station and THIS viewer, never of the
+     station alone. It lights ONLY while a pass whose TRUE peak elevation
+     for this viewer reaches the overhead gate is actually in progress:
+     the marker then climbs the band in real time along the pass's real
+     azimuth/elevation trace (drawn in az/el space centred on the
+     culmination azimuth, so culmination lands exactly at the band's top
+     centre — the 12 o'clock position — and the climb is ARRESTED there:
+     vertical motion dies at the top, as true geometry does). A pass that
+     is merely visible, or overhead for somebody else, lights NOTHING —
+     for a viewer beyond the pass's geometry the arch never lights and
+     offers no ride; their understanding is the globe. No dim preview
+     arcs, no almost-passes. The cuckoo stays in the case until the strike.
+     GATE PARAMETER: peak elevation >= 65° — a bench-chosen parameter
+     under the owner's rule ("really passing overhead, and you're going
+     to see it"); it is NOT the owner's number and is stated as chosen.
+
+  HEMISPHERE RULE: the march begins when the station enters the VIEWER's
+  latitudinal hemisphere — the bold equator line on the globe is the
+  reference. Before entry the station is still plotted (globe layer) but
+  the march state reads NOT IN YOUR HEMISPHERE.
+
+  LOCATION: computed from the individual viewer's location —
+  navigator.geolocation when granted (labelled GPS FIX), a ?lat=&lon=
+  setting when present (labelled SET), otherwise the house default
+  Johannesburg MI (44.98, -84.60) printed plainly as
+  "LOCATION NO MEASURE — DEFAULT JOHANNESBURG MI". Never silently
+  hard-coded.
+
+  DATA — REAL TELEMETRY ONLY: live fixes from wheretheiss.at
+  (https://api.wheretheiss.at/v1/satellites/25544 — ISS, NORAD 25544),
+  polled every 5 s, timeout-bounded, the source named on the face.
+  PROPAGATION (for the globe's motion between fixes, the ground track
+  and the pass search): a simplified circular-orbit model REFIT ON EVERY
+  FIX — the orbital plane from two successive real fixes (ECI cross
+  product), mean motion from the fixes' mean altitude, nodal regression
+  ≈ 5.0°/day. It is an estimate that sharpens as a pass approaches; the
+  arch's lit decision at pass time rides near-real-time geometry.
+  If the feed fails: ISS — NO FEED, no station marker, no arch — never
+  simulated data presented as real. If fixes go stale (>10 min without a
+  successful fetch) the arch prints NO MEASURE; the globe holds its last
+  honest state and says STALE.
+
+  FITTINGS: live clock (viewer-local + UTC), simple weather for the
+  viewer's location (Open-Meteo current conditions; WEATHER — NO
+  MEASURE on failure), the comms doors as quiet background chips
+  (CB · GUARD · CAST NET — drawn labels, no handlers). BOTTOM NO-FLY
+  ZONE: no actionable element anywhere on this face; the chips and all
+  controls sit clear of the bottom band. Nothing on this face is a button.
+
+  BENCH SURFACE: window.__iss = the feed state; window.__arch = the
+  viewer + orbit + pass state (viewer, gate, pass, now, hemi).
+-->
+<style>
+  :root{
+    --void:#000; --ink:#eafff1; --cyan:#22e6ff; --teal:#19f0c8;
+    --green:#52ff5e; --amber:#ffb52e; --dim:#7fa3ad; --card:#05070a; --line:#1d3a44;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--void);width:100%;height:100%;overflow:hidden}
+  #face{position:fixed;inset:0;margin:0 auto;max-width:400px;display:flex;flex-direction:column;
+    align-items:stretch;background:var(--void);color:var(--ink);
+    font-family:ui-monospace,Menlo,Consolas,monospace;-webkit-user-select:none;user-select:none}
+  /* THE ARCH BAND — top of the div, where the title banner would go */
+  #archband{flex:0 0 auto;border-bottom:1px solid var(--line);background:#010204}
+  #archband svg{display:block;width:100%;height:64px}
+  #titlebar{flex:0 0 auto;display:flex;justify-content:space-between;align-items:baseline;
+    padding:5px 10px 0 10px}
+  #titlebar .t1{font-size:11px;letter-spacing:2px;color:var(--cyan)}
+  #titlebar .t2{font-size:11px;letter-spacing:2px;color:var(--amber)}
+  #globewrap{flex:0 0 auto;display:flex;justify-content:center;padding:2px 0 0 0}
+  canvas#globe{display:block;width:min(94vw, clamp(120px, calc(100vh - 470px), 320px));height:auto}
+  #clockrow{flex:0 0 auto;text-align:center;padding:0 10px}
+  #clock{font-size:30px;line-height:1.05;color:#baffd4;text-shadow:0 0 12px rgba(82,255,94,.35)}
+  #dateline{font-size:10px;letter-spacing:2px;color:var(--dim)}
+  #reads{flex:0 0 auto;padding:6px 12px 0 12px;font-size:12.5px;line-height:1.5}
+  #reads .row{display:flex;justify-content:space-between;gap:8px;white-space:nowrap}
+  #reads .k{color:var(--dim);letter-spacing:1px}
+  #reads .v{color:var(--ink)}
+  #state{flex:0 0 auto;padding:6px 12px 0 12px;font-size:12px;line-height:1.55}
+  #state .hemi{color:var(--teal)}
+  #state .archline{color:var(--amber)}
+  #state .nofeed{color:#ff5d5d}
+  #wxloc{flex:0 0 auto;padding:4px 12px 0 12px;font-size:11px;color:var(--dim);line-height:1.5}
+  #doors{flex:1 1 auto;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:0 12px 30px 12px}
+  .chip{border:1px solid var(--line);border-radius:9px;padding:4px 10px;font-size:10.5px;
+    letter-spacing:2px;color:var(--dim);background:rgba(10,40,22,.25)}
+  #dimveil{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .6s}
+</style>
+</head>
+<body>
+<div id="face">
+  <!-- THE ARCH BAND: dark and empty while nothing is due (the cuckoo rule).
+       When lit, the pass's true az/el trace and the riding marker are drawn here. -->
+  <div id="archband"><svg id="archsvg" viewBox="0 0 400 76" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+  <div id="titlebar"><span class="t1">APEX · UAP LINE</span><span class="t2">ISS EDITION V2 · OVERHEAD PASS</span></div>
+  <div id="globewrap"><canvas id="globe" width="336" height="336"></canvas></div>
+  <div id="clockrow"><div id="clock">--:--:--</div><div id="dateline">—</div></div>
+  <div id="reads">
+    <div class="row"><span class="k">ISS LAT / LON</span><span class="v" id="r-pos">—</span></div>
+    <div class="row"><span class="k">ALT / VEL</span><span class="v" id="r-alt">—</span></div>
+    <div class="row"><span class="k">STATION</span><span class="v" id="r-vis">—</span></div>
+    <div class="row"><span class="k">HOME EL / AZ / RNG</span><span class="v" id="r-home">—</span></div>
+  </div>
+  <div id="state">
+    <div class="hemi" id="r-hemi">HEMISPHERE — WAITING FOR FEED</div>
+    <div class="archline" id="r-arch">ARCH — DARK</div>
+  </div>
+  <div id="wxloc">
+    <div id="r-wx">WEATHER — NO MEASURE</div>
+    <div id="r-loc">LOCATION — NO MEASURE</div>
+    <div id="r-src">FEED — WHERETHEISS.AT · ISS (NORAD 25544)</div>
+  </div>
+  <div id="doors"><span class="chip">CB · CH 19</span><span class="chip">GUARD</span><span class="chip">CAST NET</span></div>
+</div>
+<div id="dimveil"></div>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var D2R = Math.PI/180, R2D = 180/Math.PI;
+  var RE = 6371.0, MU = 398600.8;
+  var GATE_EL = 65;              /* chosen parameter — see header comment */
+  var REGRESS = -5.0 * D2R / 86400;  /* nodal regression, rad/s */
+  var DEFAULT_LOC = { lat: 44.98, lon: -84.60, name: "JOHANNESBURG MI" };
+
+  /* ================= VIEWER LOCATION (location-general) ================= */
+  var viewer = { lat: DEFAULT_LOC.lat, lon: DEFAULT_LOC.lon, source: "DEFAULT" };
+  (function initViewer(){
+    var q = {};
+    try { location.search.replace(/^\?/, "").split("&").forEach(function(p){
+      var kv = p.split("="); if (kv.length === 2) q[kv[0]] = parseFloat(kv[1]); }); } catch(e){}
+    if (isFinite(q.lat) && isFinite(q.lon) && Math.abs(q.lat) <= 90 && Math.abs(q.lon) <= 180) {
+      viewer = { lat: q.lat, lon: q.lon, source: "SET" };
+      return;
+    }
+    if (navigator.geolocation) {
+      var got = false;
+      var ok = function(p){ got = true;
+        viewer = { lat: p.coords.latitude, lon: p.coords.longitude, source: "GPS" }; };
+      try {
+        navigator.geolocation.getCurrentPosition(ok, function(){}, { timeout: 8000, maximumAge: 300000 });
+        navigator.geolocation.watchPosition(ok, function(){}, { timeout: 20000, maximumAge: 300000 });
+        setTimeout(function(){ if (!got && viewer.source === "DEFAULT") { /* stays DEFAULT, printed as such */ } }, 9000);
+      } catch(e){}
+    }
+  })();
+
+  /* ================= TIME / GMST ================= */
+  function gmstDeg(ms){
+    var JD = ms/86400000 + 2440587.5;
+    var T = (JD - 2451545.0)/36525;
+    var g = 280.46061837 + 360.98564736629*(JD - 2451545.0) + 0.000387933*T*T - T*T*T/38710000;
+    g = g % 360; if (g < 0) g += 360;
+    return g;
+  }
+
+  /* ================= ORBIT MODEL (refit on every fix) ================= */
+  function ecefUnit(latDeg, lonDeg){
+    var f = latDeg*D2R, l = lonDeg*D2R;
+    return [Math.cos(f)*Math.cos(l), Math.cos(f)*Math.sin(l), Math.sin(f)];
+  }
+  function eciFromFix(fix){ /* fix: {lat, lon, alt, ts(ms)} -> ECI km vector */
+    var u = ecefUnit(fix.lat, fix.lon);
+    var lam = (fix.lon + gmstDeg(fix.ts)) * D2R, f = fix.lat * D2R, r = RE + fix.alt;
+    return [r*Math.cos(f)*Math.cos(lam), r*Math.cos(f)*Math.sin(lam), r*Math.sin(f)];
+  }
+  function cross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+  function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+  function norm(a){ var m = Math.sqrt(dot(a,a)); return [a[0]/m, a[1]/m, a[2]/m]; }
+  function rotZ(a, ang){ var c = Math.cos(ang), s = Math.sin(ang);
+    return [a[0]*c - a[1]*s, a[0]*s + a[1]*c, a[2]]; }
+  function rodrigues(r, k, th){
+    var c = Math.cos(th), s = Math.sin(th), kd = dot(k, r), kc = cross(k, r);
+    return [r[0]*c + kc[0]*s + k[0]*kd*(1-c),
+            r[1]*c + kc[1]*s + k[1]*kd*(1-c),
+            r[2]*c + kc[2]*s + k[2]*kd*(1-c)];
+  }
+  var orbit = null; /* {r0:[km ECI], h:[unit], n:rad/s, a:km, t0:ms, altKm} */
+  var fixes = [];   /* newest last; each {lat, lon, alt, vel, vis, foot, ts} */
+  function refit(){
+    if (fixes.length < 2) { orbit = null; return; }
+    var f1 = fixes[fixes.length-2], f2 = fixes[fixes.length-1];
+    if (!(f2.ts > f1.ts)) { orbit = null; return; }
+    var r1 = eciFromFix(f1), r2 = eciFromFix(f2);
+    var h = cross(r1, r2);
+    if (dot(h,h) < 1e-12) { orbit = null; return; }
+    h = norm(h);
+    var altMean = 0; fixes.forEach(function(f){ altMean += f.alt; }); altMean /= fixes.length;
+    var a = RE + altMean;
+    var n = Math.sqrt(MU/(a*a*a));
+    /* anchor at the NEWEST fix, plane carried from the pair */
+    orbit = { r0: r2, h: h, n: n, a: a, t0: f2.ts, altKm: altMean };
+  }
+  function propagate(ms){ /* -> {lat, lon, alt} or null */
+    if (!orbit) return null;
+    var dt = (ms - orbit.t0)/1000;
+    var psi = REGRESS * dt;
+    var r = rotZ(orbit.r0, psi), h = rotZ(orbit.h, psi);
+    r = rodrigues(r, h, orbit.n * dt);
+    var m = Math.sqrt(dot(r,r));
+    var lat = Math.asin(r[2]/m) * R2D;
+    var lon = Math.atan2(r[1], r[0]) * R2D - gmstDeg(ms);
+    lon = ((lon + 540) % 360) - 180;
+    return { lat: lat, lon: lon, alt: orbit.altKm };
+  }
+  function elAz(lat, lon, alt, v){ /* elevation/azimuth/range from viewer v */
+    var S = ecefUnit(lat, lon), vv = ecefUnit(v.lat, v.lon);
+    var s = [S[0]*(RE+alt), S[1]*(RE+alt), S[2]*(RE+alt)];
+    var o = [vv[0]*RE, vv[1]*RE, vv[2]*RE];
+    var rho = [s[0]-o[0], s[1]-o[1], s[2]-o[2]];
+    var f = v.lat*D2R, l = v.lon*D2R;
+    var east = [-Math.sin(l), Math.cos(l), 0];
+    var north = [-Math.sin(f)*Math.cos(l), -Math.sin(f)*Math.sin(l), Math.cos(f)];
+    var e = dot(rho, east), n2 = dot(rho, north), u = dot(rho, vv);
+    var rng = Math.sqrt(dot(rho, rho));
+    var el = Math.asin(u/rng) * R2D;
+    var az = Math.atan2(e, n2) * R2D; if (az < 0) az += 360;
+    return { el: el, az: az, range: rng };
+  }
+
+  /* ================= PASS SEARCH (gated, relational) ================= */
+  var passInfo = { state: "NONE", cur: null, next: null, computedAt: 0 };
+  function scanPasses(nowMs){
+    var res = { state: "NONE", cur: null, next: null, computedAt: nowMs };
+    if (!orbit) { passInfo = res; return; }
+    var STEP = 20000, HORIZON = 48*3600*1000;
+    var prev = null, cur = null;
+    function finish(iv, tEnd){
+      /* refine culmination +-STEP at 2 s */
+      var best = { t: iv.tPk, el: iv.pk };
+      for (var t = iv.tPk - STEP; t <= iv.tPk + STEP; t += 2000) {
+        var p = propagate(t); if (!p) continue;
+        var e = elAz(p.lat, p.lon, p.alt, viewer);
+        if (e.el > best.el) best = { t: t, el: e.el };
+      }
+      iv.tPk = best.t; iv.pk = best.el; iv.tEnd = tEnd;
+      var pc = propagate(iv.tPk);
+      iv.azPk = elAz(pc.lat, pc.lon, pc.alt, viewer).az;
+      return iv;
+    }
+    for (var t = nowMs; t <= nowMs + HORIZON; t += STEP) {
+      var p = propagate(t); if (!p) break;
+      var e = elAz(p.lat, p.lon, p.alt, viewer);
+      if (e.el > 0) {
+        if (!cur) cur = { t0: t - STEP, tPk: t, pk: e.el };
+        else if (e.el > cur.pk) { cur.pk = e.el; cur.tPk = t; }
+      } else if (cur) {
+        var iv = finish(cur, t);
+        if (nowMs >= iv.t0 && nowMs <= iv.tEnd) { res.cur = iv; }
+        else if (!res.next) { res.next = iv; }
+        cur = null;
+        if (res.cur && res.next) break;
+        if (res.next && !res.cur && iv.t0 > nowMs) { /* one next is enough unless cur pending */ if (res.next) break; }
+      }
+      prev = e;
+    }
+    if (cur && !res.cur && !res.next) { var iv2 = finish(cur, nowMs + HORIZON); if (nowMs >= iv2.t0) res.cur = iv2; else res.next = iv2; }
+    if (res.cur) res.state = (res.cur.pk >= GATE_EL) ? "LIT" : "LOW";
+    else if (res.next) res.state = "NEXT";
+    passInfo = res;
+  }
+
+  /* ================= FEED (wheretheiss.at, named on the face) ================= */
+  var feed = { mode: "INIT", lastOkPerf: 0, lastFix: null };
+  window.__iss = feed;
+  function poll(){
+    var ctl = ("AbortController" in window) ? new AbortController() : null;
+    var to = ctl ? setTimeout(function(){ ctl.abort(); }, 4000) : null;
+    fetch("https://api.wheretheiss.at/v1/satellites/25544", ctl ? { signal: ctl.signal } : {})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (to) clearTimeout(to);
+        if (!d || !isFinite(d.latitude) || !isFinite(d.longitude)) throw new Error("bad fix");
+        var fix = { lat: +d.latitude, lon: +d.longitude, alt: +d.altitude || 420,
+                    vel: +d.velocity || 0, vis: ("" + (d.visibility || "")).toUpperCase(),
+                    foot: +d.footprint || 0, ts: (d.timestamp ? d.timestamp*1000 : Date.now()) };
+        if (!feed.lastFix || fix.ts > feed.lastFix.ts) {
+          fixes.push(fix); if (fixes.length > 12) fixes.shift();
+          feed.lastFix = fix; refit();
+        }
+        feed.mode = "LIVE"; feed.lastOkPerf = performance.now();
+      })
+      .catch(function(){ if (to) clearTimeout(to); if (feed.mode !== "LIVE") feed.mode = "NOFEED"; });
+  }
+  poll(); setInterval(poll, 5000);
+
+  /* ================= WEATHER (Open-Meteo, viewer location) ================= */
+  var wx = { text: "WEATHER — NO MEASURE" };
+  var WXWORDS = {0:"CLEAR",1:"MOSTLY CLEAR",2:"PARTLY CLOUDY",3:"OVERCAST",45:"FOG",48:"FOG",
+    51:"DRIZZLE",53:"DRIZZLE",55:"DRIZZLE",61:"RAIN",63:"RAIN",65:"RAIN",66:"FREEZING RAIN",67:"FREEZING RAIN",
+    71:"SNOW",73:"SNOW",75:"SNOW",77:"SNOW GRAINS",80:"SHOWERS",81:"SHOWERS",82:"VIOLENT SHOWERS",
+    85:"SNOW SHOWERS",86:"SNOW SHOWERS",95:"THUNDERSTORM",96:"THUNDERSTORM + HAIL",99:"THUNDERSTORM + HAIL"};
+  function pollWx(){
+    var ctl = ("AbortController" in window) ? new AbortController() : null;
+    var to = ctl ? setTimeout(function(){ ctl.abort(); }, 6000) : null;
+    var url = "https://api.open-meteo.com/v1/forecast?latitude=" + viewer.lat.toFixed(3) +
+              "&longitude=" + viewer.lon.toFixed(3) + "&current=temperature_2m,weather_code";
+    fetch(url, ctl ? { signal: ctl.signal } : {})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (to) clearTimeout(to);
+        if (!d || !d.current || !isFinite(d.current.temperature_2m)) throw new Error("bad wx");
+        var w = WXWORDS[d.current.weather_code] || "CONDITIONS CODE " + d.current.weather_code;
+        wx.text = "WX " + d.current.temperature_2m.toFixed(1) + "°C · " + w + " · OPEN-METEO";
+      })
+      .catch(function(){ if (to) clearTimeout(to); });
+  }
+  setTimeout(pollWx, 1200); setInterval(pollWx, 600000);
+
+  /* ================= THE GLOBE (orthographic, subpoint-centred) ================= */
+  var cv = $("globe"), ctx = cv.getContext("2d");
+  var GW = 336, GC = GW/2, GR = 160;
+  var stars = [];
+  (function(){ var s = 1234567; function rnd(){ s = (s*1103515245 + 12345) % 2147483648; return s/2147483648; }
+    for (var i = 0; i < 110; i++) stars.push({ x: rnd()*GW, y: rnd()*GW, r: rnd()*1.1 + 0.3, a: 0.25 + rnd()*0.6 }); })();
+  function viewFrame(lat0, lon0){
+    var d = ecefUnit(lat0, lon0);
+    var up0 = [0, 0, 1];
+    var right = cross(up0, d); var m = Math.sqrt(dot(right, right));
+    if (m < 1e-6) right = [1, 0, 0]; else right = [right[0]/m, right[1]/m, right[2]/m];
+    var up = cross(d, right);
+    return { d: d, right: right, up: up };
+  }
+  function proj(p, fr){ /* ECEF unit -> [sx, sy, z] */
+    return [GC + dot(p, fr.right)*GR, GC - dot(p, fr.up)*GR, dot(p, fr.d)];
+  }
+  function strokePath(pts, fr, style, width, dash){
+    ctx.beginPath();
+    ctx.strokeStyle = style; ctx.lineWidth = width || 1;
+    if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+    var pen = false;
+    for (var i = 0; i < pts.length; i++) {
+      var q = proj(pts[i], fr);
+      if (q[2] > 0.005) { if (!pen) { ctx.moveTo(q[0], q[1]); pen = true; } else ctx.lineTo(q[0], q[1]); }
+      else pen = false;
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  function latCircle(lat, step){
+    var pts = [];
+    for (var lon = -180; lon <= 180; lon += step || 3) pts.push(ecefUnit(lat, lon));
+    return pts;
+  }
+  function lonMeridian(lon){
+    var pts = [];
+    for (var lat = -90; lat <= 90; lat += 3) pts.push(ecefUnit(lat, lon));
+    return pts;
+  }
+  function drawGlobe(nowMs){
+    ctx.clearRect(0, 0, GW, GW);
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, GW, GW);
+    for (var i = 0; i < stars.length; i++) { var st = stars[i];
+      var dx = st.x - GC, dy = st.y - GC;
+      if (dx*dx + dy*dy < (GR+7)*(GR+7)) continue;
+      ctx.globalAlpha = st.a; ctx.fillStyle = "#cfe8ff";
+      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, 6.29); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    var pos = orbit ? propagate(nowMs) : null;
+    var cLat, cLon;
+    if (pos) { cLat = pos.lat; cLon = pos.lon; }
+    else { cLat = 0; cLon = -gmstDeg(nowMs); cLon = ((cLon + 540) % 360) - 180; }
+    var fr = viewFrame(cLat, cLon);
+    /* the disc */
+    var g = ctx.createRadialGradient(GC - 40, GC - 50, 30, GC, GC, GR);
+    g.addColorStop(0, "#0a1a2e"); g.addColorStop(0.75, "#05101f"); g.addColorStop(1, "#02060d");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(GC, GC, GR, 0, 6.29); ctx.fill();
+    ctx.strokeStyle = "rgba(34,230,255,.55)"; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(GC, GC, GR, 0, 6.29); ctx.stroke();
+    /* graticule */
+    var la;
+    for (la = -75; la <= 75; la += 15) { if (la === 0) continue;
+      strokePath(latCircle(la), fr, "rgba(90,160,190,.28)", 1); }
+    for (var lo = -180; lo < 180; lo += 15)
+      strokePath(lonMeridian(lo), fr, "rgba(90,160,190,.20)", 1);
+    /* arctic / antarctic circles, dotted */
+    strokePath(latCircle(66.56, 2), fr, "rgba(207,232,255,.35)", 1, [2, 4]);
+    strokePath(latCircle(-66.56, 2), fr, "rgba(207,232,255,.35)", 1, [2, 4]);
+    /* the station's road ends: +-51.6 deg, dashed amber */
+    strokePath(latCircle(51.6, 2), fr, "rgba(255,181,46,.65)", 1.2, [6, 4]);
+    strokePath(latCircle(-51.6, 2), fr, "rgba(255,181,46,.65)", 1.2, [6, 4]);
+    /* THE EQUATOR — the hemisphere reference, bold */
+    strokePath(latCircle(0, 2), fr, "#19f0c8", 2.2);
+    if (!pos) {
+      ctx.fillStyle = "#ff5d5d"; ctx.font = "bold 15px ui-monospace,monospace"; ctx.textAlign = "center";
+      ctx.fillText("ISS — NO FEED", GC, GC + 5);
+      return null;
+    }
+    /* ground track: one orbit either way, past dim / future bright */
+    function track(tFrom, tTo, style){
+      var pts = [];
+      for (var t = tFrom; t <= tTo; t += 45000) { var p = propagate(t); if (p) pts.push(ecefUnit(p.lat, p.lon)); }
+      strokePath(pts, fr, style, 1.6);
+    }
+    track(nowMs - 46*60000, nowMs, "rgba(34,230,255,.35)");
+    track(nowMs, nowMs + 46*60000, "rgba(34,230,255,.8)");
+    /* footprint circle */
+    var rho = Math.acos(RE/(RE + pos.alt));
+    var fp = [];
+    for (var b = 0; b <= 360; b += 6) {
+      var br = b*D2R, f0 = pos.lat*D2R, l0 = pos.lon*D2R;
+      var f2 = Math.asin(Math.sin(f0)*Math.cos(rho) + Math.cos(f0)*Math.sin(rho)*Math.cos(br));
+      var l2 = l0 + Math.atan2(Math.sin(br)*Math.sin(rho)*Math.cos(f0), Math.cos(rho) - Math.sin(f0)*Math.sin(f2));
+      fp.push(ecefUnit(f2*R2D, l2*R2D));
+    }
+    strokePath(fp, fr, "rgba(82,255,94,.4)", 1);
+    /* viewer marker, when on this face of the Earth */
+    var vp = ecefUnit(viewer.lat, viewer.lon), vq = proj(vp, fr);
+    if (vq[2] > 0.01) {
+      ctx.fillStyle = "#ffb52e"; ctx.beginPath(); ctx.arc(vq[0], vq[1], 3.2, 0, 6.29); ctx.fill();
+      ctx.font = "9px ui-monospace,monospace"; ctx.textAlign = "left"; ctx.fillStyle = "#ffb52e";
+      ctx.fillText("YOU", vq[0] + 5, vq[1] + 3);
+    }
+    /* THE STATION — always in view, at the centre of its world */
+    ctx.save(); ctx.translate(GC, GC);
+    ctx.strokeStyle = "#52ff5e"; ctx.lineWidth = 1.6; ctx.shadowColor = "#52ff5e"; ctx.shadowBlur = 9;
+    ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-3, 0); ctx.moveTo(3, 0); ctx.lineTo(9, 0);
+    ctx.moveTo(0, -9); ctx.lineTo(0, -3); ctx.moveTo(0, 3); ctx.lineTo(0, 9); ctx.stroke();
+    ctx.rotate(Math.PI/4); ctx.strokeRect(-4.5, -4.5, 9, 9); ctx.restore();
+    ctx.fillStyle = "#52ff5e"; ctx.font = "bold 10px ui-monospace,monospace"; ctx.textAlign = "center";
+    ctx.fillText("ISS", GC, GC + 24);
+    return pos;
+  }
+
+  /* ================= THE ARCH BAND (relational, gated) ================= */
+  var svg = $("archsvg");
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function el(name, attrs){
+    var e = document.createElementNS(SVGNS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function drawArch(nowMs, pos){
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    /* the empty case: hairline horizon + the 12 o'clock tick — the closed cuckoo door */
+    svg.appendChild(el("line", { x1: 8, y1: 70, x2: 392, y2: 70, stroke: "#1d3a44", "stroke-width": 1 }));
+    svg.appendChild(el("line", { x1: 200, y1: 2, x2: 200, y2: 10, stroke: "#3d6a78", "stroke-width": 1.4 }));
+    if (passInfo.state !== "LIT" || !passInfo.cur || !pos) return;
+    var iv = passInfo.cur;
+    if (nowMs < iv.t0 || nowMs > iv.tEnd) return; /* the ride exists only inside the pass */
+    var azAt = function(t){ var p = propagate(t); return p ? elAz(p.lat, p.lon, p.alt, viewer) : null; };
+    /* Horizontal coordinate = the SIGNED ARC ANGLE from culmination: the
+       angle between the station's topocentric direction and its culmination
+       direction, signed by time (before culmination: left). Azimuth itself
+       whips ~180 deg through a near-zenith culmination and cannot carry the
+       band; the arc angle is smooth for every pass geometry, and it puts
+       culmination at exactly x=200 — the 12 o'clock seat — by construction.
+       Height stays the TRUE elevation, scaled el/90. */
+    function enu(e){ var elr = e.el*D2R, azr = e.az*D2R;
+      return [Math.cos(elr)*Math.sin(azr), Math.cos(elr)*Math.cos(azr), Math.sin(elr)]; }
+    var eC = azAt(iv.tPk); if (!eC) return;
+    var cU = enu(eC);
+    function sang(t){
+      var e = azAt(t); if (!e) return null;
+      var u = enu(e), d = Math.max(-1, Math.min(1, dot(u, cU)));
+      var s = Math.acos(d)*R2D; if (t < iv.tPk) s = -s;
+      return { s: s, el: e.el };
+    }
+    var sA = sang(iv.t0), sB = sang(iv.tEnd), smax = 10;
+    if (sA) smax = Math.max(smax, Math.abs(sA.s));
+    if (sB) smax = Math.max(smax, Math.abs(sB.s));
+    var kx = 172/smax;
+    function pt(t){
+      var q = sang(t); if (!q) return null;
+      return [200 + q.s*kx, 70 - (q.el/90)*62];
+    }
+    var dAttr = "";
+    for (var t = iv.t0; t <= iv.tEnd; t += (iv.tEnd - iv.t0)/44) {
+      var q = pt(t); if (!q) continue;
+      dAttr += (dAttr ? " L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1);
+    }
+    var qe = pt(iv.tEnd); if (qe) dAttr += " L" + qe[0].toFixed(1) + " " + qe[1].toFixed(1);
+    if (dAttr) svg.appendChild(el("path", { d: dAttr, fill: "none", stroke: "#ffb52e",
+      "stroke-width": 2, "stroke-linejoin": "round",
+      style: "filter:drop-shadow(0 0 5px rgba(255,181,46,.8))" }));
+    /* culmination point — the arrest seat at 12 o'clock */
+    var qc = pt(iv.tPk);
+    if (qc) svg.appendChild(el("circle", { cx: qc[0], cy: qc[1], r: 3, fill: "none", stroke: "#ffd75e", "stroke-width": 1.2 }));
+    /* the rider */
+    var qn = pt(nowMs);
+    if (qn) {
+      svg.appendChild(el("circle", { cx: qn[0], cy: qn[1], r: 5.5, fill: "#52ff5e",
+        style: "filter:drop-shadow(0 0 7px rgba(82,255,94,.95))" }));
+    }
+  }
+
+  /* ================= READOUTS + MAIN LOOP ================= */
+  function fmt(n, d){ return (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(d); }
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  var lastScan = -1e12; /* first render with an orbit lock scans immediately */
+  function render(){
+    var nowMs = Date.now();
+    var nowPerf = performance.now();
+    if (orbit && nowPerf - lastScan > 30000) { lastScan = nowPerf; scanPasses(nowMs); }
+    var pos = drawGlobe(nowMs);
+    drawArch(nowMs, pos);
+    /* clock */
+    var d = new Date(nowMs);
+    $("clock").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+    $("dateline").textContent = d.toDateString().toUpperCase() + " · LOCAL " +
+      pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes()) + " UTC";
+    /* feed staleness (real elapsed time, clock-face independent) */
+    var sinceOk = feed.lastOkPerf ? (nowPerf - feed.lastOkPerf) : Infinity;
+    var fresh = sinceOk < 10000, staleArch = sinceOk > 600000;
+    if (feed.lastFix && pos) {
+      $("r-pos").textContent = fmt(pos.lat, 2) + "° / " + fmt(pos.lon, 2) + "°";
+      $("r-alt").textContent = pos.alt.toFixed(0) + " KM · " + (feed.lastFix.vel ? feed.lastFix.vel.toFixed(0) + " KM/H" : "—");
+      $("r-vis").textContent = (feed.lastFix.vis || "—") + (fresh ? " · LIVE" : " · STALE " + Math.round(sinceOk/1000) + "s");
+    } else {
+      $("r-pos").textContent = "— NO FEED —"; $("r-alt").textContent = "—"; $("r-vis").textContent = "NO FEED";
+    }
+    var hemiEl = $("r-hemi"), archEl = $("r-arch");
+    if (pos) {
+      var ea = elAz(pos.lat, pos.lon, pos.alt, viewer);
+      $("r-home").textContent = ea.el.toFixed(1) + "° / " + ea.az.toFixed(0) + "° / " + ea.range.toFixed(0) + " KM";
+      var inHemi = (pos.lat >= 0) === (viewer.lat >= 0);
+      hemiEl.textContent = inHemi
+        ? "IN YOUR HEMISPHERE — THE MARCH IS ON (" + (pos.lat >= 0 ? "N" : "S") + " OF THE EQUATOR)"
+        : "NOT IN YOUR HEMISPHERE — PLOTTED ON THE GLOBE ONLY";
+      if (staleArch) { archEl.textContent = "ARCH — NO MEASURE (FEED STALE)"; }
+      else if (passInfo.state === "LIT" && passInfo.cur) {
+        var iv = passInfo.cur;
+        if (Math.abs(nowMs - iv.tPk) <= 25000)
+          archEl.textContent = "★ 12 O'CLOCK — DEAD OVERHEAD · PEAK " + iv.pk.toFixed(0) + "°";
+        else
+          archEl.textContent = "ARCH LIT — OVERHEAD PASS · PEAK " + iv.pk.toFixed(0) + "° · " +
+            (nowMs < iv.tPk ? "CLIMBING" : "DESCENDING");
+      } else if (passInfo.state === "LOW" && passInfo.cur) {
+        archEl.textContent = "ARCH DARK — PASS PEAK " + passInfo.cur.pk.toFixed(0) + "° · NOT OVERHEAD";
+      } else if (passInfo.next) {
+        archEl.textContent = "ARCH DARK — NEXT PASS PEAK " + passInfo.next.pk.toFixed(0) + "°" +
+          (passInfo.next.pk >= GATE_EL ? " · OVERHEAD-CLASS (DOOR OPENS AT RISE)" : " · NOT OVERHEAD");
+      } else archEl.textContent = "ARCH DARK — NO PASS FOUND IN 48H";
+    } else {
+      $("r-home").textContent = "—";
+      hemiEl.textContent = "HEMISPHERE — NO MEASURE (NO FEED)";
+      archEl.textContent = "ARCH — NO MEASURE (NO FEED)";
+    }
+    $("r-wx").textContent = wx.text;
+    $("r-loc").textContent = viewer.source === "GPS"
+      ? "LOCATION — GPS FIX " + fmt(viewer.lat, 2) + "° / " + fmt(viewer.lon, 2) + "°"
+      : viewer.source === "SET"
+        ? "LOCATION — SET " + fmt(viewer.lat, 2) + "° / " + fmt(viewer.lon, 2) + "°"
+        : "LOCATION — NO MEASURE · DEFAULT " + DEFAULT_LOC.name + " " + fmt(viewer.lat, 2) + "° / " + fmt(viewer.lon, 2) + "°";
+    window.__arch = { viewer: viewer, gateEl: GATE_EL, orbit: !!orbit,
+      pass: passInfo, pos: pos, feedMode: feed.mode, sinceOkS: Math.round(sinceOk/1000) };
+  }
+  render(); setInterval(render, 250);
+
+  /* battery care: dim-only veil after 60 s untouched; motion never stops */
+  var lastTouch = Date.now();
+  function wake(){ lastTouch = Date.now(); $("dimveil").style.opacity = "0"; }
+  document.addEventListener("touchstart", wake, { passive: true });
+  document.addEventListener("mousedown", wake);
+  setInterval(function(){ $("dimveil").style.opacity = (Date.now() - lastTouch > 60000) ? "0.35" : "0"; }, 5000);
+})();
+</script>
+</body>
+</html>

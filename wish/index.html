@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merry's Wish Picker — The Combined Edition</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0a0f0c; color:#e8f2e9; font-family:Georgia,'Times New Roman',serif; }
+  #fall { position:fixed; inset:0; display:flex; justify-content:space-evenly; overflow:hidden; opacity:.16; pointer-events:none; }
+  #fall .col { writing-mode:vertical-rl; white-space:nowrap; font-family:ui-monospace,Menlo,monospace; }
+  main { position:relative; max-width:680px; margin:0 auto; padding:28px 18px 48px; }
+  h1 { font-size:34px; font-weight:700; color:#b9f4c8; text-align:center; letter-spacing:.04em; }
+  .sub { text-align:center; color:#9ec5a8; font-size:17px; margin-top:6px; }
+  .creed { text-align:center; color:#d9c98a; font-size:16.5px; line-height:1.55; margin:18px auto 6px; max-width:560px; }
+  .card { background:rgba(16,28,20,.88); border:1px solid #2c5c3e; border-radius:14px; padding:18px 18px 16px; margin-top:18px; }
+  .card h2 { font-size:15px; letter-spacing:.22em; color:#39ff6a; font-family:ui-monospace,Menlo,monospace; font-weight:700; margin-bottom:10px; }
+  .balls { display:flex; gap:10px; justify-content:center; margin:10px 0 6px; flex-wrap:wrap; }
+  .ball { width:58px; height:58px; border-radius:50%; background:radial-gradient(circle at 34% 30%, #eaffef, #39ff6a 55%, #14532a);
+    color:#062b14; font-size:25px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-family:ui-monospace,Menlo,monospace; box-shadow:0 0 16px rgba(57,255,106,.35); }
+  .ball.sm { width:46px; height:46px; font-size:20px; }
+  .ball.bonus { background:radial-gradient(circle at 34% 30%, #fff3cf, #ffc95c 55%, #8a5a12); color:#3a2403; box-shadow:0 0 16px rgba(255,201,92,.4); }
+  .digits { display:flex; gap:12px; justify-content:center; margin:10px 0 4px; }
+  .digit { width:52px; height:64px; border-radius:10px; background:#10231a; border:1px solid #39ff6a;
+    color:#b9f4c8; font-size:34px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-family:ui-monospace,Menlo,monospace; box-shadow:0 0 12px rgba(57,255,106,.25); }
+  .game { text-align:center; color:#9ec5a8; font-size:14px; letter-spacing:.18em; font-family:ui-monospace,Menlo,monospace; margin-top:12px; }
+  .why { font-size:15.5px; color:#cfe9d6; line-height:1.6; text-align:center; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  input[type=text] { flex:1; min-width:200px; background:#06110a; color:#eaffef; border:1px solid #2c5c3e; border-radius:9px;
+    padding:11px 12px; font-size:17px; font-family:ui-monospace,Menlo,monospace; }
+  button { background:#14532a; color:#eaffef; border:1px solid #39ff6a; border-radius:9px; padding:11px 18px;
+    font-size:16.5px; font-family:inherit; cursor:pointer; }
+  button:active { background:#1d7a3f; }
+  .note { font-size:14.5px; color:#8fae97; line-height:1.55; margin-top:8px; }
+  .store { font-size:18px; color:#eaffef; line-height:1.7; text-align:center; }
+  .rhythm { font-size:17px; color:#cfe9d6; line-height:1.9; text-align:center; }
+  .rhythm b { color:#ffc95c; }
+  .ledger { font-family:ui-monospace,Menlo,monospace; font-size:15px; line-height:1.7; color:#cfe9d6; }
+  .verdict { font-size:18px; color:#ffc95c; text-align:center; margin-top:8px; }
+  .hot { color:#ffb27a; } .cold { color:#8fc7e8; }
+  footer { text-align:center; color:#3f6b4d; font-size:13px; margin-top:26px; font-family:ui-monospace,Menlo,monospace; letter-spacing:.14em; line-height:2; }
+</style></head>
+<body>
+<div id="fall"></div>
+<main>
+  <h1>✦ Merry's Wish Picker ✦</h1>
+  <div class="sub">The Combined Edition · every game, one page, every day</div>
+  <p class="creed">For Merry — a little appointment with hope, kept daily.<br>
+  The fall makes the numbers, the day keeps them, and the evening<br>
+  grades them in the open. Something to watch, something to wait for.</p>
+
+  <div class="card">
+    <h2>TODAY'S WISH — FANTASY 5</h2>
+    <div class="balls" id="pickballs"></div>
+    <p class="why" id="pickwhy"></p>
+    <p class="note" id="pickdate"></p>
+  </div>
+
+  <div class="card">
+    <h2>THE DAILY DIGITS</h2>
+    <div class="game">DAILY 3 — STRAIGHT</div>
+    <div class="digits" id="d3"></div>
+    <div class="game">DAILY 4 — STRAIGHT</div>
+    <div class="digits" id="d4"></div>
+    <p class="note" style="text-align:center">Stamped fresh from today's date, the same way every morning — the date is the seed,
+    so the whole house is playing the same digits. A straight Daily 3 is a 1-in-1,000 wish; Daily 4 is 1-in-10,000.
+    Stated plain, so the watching stays sweet.</p>
+  </div>
+
+  <div class="card">
+    <h2>THE BIG LOTTO — THIS WEEK</h2>
+    <div class="game" id="pbdate">POWERBALL — SATURDAY</div>
+    <div class="balls" id="pbballs"></div>
+    <div class="game" id="mmdate">MEGA MILLIONS — WEDNESDAY</div>
+    <div class="balls" id="mmballs"></div>
+    <p class="note" style="text-align:center">The gold ball is the bonus ball. These two sets are stamped for their draw days and
+    stay the same all week — check back here on the night, or wait for the text.</p>
+  </div>
+
+  <div class="card">
+    <h2>YOUR WORDS FOR THE COUNTER</h2>
+    <p class="store">"One Fantasy 5 with my own numbers, please —<br>
+    and a Daily 3 straight, and a Daily 4 straight,<br>
+    one dollar each."</p>
+    <p class="note" style="text-align:center">On a play slip it's the same thing: mark your five, mark your digits,
+    hand it over with a smile. Or skip the store entirely — the Michigan Lottery app
+    takes the same numbers right on the phone.</p>
+  </div>
+
+  <div class="card">
+    <h2>THE DAILY RHYTHM</h2>
+    <p class="rhythm"><b>5:17 PM</b> — the day's numbers arrive by text<br>
+    <b>7:29 PM</b> — the Michigan draws<br>
+    <b>Evening</b> — the grades come back, honest and in the open<br>
+    <b>Tomorrow</b> — a fresh set, and we watch again</p>
+  </div>
+
+  <div class="card">
+    <h2>THE MEASURE — LAST <span id="ndraws"></span> REAL FANTASY 5 DRAWS</h2>
+    <p class="ledger" id="measure"></p>
+    <p class="note">Fair share is about <b>3.2 falls per number</b> in this set, and about <b>42 balls per third</b> of the board.
+    A few weeks of draws is a photograph, not a climate — the picker weighs it gently, and the ledger below keeps it honest.</p>
+  </div>
+
+  <div class="card">
+    <h2>ADD TONIGHT'S REAL FANTASY 5 DRAW</h2>
+    <div class="row">
+      <input type="text" id="drawin" placeholder="e.g. 4 9 15 22 31" inputmode="numeric">
+      <button id="adddraw">ADD + GRADE</button>
+    </div>
+    <p class="note">Type the five winning numbers after the 7:29 PM draw. The set joins the history,
+    and today's wish gets graded on the spot. (The Daily digits and the big lotto
+    get graded in the house ledger every night — they live there in full.)</p>
+    <p class="ledger" id="addmsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>THE LEDGER — EVERY WISH, GRADED</h2>
+    <p class="ledger" id="ledger"></p>
+    <p class="verdict" id="verdict"></p>
+    <p class="note">Fair luck averages about <b>0.64 matched numbers per ticket</b> (matching all five is 1 in 575,757 —
+    that's the mountain every wish climbs, stated plainly so the climb stays fun).</p>
+  </div>
+
+  <footer>APEX · BUILT FOR MERRY, WITH LOVE<br>THE FALL DECIDES, THE LEDGER REMEMBERS</footer>
+</main>
+<script>
+  // MERRY'S WISH PICKER — COMBINED EDITION (Nov 7, 2026). One page for all four games.
+  // FANTASY 5: the canonical recipe (history weights + 3-5-6 gap shape + the fall).
+  // DAILY 3 / DAILY 4 / POWERBALL / MEGA MILLIONS: stamped from the date with the
+  // SAME SHA-256 method the Wish Picker Watch prints in its seal job (verified
+  // against the bench: 2026-11-07 -> Daily 3 = 221, Daily 4 = 4339), so the page,
+  // the texts, and the house ledger all carry identical numbers.
+  var KEY = 'wishPicker.v2';
+  var SEED_DRAWS = [
+    [5,10,19,30,36],[14,20,22,24,31],[16,30,33,37,39],[3,10,21,24,27],[2,8,9,14,27],
+    [3,6,12,18,30],[8,14,23,28,29],[1,5,8,18,22],[10,21,22,29,32],[4,11,24,28,38],
+    [3,12,26,31,32],[6,16,21,33,37],[13,17,27,28,36],[9,17,19,28,34],[9,23,25,26,33],
+    [23,24,25,30,32],[10,14,22,28,33],[5,9,25,27,34],[11,20,29,30,32],[10,23,30,33,35],
+    [3,7,20,22,31],[14,22,28,31,39],[1,2,4,27,34],[1,7,17,21,34],[8,15,23,28,35]
+  ];
+  var store = { draws: SEED_DRAWS.slice(), picks: {}, graded: {} };
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var p = JSON.parse(raw); if (p && p.draws && p.picks) store = p; }
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+  function todayKey() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function counts() {
+    var c = {}, n = 0;
+    for (var i = 1; i <= 39; i++) c[i] = 0;
+    store.draws.forEach(function (d) { d.forEach(function (x) { c[x]++; n++; }); });
+    return { c: c, balls: n, draws: store.draws.length, mean: n / 39 };
+  }
+  function weights() {
+    var s = counts(), per = Math.sqrt(s.draws * (5 / 39) * (1 - 5 / 39)), w = {};
+    for (var i = 1; i <= 39; i++) { var z = per ? (s.c[i] - s.mean) / per : 0; w[i] = Math.max(0.3, 1 + 0.25 * z); }
+    return w;
+  }
+  function drawSet(w) {
+    var pool = []; for (var i = 1; i <= 39; i++) pool.push(i);
+    var out = [];
+    while (out.length < 5) {
+      var tot = 0; pool.forEach(function (n) { tot += w[n]; });
+      var r = Math.random() * tot, acc = 0, pick = pool[pool.length - 1];
+      for (var j = 0; j < pool.length; j++) { acc += w[pool[j]]; if (r <= acc) { pick = pool[j]; break; } }
+      out.push(pick); pool.splice(pool.indexOf(pick), 1);
+    }
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function gapScore(set) { var g = 0; for (var i = 1; i < set.length; i++) { var d = set[i] - set[i - 1]; if (d === 3 || d === 5 || d === 6) g++; } return g; }
+  function makePick() {
+    var w = weights(), best = null, bestG = -1;
+    for (var t = 0; t < 300; t++) { var s = drawSet(w), g = gapScore(s); if (g > bestG) { bestG = g; best = s; } }
+    return best;
+  }
+  function renderPick() {
+    var tk = todayKey();
+    if (!store.picks[tk]) { store.picks[tk] = makePick(); save(); }
+    var set = store.picks[tk], s = counts(), balls = '';
+    set.forEach(function (n) { balls += '<div class="ball">' + n + '</div>'; });
+    document.getElementById('pickballs').innerHTML = balls;
+    var gaps = []; for (var i = 1; i < set.length; i++) gaps.push(set[i] - set[i - 1]);
+    var hot = set.filter(function (n) { return s.c[n] >= 5; });
+    var cold = set.filter(function (n) { return s.c[n] <= 2; });
+    var why = 'Gaps between them: <b>' + gaps.join(' · ') + '</b> — the 3-5-6 shape is in the recipe.';
+    if (hot.length) why += '<br>Running warm in the real draws: <span class="hot">' + hot.join(', ') + '</span>.';
+    if (cold.length) why += '<br>Running quiet, wished on anyway: <span class="cold">' + cold.join(', ') + '</span>.';
+    document.getElementById('pickwhy').innerHTML = why;
+    document.getElementById('pickdate').textContent = 'Made once for today (' + tk + ') from the fall, the history, and the gaps — locked until tomorrow, so the grade is honest.';
+  }
+  // --- the date stamp (SHA-256) — identical to the house watch's printed method ---
+  function shaBytes(str) {
+    var bytes = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', bytes).then(function (buf) { return new Uint8Array(buf); });
+  }
+  function hexOf(u8) { var h = ''; u8.forEach(function (b) { h += ('0' + b.toString(16)).slice(-2); }); return h; }
+  function isoDay(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function renderDigits() {
+    var iso = isoDay(new Date());
+    shaBytes(iso + 'Daily 3').then(function (u8) {
+      var digs = hexOf(u8).replace(/[^0-9]/g, ''), call = digs.slice(0, 3), html = '';
+      for (var i = 0; i < 3; i++) html += '<div class="digit">' + call[i] + '</div>';
+      document.getElementById('d3').innerHTML = html;
+    });
+    shaBytes(iso + 'Daily 4').then(function (u8) {
+      var digs = hexOf(u8).replace(/[^0-9]/g, ''), call = digs.slice(0, 4), html = '';
+      for (var i = 0; i < 4; i++) html += '<div class="digit">' + call[i] + '</div>';
+      document.getElementById('d4').innerHTML = html;
+    });
+  }
+  function bigSet(u8, maxWhite, maxBonus) {
+    var whites = [];
+    for (var i = 0; i < u8.length && whites.length < 5; i++) { var v = (u8[i] % maxWhite) + 1; if (whites.indexOf(v) < 0) whites.push(v); }
+    whites.sort(function (a, b) { return a - b; });
+    return { whites: whites, bonus: (u8[16] % maxBonus) + 1 };
+  }
+  function renderBig() {
+    var now = new Date(), dow = now.getDay(); // 0 Sun .. 6 Sat
+    var toSat = (6 - dow + 7) % 7, sat = new Date(now); sat.setDate(now.getDate() + toSat);
+    var toWed = (3 - dow + 7) % 7; if (toWed === 0 && now.getHours() >= 23) toWed = 7;
+    var wed = new Date(now); wed.setDate(now.getDate() + toWed);
+    var opts = { weekday: 'long', month: 'long', day: 'numeric' };
+    document.getElementById('pbdate').textContent = 'POWERBALL — ' + sat.toLocaleDateString('en-US', opts).toUpperCase();
+    document.getElementById('mmdate').textContent = 'MEGA MILLIONS — ' + wed.toLocaleDateString('en-US', opts).toUpperCase();
+    shaBytes(isoDay(sat) + 'Powerball').then(function (u8) {
+      var s = bigSet(u8, 69, 26), html = '';
+      s.whites.forEach(function (n) { html += '<div class="ball sm">' + n + '</div>'; });
+      html += '<div class="ball sm bonus">' + s.bonus + '</div>';
+      document.getElementById('pbballs').innerHTML = html;
+    });
+    shaBytes(isoDay(wed) + 'Mega Millions').then(function (u8) {
+      var s = bigSet(u8, 70, 24), html = '';
+      s.whites.forEach(function (n) { html += '<div class="ball sm">' + n + '</div>'; });
+      html += '<div class="ball sm bonus">' + s.bonus + '</div>';
+      document.getElementById('mmballs').innerHTML = html;
+    });
+  }
+  function renderMeasure() {
+    var s = counts();
+    document.getElementById('ndraws').textContent = s.draws;
+    var low = 0, mid = 0, high = 0;
+    for (var i = 1; i <= 39; i++) { if (i <= 13) low += s.c[i]; else if (i <= 26) mid += s.c[i]; else high += s.c[i]; }
+    var all = []; for (var j = 1; j <= 39; j++) all.push([j, s.c[j]]);
+    all.sort(function (a, b) { return b[1] - a[1]; });
+    var hot = all.slice(0, 5).map(function (x) { return x[0] + ' ×' + x[1]; }).join(' · ');
+    var cold = all.slice(-5).map(function (x) { return x[0] + ' ×' + x[1]; }).join(' · ');
+    document.getElementById('measure').innerHTML =
+      'LOW END 1–13: <b>' + low + '</b> balls · MIDDLE 14–26: <b>' + mid + '</b> · HIGH END 27–39: <b>' + high + '</b><br>' +
+      'WARMEST: <span class="hot">' + hot + '</span><br>QUIETEST: <span class="cold">' + cold + '</span>';
+  }
+  function renderLedger() {
+    var dates = Object.keys(store.graded).sort(), lines = [], totM = 0, totT = 0;
+    dates.forEach(function (d) {
+      var g = store.graded[d]; totM += g.matches; totT++;
+      lines.push(d + ' — wished ' + g.pick.join('-') + ' · drew ' + g.draw.join('-') + ' · matched <b>' + g.matches + '</b>');
+    });
+    document.getElementById('ledger').innerHTML = lines.length ? lines.join('<br>') : 'No graded wishes yet — the first one grades tonight.';
+    var v = '';
+    if (totT) {
+      var avg = totM / totT, fair = 0.64;
+      v = 'Average match ' + avg.toFixed(2) + ' per wish over ' + totT + ' graded · fair luck is ' + fair + ' — ' +
+        (avg > fair + 0.3 ? 'running ABOVE fair so far (small count — the ledger keeps watching)' :
+         avg < fair - 0.3 ? 'running below fair so far (small count — the ledger keeps watching)' :
+         'running at fair, as honest wishes do');
+    }
+    document.getElementById('verdict').textContent = v;
+  }
+  document.getElementById('adddraw').addEventListener('click', function () {
+    var txt = document.getElementById('drawin').value;
+    var nums = (txt.match(/\d+/g) || []).map(Number).filter(function (n) { return n >= 1 && n <= 39; });
+    nums = nums.filter(function (n, i) { return nums.indexOf(n) === i; }).sort(function (a, b) { return a - b; });
+    var msg = document.getElementById('addmsg');
+    if (nums.length !== 5) { msg.textContent = 'That reads as ' + nums.length + ' usable numbers — a Fantasy 5 draw is five, each 1 to 39, no repeats.'; return; }
+    store.draws.push(nums);
+    var tk = todayKey(), note = 'Draw added to the history (' + store.draws.length + ' sets now).';
+    if (store.picks[tk] && !store.graded[tk]) {
+      var m = store.picks[tk].filter(function (n) { return nums.indexOf(n) >= 0; }).length;
+      store.graded[tk] = { pick: store.picks[tk], draw: nums, matches: m };
+      note += ' Today\'s wish matched ' + m + ' of 5.';
+    }
+    save(); renderMeasure(); renderLedger();
+    document.getElementById('drawin').value = '';
+    msg.textContent = note;
+  });
+  (function () {
+    var fall = document.getElementById('fall'), cols = Math.max(10, Math.floor(window.innerWidth / 26)), streams = [];
+    var shades = ['#39ff6a', '#27c452', '#166b32', '#0b3d1d'];
+    for (var c = 0; c < cols; c++) {
+      var el = document.createElement('div'); el.className = 'col';
+      el.style.fontSize = '15px'; el.style.lineHeight = '1.5'; el.style.letterSpacing = '.35em';
+      el.style.color = shades[c % 4]; fall.appendChild(el);
+      var s = []; for (var i = 0; i < 46; i++) s.push(Math.random() > 0.5 ? 1 : 0);
+      streams.push({ el: el, chars: s, speed: 1 + (c % 3), tick: 0 });
+    }
+    function render(st) {
+      var html = '';
+      for (var i = 0; i < st.chars.length; i++) html += (i === 0) ? '<b style="color:#b6ffd0;font-weight:400">' + st.chars[i] + '</b>' : st.chars[i];
+      st.el.innerHTML = html;
+    }
+    streams.forEach(render);
+    setInterval(function () {
+      streams.forEach(function (st) {
+        if (++st.tick % st.speed) return;
+        st.chars.pop(); st.chars.unshift(Math.random() > 0.5 ? 1 : 0); render(st);
+      });
+    }, 130);
+  })();
+  renderPick(); renderDigits(); renderBig(); renderMeasure(); renderLedger();
+</script>
+</body></html>

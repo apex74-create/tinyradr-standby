@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexDash — Gateway Setup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+
+    h1 {
+      font-size: 18px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 10px;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #00aa00;
+      margin-bottom: 28px;
+      letter-spacing: 1px;
+    }
+
+    /* ── Section cards ── */
+    .card {
+      border: 1px solid #00ff00;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      color: #00ff00;
+    }
+
+    .card-hint {
+      font-size: 11px;
+      color: #556655;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    /* ── Form rows ── */
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .field-label {
+      width: 120px;
+      flex-shrink: 0;
+      font-size: 11px;
+      color: #00aa00;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .field-input {
+      flex: 1;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      padding: 7px 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    .field-input:focus { outline: none; border-color: #00ffff; }
+    .field-input::placeholder { color: #333; }
+
+    /* required fields */
+    .field-input.required { border-color: #ffaa00; }
+    .field-input.required:valid { border-color: #00ff00; }
+
+    /* ── OCR button ── */
+    .ocr-btn {
+      background: #0a0a0a;
+      border: 1px solid #00ffff;
+      color: #00ffff;
+      padding: 6px 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .ocr-btn:hover  { background: #0a1a1a; }
+    .ocr-btn:active { background: #001a1a; }
+    .ocr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── OCR overlay ── */
+    #ocrOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+    }
+
+    #ocrOverlay.active { display: flex; }
+
+    #ocrVideo {
+      width: 100%;
+      max-width: 480px;
+      border: 2px solid #00ffff;
+      background: #000;
+    }
+
+    #ocrCanvas { display: none; }
+
+    .ocr-controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    .ocr-action-btn {
+      background: #0a0a0a;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      padding: 10px 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .ocr-action-btn:hover { background: #1a3a1a; }
+
+    #ocrStatus {
+      font-size: 12px;
+      color: #00aa00;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .ocr-file-fallback {
+      font-size: 11px;
+      color: #556655;
+    }
+
+    /* ── Trusted device list ── */
+    .device-list { list-style: none; }
+
+    .device-item {
+      border: 1px solid #1a2a1a;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      line-height: 1.8;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .device-item.trusted  { border-color: #00ff00; }
+    .device-item.flagged  { border-color: #ff4444; }
+    .device-item.unknown  { border-color: #666; }
+
+    .device-remove {
+      background: none;
+      border: 1px solid #ff4444;
+      color: #ff4444;
+      font-size: 10px;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    /* ── Action buttons ── */
+    .btn-primary {
+      background: #00ff00;
+      color: #000;
+      border: none;
+      padding: 14px 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover { background: #00cc00; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: #0a0a0a;
+      color: #00aa00;
+      border: 1px solid #00aa00;
+      padding: 10px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover { background: #0a1a0a; }
+
+    /* ── Status / toast ── */
+    #statusMsg {
+      display: none;
+      padding: 10px 16px;
+      border: 1px solid #00ff00;
+      background: #0a1a0a;
+      font-size: 12px;
+      color: #00ff00;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    #statusMsg.error { border-color: #ff4444; color: #ff4444; background: #1a0a0a; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .field-row { flex-direction: column; align-items: flex-start; }
+      .field-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚙ Gateway Setup</h1>
+<p class="subtitle">APEX AIR SOLUTIONS — OPERATOR ACKNOWLEDGMENT &amp; DEVICE REGISTRATION</p>
+
+<div id="statusMsg"></div>
+
+<!-- ── Operator Signature ── -->
+<div class="card" id="sigCard">
+  <div class="card-title">Step 1 — Operator Signature</div>
+  <p class="card-hint">
+    Enter your name or callsign to acknowledge this session.
+    This is required before the registry is activated.
+    No typing needed — tap the camera icon to scan a printed label.
+  </p>
+  <div class="field-row">
+    <label class="field-label" for="operatorSig">Operator</label>
+    <input id="operatorSig" type="text" class="field-input required"
+           placeholder="Your name or callsign" required autocomplete="name">
+    <button class="ocr-btn" onclick="openOcr('operatorSig', 'your name or printed ID label')">📷 SCAN</button>
+  </div>
+</div>
+
+<!-- ── Router ── -->
+<div class="card">
+  <div class="card-title">Step 2 — Router (Optional)</div>
+  <p class="card-hint">
+    Look on the back of your router for the SSID sticker, gateway IP, and MAC address.
+    Tap 📷 SCAN next to any field to capture it automatically with your camera.
+  </p>
+  <div class="field-row">
+    <label class="field-label" for="routerSsid">SSID</label>
+    <input id="routerSsid" type="text" class="field-input" placeholder="e.g. TMOBILE-DCEA">
+    <button class="ocr-btn" onclick="openOcr('routerSsid', 'the SSID label on your router')">📷 SCAN</button>
+  </div>
+  <div class="field-row">
+    <label class="field-label" for="routerGateway">Gateway IP</label>
+    <input id="routerGateway" type="text" class="field-input" placeholder="e.g. 192.168.12.1">
+    <button class="ocr-btn" onclick="openOcr('routerGateway', 'the gateway IP on your router label')">📷 SCAN</button>
+  </div>
+  <div class="field-row">
+    <label class="field-label" for="routerMac">MAC Address</label>
+    <input id="routerMac" type="text" class="field-input" placeholder="e.g. aa:bb:cc:dd:ee:ff">
+    <button class="ocr-btn" onclick="openOcr('routerMac', 'the MAC address on the back of your router')">📷 SCAN</button>
+  </div>
+</div>
+
+<!-- ── Handset ── -->
+<div class="card">
+  <div class="card-title">Step 3 — Handset (Optional)</div>
+  <p class="card-hint">
+    Go to Settings › About Phone › Status on your Android device to find the IP and MAC.
+    Tap 📷 SCAN to capture from a screenshot or printed page.
+  </p>
+  <div class="field-row">
+    <label class="field-label" for="handsetIp">IP Address</label>
+    <input id="handsetIp" type="text" class="field-input" placeholder="e.g. 192.168.12.127">
+    <button class="ocr-btn" onclick="openOcr('handsetIp', 'your handset IP address')">📷 SCAN</button>
+  </div>
+  <div class="field-row">
+    <label class="field-label" for="handsetMac">MAC Address</label>
+    <input id="handsetMac" type="text" class="field-input" placeholder="e.g. ea:e2:cb:b9:80:61">
+    <button class="ocr-btn" onclick="openOcr('handsetMac', 'the MAC address from your handset settings')">📷 SCAN</button>
+  </div>
+  <div class="field-row">
+    <label class="field-label" for="handsetModel">Model</label>
+    <input id="handsetModel" type="text" class="field-input" placeholder="e.g. Armor 22">
+    <button class="ocr-btn" onclick="openOcr('handsetModel', 'your handset model name or label')">📷 SCAN</button>
+  </div>
+</div>
+
+<!-- ── Chromebook ── -->
+<div class="card">
+  <div class="card-title">Step 4 — Chromebook (Optional)</div>
+  <p class="card-hint">
+    Open Settings › Network › Wi-Fi on your Chromebook to find the IP and MAC.
+    Tap 📷 SCAN to capture from a screen or label.
+  </p>
+  <div class="field-row">
+    <label class="field-label" for="cbIp">IP Address</label>
+    <input id="cbIp" type="text" class="field-input" placeholder="e.g. 192.168.12.234">
+    <button class="ocr-btn" onclick="openOcr('cbIp', 'your Chromebook IP address')">📷 SCAN</button>
+  </div>
+  <div class="field-row">
+    <label class="field-label" for="cbMac">MAC Address</label>
+    <input id="cbMac" type="text" class="field-input" placeholder="e.g. aa:bb:cc:dd:ee:ff">
+    <button class="ocr-btn" onclick="openOcr('cbMac', 'the MAC from your Chromebook network settings')">📷 SCAN</button>
+  </div>
+  <div class="field-row">
+    <label class="field-label" for="cbModel">Model</label>
+    <input id="cbModel" type="text" class="field-input" placeholder="e.g. HP Chromebook 14">
+    <button class="ocr-btn" onclick="openOcr('cbModel', 'the model name printed under your Chromebook')">📷 SCAN</button>
+  </div>
+</div>
+
+<!-- ── Registered Devices ── -->
+<div class="card" id="devicesCard">
+  <div class="card-title">Registered Trusted Devices</div>
+  <ul class="device-list" id="deviceList">
+    <li style="color:#444;font-size:11px;">Loading…</li>
+  </ul>
+</div>
+
+<!-- ── Actions ── -->
+<button class="btn-primary" id="saveBtn" onclick="saveGateway()">✔ ACKNOWLEDGE &amp; SAVE</button>
+<button class="btn-secondary" onclick="window.location.href='index.html'">← BACK TO DASHBOARD</button>
+
+<!-- ── OCR Overlay ── -->
+<div id="ocrOverlay">
+  <div id="ocrStatus">POINT CAMERA AT LABEL — TAP CAPTURE</div>
+  <video id="ocrVideo" autoplay playsinline muted></video>
+  <canvas id="ocrCanvas"></canvas>
+  <div class="ocr-controls">
+    <button class="ocr-action-btn" id="captureBtn" onclick="captureFrame()">📷 CAPTURE</button>
+    <button class="ocr-action-btn" style="border-color:#ff4444;color:#ff4444;" onclick="closeOcr()">✕ CANCEL</button>
+  </div>
+  <label class="ocr-file-fallback">
+    No camera? <input type="file" id="ocrFileInput" accept="image/*" style="color:#00aa00;font-size:11px;">
+  </label>
+</div>
+
+<!-- Tesseract.js via CDN (open-source OCR, MIT licence) -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="trusted-devices.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ── State ──────────────────────────────────────────────
+  let _ocrTargetId = '';
+  let _ocrStream   = null;
+  let _tesseractWorker = null;
+
+  // ── Init ───────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    loadRegistryIntoForm();
+    renderDeviceList();
+  });
+
+  function loadRegistryIntoForm() {
+    const reg = TrustedDevices.getRegistry();
+    if (reg.operator_signature) {
+      document.getElementById('operatorSig').value = reg.operator_signature;
+    }
+
+    const devices = reg.devices || [];
+
+    const router = devices.find(d => d.device_type === 'router');
+    if (router) {
+      setVal('routerSsid',    router.ssid    || '');
+      setVal('routerGateway', router.gateway || '');
+      setVal('routerMac',     router.mac     || '');
+    }
+
+    const handset = devices.find(d => d.device_type === 'handset');
+    if (handset) {
+      setVal('handsetIp',    handset.ip    || '');
+      setVal('handsetMac',   handset.mac   || '');
+      setVal('handsetModel', handset.model || '');
+    }
+
+    const cb = devices.find(d => d.device_type === 'chromebook');
+    if (cb) {
+      setVal('cbIp',    cb.ip    || '');
+      setVal('cbMac',   cb.mac   || '');
+      setVal('cbModel', cb.model || '');
+    }
+  }
+
+  function setVal(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  function renderDeviceList() {
+    const listEl = document.getElementById('deviceList');
+    if (!listEl) return;
+    const devices = TrustedDevices.listDevices();
+    if (!devices.length) {
+      listEl.innerHTML = '<li style="color:#444;font-size:11px;">No devices registered yet.</li>';
+      return;
+    }
+    listEl.innerHTML = '';
+    devices.forEach(d => {
+      const li = document.createElement('li');
+      li.className = 'device-item ' + (d.trust_level || 'unknown');
+      // Build display text from escaped parts — no HTML injection possible.
+      const parts = [
+        escHtml(d.label || d.model || 'Unknown Device'),
+        d.device_type ? '[' + escHtml(d.device_type) + ']' : '',
+        d.ip     ? 'IP: '   + escHtml(d.ip)     : '',
+        d.mac    ? 'MAC: '  + escHtml(d.mac)    : '',
+        d.fcc_id ? 'FCC: '  + escHtml(d.fcc_id) : '',
+        d.ssid   ? 'SSID: ' + escHtml(d.ssid)   : '',
+      ].filter(Boolean).join(' \u00b7 ');   // U+00B7 middle dot (plain text)
+      const span = document.createElement('span');
+      span.textContent = parts;
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'device-remove';
+      removeBtn.textContent = 'REMOVE';
+      removeBtn.addEventListener('click', () => {
+        TrustedDevices.removeDevice(d.id);
+        renderDeviceList();
+      });
+      li.appendChild(span);
+      li.appendChild(removeBtn);
+      listEl.appendChild(li);
+    });
+  }
+
+  // ── Save ───────────────────────────────────────────────
+  window.saveGateway = function () {
+    const sig = document.getElementById('operatorSig').value.trim();
+    if (!sig) {
+      showStatus('Operator signature is required.', true);
+      document.getElementById('operatorSig').focus();
+      return;
+    }
+
+    TrustedDevices.setOperatorSignature(sig);
+
+    // Router
+    const routerSsid = val('routerSsid');
+    const routerGw   = val('routerGateway');
+    const routerMac  = val('routerMac');
+    if (routerSsid || routerGw || routerMac) {
+      TrustedDevices.upsertDevice({
+        label:       'Router (' + (routerSsid || routerMac || 'unnamed') + ')',
+        device_type: 'router',
+        ssid:        routerSsid,
+        gateway:     routerGw,
+        mac:         routerMac,
+        trust_level: 'trusted',
+      });
+    }
+
+    // Handset
+    const hIp    = val('handsetIp');
+    const hMac   = val('handsetMac');
+    const hModel = val('handsetModel');
+    if (hIp || hMac || hModel) {
+      TrustedDevices.upsertDevice({
+        label:       'Handset (' + (hModel || hMac || hIp || 'unnamed') + ')',
+        device_type: 'handset',
+        ip:          hIp,
+        mac:         hMac,
+        model:       hModel,
+        trust_level: 'trusted',
+      });
+    }
+
+    // Chromebook
+    const cIp    = val('cbIp');
+    const cMac   = val('cbMac');
+    const cModel = val('cbModel');
+    if (cIp || cMac || cModel) {
+      TrustedDevices.upsertDevice({
+        label:       'Chromebook (' + (cModel || cMac || cIp || 'unnamed') + ')',
+        device_type: 'chromebook',
+        ip:          cIp,
+        mac:         cMac,
+        model:       cModel,
+        trust_level: 'trusted',
+      });
+    }
+
+    renderDeviceList();
+    showStatus('✔ Gateway acknowledged. Registry saved.', false);
+
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1800);
+  };
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  // ── Status toast ───────────────────────────────────────
+  function showStatus(msg, isError) {
+    const el = document.getElementById('statusMsg');
+    if (!el) return;
+    el.textContent = msg;
+    el.className   = isError ? 'error' : '';
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+
+  // ── OCR ────────────────────────────────────────────────
+  window.openOcr = async function (targetInputId, hintText) {
+    _ocrTargetId = targetInputId;
+    const overlay  = document.getElementById('ocrOverlay');
+    const statusEl = document.getElementById('ocrStatus');
+    statusEl.textContent = 'Opening camera to scan: ' + hintText;
+    overlay.classList.add('active');
+
+    try {
+      _ocrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      document.getElementById('ocrVideo').srcObject = _ocrStream;
+      statusEl.textContent = 'POINT CAMERA AT LABEL — TAP CAPTURE';
+    } catch (e) {
+      statusEl.textContent = 'Camera unavailable. Use file upload below.';
+    }
+
+    // Ensure worker is ready
+    if (!_tesseractWorker) {
+      statusEl.textContent = 'Loading OCR engine…';
+      try {
+        _tesseractWorker = await Tesseract.createWorker('eng');
+        statusEl.textContent = 'OCR ready. Point camera at label — tap CAPTURE.';
+      } catch (e) {
+        statusEl.textContent = 'OCR load failed. Try file upload.';
+      }
+    }
+  };
+
+  window.closeOcr = function () {
+    const overlay = document.getElementById('ocrOverlay');
+    overlay.classList.remove('active');
+    if (_ocrStream) {
+      _ocrStream.getTracks().forEach(t => t.stop());
+      _ocrStream = null;
+    }
+    document.getElementById('ocrVideo').srcObject = null;
+  };
+
+  window.captureFrame = async function () {
+    const video    = document.getElementById('ocrVideo');
+    const canvas   = document.getElementById('ocrCanvas');
+    const statusEl = document.getElementById('ocrStatus');
+    const captureBtn = document.getElementById('captureBtn');
+
+    if (!_tesseractWorker) {
+      statusEl.textContent = 'OCR engine not ready yet. Please wait.';
+      return;
+    }
+
+    canvas.width  = video.videoWidth  || 480;
+    canvas.height = video.videoHeight || 360;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    statusEl.textContent = 'Reading text…';
+    captureBtn.disabled  = true;
+
+    try {
+      const { data: { text } } = await _tesseractWorker.recognize(canvas);
+      const extracted = extractRelevantText(text, _ocrTargetId);
+      const inputEl = document.getElementById(_ocrTargetId);
+      if (inputEl && extracted) {
+        inputEl.value = extracted;
+        statusEl.textContent = '✔ Extracted: ' + extracted;
+      } else {
+        statusEl.textContent = 'Could not extract text. Try again or type manually.';
+      }
+    } catch (e) {
+      statusEl.textContent = 'OCR error: ' + e.message;
+    } finally {
+      captureBtn.disabled = false;
+    }
+
+    setTimeout(closeOcr, 1500);
+  };
+
+  // File-upload fallback
+  document.getElementById('ocrFileInput').addEventListener('change', async function (e) {
+    const file = e.target.files[0];
+    if (!file || !_tesseractWorker) return;
+    const statusEl = document.getElementById('ocrStatus');
+    statusEl.textContent = 'Reading image…';
+    try {
+      const { data: { text } } = await _tesseractWorker.recognize(file);
+      const extracted = extractRelevantText(text, _ocrTargetId);
+      const inputEl = document.getElementById(_ocrTargetId);
+      if (inputEl && extracted) {
+        inputEl.value = extracted;
+        statusEl.textContent = '✔ Extracted: ' + extracted;
+      } else {
+        statusEl.textContent = 'Nothing extracted. Type manually.';
+      }
+    } catch (e) {
+      statusEl.textContent = 'OCR error: ' + e.message;
+    }
+    setTimeout(closeOcr, 1500);
+  });
+
+  /**
+   * Heuristically pull the most relevant value from raw OCR text,
+   * based on which field is being populated.
+   */
+  function extractRelevantText(rawText, fieldId) {
+    const lines = rawText.split(/\n+/).map(l => l.trim()).filter(Boolean);
+
+    if (fieldId.includes('Mac') || fieldId.includes('mac')) {
+      // Look for MAC-like patterns  xx:xx:xx:xx:xx:xx  or  xx-xx-xx-xx-xx-xx
+      const mac = rawText.match(/([0-9a-fA-F]{2}[:\-]){5}[0-9a-fA-F]{2}/);
+      if (mac) return mac[0].replace(/-/g, ':').toLowerCase();
+    }
+
+    if (fieldId.includes('Ip') || fieldId.includes('ip') || fieldId.includes('Gateway') || fieldId.includes('gateway')) {
+      // Look for IPv4 addresses
+      const ip = rawText.match(/\b(\d{1,3}\.){3}\d{1,3}\b/);
+      if (ip) return ip[0];
+    }
+
+    if (fieldId.includes('Ssid') || fieldId.includes('ssid')) {
+      // Prefer lines that look like SSID names (short, no special chars)
+      const ssidLine = lines.find(l => l.length > 2 && l.length < 40 && /^[\w\-_ ]+$/.test(l));
+      return ssidLine || lines[0] || '';
+    }
+
+    if (fieldId.includes('operator') || fieldId.includes('Sig')) {
+      return lines[0] || '';
+    }
+
+    // Generic: return first non-empty line
+    return lines[0] || '';
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/'/g,'&#39;')
+      .replace(/"/g,'&quot;');
+  }
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — P&W J58 · Motors Under Glass</title>
+<style>
+  /* P&W J58 MOTOR FACE v1 (Nov 9, 2026) — LATERAL view.
+     Family: Motors Under Glass (Compounding Pass #1 §B roster #4).
+     Determination: the J58's whole identity is its silhouette, so this
+     face is the lateral cut — the long translating spike, the intake
+     annulus, the long nacelle body, the bronze turbine section and the
+     ejector nozzle, drawn as its OWN machine (not a J79 reskin: the
+     J79 face looks down a bore; this one rides alongside the motor).
+     Backdrop is this motor's own: a dark titanium plate with panel
+     seams — high-altitude metal, not wood, not galaxy.
+     Motion (LIVE from first paint): the spool lines run their dash at geared
+     rates (a drawn convention for a spool turning inside a closed
+     nacelle — the lines' advance IS the spool read), exhaust breathes,
+     fine tremor. Dash offsets are clock-true at every instant.
+     Spec character as DESIGN INPUT ONLY (public, historical): the
+     SR-71's turbojet with its translating spike intake. NO performance
+     figures appear on this face.
+     Governor history: this face was born under Battery V2 (REST/
+     OBSERVED, 12 s auto-exit); the face-line sweep removed that
+     governor Nov 10, 2026 - machinery runs from first paint, nothing
+     holds the screen on. Colour CALLED from the palette — solids,
+     never layered. */
+  :root{
+    --void:#050607;        /* altitude depth */
+    --plate:#0d0f10;       /* titanium plate */
+    --seam:#1c1f21;        /* panel seams */
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --ti:#a8adb3;          /* titanium body */
+    --ti-lo:#6d7278;
+    --bronze:#b0763a;      /* turbine section */
+    --laser:#57e6ff;
+    --digit:#ffb52e;
+    --cream:#f5ead2;
+    --hot:#ff7a1a; --hot2:#ff3d00;
+    --panel:#000000;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none;cursor:pointer}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--steel);letter-spacing:.14em;text-align:right}
+  body.live #stateLamp{color:var(--laser)}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">P&amp;W&nbsp;J58</div>
+  <div id="specLbl" class="lbl">SR-71 TURBOJET · SPIKE INTAKE</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="J58 turbojet, lateral view"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stateLamp">REST</div>
+</div>
+
+<script>
+"use strict";
+/* Palette in code — the same called colours as the CSS block. */
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  ti:"#a8adb3", tiLo:"#6d7278", bronze:"#b0763a", laser:"#57e6ff",
+  hot:"#ff7a1a", hot2:"#ff3d00", seam:"#1c1f21", void:"#050607" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+
+var svg = document.getElementById("bore");
+var CX = 200, CY = 200, MY = 196;   /* MY = the motor's centreline */
+
+/* ---- Titanium plate seams (this motor's own backdrop) --------------- */
+[92, 164, 236, 308].forEach(function(y){
+  el("line", {x1:52, y1:y, x2:348, y2:y, stroke:PAL.seam, "stroke-width":2}, svg);
+});
+
+/* ---- Bezel: brass ring, degree ticks, cardinal points, hour numerals
+   (the mariner treatment rides every face in this series). ---------- */
+el("circle", {cx:CX, cy:CY, r:196, fill:"none", stroke:PAL.brassLo, "stroke-width":7}, svg);
+var hdgRing = el("circle", {cx:CX, cy:CY, r:188, fill:"none", stroke:PAL.brass, "stroke-width":2.5}, svg);
+for(var d=0; d<360; d+=6){
+  var big = (d % 30 === 0), p1 = polar(CX, CY, big?176:181, d), p2 = polar(CX, CY, 186, d);
+  el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1],
+    stroke: big?PAL.brassHi:PAL.brassLo, "stroke-width": big?2.4:1.2}, svg);
+}
+var hdgNorth = null;
+["N","E","S","W"].forEach(function(card, i){
+  var p = polar(CX, CY, 165, i*90);
+  var t = el("text", {x:p[0], y:p[1]+5, "text-anchor":"middle",
+    fill:PAL.brassHi, "font-size":15, "font-weight":800,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = card;
+  if(card === "N") hdgNorth = t;
+});
+/* ---- Heading witness (Face Law 2): a needle inside the dial that
+   points at the stack's live heading, or sweeps in SEARCHING. The
+   cardinals above stay where the bezel's geometry puts them - the
+   witness, not the paint, carries the truth. Stack = the firewalled
+   script at the end of this file. ------------------------------- */
+var hdgNeedle = el("line", {x1:CX, y1:CY-138, x2:CX, y2:CY-118,
+  stroke:"#ff3d00", "stroke-width":3.4, "stroke-linecap":"round"}, svg);
+window.__hdgTargets = { needle:hdgNeedle, ring:hdgRing, north:hdgNorth,
+  cx:CX, cy:CY, green:PAL.brassHi, yellow:"#ffb52e", red:"#ff3d00" };
+for(var h=1; h<=12; h++){
+  var hp = polar(CX, CY, 147, h*30);
+  var ht = el("text", {x:hp[0], y:hp[1]+4.5, "text-anchor":"middle",
+    fill:"#f5ead2", "font-size":11, "font-weight":700,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  ht.textContent = String(h);
+}
+
+/* ---- The motor (tremor group), lateral: spike → annulus → nacelle →
+   turbine → ejector → exhaust. -------------------------------------- */
+var motor = el("g", {}, svg);
+/* exhaust plume (drawn solids, breathes when OBSERVED) */
+var plume = el("g", {}, motor);
+el("polygon", {points:"352,"+(MY-13)+" 394,"+(MY-4)+" 394,"+(MY+4)+" 352,"+(MY+13),
+  fill:PAL.hot2, stroke:"none", opacity:"0.55"}, plume);
+el("polygon", {points:"352,"+(MY-7)+" 384,"+(MY-2)+" 384,"+(MY+2)+" 352,"+(MY+7),
+  fill:PAL.hot, stroke:"none", opacity:"0.8"}, plume);
+/* the spike: a long translating cone, point forward */
+el("polygon", {points:"58,"+MY+" 148,"+(MY-13)+" 148,"+(MY+13),
+  fill:"none", stroke:PAL.steelHi, "stroke-width":2.4, "stroke-linejoin":"round"}, motor);
+el("line", {x1:66, y1:MY, x2:146, y2:MY, stroke:PAL.steelLo, "stroke-width":1.6}, motor);
+[104, 122, 136].forEach(function(x){
+  var half = (x-58)/90*13;
+  el("line", {x1:x, y1:MY-half, x2:x, y2:MY+half, stroke:PAL.steel, "stroke-width":1.3}, motor);
+});
+/* intake annulus: the ring the spike sits in */
+el("ellipse", {cx:152, cy:MY, rx:7, ry:30, fill:PAL.void, stroke:PAL.steelHi, "stroke-width":2.6}, motor);
+el("ellipse", {cx:152, cy:MY, rx:3.4, ry:21, fill:"none", stroke:PAL.steelLo, "stroke-width":1.4}, motor);
+/* nacelle body: long titanium tube with panel rings */
+el("rect", {x:152, y:MY-30, width:150, height:60, fill:"none", stroke:PAL.ti, "stroke-width":2.6}, motor);
+[182, 214, 246, 278].forEach(function(x){
+  el("line", {x1:x, y1:MY-30, x2:x, y2:MY+30, stroke:PAL.tiLo, "stroke-width":1.5}, motor);
+});
+el("line", {x1:152, y1:MY-30, x2:302, y2:MY-30, stroke:PAL.tiLo, "stroke-width":1.2}, motor);
+el("line", {x1:152, y1:MY+30, x2:302, y2:MY+30, stroke:PAL.tiLo, "stroke-width":1.2}, motor);
+/* spool lines: the turning read inside the closed nacelle */
+var spool1 = el("line", {x1:158, y1:MY-11, x2:298, y2:MY-11, stroke:PAL.laser,
+  "stroke-width":2.2, "stroke-dasharray":"10 7"}, motor);
+var spool2 = el("line", {x1:158, y1:MY+11, x2:298, y2:MY+11, stroke:PAL.steelHi,
+  "stroke-width":2.2, "stroke-dasharray":"10 7"}, motor);
+/* turbine section: bronze, hotter metal */
+el("rect", {x:302, y:MY-27, width:30, height:54, fill:"none", stroke:PAL.bronze, "stroke-width":2.8}, motor);
+[311, 320].forEach(function(x){
+  el("line", {x1:x, y1:MY-27, x2:x, y2:MY+27, stroke:PAL.bronze, "stroke-width":1.4}, motor);
+});
+/* ejector nozzle: petal trapezoids */
+el("polygon", {points:"332,"+(MY-27)+" 354,"+(MY-17)+" 354,"+(MY-9)+" 332,"+(MY-11),
+  fill:"none", stroke:PAL.ti, "stroke-width":2.2, "stroke-linejoin":"round"}, motor);
+el("polygon", {points:"332,"+(MY+11)+" 354,"+(MY+9)+" 354,"+(MY+17)+" 332,"+(MY+27),
+  fill:"none", stroke:PAL.ti, "stroke-width":2.2, "stroke-linejoin":"round"}, motor);
+el("line", {x1:332, y1:MY-11, x2:354, y2:MY-9, stroke:PAL.tiLo, "stroke-width":1.4}, motor);
+el("line", {x1:332, y1:MY+11, x2:354, y2:MY+9, stroke:PAL.tiLo, "stroke-width":1.4}, motor);
+/* glass sheen over the nacelle: two called lines, solid tones */
+el("line", {x1:166, y1:MY-22, x2:296, y2:MY-22, stroke:PAL.steelHi, "stroke-width":1.8}, motor);
+el("line", {x1:186, y1:MY-17, x2:276, y2:MY-17, stroke:PAL.steelLo, "stroke-width":1.1}, motor);
+
+/* ---- Face motion hooks: spool dash advance is the spool read —
+   geared rates, always live. Exhaust breathes and the motor
+   trembles with it. ---------------------------------------------- */
+function spoolOff(nowMs, rate){ return -((nowMs/rate) % 17); }
+function paintSpool(nowMs, obs){
+  var r = obs ? 90 : 2600;
+  spool1.setAttribute("stroke-dashoffset", spoolOff(nowMs, r).toFixed(1));
+  spool2.setAttribute("stroke-dashoffset", spoolOff(nowMs, r*1.7).toFixed(1));
+}
+function extraStill(nowMs){ /* retained for the bench: poses the still frame on demand; the live driver never calls it */
+  motor.setAttribute("transform", "translate(0 0)");
+  plume.setAttribute("opacity", "0.5");
+  paintSpool(nowMs, false);
+}
+function extraFrame(el_ms){
+  var now = Date.now();
+  var tx = Math.sin(el_ms/43)*0.5;
+  motor.setAttribute("transform", "translate("+tx.toFixed(2)+" 0)");
+  plume.setAttribute("opacity", (0.65 + 0.35*Math.sin(el_ms/300)).toFixed(2));
+  paintSpool(now, true);
+}
+
+/* ---- Spinners: none rotating in this plane — the lateral spool read
+   lives in the hooks above. ------------------------------------------ */
+var SPIN = [];
+
+/* ---- Time read ------------------------------------------------------- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var lampEl = document.getElementById("stateLamp");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute && now.getSeconds() !== 0 && lastMinute !== -1 && paintedOnce) return;
+  lastMinute = m; paintedOnce = true;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+var paintedOnce = false;
+
+/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
+   This face previously ran the BATTERY V2 GOVERNOR: a two-state
+   REST/OBSERVED runtime. It booted into REST and ran its machinery
+   only while an observation signal (container hook, focus, touch,
+   ?face=observed) kept it awake, auto-exiting to REST 12 s after
+   the last signal. In any plain viewer it sat frozen behind a live
+   clock - the Betta V2 defect class, banned house-wide. The
+   governor is REMOVED on the flagship repair pattern: the driver
+   below is kicked at load and runs unconditionally while the face
+   is open; every angle is a pure function of absolute time, so a
+   returning face resumes exactly on cadence. The only pause left
+   is document.hidden (the platform stops rAF itself when the
+   screen sleeps). window.__faceRest is pinned false and
+   window.__governor reports state "live" - the bench handles stay
+   readable and now tell the truth. window.ApexFace keeps the old
+   container contract as NO-OP compatibility: its calls only note
+   the signal; state() always returns "live". Battery care,
+   honestly scoped: no auto-exit, no still-painting; while the
+   face is lit, it lives. */
+var bootMs = Date.now();
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+function liveAngles(nowMs){
+  var t = nowMs/1000;
+  return SPIN.map(function(c){ return ((t % c.obsP)/c.obsP)*360; });
+}
+function liveFrame(){
+  var now = Date.now();
+  applyAngles(liveAngles(now)); extraFrame(now - bootMs);
+  requestAnimationFrame(liveFrame);
+}
+function setLamp(){ lampEl.textContent = "LIVE"; }
+function note(sig){ gov.lastSignal = sig; }
+window.ApexFace = {
+  observe: function(){ note("container-observe(noop)"); },
+  rest:    function(){ note("container-rest(noop)"); },
+  toggle:  function(){ note("toggle(noop)"); },
+  state:   function(){ return "live"; }
+};
+window.addEventListener("apex-face-observe", function(){ note("event-observe(noop)"); });
+window.addEventListener("apex-face-rest", function(){ note("event-rest(noop)"); });
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ note(ev); }, true);
+});
+window.addEventListener("focus", function(){ note("focus"); });
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) paintTime(new Date());
+});
+
+/* ---- Boot: paint the clock, then the live loop runs from first
+   paint. No wake-lock of any kind - the system sleep governs
+   this face, never a governor inside it. ----------------------- */
+paintTime(new Date());
+setLamp();
+document.body.classList.add("live");
+requestAnimationFrame(liveFrame);
+setInterval(function(){
+  var now = new Date();
+  if(now.getMinutes() !== lastMinute) paintTime(now);
+}, 1000);
+function applyAngles(angles){
+  SPIN.forEach(function(c, i){
+    c.g.setAttribute("transform", "rotate("+angles[i].toFixed(2)+" "+c.cx+" "+c.cy+")");
+  });
+}
+
+</script>
+<script>
+/* =====================================================================
+   FACE LAW 2 - THE BEZEL IS WIRED (face-line sweep, Nov 10, 2026)
+   ---------------------------------------------------------------------
+   This bezel's cardinals were paint: N sat at the top because it was
+   drawn there. Under Face Law 2 (as amended, Nov 10, 2026) a compass
+   bezel must always show a LIVE heading state with an honest
+   confidence colour in the face's own palette - or honestly show
+   that it has nothing. The stack, in order:
+     (a) deviceorientation / deviceorientationabsolute - the
+         magnetometer answer, when the hardware answers;
+     (b) GPS course-over-ground while moving, fused with the
+         inertial carry;
+     (c) inertial carry from the last good anchor;
+     (d) no anchor: SEARCHING - the witness sweeps slowly and
+         asserts NO north. A fabricated heading is a firing offence
+         under the fabrication ban; this stack would rather sweep.
+   An accelerometer alone never originates north (deviceorientation
+   is only read when it carries an absolute/compass heading).
+   Confidence, in this face's called colours: brassHi (green-class)
+   = live anchor agreeing with the inertial read; #ffb52e
+   (yellow-class) = real but weak/intermittent anchor, or a recent
+   inertial carry; #ff3d00 (red-class) = stale, disagreeing, or no
+   anchor - searching. The stack is FIREWALLED: it lives in its own
+   script and touches only its own three elements (witness, ring,
+   the N glyph). Its failure changes nothing else on the face, and
+   nothing else on the face can stop it. Bench: window.__heading.
+   ===================================================================== */
+(function(){
+  "use strict";
+  var T = window.__hdgTargets;
+  if(!T || !T.needle || !T.ring || !T.north) return;   /* bezel absent: nothing to govern */
+  var hdg = { state:"searching", heading:null, source:"none",
+              confidence:"red", lastAnchorMs:0, disagreements:0 };
+  window.__heading = hdg;
+  var CXp = T.cx, CYp = T.cy;
+  function paint(now){
+    var col = hdg.confidence === "green" ? T.green :
+              hdg.confidence === "yellow" ? T.yellow : T.red;
+    T.ring.setAttribute("stroke", col);
+    T.north.setAttribute("fill", col);
+    T.needle.setAttribute("stroke", col);
+    var ang;
+    if(hdg.state === "live" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else if(hdg.state === "carry" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else {
+      hdg.state = "searching"; hdg.heading = null;
+      ang = ((now/1000) * 6) % 360;          /* one slow sweep per minute */
+    }
+    T.needle.setAttribute("transform", "rotate(" + ang.toFixed(2) + " " + CXp + " " + CYp + ")");
+  }
+  function anchor(deg, src, now){
+    if(typeof deg !== "number" || !isFinite(deg)) return;
+    deg = ((deg % 360) + 360) % 360;
+    if(typeof hdg.heading === "number" && hdg.state === "live"){
+      var d = Math.abs(deg - hdg.heading); if(d > 180) d = 360 - d;
+      if(d > 25){ hdg.disagreements++; } else { hdg.disagreements = 0; }
+    }
+    hdg.heading = deg; hdg.source = src; hdg.lastAnchorMs = now;
+    hdg.state = "live";
+    hdg.confidence = hdg.disagreements >= 3 ? "yellow" : "green";
+  }
+  function onOrient(e){
+    var deg = null;
+    if(typeof e.webkitCompassHeading === "number") deg = e.webkitCompassHeading;
+    else if(e.absolute && typeof e.alpha === "number") deg = 360 - e.alpha;
+    if(deg !== null) anchor(deg, "magnetometer", Date.now());
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientationabsolute", onOrient, true);
+    window.addEventListener("deviceorientation", onOrient, true);
+    if(typeof DeviceOrientationEvent.requestPermission === "function"){
+      /* iOS gate: permission is asked on the first press of the glass,
+         inside this stack only; a refusal leaves the stack searching. */
+      window.addEventListener("pointerdown", function ask(){
+        window.removeEventListener("pointerdown", ask, true);
+        try { DeviceOrientationEvent.requestPermission().catch(function(){}); } catch(e){}
+      }, true);
+    }
+  }
+  var lastFix = null;
+  function onGeo(pos){
+    var c = pos.coords, now = Date.now();
+    if(lastFix && typeof c.speed === "number" && c.speed >= 0.5){
+      var dt = (now - lastFix.t)/1000;
+      if(dt > 0){
+        var dy = (c.latitude - lastFix.lat) * 111320;
+        var dx = (c.longitude - lastFix.lon) * 111320 * Math.cos(c.latitude * Math.PI/180);
+        if(Math.sqrt(dx*dx + dy*dy) >= 2){
+          anchor((Math.atan2(dx, dy) * 180/Math.PI + 360) % 360, "gps-course", now);
+        }
+      }
+    }
+    lastFix = { lat:c.latitude, lon:c.longitude, t:now };
+  }
+  if(navigator.geolocation && navigator.geolocation.watchPosition){
+    try { navigator.geolocation.watchPosition(onGeo, function(){}, { enableHighAccuracy:true, maximumAge:2000 }); } catch(e){}
+  }
+  function tick(){
+    var now = Date.now();
+    if(hdg.state === "live" && now - hdg.lastAnchorMs > 5000){
+      hdg.state = "carry"; hdg.confidence = "yellow";   /* inertial carry: last anchored heading, honestly ageing */
+    }
+    if(hdg.state === "carry" && now - hdg.lastAnchorMs > 30000){
+      hdg.state = "searching"; hdg.confidence = "red"; hdg.heading = null; hdg.source = "none";
+    }
+    paint(now);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

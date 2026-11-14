@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex AR Lab — Sovereign Spatial Stack</title>
+<!--
+  APEX AR LAB — HUB
+  Patent Pending · E026/E027/E032/E033 · © 2026 Apex Air Solutions, LLC
+  Proprietary &amp; Confidential · All Rights Reserved
+
+  Operator hub for the AR application suite.  Links each AR micro-app and
+  reports whether the local sovereign math daemon is live (full fidelity) or
+  the client is running in demo fallback.
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #000; color: #0f0; font-family: 'Courier New', monospace;
+    padding: 14px; min-height: 100vh;
+  }
+  .hdr { border: 1px solid #0f0; padding: 12px; margin-bottom: 14px; }
+  .hdr h1 { font-size: 18px; letter-spacing: 3px; color: #0ff; }
+  .hdr .sub { font-size: 10px; color: #0f0; opacity: .8; margin-top: 5px; }
+  .status {
+    display: flex; align-items: center; gap: 8px; margin-top: 10px;
+    font-size: 11px; letter-spacing: 1px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #fa0; }
+  .dot.live { background: #0f0; box-shadow: 0 0 8px #0f0; }
+  .dot.demo { background: #fa0; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
+  .card {
+    border: 1px solid #0f0; background: #020; padding: 12px; display: block;
+    text-decoration: none; color: inherit; transition: border-color .15s;
+  }
+  .card:hover, .card:focus { border-color: #0ff; }
+  .card h2 { font-size: 13px; letter-spacing: 2px; color: #0ff; }
+  .card .tag { font-size: 10px; color: #0f0; opacity: .75; margin-top: 6px; line-height: 1.5; }
+  .card .go { font-size: 11px; color: #ff0; margin-top: 8px; letter-spacing: 1px; }
+  .note { font-size: 10px; color: #0f0; opacity: .6; margin-top: 14px; line-height: 1.6; }
+  code { color: #0ff; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ APEX AR LAB ◢</h1>
+  <div class="sub">SOVEREIGN SPATIAL STACK · ZERO-SLAM · SUPERPOSITION DOM</div>
+  <div class="status">
+    <span class="dot demo" id="daemonDot"></span>
+    <span id="daemonLine">ENGINE DAEMON: CHECKING…</span>
+  </div>
+</div>
+
+<div class="grid">
+  <a class="card" href="apex-ar-glasses/index.html">
+    <h2>🥽 AR GLASSES — CARDBOARD VR</h2>
+    <div class="tag">Stereoscopic dual-viewport · gaze dwell selection · camera passthrough · operator licence gate.</div>
+    <div class="go">OPEN →</div>
+  </a>
+
+  <a class="card" href="apex-floating-notes/index.html">
+    <h2>📝 FLOATING NOTES</h2>
+    <div class="tag">Pin spatial notes to sovereign nodes that survive reflow, zoom, and motion.</div>
+    <div class="go">OPEN →</div>
+  </a>
+
+  <a class="card" href="apex-inventory-assist/index.html">
+    <h2>📦 INVENTORY ASSIST</h2>
+    <div class="tag">Scan and place tagged items into O(1) helical addresses for instant recall.</div>
+    <div class="go">OPEN →</div>
+  </a>
+
+  <a class="card" href="apex-store-navigator/index.html">
+    <h2>🗺️ STORE NAVIGATOR</h2>
+    <div class="tag">Indoor wayfinding anchored to the TriStar spatial field.</div>
+    <div class="go">OPEN →</div>
+  </a>
+
+  <a class="card" href="apex-person-finder/index.html">
+    <h2>🧭 PERSON FINDER</h2>
+    <div class="tag">Locate tagged people/assets by helical address and pose.</div>
+    <div class="go">OPEN →</div>
+  </a>
+
+  <a class="card" href="apex-tactical-patch/index.html">
+    <h2>🎯 TACTICAL PATCH</h2>
+    <div class="tag">Deep-space lattice addressing on the planetary pixel field.</div>
+    <div class="go">OPEN →</div>
+  </a>
+
+  <a class="card" href="apex-dash/index.html">
+    <h2>📡 APEX DASH — RF / NAV</h2>
+    <div class="tag">SDR waterfall · radio control · celestial sextant · geiger counter.</div>
+    <div class="go">OPEN →</div>
+  </a>
+</div>
+
+<div class="note">
+  Full engine fidelity requires the local sovereign math daemon.
+  Run <code>node apex-daemon/server.js</code> on this machine, then reload.
+  Without it, apps run in demo mode (generic addressing, watermarked exports).
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var dot = document.getElementById('daemonDot');
+  var line = document.getElementById('daemonLine');
+  function set(state, text) {
+    dot.className = 'dot ' + state;
+    line.textContent = text;
+  }
+  function ping(url, ms) {
+    return new Promise(function (resolve) {
+      var ctrl = ('AbortController' in window) ? new AbortController() : null;
+      var to = setTimeout(function () { if (ctrl) ctrl.abort(); resolve(false); }, ms || 800);
+      fetch(url, { method: 'GET', signal: ctrl ? ctrl.signal : undefined })
+        .then(function (r) { clearTimeout(to); resolve(r.ok); })
+        .catch(function () { clearTimeout(to); resolve(false); });
+    });
+  }
+  function check() {
+    ping('http://127.0.0.1:8081/v1/health').then(function (tristar) {
+      if (tristar) {
+        set('live', 'ENGINE DAEMON: LIVE — FULL FIDELITY');
+      } else {
+        set('demo', 'ENGINE DAEMON: OFFLINE — DEMO MODE');
+      }
+    });
+  }
+  check();
+  setInterval(check, 5000);
+})();
+</script>
+
+</body>
+</html>

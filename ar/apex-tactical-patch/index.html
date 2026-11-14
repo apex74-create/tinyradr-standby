@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Tactical AR Patch — Anchor Recognition Feed</title>
+<!--
+  APEX TACTICAL AR PATCH — our software is the anchor-recognition patch that
+  sits on the headset's raw intake and feeds it corrected world anchors.
+  The glasses' own camera+IMU give fast head lock; we supply the GPS-denied
+  WORLD anchor so overlays don't drift off the real point.
+  Patent Pending · E027/E028/E032/E033 · © 2026 Apex Air Solutions, LLC
+-->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#000;color:#0f0;font-family:'Courier New',monospace;padding:12px;}
+  .hdr{border:1px solid #0f0;padding:12px;margin-bottom:12px;}
+  .hdr h1{font-size:18px;letter-spacing:2px;color:#0ff;}
+  .hdr .sub{font-size:11px;opacity:.8;margin-top:4px;}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:900px){.grid{grid-template-columns:1fr 1fr;}}
+  .panel{border:1px solid #0f0;padding:12px;background:#020;}
+  .panel h2{font-size:12px;letter-spacing:2px;color:#0ff;border-bottom:1px solid #040;padding-bottom:4px;margin-bottom:8px;}
+  .btn{width:100%;min-height:56px;margin-top:10px;background:#000;color:#0f0;border:2px solid #0f0;
+       font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;}
+  .btn:active{background:#0f0;color:#000;}
+  .btn.primary{border-color:#0ff;color:#0ff;}
+  .btn.big{min-height:72px;font-size:20px;}
+  pre{background:#000;border:1px solid #030;padding:10px;font-size:11px;color:#0f0;
+      max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all;}
+  .stat{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #030;}
+  .stat .k{opacity:.7;} .stat .v{color:#0ff;}
+  .note{font-size:12px;opacity:.7;margin-top:8px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ TACTICAL AR PATCH ◢</h1>
+  <div class="sub">Anchor-recognition layer that feeds corrected world anchors into a headset's raw feed.</div>
+  <div class="sub" id="posLine">Position: not started</div>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>PATCH CONTROL</h2>
+    <button class="btn primary big" id="startBtn">▶ START ANCHOR PATCH</button>
+    <div class="stat"><span class="k">Radio pose (E027)</span><span class="v" id="radioPose">—</span></div>
+    <div class="stat"><span class="k">Helical lock (E032)</span><span class="v" id="helixPose">—</span></div>
+    <div class="stat"><span class="k">Last QR anchor (E028)</span><span class="v" id="qrAnchor">—</span></div>
+    <div class="stat"><span class="k">Deep address (E033)</span><span class="v" id="deepAddr">—</span></div>
+    <button class="btn" id="qrBtn">📷 SCAN REFERENCE QR</button>
+    <div class="note">Headset makers: subscribe to <b>apexAnchorCorrection</b>. Each event hands you a world-locked anchor to blend with your camera/IMU tracking.</div>
+  </div>
+
+  <div class="panel">
+    <h2>CORRECTION FEED (what the headset receives)</h2>
+    <pre id="feed">— waiting for start —</pre>
+  </div>
+</div>
+
+<script src="../apex-dash/tristar-routing.js"></script>
+<script src="../apex-ar-core/engine-dispatch.js"></script>
+<script src="../apex-ar-glasses/superposition-dom.js"></script>
+<script src="../apex-ar-glasses/zero-slam.js"></script>
+<script src="../apex-ar-core/tristar-deep.js"></script>
+<script src="../apex-ar-core/helical-lock.js"></script>
+<script src="../apex-ar-core/anchor-engine.js"></script>
+<script>
+(function(){
+  'use strict';
+  SuperpositionDOM.init(document);
+  let radioPose=null, helixPose=null, lastQR=null;
+
+  function line(id,v){document.getElementById(id).textContent=v;}
+  function feed(obj){
+    const el=document.getElementById('feed');
+    el.textContent=JSON.stringify(obj,null,2)+'\n\n'+el.textContent.split('\n\n').slice(0,4).join('\n\n');
+  }
+
+  /* ── fuse radio pose + helical correction into one anchor correction ── */
+  function emitCorrection(){
+    if(!helixPose)return;
+    const addr=TriStarDeep.helixAddress
+      ? TriStarDeep.helixAddress(helixPose.x,helixPose.y,helixPose.z)
+      : HelicalLock.helixAddress(helixPose.x,helixPose.y,helixPose.z);
+    const deep=TriStarDeep.address(
+      Math.round(helixPose.x*2),Math.round(helixPose.y*2),Math.round((helixPose.z||0)*2),14);
+    line('radioPose',radioPose?('±'+Math.round((radioPose.conf||0)*100)+'%'):'—');
+    line('helixPose','x'+helixPose.x.toFixed(2)+' y'+helixPose.y.toFixed(2)+' · '+Math.round((helixPose.conf||0)*100)+'%');
+    line('deepAddr',deep.key.slice(0,16)+'…');
+    const correction={
+      type:'apexAnchorCorrection',
+      ts:Date.now(),
+      pose:{ x:+helixPose.x.toFixed(3), y:+helixPose.y.toFixed(3), z:+((helixPose.z||0).toFixed(3)),
+             heading:+((helixPose.heading||0).toFixed(1)) },
+      confidence:+((helixPose.conf||0).toFixed(2)),
+      helicalKey:addr.key||addr,
+      deepKey:deep.key,
+      qrAnchor:lastQR?{ id:lastQR.anchor.id, x:lastQR.anchor.x, y:lastQR.anchor.y }:null,
+      source:helixPose.source||'HELIX',
+    };
+    window.dispatchEvent(new CustomEvent('apexAnchorCorrection',{detail:correction}));
+    feed(correction);
+  }
+
+  window.addEventListener('apexPoseUpdate',(e)=>{radioPose=e.detail;});
+  window.addEventListener('apexHelixUpdate',(e)=>{helixPose=e.detail.pose;emitCorrection();
+    document.getElementById('posLine').textContent='Position: '+helixPose.source+' · '+Math.round((helixPose.conf||0)*100)+'% sure';
+  });
+  window.addEventListener('apexAnchorFix',(e)=>{lastQR=e.detail;
+    line('qrAnchor',lastQR.anchor.label);emitCorrection();});
+
+  document.getElementById('startBtn').addEventListener('click',function(){
+    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().catch(function(){});}
+    if(window.SuperpositionEngine&&SuperpositionEngine.init){try{SuperpositionEngine.init();}catch(e){}}
+    ZeroSLAM.start();
+    this.textContent='● PATCH ACTIVE';this.disabled=true;
+  });
+
+  document.getElementById('qrBtn').addEventListener('click',()=>{
+    const t=prompt('Scan / paste the reference QR text:');if(t)AnchorEngine.scan(t);
+  });
+})();
+</script>
+</body>
+</html>

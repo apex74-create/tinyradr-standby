@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<link rel="manifest" href="/lcb.webmanifest" />
+<link rel="icon" href="/icons/wristcb-192.png" />
+<link rel="apple-touch-icon" href="/icons/wristcb-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Wrist CB" />
+<title>Lokmat CB Edition — Wrist Radar Radio</title>
+<meta name="description" content="Baked single-file wrist CB: radar sweep face with push-to-talk on the same public channels as the full radio." />
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#8ef7c6;font-family:monospace;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#st{position:fixed;inset:0;display:flex;flex-direction:column}
+#st.wide{flex-direction:row}
+#rd{position:relative;flex:1 1 auto;min-height:0}
+#st.wide #rd{flex:0 0 50%}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+#hud{padding:4px;text-align:center;font-size:10px;letter-spacing:2px;color:#00ff88;font-weight:bold}
+#net{position:absolute;bottom:2%;left:0;right:0;text-align:center;font-size:9px;color:#ffb000}
+#pn{flex:1 1 auto;min-height:0;padding:2%;display:flex;flex-direction:column;gap:5px}
+#st.wide #pn{justify-content:center}
+.row{display:flex;gap:5px;align-items:center}
+.b{border:3px solid #ffb000;border-radius:10px;background:#0a0700;color:#ffb000;font:bold 20px monospace;height:44px;min-width:44px}
+#ch{flex:1;text-align:center;font:bold 40px monospace;color:#ffb000;line-height:44px}
+#last{font-size:10px;color:#00ff88;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:13px}
+#ptt{border:3px solid #ffb000;border-radius:10px;background:#0a0700;color:#ffb000;font:900 20px monospace;letter-spacing:2px;padding:18px 10px;touch-action:none}
+#ptt.on{background:#ffb000;color:#000}
+#ptt.rx{border-color:#00ff88;color:#00ff88}
+.nav{display:flex;gap:5px}.nav a{flex:1;text-align:center;border:1px solid #1f6b52;border-radius:8px;color:#8ef7c6;text-decoration:none;font-size:9px;font-weight:bold;padding:7px 0}
+</style>
+</head>
+<body>
+<div id="st">
+  <div id="hud">LOKMAT CB · <span id="net">TUNING</span></div>
+  <div id="pn">
+    <div class="row"><button class="b" id="dn" aria-label="Channel down">-</button><div id="ch">19</div><button class="b" id="up" aria-label="Channel up">+</button></div>
+    <div id="last">LISTENING</div>
+    <button id="allow" style="display:none;border:3px solid #ff4d4d;border-radius:10px;background:#1a0000;color:#ff4d4d;font:bold 12px monospace;padding:8px">ALLOW MIC</button>
+    <div id="help" style="display:none;font-size:9px;color:#ffb000;text-align:center">Still blocked? Tap the lock / &#9432; by the address bar &rarr; Permissions &rarr; Microphone &rarr; Allow, then reload.</div>
+    <button id="ptt">TAP TO TALK</button>
+    <div class="nav"><a href="https://encryptedcb.com/watch.html" rel="external">FACE</a><a href="https://encryptedcb.com/shield.html" rel="external">SHIELD</a><a href="https://encryptedcb.com/junior.html" rel="external">COMPANION</a></div>
+  </div>
+</div>
+<script>
+(function(){
+var URL_="https://cqsirpfulbcqilrsjotn.supabase.co",KEY="sb_publishable_OqJpyXDLyo4yn2I6ktHfCg_qg_YL6CU";
+var $=function(i){return document.getElementById(i)};
+var ch=19,call="APEX",keyed=false,rec=null,chunks=[],stream=null,ws=null,ref=1,joinRef=null,hb=null,live=false,rxUntil=0,blips=[],killT=null,actx=null;
+try{var s=+localStorage.getItem("apex.wcb.ch");if(s>=1&&s<=40)ch=s;call=localStorage.getItem("apex.ptt.callsign")||("APEX-"+(100+Math.floor(Math.random()*900)));localStorage.setItem("apex.ptt.callsign",call)}catch(e){}
+function bus(){return "ptt-"+(ch<10?"0"+ch:ch)}
+function setNet(t){$("net").firstChild.nodeValue=t}
+function say(t){$("last").firstChild.nodeValue=t}
+function paintCh(){$("ch").firstChild.nodeValue=(ch<10?"0":"")+ch}
+/* Raw realtime socket: no SDK, one join, 25s heartbeat, auto-reconnect. */
+function connect(){
+  live=false;setNet("TUNING CH "+ch);
+  try{if(ws){ws.onclose=null;ws.close()}}catch(e){}
+  if(typeof WebSocket!=="function"){setNet("NO SOCKET · SEND ONLY");return}
+  ws=new WebSocket(URL_.replace("https","wss")+"/realtime/v1/websocket?apikey="+KEY+"&vsn=1.0.0");
+  ws.onopen=function(){
+    joinRef=String(ref++);
+    ws.send(JSON.stringify({topic:"realtime:"+bus(),event:"phx_join",payload:{config:{broadcast:{self:false},presence:{key:""}}},ref:joinRef}));
+    clearInterval(hb);hb=setInterval(function(){try{ws.send(JSON.stringify({topic:"phoenix",event:"heartbeat",payload:{},ref:String(ref++)}))}catch(e){}},25000);
+  };
+  ws.onmessage=function(m){var d;try{d=JSON.parse(m.data)}catch(e){return}
+    if(d.event==="phx_reply"&&d.ref===joinRef){live=d.payload&&d.payload.status==="ok";setNet(live?"ON AIR · CH "+ch:"JOIN REFUSED")}
+    if(d.event==="broadcast"&&d.payload&&d.payload.event==="tx")rx(d.payload.payload||{});
+  };
+  ws.onclose=function(){live=false;clearInterval(hb);setNet("RECONNECTING");setTimeout(function(){if(document.visibilityState==="visible")connect()},2000)};
+}
+function rx(p){
+  if(!p||p.ch!==ch)return;
+  /* Press signal from the other side: open chirp + light the bar right away. */
+  if(p.kind==="key"){$("ptt").className="rx";say((p.from||"?")+" · TALKING");cadence(true);return}
+  var b=String(p.body||"");if(b.indexOf("enc:")===0)return; /* private rooms stay on the full radio */
+  $("ptt").className="rx";setTimeout(function(){if(!keyed)$("ptt").className=""},2500);
+  say((p.from||"?")+" · "+(p.kind==="voice"?"VOICE":b.slice(0,40)));
+  if(p.kind==="voice"&&b.indexOf("data:audio/")===0)playVoice(b);
+  else{cadence(false)}
+}
+function send(kind,body){
+  var tx={id:Math.random().toString(36).slice(2)+Date.now().toString(36),kind:kind,from:call,ch:ch,tag:"wrist",ts:Date.now(),body:body};
+  if(ws&&live){try{ws.send(JSON.stringify({topic:"realtime:"+bus(),event:"broadcast",payload:{type:"broadcast",event:"tx",payload:tx},ref:String(ref++)}));say("SENT · "+(kind==="voice"?"VOICE":body));return}catch(e){}}
+  /* Socket down: REST broadcast fallback. */
+  fetch(URL_+"/realtime/v1/api/broadcast",{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify({messages:[{topic:bus(),event:"tx",payload:tx}]})})
+    .then(function(r){say(r.ok?"SENT (REST)":"SEND FAILED "+r.status)})["catch"](function(){say("OFFLINE · NOT SENT")});
+}
+/* Tell the other side the moment the button goes down, so they hear the open chirp on press. */
+function sendKey(){if(!(ws&&live))return;try{ws.send(JSON.stringify({topic:"realtime:"+bus(),event:"broadcast",payload:{type:"broadcast",event:"tx",payload:{id:"k"+Date.now().toString(36),kind:"key",from:call,ch:ch,tag:"wrist",ts:Date.now(),body:""}},ref:String(ref++)}))}catch(e){}}
+function ac(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state!=="running")actx.resume()}catch(e){}return actx}
+function beep(f,d,at,vol){try{var c=ac();if(!c)return;var t=at||c.currentTime,o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=vol||.08;o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d)}catch(e){}}
+/* Start = rising two-tone, end = falling roger tail; scheduled on one clock. */
+function cadence(start,at){var c=ac();if(!c)return;var t=at||c.currentTime+.02;if(start){beep(900,.07,t,.15);beep(1300,.09,t+.09,.15)}else{beep(1300,.07,t,.15);beep(800,.12,t+.09,.15)}}
+/* Decode voice on the already-unlocked audio clock: far more reliable on watch
+   WebViews than a fresh Audio element, which autoplay rules often block. */
+function playVoice(uri){
+  var c=ac();
+  function fallback(){cadence(true);try{var a=new Audio(uri);a.onended=function(){cadence(false)};a.play()["catch"](function(){say("TAP SCREEN TO HEAR")})}catch(e){}}
+  if(!c||!c.decodeAudioData)return fallback();
+  try{
+    var bin=atob(uri.slice(uri.indexOf(",")+1)),buf=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+    var done=false,ok=function(ab){if(done)return;done=true;var t=c.currentTime+.05;cadence(true,t);var s=c.createBufferSource();s.buffer=ab;s.connect(c.destination);s.start(t+.25);cadence(false,t+.3+ab.duration)},bad=function(){if(done)return;done=true;fallback()};
+    var pr=c.decodeAudioData(buf.buffer,ok,bad);if(pr&&pr["catch"])pr["catch"](bad);
+  }catch(e){fallback()}
+}
+function vib(n){try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}}
+var micState="idle",stopWanted=false;
+function micBtn(show,msg){var b=$("allow");b.style.display=show?"block":"none";if(msg)b.firstChild.nodeValue=msg}
+function getMic(cb){
+  if(stream&&stream.active!==false){cb(stream);return}stream=null;
+  if(typeof MediaRecorder==="undefined"||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){micState="none";say("NO MIC IN THIS BROWSER");cb(null);return}
+  micState="asking";
+  var md=navigator.mediaDevices;
+  /* Some watch WebViews reject constraint objects — retry with plain audio:true before giving up. */
+  /* Same plain call Chrome and the other apps use. */
+  md.getUserMedia({audio:true})
+    /* Mic alone refused? Ask for selfie camera + mic together, keep only the mic. */
+    ["catch"](function(){return md.getUserMedia({audio:true,video:{facingMode:"user"}}).then(function(av){av.getVideoTracks().forEach(function(t){t.stop()});return new MediaStream(av.getAudioTracks())})})
+    .then(function(st){stream=st;micState="ok";micBtn(false);cb(st)})
+     ["catch"](function(e){micState="blocked";var n=(e&&e.name)||"";
+       say(n==="NotFoundError"?"NO MIC FOUND":n==="NotReadableError"?"MIC BUSY · CLOSE CAMERA APP":"MIC BLOCKED · TAP ALLOW MIC, OR INSTALL AS APP");
+       micBtn(true,"ALLOW MIC — TAP, THEN \u201CALLOW\u201D. NO PROMPT? USE BROWSER MENU \u2192 \u201CADD TO HOME SCREEN\u201D, OPEN THE WRIST CB APP, TAP ALLOW MIC AGAIN.");
+       diag(n,(e&&e.message)||"");cb(null)});
+}
+/* Show exactly why the mic failed so the owner can read it off the watch. */
+function diag(n,m){
+  var app=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)?"APP":"TAB";
+  var ua=navigator.userAgent,br=/wv\)|; wv/.test(ua)?"WEBVIEW":/SamsungBrowser/.test(ua)?"SAMSUNG":/Firefox/.test(ua)?"FIREFOX":/Chrome\/(\d+)/.test(ua)?"CHROME "+RegExp.$1:"OTHER";
+  function paint(p){var h=$("help");h.style.display="block";h.style.color="#ffb000";
+    h.textContent="CODE: "+(n||"?")+" · PERM "+p+" · "+app+" · "+br+(window.isSecureContext?"":" · NOT HTTPS")+(m?" · "+m.slice(0,60):"")}
+  try{navigator.permissions.query({name:"microphone"}).then(function(s){paint(s.state.toUpperCase())},function(){paint("N/A")})}catch(x){paint("N/A")}
+}
+function pickType(){var t=["audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus","audio/mp4"];for(var i=0;i<t.length;i++){try{if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t[i]))return t[i]}catch(e){}}return ""}
+function finish(r){r.onstop=function(){var bl=new Blob(chunks,{type:r.mimeType||"audio/webm"});if(!bl.size){say("NO AUDIO CAPTURED");send("text","chirp chirp");return}var fr=new FileReader();fr.onload=function(){send("voice",fr.result)};fr.readAsDataURL(bl)};try{r.requestData&&r.requestData()}catch(e){}r.stop()}
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition,sr=null,heard="";
+function srStart(){if(!SR)return;heard="";try{sr=new SR();sr.lang="en-US";sr.interimResults=true;sr.continuous=true;
+  sr.onresult=function(e){var t="";for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;heard=t;say("\u201C"+t.slice(-40)+"\u201D")};
+  sr.onerror=function(e){if(e.error==="not-allowed")say("SPEECH BLOCKED")};sr.start()}catch(e){sr=null}}
+function srStop(){if(!sr)return;var s0=sr;sr=null;s0.onend=function(){if(heard.trim())send("text","\uD83D\uDDE3 "+heard.trim())};try{s0.stop()}catch(e){}}
+var cdT=null;
+function keyUp(){
+  if(keyed)return;if(typeof MediaRecorder==="undefined"||micState==="blocked")srStart();keyed=true;stopWanted=false;$("ptt").className="on";cadence(true);vib(20);
+  sendKey();
+  /* Original eight-second logic: the clock starts at the tap, mic or no mic. */
+  var left=8;$("ptt").firstChild.nodeValue="TALKING · "+left;
+  clearInterval(cdT);cdT=setInterval(function(){left--;if(left>0&&keyed)$("ptt").firstChild.nodeValue="TALKING · "+left},1000);
+  clearTimeout(killT);killT=setTimeout(release,8000);
+  getMic(function(st){
+    if(!st){if(stopWanted){stopWanted=false;send("text","chirp chirp")}return}
+    if(!keyed)return;
+    chunks=[];var mt=pickType();try{rec=mt?new MediaRecorder(st,{mimeType:mt,audioBitsPerSecond:24000}):new MediaRecorder(st)}catch(e){try{rec=new MediaRecorder(st)}catch(e2){rec=null;say("RECORDER FAILED");return}}
+    rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};rec.start(250);say("REC ●");
+  });
+}
+function release(){
+  if(!keyed)return;srStop();keyed=false;clearTimeout(killT);clearInterval(cdT);$("ptt").className="";$("ptt").firstChild.nodeValue="TAP TO TALK";cadence(false);vib(10);
+  if(rec&&rec.state==="recording"){var r=rec;rec=null;finish(r)}
+  else if(micState==="asking"){stopWanted=true}
+  else send("text","chirp chirp");
+}
+/* Unlock speaker + ask for mic on the very first touch so the first call isn't lost. */
+var unlocked=false;
+document.addEventListener("pointerdown",function(){if(unlocked)return;unlocked=true;beep(1,.001);try{var a=new Audio();a.play()["catch"](function(){})}catch(e){}if(!stream&&micState==="idle")getMic(function(){})},true);
+/* Tap to talk, tap again (or wait 8 s) to send. No finger-lift tracking. */
+var lastTap=0;function tap(e){e.preventDefault();var n=Date.now();if(n-lastTap<400)return;lastTap=n;if(keyed)release();else keyUp()}
+$("ptt").addEventListener("pointerdown",tap);
+$("ptt").addEventListener("touchstart",tap,{passive:false});
+$("ptt").addEventListener("contextmenu",function(e){e.preventDefault()});
+/* Hardware key forwarded by the native shell (F24 edges, MainActivity) — and
+   any of the usual rugged-handset codes a watch WebView delivers directly —
+   drives the talk surface with hold semantics: down keys, up releases, and
+   nothing here can raise a menu or a selector. No selection step, ever. */
+var hwCodes={F24:1,F23:1,MediaRecord:1},hwKeyCodes={79:1,130:1,286:1,287:1,288:1,289:1},hwDown=false;
+window.addEventListener("keydown",function(e){
+  if(e.repeat||hwDown)return;
+  if(!(hwCodes[e.code]||hwKeyCodes[e.keyCode]))return;
+  e.preventDefault();hwDown=true;if(!keyed)keyUp();
+},true);
+window.addEventListener("keyup",function(e){
+  if(!hwDown)return;
+  if(!(hwCodes[e.code]||hwKeyCodes[e.keyCode]))return;
+  e.preventDefault();hwDown=false;if(keyed)release();
+},true);
+function step(d){ch=((ch-1+d+40)%40)+1;paintCh();try{localStorage.setItem("apex.wcb.ch",ch)}catch(e){}beep(1000,.03);connect()}
+function askMic(){say("ASKING FOR MIC…");getMic(function(st){if(st){say("MIC OK · TAP TO TALK");$("help").style.display="none"}else{$("help").style.display="block"}})}
+/* Watch WebViews can swallow click — listen for touch and pointer too. */
+$("allow").addEventListener("click",askMic);
+$("allow").addEventListener("pointerdown",function(e){e.preventDefault();askMic()});
+$("allow").addEventListener("touchstart",function(e){e.preventDefault();askMic()},{passive:false});
+/* Ask for the mic the moment the page loads — don't wait for a touch. */
+getMic(function(){});
+$("up").onclick=function(){step(1)};$("dn").onclick=function(){step(-1)};
+function fit(){var vv=window.visualViewport,w=Math.round((vv&&vv.width)||innerWidth),h=Math.round((vv&&vv.height)||innerHeight);if(!w||!h)return;
+  var st=$("st");st.style.width=w+"px";st.style.height=h+"px";}
+fit();addEventListener("resize",fit);setTimeout(fit,400);
+paintCh();
+/* Paint first, then open the radio. */
+setTimeout(connect,350);
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&(!ws||ws.readyState>1))connect()});
+})();
+</script>
+</body>
+</html>

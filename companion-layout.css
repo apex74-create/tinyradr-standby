@@ -1,0 +1,81 @@
+/* Shared standalone layout; transport and pairing remain in companion-core.js. */
+:root {
+  --comp-map-width: 42%;
+  --comp-divider: #333;
+  --comp-surface: #000;
+  --comp-amber: #ffb020;
+  --comp-muted: #8a968d;
+  --comp-glow: #203619;
+  --comp-talk-active: #ffb020;
+}
+html, body { height: 100%; height: 100dvh; }
+#map {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--comp-map-width);
+  border-right: 1px solid var(--comp-divider);
+  box-sizing: border-box;
+}
+#ui {
+  position: fixed;
+  inset: 0 0 0 var(--comp-map-width);
+  max-width: none;
+  min-width: 0;
+  height: 100%;
+  height: 100dvh;
+  padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) 6px;
+  gap: 6px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--comp-surface);
+  pointer-events: auto;
+}
+#ui > * { min-width: 0; flex-shrink: 0; }
+#ui .card { border-radius: 8px; }
+#ui button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+#ui input { min-width: 0; width: 0; }
+#ui #log { flex: 1 0 80px; overflow-wrap: anywhere; }
+#ui #row, #ui #role { flex-wrap: wrap; }
+#ui #row button, #ui #role button { min-width: 0; }
+#ui #row:has(#txt) { flex-wrap: nowrap; }
+#ui #txt { flex: 1; }
+#ui #last, #ui #seen { overflow-wrap: anywhere; }
+#ui #bar { min-width: 0; }
+.comp-range-strip { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:4px 0; }
+#ui #range { display:flex; align-items:center; gap:8px; height:38px; padding:5px 9px; font-size:11px; color:var(--comp-amber); border:1px solid var(--comp-amber); background:var(--comp-surface); box-shadow:inset 0 -8px 14px var(--comp-glow); border-radius:6px; }
+#range svg { fill:none; stroke:currentColor; stroke-width:1.5; }
+#range output { margin-left:8px; font-size:16px; font-weight:bold; font-variant-numeric:tabular-nums; }
+#range small { font-size:10px; }
+#range-fix { color:var(--comp-muted); font-size:9px; }
+.comp-local { font-size:11px; background:var(--comp-surface); border:1px solid var(--comp-divider); border-radius:6px; padding:6px; }
+.comp-local summary { cursor:pointer; color:var(--comp-amber); }
+#local-state { float:right; }
+.comp-local-actions { display:flex; gap:4px; margin-top:6px; }
+#ui .comp-local-actions button { flex:1; padding:6px; font-size:10px; }
+.comp-local textarea { box-sizing:border-box; width:100%; min-height:48px; margin-top:6px; font:inherit; background:var(--comp-surface); color:var(--comp-amber); border:1px solid var(--comp-divider); }
+#local-note { overflow-wrap:anywhere; color:var(--comp-muted); margin-top:4px; }
+#talk { touch-action:none; user-select:none; -webkit-user-select:none; }
+#ui #talk.on { background:var(--comp-talk-active); color:var(--comp-surface); }
+body.comp-map-open #map { inset:0; width:100%; border-right:0; filter:none; }
+body.comp-map-open #map:after { background:transparent; }
+body.comp-map-open #ui { inset:0; background:transparent; pointer-events:none; justify-content:flex-start; }
+body.comp-map-open #ui > :not(.comp-range-strip) { display:none !important; }
+body.comp-map-open .comp-range-strip { margin-top:auto; margin-bottom:18px; background:var(--comp-surface); padding:4px; pointer-events:auto; }
+body.comp-map-open #range-fix { display:none; }
+@media (max-width: 480px) {
+  :root { --comp-map-width: 32%; }
+  #ui { font-size: 12px; }
+  #ui button { padding: 8px 4px; }
+  #ui #talk { font-size: 16px; padding: 14px 4px; }
+}
+@media (max-height: 420px) {
+  #ui { justify-content: flex-start; }
+  #ui #log { flex-basis: 60px; min-height: 60px; }
+}
+@media (orientation: portrait) {
+  #map { inset: 0; width: 100%; border-right: 0; }
+  #ui { inset: 0; background: transparent; pointer-events: none; }
+  #ui > * { pointer-events: auto; }
+  #ui #log { flex: 0 1 120px; min-height: 60px; }
+  #ui #ctl { margin-top: auto; }
+}

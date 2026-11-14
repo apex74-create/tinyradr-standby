@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-NZYk81nU.js";var t=e(),n=()=>(0,t.jsx)(`main`,{className:`min-h-app p-6 text-sm text-muted-foreground`,children:`Page not found.`});export{n as notFoundComponent};

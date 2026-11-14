@@ -1,0 +1,1 @@
+function e(e,t=1){let n=(e-32)*(5/9),r=n+273.15;return`${e.toFixed(t)}°F · ${n.toFixed(t)}°C · ${r.toFixed(t)}K`}function t(e){let t=(e-32)*(5/9);return`${Math.round(e)}°/${Math.round(t)}°/${Math.round(t+273.15)}°`}export{t as n,e as t};

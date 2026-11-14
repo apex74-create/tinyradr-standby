@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#04070a" />
+    <title>Apex Signal — Watch</title>
+    <meta
+      name="description"
+      content="Stable vector watch face for Apex Signal on Android watches, square and 640x320 wide panels."
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #8ef7c6;
+        font-family: monospace;
+        -webkit-text-size-adjust: 100%;
+        touch-action: manipulation;
+      }
+      body {
+        position: fixed;
+        inset: 0;
+      }
+      /* ONE layout, one source of truth (this file used to carry three
+         generations of layout CSS fighting under !important overrides).
+         The vector dial is a dim full-bleed backdrop; the readout panel owns
+         the whole glass on every panel shape. Readout type is NOT sized
+         here beyond first-paint defaults: the fit routine in the script
+         measures the real panel and sets pixel sizes, because this WebView
+         can report a desktop viewport to CSS. */
+      #stage {
+        position: absolute;
+        left: 0;
+        top: 0;
+        overflow: hidden;
+      }
+      #dial {
+        position: absolute;
+        inset: 0;
+        opacity: 0.35;
+      }
+      #face {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #panel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 8px 10px 6px;
+      }
+      #brand {
+        position: absolute;
+        top: 6px;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        text-align: center;
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        color: #00ff88;
+      }
+      #status {
+        position: absolute;
+        left: 8px;
+        bottom: 4px;
+        z-index: 2;
+        font-size: 9px;
+        color: #ffb000;
+      }
+      #read {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        text-shadow:
+          0 0 6px #000,
+          0 0 14px #000,
+          0 0 22px #001b10;
+      }
+      #read span {
+        display: block;
+      }
+      #clock {
+        font-size: 44px;
+        line-height: 1;
+        font-weight: bold;
+        color: #c8ffe1;
+      }
+      #date {
+        margin-top: 3px;
+        font-size: 12px;
+        color: #00eeff;
+        text-transform: uppercase;
+      }
+      #bearing {
+        margin-top: 2px;
+        font-size: 12px;
+        color: #ff3bd4;
+      }
+      #wx {
+        margin-top: 3px;
+        font-size: 22px;
+        line-height: 1.05;
+        font-weight: bold;
+        color: #ffb000;
+        text-transform: uppercase;
+      }
+      #peak,
+      #water {
+        margin-top: 1px;
+        font-size: 14px;
+        color: #8ef7c6;
+      }
+      /* Six links, three columns, two rows — the old grid declared five
+         columns, so the sixth link wrapped into a broken stub row. */
+      .nav {
+        margin-top: 4px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+      }
+      .nav a {
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #1f6b52;
+        background: rgba(0, 255, 136, 0.07);
+        color: #8ef7c6;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: bold;
+      }
+      .nav a:active {
+        background: #173822;
+        color: #fff;
+      }
+      #faceswap {
+        display: block;
+        margin-top: 4px;
+        text-align: right;
+        color: #ffb000;
+        font-size: 9px;
+        letter-spacing: 0.15em;
+        text-decoration: none;
+      }
+      .tick {
+        stroke: #1f6b52;
+        stroke-width: 1;
+      }
+      .major {
+        stroke: #00ff88;
+        stroke-width: 2;
+      }
+      .trace {
+        fill: none;
+        stroke: #0a6945;
+        stroke-width: 0.65;
+      }
+      .hot {
+        fill: none;
+        stroke: #00eeff;
+        stroke-width: 0.55;
+      }
+      .pink {
+        stroke: #ff3bd4;
+      }
+      .amber {
+        stroke: #ffb000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="dial">
+        <svg
+          id="face"
+          viewBox="0 0 200 200"
+          preserveAspectRatio="xMidYMid slice"
+          aria-label="Apex Signal watch face"
+        >
+          <rect width="200" height="200" fill="#04070a" />
+          <g opacity=".72">
+            <path
+              class="trace"
+              d="M0 30H32L42 20H74L84 30H106M200 30H168L158 20H130L120 30H98M0 74H27L38 84H69L80 74H104M200 74H173L162 84H131L120 74H96M24 0V25L34 35V67L24 77V110M176 0V25L166 35V67L176 77V110"
+            />
+            <path
+              class="hot"
+              d="M0 52H22L34 64H68L80 52H200M48 0V21L58 31V169L48 179V200M152 0V21L142 31V169L152 179V200"
+            />
+            <circle cx="34" cy="64" r="2" fill="#00ff88" />
+            <circle cx="166" cy="64" r="2" fill="#ff3bd4" />
+            <circle cx="58" cy="31" r="2" fill="#00eeff" />
+            <circle cx="142" cy="169" r="2" fill="#ffb000" />
+          </g>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#0d3a2c" stroke-width="2" />
+          <circle cx="100" cy="100" r="66" fill="none" stroke="#0d3a2c" />
+          <circle
+            cx="100"
+            cy="100"
+            r="46"
+            fill="#03110b"
+            fill-opacity=".68"
+            stroke="#00ff88"
+            stroke-opacity=".5"
+          />
+          <g id="rose">
+            <line x1="100" y1="14" x2="100" y2="30" class="major" />
+            <line x1="100" y1="170" x2="100" y2="186" class="major" />
+            <line x1="14" y1="100" x2="30" y2="100" class="major" />
+            <line x1="170" y1="100" x2="186" y2="100" class="major" />
+            <line x1="42" y1="42" x2="51" y2="51" class="tick amber" />
+            <line x1="158" y1="42" x2="149" y2="51" class="tick pink" />
+            <line x1="42" y1="158" x2="51" y2="149" class="tick pink" />
+            <line x1="158" y1="158" x2="149" y2="149" class="tick amber" />
+            <path
+              d="M100 24L108 100L100 114L92 100Z"
+              fill="#00ff88"
+              fill-opacity=".18"
+              stroke="#00ff88"
+              stroke-width="1"
+            />
+            <text x="100" y="11" text-anchor="middle" font-size="8" fill="#00ff88">N</text>
+            <g id="sky">
+              <g id="sunmk" opacity="0">
+                <circle r="4.5" fill="#ffb000" fill-opacity=".8" stroke="#ffb000" />
+                <text y="2.6" text-anchor="middle" font-size="5" fill="#04070a">S</text>
+              </g>
+              <g id="moonmk" opacity="0">
+                <circle r="4.5" fill="#04070a" stroke="#c8ffe1" />
+                <text y="2.6" text-anchor="middle" font-size="5" fill="#c8ffe1">M</text>
+              </g>
+            </g>
+          </g>
+          <g fill="none" stroke-width="1">
+            <path d="M100 60L132 100L100 140L68 100Z" stroke="#00eeff" />
+            <path d="M100 60L100 140M68 100H132" stroke="#ff3bd4" stroke-opacity=".7" />
+            <path d="M100 68L122 111L78 111Z" stroke="#ffb000" stroke-width="1.5" />
+          </g>
+        </svg>
+      </div>
+      <div id="brand">APEX SIGNAL</div>
+      <div id="status">VECTOR WATCH · STABLE</div>
+      <div id="panel">
+        <div id="read">
+          <span id="clock">--:--</span><span id="date">---</span
+          ><span id="bearing">COMPASS WAIT</span><span id="wx">WX ---</span
+          ><span id="peak">PEAK ---</span><span id="water">WATER ---</span>
+        </div>
+        <nav class="nav">
+          <a href="/face">LIVE</a><a href="/map">MAP</a><a href="/lcb.html">PTT</a
+          ><a href="https://encryptedcb.com/junior.html">PAIR</a
+          ><a href="/forecast">WX</a><a href="/app">TOOLS</a>
+        </nav>
+        <a
+          id="faceswap"
+          href="/lcb.html"
+          >‹ CB RADIO</a
+        >
+      </div>
+    </div>
+    <script>
+      (function () {
+        try {
+          localStorage.removeItem("apex.face");
+        } catch (e) {}
+        var c = document.getElementById("clock"),
+          d = document.getElementById("date"),
+          b = document.getElementById("bearing"),
+          w = document.getElementById("wx"),
+          pk = document.getElementById("peak"),
+          wtr = document.getElementById("water"),
+          r = document.getElementById("rose"),
+          heading = 0,
+          last = 0;
+        function pad(n) {
+          return n < 10 ? "0" + n : "" + n;
+        }
+        function tick() {
+          var t = new Date();
+          c.firstChild.nodeValue = pad(t.getHours()) + ":" + pad(t.getMinutes());
+          d.firstChild.nodeValue = t.toDateString().toUpperCase();
+        }
+        function orient(e) {
+          var now = Date.now();
+          if (now - last < 100) return;
+          last = now;
+          var h =
+            typeof e.webkitCompassHeading === "number"
+              ? e.webkitCompassHeading
+              : typeof e.alpha === "number"
+                ? (360 - e.alpha) % 360
+                : null;
+          if (h === null) return;
+          heading = h;
+          r.setAttribute("transform", "rotate(" + (-heading).toFixed(0) + " 100 100)");
+          b.firstChild.nodeValue = "AZ " + Math.round(heading) + " DEG";
+        }
+        // Weather embed: one tiny read of the forecast proxy, no library, no
+        // polling loop. Failure is silent so the face can never be blocked.
+        function weather(lat, lon) {
+          if (typeof fetch !== "function") return;
+          // No coordinates means "server, locate me": the edge resolves the
+          // gateway access point's position and the collapse runs there.
+          var hasFix = typeof lat === "number" && typeof lon === "number";
+          var q = hasFix ? "?lat=" + lat.toFixed(3) + "&lon=" + lon.toFixed(3) : "";
+          try {
+            fetch("/api/public/forecast" + q, {
+              headers: { Accept: "application/json" },
+            })
+              .then(function (res) {
+                return res.ok ? res.json() : null;
+              })
+              .then(function (j) {
+                if (!j) return;
+                var m = j.metadata || {};
+                // Adopt the server-resolved site (gateway position) so the
+                // sun/moon ring and the collapse agree on where we are.
+                if (!hasFix && m.location && typeof m.location.lat === "number") {
+                  site.lat = m.location.lat;
+                  site.lon = m.location.lon;
+                  sky();
+                }
+                // Read TODAY off the normalized timeline, never index 0 — the
+                // series starts in the measured past, so index 0 is history.
+                // These points already carry the measurement correction and the
+                // 100-mile upwind water thermal shift applied server-side.
+                if (j.timeline && j.timeline.length) {
+                  var today = new Date().toISOString().slice(0, 10);
+                  var pt = null,
+                    i;
+                  for (i = 0; i < j.timeline.length; i++) {
+                    var q = j.timeline[i];
+                    if (!q || typeof q.temp !== "number" || !q.iso) continue;
+                    if (q.iso === today) {
+                      pt = q;
+                      break;
+                    }
+                    if (q.iso < today) pt = q;
+                    else if (!pt) {
+                      pt = q;
+                      break;
+                    }
+                  }
+                if (pt) {
+                    w.firstChild.nodeValue =
+                      "WX " + Math.round(pt.temp) + "F" + (pt.observed ? " OBS" : "");
+                  }
+                }
+                // Now layer: the timeline point above is the DAY value (daily
+                // mean/high), which reads wildly wrong at night. Override with
+                // the live current reading from the conditions proxy (10-min
+                // server cache) so the face shows what it is right now.
+                fetch("/api/public/conditions" + q, {
+                  headers: { Accept: "application/json" },
+                })
+                  .then(function (res) {
+                    return res.ok ? res.json() : null;
+                  })
+                  .then(function (c) {
+                    var t =
+                      c && c.current && typeof c.current.temp === "number" ? c.current.temp : null;
+                    if (t !== null)
+                      w.firstChild.nodeValue = "WX " + Math.round(t) + "F NOW";
+                  })
+                  .catch(function () {
+                    /* keep the day-value fallback */
+                  });
+                // Water line: which lake or ocean is upwind inside 100 miles and
+                // how many degrees it is pulling the reading.
+                var mc = m.microclimate;
+                if (mc && wtr) {
+                  var body =
+                    mc.water_bodies && mc.water_bodies.length ? mc.water_bodies[0].name : null;
+                  var sh = typeof mc.upwind_water === "number" ? mc.upwind_water : 0;
+                  wtr.firstChild.nodeValue = body
+                    ? body.toUpperCase().slice(0, 12) +
+                      " " +
+                      (sh >= 0 ? "+" : "") +
+                      sh.toFixed(1) +
+                      "F"
+                    : "LOCAL BASELINE";
+                }
+                if (m.peak_date) {
+                  pk.firstChild.nodeValue =
+                    "PEAK " +
+                    m.peak_date.slice(5) +
+                    " " +
+                    Math.round(m.peak_intensity) +
+                    "F " +
+                    Math.round((m.confidence_score || 0) * 100) +
+                    "%";
+                }
+              })
+              ["catch"](function () {});
+          } catch (err) {
+            /* offline watch: keep the face up */
+          }
+        }
+        function locate() {
+          // No GPS path at all: let the server locate us by gateway.
+          if (!navigator.geolocation) return weather();
+          navigator.geolocation.getCurrentPosition(
+            function (pos) {
+              site.lat = pos.coords.latitude;
+              site.lon = pos.coords.longitude;
+              sky();
+              weather(pos.coords.latitude, pos.coords.longitude);
+            },
+            function () {
+              // Fix denied or timed out: collapse at the gateway position
+              // the edge sees, not a hardcoded hometown.
+              weather();
+            },
+            { timeout: 8000, maximumAge: 600000 },
+          );
+        }
+        // Sun and moon, counter-positioned on the ring at their true azimuths.
+        // Low-precision closed form, no network, no library: the face keeps
+        // working with the radio off.
+        var sunmk = document.getElementById("sunmk"),
+          moonmk = document.getElementById("moonmk"),
+          site = { lat: 44.98, lon: -84.6 };
+        var RAD = Math.PI / 180;
+        function place(el, lat, lon, ra, dec) {
+          var d = (Date.now() - Date.UTC(2000, 0, 1, 12)) / 86400000;
+          var lst = (280.16 + 360.9856235 * d + lon) % 360;
+          var H = (lst - ra) * RAD,
+            p = lat * RAD,
+            dd = dec * RAD;
+          var alt = Math.asin(Math.sin(p) * Math.sin(dd) + Math.cos(p) * Math.cos(dd) * Math.cos(H));
+          var az =
+            (Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(p) - Math.tan(dd) * Math.cos(p)) /
+              RAD +
+              180) %
+            360;
+          if (az < 0) az += 360;
+          var x = 100 + 76 * Math.sin(az * RAD),
+            y = 100 - 76 * Math.cos(az * RAD);
+          el.setAttribute("transform", "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ")");
+          el.setAttribute("opacity", alt > 0 ? "1" : "0.38");
+        }
+        function sky() {
+          var d = (Date.now() - Date.UTC(2000, 0, 1, 12)) / 86400000;
+          var g = (357.528 + 0.9856003 * d) * RAD;
+          var lam = (280.46 + 0.9856474 * d + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * RAD;
+          var e = 23.439 * RAD;
+          var sra = Math.atan2(Math.cos(e) * Math.sin(lam), Math.cos(lam)) / RAD;
+          var sdec = Math.asin(Math.sin(e) * Math.sin(lam)) / RAD;
+          place(sunmk, site.lat, site.lon, sra, sdec);
+          var L = (218.316 + 13.176396 * d) * RAD,
+            M = (134.963 + 13.064993 * d) * RAD,
+            F = (93.272 + 13.22935 * d) * RAD;
+          var ml = L + 6.289 * RAD * Math.sin(M),
+            mb = 5.128 * RAD * Math.sin(F);
+          var mra =
+            Math.atan2(
+              Math.sin(ml) * Math.cos(e) - Math.tan(mb) * Math.sin(e),
+              Math.cos(ml),
+            ) / RAD;
+          var mdec =
+            Math.asin(
+              Math.sin(mb) * Math.cos(e) + Math.cos(mb) * Math.sin(e) * Math.sin(ml),
+            ) / RAD;
+          place(moonmk, site.lat, site.lon, mra, mdec);
+        }
+        tick();
+        sky();
+        setInterval(sky, 120000);
+        setInterval(tick, 15000);
+        /* Only keep listening for a compass the watch actually has. */
+        var heardCompass = false;
+        function firstOrient(e) {
+          if (e && (e.alpha !== null || e.webkitCompassHeading !== undefined)) heardCompass = true;
+          orient(e);
+        }
+        window.addEventListener("deviceorientation", firstOrient, false);
+        window.addEventListener("deviceorientationabsolute", firstOrient, false);
+        setTimeout(function () {
+          if (heardCompass) return;
+          window.removeEventListener("deviceorientation", firstOrient, false);
+          window.removeEventListener("deviceorientationabsolute", firstOrient, false);
+          b.firstChild.nodeValue = "NO COMPASS";
+          /* No magnetometer: use GPS course while moving, labeled honestly. */
+          if (navigator.geolocation && navigator.geolocation.watchPosition) {
+            navigator.geolocation.watchPosition(
+              function (p) {
+                var hd = p.coords.heading,
+                  sp = p.coords.speed;
+                if (typeof hd === "number" && !isNaN(hd) && typeof sp === "number" && sp > 1) {
+                  r.setAttribute("transform", "rotate(" + (-hd).toFixed(0) + " 100 100)");
+                  b.firstChild.nodeValue = "GPS COURSE " + Math.round(hd) + " DEG";
+                } else {
+                  b.firstChild.nodeValue = "NO COMPASS";
+                }
+              },
+              function () {},
+              { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 },
+            );
+          }
+        }, 3000);
+        setTimeout(locate, 1200);
+        setInterval(locate, 900000);
+        /* Measure-and-jam — the Lokmat kit discipline. An embedded
+           WebView (the Tremor dash host) can hand us a desktop CSS
+           viewport, so percentage layout paints into a corner of the
+           panel. Measure the real panel (visualViewport first), pin the
+           stage to it in explicit pixels, and size the readout from the
+           measurement: big glanceable type fitted to THIS glass, whatever
+           its dimensions turn out to be. */
+        var stage = document.getElementById("stage");
+        var brandEl = document.getElementById("brand"),
+          statusEl = document.getElementById("status"),
+          swapEl = document.getElementById("faceswap"),
+          navLinks = document.querySelectorAll(".nav a");
+        function setPx(el, v) {
+          if (el) el.style.fontSize = Math.max(8, Math.round(v)) + "px";
+        }
+        function fit() {
+          var vv = window.visualViewport,
+            W = Math.round(
+              (vv && vv.width) ||
+                window.innerWidth ||
+                document.documentElement.clientWidth,
+            ),
+            H = Math.round(
+              (vv && vv.height) ||
+                window.innerHeight ||
+                document.documentElement.clientHeight,
+            );
+          if (!W || !H) return;
+          stage.style.width = W + "px";
+          stage.style.height = H + "px";
+          setPx(c, Math.min(W * 0.3, H * 0.3));
+          setPx(w, Math.min(W * 0.17, H * 0.16));
+          setPx(d, Math.min(W * 0.085, H * 0.075));
+          setPx(b, Math.min(W * 0.085, H * 0.075));
+          setPx(pk, Math.min(W * 0.1, H * 0.09));
+          setPx(wtr, Math.min(W * 0.1, H * 0.09));
+          setPx(brandEl, Math.min(W * 0.05, H * 0.05));
+          setPx(statusEl, Math.min(W * 0.042, H * 0.04));
+          setPx(swapEl, Math.min(W * 0.042, H * 0.04));
+          for (var n = 0; n < navLinks.length; n++) {
+            navLinks[n].style.fontSize =
+              Math.max(9, Math.round(Math.min(W * 0.045, H * 0.05))) + "px";
+            navLinks[n].style.height = Math.max(30, Math.round(H * 0.11)) + "px";
+          }
+        }
+        fit();
+        window.addEventListener("resize", fit, false);
+        window.addEventListener("orientationchange", fit, false);
+        if (window.visualViewport) window.visualViewport.addEventListener("resize", fit);
+        setTimeout(fit, 300);
+        setTimeout(fit, 1500);
+
+        /* Panels drop the screen a few seconds after paint, which looks like
+           the face blacking out. Hold a screen wake lock, re-take it on every
+           wake, touch, or periodic retry, and repaint as soon as we are back. */
+        var lock = null;
+        function hold() {
+          if (document.visibilityState !== "visible") {
+            lock = null;
+            return;
+          }
+          tick();
+          sky();
+          if (!navigator.wakeLock || lock) return;
+          navigator.wakeLock
+            .request("screen")
+            .then(function (s) {
+              lock = s;
+              s.addEventListener("release", function () {
+                lock = null;
+              });
+            })
+            ["catch"](function () {});
+        }
+        hold();
+        document.addEventListener("visibilitychange", hold, false);
+        window.addEventListener("pageshow", hold, false);
+        window.addEventListener("focus", hold, false);
+        window.addEventListener("touchstart", hold, false);
+        window.addEventListener("pointerdown", hold, false);
+        setInterval(hold, 20000);
+        // The static watch is reachable without the React shell; it uses the
+        // same generated worker URL and refuses it on previews and local dev.
+        if (false && "serviceWorker" in navigator) {
+          var offlineAllowed = location.protocol === "https:" &&
+            !/^(id-preview--|preview--)/.test(location.hostname) &&
+            !/(^|\.)lovableproject(-dev)?\.com$/.test(location.hostname) &&
+            !/(^|\.)beta\.lovable\.dev$/.test(location.hostname) &&
+            new URLSearchParams(location.search).get("sw") !== "off";
+          if (!offlineAllowed) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              for (var i = 0; i < regs.length; i++) {
+                if ((regs[i].active && /\/sw\.js$/.test(regs[i].active.scriptURL)) ||
+                    (regs[i].installing && /\/sw\.js$/.test(regs[i].installing.scriptURL))) regs[i].unregister();
+              }
+            })["catch"](function () {});
+          } else {
+            var controlled = !!navigator.serviceWorker.controller;
+            navigator.serviceWorker.addEventListener("controllerchange", function () {
+              if (controlled && navigator.onLine) location.reload();
+            });
+            navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" })
+              .then(function (reg) {
+                function check() { if (navigator.onLine) reg.update()["catch"](function () {}); }
+                check();
+                window.addEventListener("pageshow", check);
+                window.addEventListener("online", check);
+                document.addEventListener("visibilitychange", function () {
+                  if (document.visibilityState === "visible") check();
+                });
+              })["catch"](function () {});
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

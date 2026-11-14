@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Index A — phase 1 of 3</title>
+<style>
+html,body{margin:0;background:#010804;color:#00ff3b;font-family:"Share Tech Mono",Courier New,monospace}
+body{padding:12px;font-size:12px;line-height:1.5}
+h1{font-size:11px;letter-spacing:.25em;text-transform:uppercase;margin:0 0 8px}
+.bar{height:6px;border:1px solid #0f5;background:#000;margin:8px 0}
+.bar i{display:block;height:100%;width:0;background:#0f5}
+a{color:#0ff}
+small{color:#5f8f6f}
+</style>
+</head>
+<body>
+<h1>Index A · strip origin</h1>
+<p>Microbowl D envelope, 400 ms tick. Referrer dropped, no cookies, no storage.</p>
+<div class="bar"><i id="b"></i></div>
+<p><a id="m" href="./b.html">continue manually &rsaquo;</a></p>
+<small>Nothing on this page is logged. The query rides the URL fragment and is never sent to this host.</small>
+<script>
+(function () {
+  var p = location.hash.slice(1);
+  var next = "./b.html" + (p ? "#" + p : "");
+  document.getElementById("m").href = next;
+  var bar = document.getElementById("b"), t0 = Date.now(), TICK = 400;
+  var id = setInterval(function () {
+    var f = Math.min(1, (Date.now() - t0) / TICK);
+    bar.style.width = (f * 100).toFixed(0) + "%";
+    if (f >= 1) { clearInterval(id); location.replace(next); }
+  }, 40);
+})();
+</script>
+</body>
+</html>

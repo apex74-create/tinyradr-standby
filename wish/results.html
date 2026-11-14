@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merry's Wish Picker — Tonight's Results</title>
+<!--
+  MERRY'S WISH PICKER — RESULTS WIDGET (Nov 7, 2026)
+  Built for Merry Pearson, the Everyday-Man Tester. A CARE surface first:
+  after the 7:29 PM draw she wants the winning numbers the minute they post,
+  next to her own numbers, in plain words — no hunting the Lottery site.
+
+  HONEST BLANKS ARE LAW on this board (the house Widget Standard, wrist form):
+  a winning-numbers slot shows a number ONLY when a real result has been
+  loaded into it — from the house feed or typed in by hand and labelled so.
+  No placeholder numbers. No simulated draws. No guesses. Ever.
+
+  THE FEED — this board polls a small JSON file named  wish-results.json
+  sitting beside this page. The board fetches it when the page opens and
+  every 60 seconds while the page stays open. A missing or unreadable file
+  is NOT an error here — it simply means NOT POSTED YET, and the board
+  says so in plain words.
+
+  Expected feed shape (any game may be absent — absent means not posted
+  yet for that game; invalid values are refused, never displayed):
+  {
+    "date": "2026-11-07",
+    "postedAt": "2026-11-07T19:41:00-05:00",
+    "checkedTwice": true,
+    "games": {
+      "fantasy5":     [4, 9, 13, 21, 30],
+      "fantasy5DoublePlay": [2, 8, 14, 22, 31],
+      "daily3":       "221",
+      "daily4":       "4339",
+      "powerball":    { "whites": [15, 34, 35, 38, 63], "bonus": 7 },
+      "megaMillions": { "whites": [3, 11, 22, 40, 51],  "bonus": 9 }
+    },
+    "grades": {
+      "doublePlay": "You won $7.00 on the Double Play."
+    }
+  }
+
+  THE GRADES BLOCK — the house grader computes the grade and prize
+  wording and carries it in the feed as "grades", one plain-words entry
+  per game. The Double Play rows consume their prize text from this
+  block VERBATIM: this page never computes a grade, never counts matches
+  to decide a prize, and never invents wording. No grades block means
+  NOT GRADED, said in plain words.
+
+  DOUBLE PLAY (added Nov 10, 2026): on Powerball nights the played ticket
+  can carry the Double Play add-on — a SECOND drawing the same night,
+  graded against the same sealed set (Double Play never has its own
+  numbers). When the house feed has fetched and checked that drawing
+  twice, it carries it as a sibling of "powerball" inside "games":
+      "doublePlay": { "whites": [11, 17, 26, 37, 45], "bonus": 7 }
+  and this board shows a second winning-numbers row in the Powerball
+  card, graded against the same sealed set. "doublePlay" is absent on
+  every other night and whenever the drawing was not checked twice —
+  absent means not posted, never a miss. (Day 1, Nov 7: the Double Play
+  Powerball matched and paid $7 — the main-drawing-only grade missed it;
+  that correction is why this row exists.)
+
+  ALWAYS-VISIBLE DOUBLE PLAY (amended Nov 11, 2026): both Double Play
+  rows — Fantasy 5's and Powerball's — stay on the board from the moment
+  the page opens; until the checked drawing lands, each row says
+  "DOUBLE PLAY — NOT POSTED YET". The feed carries Fantasy 5's second
+  drawing as "fantasy5DoublePlay". Every Double Play prize word is
+  consumed from the feed's computed grades block — no row grades itself,
+  no prize is invented.
+  The feed is written by the house only AFTER the official Michigan numbers
+  post, and only after they have been checked against two sources — that is
+  the existing wish-picker-grade run (20:47 ET). Nothing reaches this board
+  that has not passed that check.
+
+  THE WEAKEST HOP, named on the face of the design: the feed file itself.
+  A human-checked step writes it, and this page's home (a permanent hang)
+  must let that file sit beside the page and be replaced the minute the
+  numbers post. The double-check is what keeps wrong numbers off this
+  board — and it can take a few minutes. The hand-entry mode below is the
+  bridge for those minutes: numbers typed in by hand are labelled
+  "TYPED IN BY HAND" wherever they show. When the checked feed arrives,
+  it takes the slot over and the label changes to say so.
+
+  RECEIVING PUSH — the marked slot in the page (id="gradecard"):
+  the house's push to Merry is the 20:47 grade TEXT to her phone. This
+  board is that text's visual twin — the slot is where the grade word
+  sits on the page. No push machinery is built into this file, and none
+  is needed: the text lands on her phone; the numbers land here.
+
+  Wednesday boards carry Mega Millions in the same shape as Powerball
+  (a "megaMillions" entry in the sealed set + the feed).
+
+  NIGHTLY BOARD (amended Nov 10, 2026): this board used to be built for
+  one night only — the sealed set was printed in the file for Sat Nov 7
+  and the feed was refused unless its date matched that night. The hang
+  is permanent, so the board now follows the FEED's night: the feed's
+  date names the night; Daily 3, Daily 4, Powerball (Saturday) and Mega
+  Millions (Wednesday) sealed sets are re-stamped on the board from that
+  date by the house date-stamp method (SHA-256 of the date + the game's
+  name — the canonical method in the wish-watch README; anyone can
+  reproduce the call from the date alone). The FANTASY 5 wish is
+  stream-made and cannot be re-stamped, so the board keeps it in this
+  browser (local storage) when Merry or the house enters it from the
+  day's text — see the ENTER YOUR FANTASY 5 NUMBERS card. No Fantasy 5
+  numbers are printed in this file: a fresh deal is NOT tonight's play.
+-->
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0a0f0c; color:#e8f2e9; font-family:Georgia,'Times New Roman',serif; }
+  main { position:relative; max-width:640px; margin:0 auto; padding:24px 16px 44px; }
+  h1 { font-size:32px; font-weight:700; color:#b9f4c8; text-align:center; letter-spacing:.03em; line-height:1.25; }
+  .sub { text-align:center; color:#9ec5a8; font-size:17px; margin-top:6px; }
+  .headline { text-align:center; font-size:25px; font-weight:700; color:#ffc95c; line-height:1.45;
+    margin:20px auto 4px; max-width:580px; }
+  .postline { text-align:center; font-size:20px; color:#e8f2e9; line-height:1.5; margin-top:6px; }
+  .howline { text-align:center; font-size:16.5px; color:#9ec5a8; line-height:1.6; margin:14px auto 2px; max-width:560px; }
+  .card { background:rgba(16,28,20,.92); border:1px solid #2c5c3e; border-radius:14px; padding:18px 18px 16px; margin-top:18px; }
+  .card h2 { font-size:16px; letter-spacing:.2em; color:#39ff6a; font-family:ui-monospace,Menlo,monospace; font-weight:700; margin-bottom:8px; text-align:center; }
+  .sect { font-size:15px; letter-spacing:.18em; color:#9ec5a8; font-family:ui-monospace,Menlo,monospace; text-align:center; margin:12px 0 2px; }
+  .balls { display:flex; gap:10px; justify-content:center; margin:10px 0 4px; flex-wrap:wrap; }
+  .ball { width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 34% 30%, #eaffef, #39ff6a 55%, #14532a);
+    color:#062b14; font-size:27px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-family:ui-monospace,Menlo,monospace; box-shadow:0 0 16px rgba(57,255,106,.35); }
+  .ball.sm { width:52px; height:52px; font-size:22px; }
+  .ball.bonus { background:radial-gradient(circle at 34% 30%, #fff3cf, #ffc95c 55%, #8a5a12); color:#3a2403; box-shadow:0 0 16px rgba(255,201,92,.4); }
+  .ball.win { background:radial-gradient(circle at 34% 30%, #ffffff, #cfdccf 55%, #5f7a63); color:#122b18; box-shadow:0 0 14px rgba(220,240,220,.35); }
+  .ball.winbonus { background:radial-gradient(circle at 34% 30%, #fff3cf, #ffc95c 55%, #8a5a12); color:#3a2403; }
+  .ball.hit { outline:4px solid #ffc95c; outline-offset:2px; }
+  .digits { display:flex; gap:12px; justify-content:center; margin:10px 0 4px; }
+  .digit { width:56px; height:70px; border-radius:10px; background:#10231a; border:1px solid #39ff6a;
+    color:#b9f4c8; font-size:38px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-family:ui-monospace,Menlo,monospace; box-shadow:0 0 12px rgba(57,255,106,.25); }
+  .digit.win { border-color:#cfdccf; color:#eef6ee; background:#1a2a1e; }
+  .digit.hit { outline:4px solid #ffc95c; outline-offset:2px; }
+  .notposted { text-align:center; font-size:21px; font-weight:700; color:#8fc7e8; line-height:1.5; margin:10px 0 4px; letter-spacing:.02em; }
+  .src { text-align:center; font-size:14.5px; color:#8fae97; font-family:ui-monospace,Menlo,monospace; letter-spacing:.1em; margin-top:4px; }
+  .src.hand { color:#ffc95c; }
+  .match { text-align:center; font-size:20px; color:#e8f2e9; line-height:1.55; margin-top:10px; }
+  .match b { color:#ffc95c; }
+  .payline { text-align:center; font-size:17px; color:#9ec5a8; margin-top:6px; }
+  .gradebody { font-size:19px; color:#e8f2e9; line-height:1.6; text-align:center; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:center; }
+  .row label { font-size:16.5px; color:#cfe9d6; min-width:118px; }
+  input[type=text] { flex:1; min-width:170px; background:#06110a; color:#eaffef; border:1px solid #2c5c3e; border-radius:9px;
+    padding:11px 12px; font-size:18px; font-family:ui-monospace,Menlo,monospace; }
+  button { background:#14532a; color:#eaffef; border:1px solid #39ff6a; border-radius:9px; padding:11px 16px;
+    font-size:16.5px; font-family:inherit; cursor:pointer; }
+  button:active { background:#1d7a3f; }
+  .note { font-size:15.5px; color:#8fae97; line-height:1.6; margin-top:10px; text-align:center; }
+  .wish { text-align:center; color:#d9c98a; font-size:17px; line-height:1.6; margin:22px auto 0; max-width:540px; }
+  footer { text-align:center; color:#3f6b4d; font-size:13px; margin-top:22px; font-family:ui-monospace,Menlo,monospace; letter-spacing:.14em; line-height:2; }
+</style></head>
+<body>
+<main>
+  <h1>✦ Merry's Wish Picker ✦</h1>
+  <div class="sub">TONIGHT'S RESULTS — your numbers and the winning numbers, side by side</div>
+
+  <!-- RECEIVING PUSH SLOT: the grade word's home on this page (see header comment) -->
+  <p class="headline" id="headline">THE DRAW IS TONIGHT AT 7:29. YOUR NUMBERS ARE IN.</p>
+  <p class="postline" id="postline">Winning numbers posted: not yet.</p>
+  <p class="howline">This board checks for the winning numbers every minute while it is open.
+  The minute the official numbers are posted and checked twice at the house, they land here on their own —
+  you do not have to go looking for them. <span id="lastcheck"></span></p>
+
+  <div class="card">
+    <h2 id="night-title">YOUR NUMBERS — TONIGHT</h2>
+    <div class="sect">FANTASY 5 — YOURS</div>
+    <div class="balls" id="f5-yours"></div>
+    <div class="sect">THE WINNING NUMBERS</div>
+    <div id="f5-win"></div>
+    <p class="match" id="f5-match"></p>
+    <div class="sect">DOUBLE PLAY — THE SECOND DRAWING, SAME NUMBERS OF YOURS</div>
+    <div id="f5dp-win"></div>
+    <p class="match" id="f5dp-match"></p>
+  </div>
+
+  <div class="card">
+    <h2>DAILY 3</h2>
+    <div class="sect">YOURS</div>
+    <div class="digits" id="d3-yours"></div>
+    <div class="sect">THE WINNING NUMBERS</div>
+    <div id="d3-win"></div>
+    <p class="match" id="d3-match"></p>
+  </div>
+
+  <div class="card">
+    <h2>DAILY 4</h2>
+    <div class="sect">YOURS</div>
+    <div class="digits" id="d4-yours"></div>
+    <div class="sect">THE WINNING NUMBERS</div>
+    <div id="d4-win"></div>
+    <p class="match" id="d4-match"></p>
+  </div>
+
+  <div class="card" id="pb-card">
+    <h2>POWERBALL</h2>
+    <div class="sect">YOURS</div>
+    <div class="balls" id="pb-yours"></div>
+    <div class="sect">THE WINNING NUMBERS</div>
+    <div id="pb-win"></div>
+    <p class="match" id="pb-match"></p>
+    <div id="dp-block">
+      <div class="sect">DOUBLE PLAY — THE SECOND DRAWING, SAME NUMBERS OF YOURS</div>
+      <div id="dp-win"></div>
+      <p class="match" id="dp-match"></p>
+    </div>
+    <p class="payline" id="payline"></p>
+  </div>
+
+  <div class="card" id="mm-card" style="display:none">
+    <h2>MEGA MILLIONS</h2>
+    <div class="sect">YOURS</div>
+    <div class="balls" id="mm-yours"></div>
+    <div class="sect">THE WINNING NUMBERS</div>
+    <div id="mm-win"></div>
+    <p class="match" id="mm-match"></p>
+  </div>
+
+  <div class="card" id="gradecard">
+    <h2>TONIGHT'S GRADE — THE WORD FROM THE HOUSE</h2>
+    <p class="gradebody" id="gradebody">The grade comes by text tonight, after the numbers post —
+    watch your phone for the text, and this board for the numbers themselves.</p>
+  </div>
+
+  <div class="card">
+    <h2>TYPE THE WINNING NUMBERS BY HAND</h2>
+    <p class="note" style="margin-top:0">If the numbers are on the TV before they reach this board,
+    type them in here. Anything typed in by hand is marked TYPED IN BY HAND on the board,
+    so nobody ever mistakes it for the checked numbers. When the checked numbers arrive,
+    they take the slot over.</p>
+    <div class="row"><label for="m-f5">Fantasy 5</label>
+      <input type="text" id="m-f5" placeholder="e.g. 4 9 13 21 30" inputmode="numeric">
+      <button id="set-f5">SET</button></div>
+    <div class="row"><label for="m-f5dp">F5 Double Play</label>
+      <input type="text" id="m-f5dp" placeholder="e.g. 2 8 14 22 31" inputmode="numeric">
+      <button id="set-f5dp">SET</button></div>
+    <div class="row"><label for="m-d3">Daily 3</label>
+      <input type="text" id="m-d3" placeholder="e.g. 122" inputmode="numeric">
+      <button id="set-d3">SET</button></div>
+    <div class="row"><label for="m-d4">Daily 4</label>
+      <input type="text" id="m-d4" placeholder="e.g. 3493" inputmode="numeric">
+      <button id="set-d4">SET</button></div>
+    <div class="row"><label for="m-pb">Powerball</label>
+      <input type="text" id="m-pb" placeholder="e.g. 15 34 35 38 63 + 7" inputmode="numeric">
+      <button id="set-pb">SET</button></div>
+    <div class="row"><label for="m-dp">Double Play</label>
+      <input type="text" id="m-dp" placeholder="e.g. 11 17 26 37 45 + 7" inputmode="numeric">
+      <button id="set-dp">SET</button></div>
+    <div class="row" id="row-mm" style="display:none"><label for="m-mm">Mega Millions</label>
+      <input type="text" id="m-mm" placeholder="e.g. 3 11 22 40 51 + 9" inputmode="numeric">
+      <button id="set-mm">SET</button></div>
+    <p class="note" id="handmsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>ENTER YOUR FANTASY 5 NUMBERS</h2>
+    <p class="note" style="margin-top:0">Your Fantasy 5 wish comes in the day's text — it is made fresh
+    every day and is different from anyone else's. Type the five numbers from your text here
+    and this board keeps them on this phone or computer, night after night, until you change them.</p>
+    <div class="row"><label for="m-mine">Fantasy 5</label>
+      <input type="text" id="m-mine" placeholder="e.g. 3 15 34 35 39" inputmode="numeric">
+      <button id="set-mine">SET</button></div>
+    <p class="note" id="minemsg"></p>
+  </div>
+
+  <p class="wish">Your numbers were yours to play, and nobody played them for you.
+  A wish is a wish — it isn't a promise the numbers will hit.
+  Mav grades them after the draw, and the grade comes by text.</p>
+
+  <footer>APEX · BUILT FOR MERRY, WITH LOVE<br>THE NUMBERS LAND HERE — YOU DO NOT HAVE TO GO LOOKING</footer>
+</main>
+<script>
+  // MERRY'S WISH PICKER — RESULTS WIDGET (Nov 7, 2026; nightly board +
+  // Double Play amended Nov 10, 2026; both Double Play rows always
+  // visible with prize text consumed from the computed grades block,
+  // amended Nov 11, 2026).
+  // The night belongs to the FEED: its date names the night, and the
+  // date-stamped sealed sets (Daily 3, Daily 4, Powerball on Saturday,
+  // Mega Millions on Wednesday) are re-stamped below from that date by
+  // the house date-stamp method — SHA-256 of "YYYY-MM-DD" + the game's
+  // name, per the wish-watch README. The board never deals a fresh set:
+  // the stamp IS the sealed call of record for that date. The Fantasy 5
+  // wish is stream-made (no stamp exists), so it is kept in this
+  // browser from Merry's own entry — see the mine card.
+  var SEALED = null;      // built by buildSealed() for the feed's night
+  var FEED_DATE = null;   // the feed's date, once a feed has loaded
+  var DRAW_H = 19, DRAW_M = 29; // 7:29 PM local
+  var FEED_URL = 'wish-results.json';
+  var MKEY = 'wishResultsWidget.v2';
+  var MINEKEY = 'wishPickerMineF5.v1';
+  var results = {}; // game -> { value: <validated value>, source: 'feed' | 'hand' }
+  var GRADES = null; // the feed's computed grades block, house-grader wording verbatim
+  var GAMES = ['fantasy5', 'fantasy5DoublePlay', 'daily3', 'daily4', 'powerball', 'doublePlay', 'megaMillions'];
+  var mineF5 = null; // Merry's Fantasy 5 set for the night, from her entry
+
+  function el(id) { return document.getElementById(id); }
+  function pad2(n) { return ('0' + n).slice(-2); }
+
+  // ---------- the date stamp (canonical method, wish-watch README) ----------
+  // SHA-256 of "YYYY-MM-DD" + game name. Daily 3/4: hex digest, strip
+  // non-digits, first 3/4 digits. Big lotto: digest BYTES, first 5
+  // distinct (byte mod pool)+1 sorted; bonus = (byte 16 mod cap)+1.
+  function sha256Bytes(ascii) {
+    function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
+    var i, j, result = '';
+    var words = [], asciiBitLength = ascii.length * 8;
+    var hash, k;
+    if (!sha256Bytes.cache) {
+      var H = [], K = [], pc = 0, comp = {};
+      for (var cand = 2; pc < 64; cand++) {
+        if (!comp[cand]) {
+          for (i = 0; i < 313; i += cand) comp[i] = cand;
+          if (pc < 8) H.push((Math.pow(cand, 0.5) * 4294967296) | 0);
+          K.push((Math.pow(cand, 1 / 3) * 4294967296) | 0);
+          pc++;
+        }
+      }
+      sha256Bytes.cache = { h: H, k: K };
+    }
+    hash = sha256Bytes.cache.h.slice(0, 8);
+    k = sha256Bytes.cache.k;
+    ascii += '\x80';
+    while (ascii.length % 64 - 56) ascii += '\x00';
+    for (i = 0; i < ascii.length; i++) {
+      j = ascii.charCodeAt(i);
+      if (j >> 8) return null; // ASCII check
+      words[i >> 2] |= j << ((3 - i) % 4) * 8;
+    }
+    words[words.length] = ((asciiBitLength / 4294967296) | 0);
+    words.push(asciiBitLength);
+    for (j = 0; j < words.length;) {
+      var w = words.slice(j, j += 16), oldHash = hash;
+      hash = hash.slice(0, 8);
+      for (i = 0; i < 64; i++) {
+        var w15 = w[i - 15], w2 = w[i - 2];
+        var a = hash[0], e = hash[4];
+        if (i >= 16) {
+          w[i] = (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7]
+            + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0;
+        }
+        var temp1 = hash[7]
+          + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25))
+          + ((e & hash[5]) ^ ((~e) & hash[6]))
+          + k[i]
+          + w[i];
+        var temp2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22))
+          + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+        hash = [(temp1 + temp2) | 0].concat(hash.slice(0, 7));
+        hash[4] = (hash[4] + temp1) | 0;
+      }
+      for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+    }
+    for (i = 0; i < 8; i++) {
+      for (j = 3; j + 1; j--) {
+        var b = (hash[i] >> (j * 8)) & 255;
+        result += ((b < 16) ? '0' : '') + b.toString(16);
+      }
+    }
+    return result;
+  }
+  function stampDigits(iso, name, count) {
+    var hex = sha256Bytes(iso + name), digits = '', i;
+    if (!hex) return null;
+    for (i = 0; i < hex.length; i++) if (hex[i] >= '0' && hex[i] <= '9') digits += hex[i];
+    return digits.length >= count ? digits.slice(0, count) : null;
+  }
+  function stampBig(iso, name, pool, cap) {
+    var hex = sha256Bytes(iso + name), bytes = [], whites = [], i, v;
+    if (!hex) return null;
+    for (i = 0; i + 1 < hex.length; i += 2) bytes.push(parseInt(hex.slice(i, i + 2), 16));
+    for (i = 0; i < bytes.length && whites.length < 5; i++) {
+      v = (bytes[i] % pool) + 1;
+      if (whites.indexOf(v) < 0) whites.push(v);
+    }
+    if (whites.length < 5 || bytes.length < 17) return null;
+    whites.sort(function (a, b) { return a - b; });
+    return { whites: whites, bonus: (bytes[16] % cap) + 1 };
+  }
+  var DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  var MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  function buildSealed(iso) {
+    var p = iso.split('-'), d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    if (isNaN(d.getTime())) return null;
+    var s = {
+      iso: iso,
+      label: (DOW[d.getDay()] + ' ' + MON[d.getMonth()] + ' ' + d.getDate()).toUpperCase(),
+      fantasy5: mineF5,
+      daily3: stampDigits(iso, 'Daily 3', 3),
+      daily4: stampDigits(iso, 'Daily 4', 4),
+      powerball: null,
+      megaMillions: null
+    };
+    if (!s.daily3 || !s.daily4) return null;
+    if (d.getDay() === 6) { s.powerball = stampBig(iso, 'Powerball', 69, 26); if (!s.powerball) return null; }
+    if (d.getDay() === 3) { s.megaMillions = stampBig(iso, 'Mega Millions', 70, 24); if (!s.megaMillions) return null; }
+    return s;
+  }
+
+  // ---------- your numbers (the sealed set, always shown) ----------
+  function ballsHtml(set, cls, hits) {
+    var h = '';
+    set.forEach(function (n) {
+      var hit = hits && hits.indexOf(n) >= 0;
+      h += '<div class="ball' + (cls ? ' ' + cls : '') + (hit ? ' hit' : '') + '">' + n + '</div>';
+    });
+    return h;
+  }
+  function bigHtml(s, win, hitWhites, bonusHit) {
+    var h = '';
+    s.whites.forEach(function (n) {
+      var hit = hitWhites && hitWhites.indexOf(n) >= 0;
+      h += '<div class="ball sm' + (win ? ' win' : '') + (hit ? ' hit' : '') + '">' + n + '</div>';
+    });
+    h += '<div class="ball sm ' + (win ? 'winbonus' : 'bonus') + (bonusHit ? ' hit' : '') + '">' + s.bonus + '</div>';
+    return h;
+  }
+  function digitsHtml(str, win, hitPos) {
+    var h = '';
+    for (var i = 0; i < str.length; i++) {
+      h += '<div class="digit' + (win ? ' win' : '') + (hitPos && hitPos[i] ? ' hit' : '') + '">' + str[i] + '</div>';
+    }
+    return h;
+  }
+  function nightGames() {
+    var g = ['fantasy5', 'fantasy5DoublePlay', 'daily3', 'daily4'];
+    if (SEALED) {
+      if (SEALED.powerball) g.push('powerball', 'doublePlay');
+      if (SEALED.megaMillions) g.push('megaMillions');
+    }
+    return g;
+  }
+  function renderYours() {
+    el('night-title').textContent = SEALED ? ('YOUR NUMBERS — TONIGHT, ' + SEALED.label) : 'YOUR NUMBERS — TONIGHT';
+    el('f5-yours').innerHTML = (SEALED && SEALED.fantasy5)
+      ? ballsHtml(SEALED.fantasy5, '', matchedF5())
+      : '<p class="notposted">YOUR FANTASY 5 NUMBERS ARE NOT ON THIS BOARD YET —<br>type them in below, from today\'s text.</p>';
+    el('d3-yours').innerHTML = SEALED ? digitsHtml(SEALED.daily3, false, digitHits('daily3')) : '';
+    el('d4-yours').innerHTML = SEALED ? digitsHtml(SEALED.daily4, false, digitHits('daily4')) : '';
+    el('pb-card').style.display = (SEALED && SEALED.powerball) ? '' : 'none';
+    el('mm-card').style.display = (SEALED && SEALED.megaMillions) ? '' : 'none';
+    el('row-mm').style.display = (SEALED && SEALED.megaMillions) ? '' : 'none';
+    if (SEALED && SEALED.powerball) {
+      var pb = results.powerball ? results.powerball.value : null;
+      el('pb-yours').innerHTML = bigHtml(SEALED.powerball, false,
+        pb ? SEALED.powerball.whites.filter(function (n) { return pb.whites.indexOf(n) >= 0; }) : null,
+        pb ? (pb.bonus === SEALED.powerball.bonus) : false);
+    }
+    if (SEALED && SEALED.megaMillions) {
+      var mm = results.megaMillions ? results.megaMillions.value : null;
+      el('mm-yours').innerHTML = bigHtml(SEALED.megaMillions, false,
+        mm ? SEALED.megaMillions.whites.filter(function (n) { return mm.whites.indexOf(n) >= 0; }) : null,
+        mm ? (mm.bonus === SEALED.megaMillions.bonus) : false);
+    }
+  }
+  function matchedF5() {
+    var r = results.fantasy5; if (!r || !SEALED || !SEALED.fantasy5) return null;
+    return SEALED.fantasy5.filter(function (n) { return r.value.indexOf(n) >= 0; });
+  }
+  function matchedF5Dp() {
+    var r = results.fantasy5DoublePlay; if (!r || !SEALED || !SEALED.fantasy5) return null;
+    return SEALED.fantasy5.filter(function (n) { return r.value.indexOf(n) >= 0; });
+  }
+  function digitHits(game) {
+    var r = results[game]; if (!r || !SEALED) return null;
+    var mine = game === 'daily3' ? SEALED.daily3 : SEALED.daily4, out = [];
+    for (var i = 0; i < mine.length; i++) out.push(mine[i] === r.value[i]);
+    return out;
+  }
+
+  // ---------- winning slots ----------
+  function drawHasHappened() {
+    var n = new Date(), d = new Date(n.getFullYear(), n.getMonth(), n.getDate(), DRAW_H, DRAW_M, 0);
+    return n >= d;
+  }
+  function notPostedHtml() {
+    var msg = drawHasHappened()
+      ? 'NOT POSTED YET — the winning numbers have not come in yet.'
+      : 'NOT POSTED YET — the draw is 7:29 PM.';
+    return '<p class="notposted">' + msg + '</p>';
+  }
+  function dpNotPostedHtml() {
+    return '<p class="notposted">DOUBLE PLAY — NOT POSTED YET</p>';
+  }
+  function srcLine(game) {
+    var r = results[game]; if (!r) return '';
+    return r.source === 'hand'
+      ? '<p class="src hand">TYPED IN BY HAND</p>'
+      : '<p class="src">FROM THE HOUSE RESULTS FILE — CHECKED TWICE</p>';
+  }
+  function renderWin() {
+    if (!SEALED) {
+      el('f5-win').innerHTML = notPostedHtml();
+      el('f5dp-win').innerHTML = dpNotPostedHtml();
+      el('f5dp-match').innerHTML = '';
+      el('d3-win').innerHTML = notPostedHtml();
+      el('d4-win').innerHTML = notPostedHtml();
+      el('dp-win').innerHTML = dpNotPostedHtml();
+      el('dp-match').innerHTML = '';
+      renderYours();
+      renderHead();
+      renderGrade();
+      return;
+    }
+    var r, grades = computeGrades();
+    r = results.fantasy5;
+    el('f5-win').innerHTML = r ? '<div class="balls">' + ballsHtml(r.value, 'win', matchedF5()) + '</div>' + srcLine('fantasy5') : notPostedHtml();
+    el('f5-match').innerHTML = grades.fantasy5 || '';
+    r = results.fantasy5DoublePlay;
+    el('f5dp-win').innerHTML = r ? '<div class="balls">' + ballsHtml(r.value, 'win', matchedF5Dp()) + '</div>' + srcLine('fantasy5DoublePlay') : dpNotPostedHtml();
+    el('f5dp-match').textContent = r ? dpGradeText('fantasy5DoublePlay') : '';
+    r = results.daily3;
+    el('d3-win').innerHTML = r ? '<div class="digits">' + digitsHtml(r.value, true, digitHits('daily3')) + '</div>' + srcLine('daily3') : notPostedHtml();
+    el('d3-match').innerHTML = grades.daily3 || '';
+    r = results.daily4;
+    el('d4-win').innerHTML = r ? '<div class="digits">' + digitsHtml(r.value, true, digitHits('daily4')) + '</div>' + srcLine('daily4') : notPostedHtml();
+    el('d4-match').innerHTML = grades.daily4 || '';
+    r = results.powerball;
+    el('pb-win').innerHTML = r ? '<div class="balls">' + bigHtml(r.value, true,
+      r.value.whites.filter(function (n) { return SEALED.powerball.whites.indexOf(n) >= 0; }),
+      r.value.bonus === SEALED.powerball.bonus) + '</div>' + srcLine('powerball') : notPostedHtml();
+    el('pb-match').innerHTML = grades.powerball || '';
+    r = results.doublePlay;
+    if (r) {
+      el('dp-win').innerHTML = '<div class="balls">' + bigHtml(r.value, true,
+        r.value.whites.filter(function (n) { return SEALED.powerball.whites.indexOf(n) >= 0; }),
+        r.value.bonus === SEALED.powerball.bonus) + '</div>' + srcLine('doublePlay');
+      el('dp-match').textContent = dpGradeText('doublePlay');
+    } else {
+      el('dp-win').innerHTML = dpNotPostedHtml();
+      el('dp-match').textContent = '';
+    }
+    r = results.megaMillions;
+    el('mm-win').innerHTML = r ? '<div class="balls">' + bigHtml(r.value, true,
+      r.value.whites.filter(function (n) { return SEALED.megaMillions.whites.indexOf(n) >= 0; }),
+      r.value.bonus === SEALED.megaMillions.bonus) + '</div>' + srcLine('megaMillions') : notPostedHtml();
+    el('mm-match').innerHTML = grades.megaMillions || '';
+    el('payline').textContent = anyHit() ? 'Check the Lottery app for what it pays.' : '';
+    renderYours();
+    renderHead();
+    renderGrade();
+  }
+  function f5MatchLine(win) {
+    if (!SEALED || !SEALED.fantasy5) return 'Type your Fantasy 5 numbers in below and this board will grade them.';
+    var m = matchedF5().length;
+    if (m === 0) return 'None of your Fantasy 5 numbers matched tonight.';
+    return '<b>' + m + ' of your Fantasy 5 numbers matched.</b>';
+  }
+  // ---------- Double Play prize text: consumed from the feed's grades block ----------
+  // The house grader computes the grade and prize wording; this board
+  // never computes or invents a prize. No grades block = NOT GRADED,
+  // in plain words.
+  function dpGradeText(game) {
+    if (GRADES && typeof GRADES[game] === 'string' && GRADES[game]) return GRADES[game];
+    return 'NOT GRADED — the house has not graded this drawing yet.';
+  }
+  function sameDigits(a, b) {
+    return a.split('').sort().join('') === b.split('').sort().join('');
+  }
+  function digitMatchLine(name, mine, win) {
+    if (mine === win) return '<b>Hit in your exact order.</b>';
+    if (sameDigits(mine, win)) return '<b>Hit in a different order — your wheel covers this.</b>';
+    return 'No hit on the ' + name + ' tonight.';
+  }
+  function pbMatchLine(name, win) {
+    var mine = name === 'Mega Millions' ? SEALED.megaMillions : SEALED.powerball;
+    var m = mine.whites.filter(function (n) { return win.whites.indexOf(n) >= 0; }).length;
+    var b = (win.bonus === mine.bonus);
+    return '<b>' + m + ' of your white numbers matched.</b><br>' + name + ': ' + (b ? '<b>hit.</b>' : 'no.');
+  }
+  function anyHit() {
+    if (!SEALED) return false;
+    if (results.fantasy5 && SEALED.fantasy5 && matchedF5().length > 0) return true;
+    if (results.fantasy5DoublePlay && SEALED.fantasy5) {
+      var fw = results.fantasy5DoublePlay.value;
+      if (SEALED.fantasy5.some(function (n) { return fw.indexOf(n) >= 0; })) return true;
+    }
+    if (results.daily3 && (SEALED.daily3 === results.daily3.value || sameDigits(SEALED.daily3, results.daily3.value))) return true;
+    if (results.daily4 && (SEALED.daily4 === results.daily4.value || sameDigits(SEALED.daily4, results.daily4.value))) return true;
+    if (results.powerball && SEALED.powerball) {
+      var w = results.powerball.value;
+      if (SEALED.powerball.whites.some(function (n) { return w.whites.indexOf(n) >= 0; })) return true;
+      if (w.bonus === SEALED.powerball.bonus) return true;
+    }
+    if (results.doublePlay && SEALED.powerball) {
+      var dw = results.doublePlay.value;
+      if (SEALED.powerball.whites.some(function (n) { return dw.whites.indexOf(n) >= 0; })) return true;
+      if (dw.bonus === SEALED.powerball.bonus) return true;
+    }
+    if (results.megaMillions && SEALED.megaMillions) {
+      var mw = results.megaMillions.value;
+      if (SEALED.megaMillions.whites.some(function (n) { return mw.whites.indexOf(n) >= 0; })) return true;
+      if (mw.bonus === SEALED.megaMillions.bonus) return true;
+    }
+    return false;
+  }
+
+  // ---------- the computed grades block ----------
+  // One place grades the night's main drawings — the match lines under
+  // each game and the grade card below all read from here. The Double
+  // Play rows are the exception: their prize text is consumed verbatim
+  // from the FEED's grades block (see dpGradeText), never computed here.
+  // Prize amounts are never invented: a hit says to check the Lottery app.
+  function computeGrades() {
+    var g = {};
+    if (!SEALED) return g;
+    if (results.fantasy5) g.fantasy5 = f5MatchLine(results.fantasy5.value);
+    if (results.daily3) g.daily3 = digitMatchLine('Daily 3', SEALED.daily3, results.daily3.value);
+    if (results.daily4) g.daily4 = digitMatchLine('Daily 4', SEALED.daily4, results.daily4.value);
+    if (results.powerball) g.powerball = pbMatchLine('Powerball', results.powerball.value);
+    if (results.megaMillions) g.megaMillions = pbMatchLine('Mega Millions', results.megaMillions.value);
+    return g;
+  }
+  function renderGrade() {
+    var g = computeGrades(), lines = [];
+    nightGames().forEach(function (game) { if (g[game]) lines.push(g[game]); });
+    el('gradebody').innerHTML = lines.length
+      ? lines.join('<br>')
+      : 'The grade comes by text tonight, after the numbers post —<br>watch your phone for the text, and this board for the numbers themselves.';
+  }
+
+  // ---------- the head line: two plain facts, kept separate ----------
+  function renderHead() {
+    var games = nightGames();
+    var posted = games.filter(function (g) { return !!results[g]; }).length;
+    var head, post;
+    if (!drawHasHappened()) {
+      head = 'THE DRAW IS TONIGHT AT 7:29. YOUR NUMBERS ARE IN.';
+      post = 'Winning numbers posted: not yet — the draw has not happened yet.';
+    } else if (posted === 0) {
+      head = 'THE DRAW HAS HAPPENED — IT RAN AT 7:29 PM.';
+      post = 'Winning numbers posted: not yet. They will land here the minute they post.';
+    } else if (posted < games.length) {
+      head = 'THE WINNING NUMBERS ARE COMING IN.';
+      post = 'Winning numbers posted: some are in — the rest are still on their way.';
+    } else {
+      head = 'THE WINNING NUMBERS ARE IN.';
+      post = 'Winning numbers posted: yes — every game for tonight, below.';
+    }
+    el('headline').textContent = head;
+    el('postline').textContent = post;
+  }
+
+  // ---------- validation: a value is refused, never displayed, if it is not a real shape ----------
+  function validSet(v, count, lo, hi) {
+    if (!Array.isArray(v) || v.length !== count) return null;
+    var out = [], i, n;
+    for (i = 0; i < v.length; i++) {
+      n = Number(v[i]);
+      if (!isFinite(n) || Math.floor(n) !== n || n < lo || n > hi || out.indexOf(n) >= 0) return null;
+      out.push(n);
+    }
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function validDigits(v, count) {
+    var s = String(v == null ? '' : v).replace(/\D/g, '');
+    if (s.length !== count) return null;
+    return s;
+  }
+  function validBig(v, maxWhite, maxBonus) {
+    if (!v || typeof v !== 'object') return null;
+    var w = validSet(v.whites, 5, 1, maxWhite), b = Number(v.bonus);
+    if (!w || !isFinite(b) || Math.floor(b) !== b || b < 1 || b > maxBonus) return null;
+    return { whites: w, bonus: b };
+  }
+  function validateGame(game, v) {
+    if (game === 'fantasy5') return validSet(v, 5, 1, 39);
+    if (game === 'fantasy5DoublePlay') return validSet(v, 5, 1, 39);
+    if (game === 'daily3') return validDigits(v, 3);
+    if (game === 'daily4') return validDigits(v, 4);
+    if (game === 'powerball') return validBig(v, 69, 26);
+    if (game === 'doublePlay') return validBig(v, 69, 26);
+    if (game === 'megaMillions') return validBig(v, 70, 24);
+    return null;
+  }
+
+  // ---------- the feed ----------
+  function applyFeed(data) {
+    if (!data || !data.games || typeof data.date !== 'string') return;
+    if (FEED_DATE && data.date < FEED_DATE) return; // never walk the night backwards
+    var s = buildSealed(data.date);
+    if (!s) return;
+    if (data.date !== FEED_DATE) {
+      FEED_DATE = data.date;
+      SEALED = s;
+      results = {}; // a new night: yesterday's numbers never linger
+      loadHand();
+      loadMine();
+    }
+    nightGames().forEach(function (g) {
+      if (data.games[g] != null) {
+        var v = validateGame(g, data.games[g]);
+        if (v !== null) results[g] = { value: v, source: 'feed' };
+      }
+    });
+    // the house grader's computed grades block — the Double Play rows
+    // consume their prize text from here verbatim, never computed here
+    GRADES = (data.grades && typeof data.grades === 'object') ? data.grades : null;
+    renderWin();
+  }
+  function checkFeed() {
+    var t = new Date();
+    el('lastcheck').textContent = 'Last checked at ' +
+      ((t.getHours() % 12) || 12) + ':' + pad2(t.getMinutes()) + (t.getHours() >= 12 ? ' PM.' : ' AM.');
+    if (typeof fetch !== 'function') return;
+    fetch(FEED_URL + '?t=' + t.getTime(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('not there'); return r.json(); })
+      .then(applyFeed)
+      .catch(function () { /* a missing feed = NOT POSTED YET — never an error screen */ });
+  }
+
+  // ---------- hand entry (labelled wherever it shows) ----------
+  function saveHand() {
+    if (!FEED_DATE) return;
+    var hand = {};
+    GAMES.forEach(function (g) { if (results[g] && results[g].source === 'hand') hand[g] = results[g].value; });
+    try { localStorage.setItem(MKEY, JSON.stringify({ date: FEED_DATE, hand: hand })); } catch (e) {}
+  }
+  function loadHand() {
+    try {
+      var raw = localStorage.getItem(MKEY);
+      if (!raw) return;
+      var p = JSON.parse(raw);
+      if (!p || p.date !== FEED_DATE || !p.hand) return;
+      nightGames().forEach(function (g) {
+        if (p.hand[g] != null) { var v = validateGame(g, p.hand[g]); if (v !== null) results[g] = { value: v, source: 'hand' }; }
+      });
+    } catch (e) {}
+  }
+  // ---------- Merry's own Fantasy 5 set (kept in this browser) ----------
+  function saveMine() {
+    if (!FEED_DATE) return;
+    try { localStorage.setItem(MINEKEY, JSON.stringify({ date: FEED_DATE, set: mineF5 })); } catch (e) {}
+  }
+  function loadMine() {
+    mineF5 = null;
+    try {
+      var raw = localStorage.getItem(MINEKEY);
+      if (!raw) return;
+      var p = JSON.parse(raw);
+      if (!p || p.date !== FEED_DATE) return;
+      var v = validateGame('fantasy5', p.set);
+      if (v !== null) mineF5 = v;
+    } catch (e) {}
+    if (SEALED) SEALED.fantasy5 = mineF5;
+  }
+  function parseNums(txt) {
+    return (String(txt).match(/\d+/g) || []).map(Number);
+  }
+  function setHand(game, value, okMsg) {
+    var v = validateGame(game, value), msg = el('handmsg');
+    if (v === null) { msg.textContent = 'That does not read as a full set of winning numbers for that game — nothing was changed.'; return; }
+    results[game] = { value: v, source: 'hand' };
+    saveHand(); renderWin();
+    msg.textContent = okMsg;
+  }
+  el('set-f5').addEventListener('click', function () {
+    setHand('fantasy5', parseNums(el('m-f5').value), 'Fantasy 5 winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-f5dp').addEventListener('click', function () {
+    setHand('fantasy5DoublePlay', parseNums(el('m-f5dp').value), 'Fantasy 5 Double Play winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-d3').addEventListener('click', function () {
+    setHand('daily3', el('m-d3').value, 'Daily 3 winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-d4').addEventListener('click', function () {
+    setHand('daily4', el('m-d4').value, 'Daily 4 winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-pb').addEventListener('click', function () {
+    var txt = el('m-pb').value, parts = txt.split('+'), nums = parseNums(txt), v = null;
+    if (parts.length === 2) {
+      var w = parseNums(parts[0]), b = parseNums(parts[1]);
+      if (w.length === 5 && b.length === 1) v = { whites: w, bonus: b[0] };
+    }
+    if (!v && nums.length === 6) v = { whites: nums.slice(0, 5), bonus: nums[5] };
+    setHand('powerball', v, 'Powerball winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-dp').addEventListener('click', function () {
+    var txt = el('m-dp').value, parts = txt.split('+'), nums = parseNums(txt), v = null;
+    if (parts.length === 2) {
+      var w = parseNums(parts[0]), b = parseNums(parts[1]);
+      if (w.length === 5 && b.length === 1) v = { whites: w, bonus: b[0] };
+    }
+    if (!v && nums.length === 6) v = { whites: nums.slice(0, 5), bonus: nums[5] };
+    setHand('doublePlay', v, 'Double Play winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-mm').addEventListener('click', function () {
+    var txt = el('m-mm').value, parts = txt.split('+'), nums = parseNums(txt), v = null;
+    if (parts.length === 2) {
+      var w = parseNums(parts[0]), b = parseNums(parts[1]);
+      if (w.length === 5 && b.length === 1) v = { whites: w, bonus: b[0] };
+    }
+    if (!v && nums.length === 6) v = { whites: nums.slice(0, 5), bonus: nums[5] };
+    setHand('megaMillions', v, 'Mega Millions winning numbers set by hand — marked TYPED IN BY HAND on the board.');
+  });
+  el('set-mine').addEventListener('click', function () {
+    var v = validateGame('fantasy5', parseNums(el('m-mine').value)), msg = el('minemsg');
+    if (v === null) { msg.textContent = 'That does not read as five Fantasy 5 numbers — nothing was changed.'; return; }
+    mineF5 = v;
+    if (SEALED) SEALED.fantasy5 = v;
+    saveMine(); renderWin();
+    msg.textContent = 'Your Fantasy 5 numbers are on the board — kept on this phone or computer for tonight.';
+  });
+
+  renderWin();
+  checkFeed();
+  setInterval(checkFeed, 60000);
+  setInterval(renderHead, 30000);
+</script>
+</body></html>

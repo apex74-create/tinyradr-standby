@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#02030a">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — DEEP SPACE WALLPAPER</title>
+<!--
+  APEX — DEEP SPACE WALLPAPER (Nov 10, 2026). The owner's brief,
+  minutes after his wrist verdict on UAP Space Scene V2
+  (21:24–21:29 EST — "fucking beautiful… outstanding"):
+
+    "just straight up this wallpaper, the actual scenario on the
+    website — just that running in the background, with a large
+    face digital clock, with the randomness going by, and if
+    anything some extra stars, pinpoints — that's it. That'd be
+    a killer face. It's like an aquarium but it's spaceships
+    floating around in it, with the galaxy spinning in the
+    background."
+
+  "THAT'S IT" IS THE SCOPE LOCK. This face is the shipped V2
+  living scene — dimensional four-arm galaxies spinning and
+  breathing, the ORGANIC POPULATION (continuous spawn pressure,
+  random wander, density-made laser fights and explosions,
+  accretion toilet-flush captures, boom-and-bust waves), the
+  420-star seeded field — with exactly TWO changes:
+
+   1. THE SCENE IS THE WHOLE GLASS. V2's top clock rail, label
+      lines and bordered sky box are gone; the sky runs
+      edge-to-edge behind everything, like an aquarium window.
+   2. A LARGE DIGITAL CLOCK floats front and centre: DSEG7
+      segment digits (house ApexDigital embed, SIL OFL 1.1,
+      zero external calls), HOLLOW in the house treatment —
+      OLED-black heart, bright stroke in the scene's own clock
+      cyan #7fe7ff. If the scene fights the digits, readability
+      wins through a soft dark halo BEHIND THE DIGITS ONLY.
+      Nothing else was added: no panels, no readouts, no bezel.
+
+   PLUS his one permitted addition: EXTRA PINPOINT STARS — a
+   second seeded field of 640 tiny sharp stars over the base
+   field (own seed stream, so the V2 sky is untouched).
+
+  SHAPE BAKED AT PURCHASE (owner's ruling, Nov 10, 20:28 EST):
+  no in-face shape controls; this file is the SQUARE build.
+
+  FROZEN HOUSE LAWS: vanilla standalone single file; motion
+  from first paint — NO REST / observe governor, no auto-exit;
+  battery care is a DIM-ONLY overlay after 60 s idle (never
+  stops motion); a driver throw raises the loud DRIVER FAULT
+  plate; no compass bezel, so Face Law 2 has nothing to govern;
+  Face Law 1's post pin governs analog hands and this face
+  carries none — its clock is the digital readout above.
+
+  BENCH SURFACE: window.__uap carries the ecology counters
+  (inherited from V2) plus pinpointCount; window.__state.clock
+  mirrors the big readout (HH:MM:SS) and window.__clockStr
+  carries it per tick. The ?accel=N bench accelerator multiplies
+  SIMULATION time only (never the clock), labelled in
+  __uap.benchAccel — a plain open runs at accel 1.
+
+  PALETTE — inherited from V2, CALLED COLOURS ONLY: deep space
+  #02030a, glass tint #060b1d, star white #f4f7ff, star dim
+  #8fa3c8, saucer hull #c7d2e0, saucer dome #7fe7ff, saucer lamp
+  #ffd34d, triangle hull #ff5d47, triangle core #ffe9a8, alien
+  hull #39ff6a, alien eye #03140a, galaxy core #fff3c4, galaxy
+  arm #b18cff, galaxy rim #4d6fff, clock cyan #7fe7ff, alarm
+  red #ff4d4d, amber #ffb000, laser red #ff6a3d, hot orange
+  #ff9a3d. The halo is deep-space black at partial alpha.
+-->
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#02030a;}
+  #stage{position:absolute;left:0;top:0;}
+  canvas{display:block;}
+  /* ---- THE CLOCK — front and centre, floating over the scene.
+     The scene is the window; the digits hover in it. Halo is a
+     soft text-shadow in deep space black, behind the digits
+     only — no panel, no plate, nothing else added. ---- */
+  #clockWrap{position:absolute;left:0;top:0;width:100%;height:100%;z-index:3;pointer-events:none;}
+  #halo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(2,3,10,0.52) 0%, rgba(2,3,10,0.34) 46%, rgba(2,3,10,0) 72%);}
+  #clock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;
+    font-family:"ApexDigital","Courier New",monospace;font-weight:700;line-height:1;
+    color:#000;-webkit-text-stroke:3px #7fe7ff;paint-order:stroke fill;letter-spacing:4px;
+    text-shadow:0 0 14px rgba(2,3,10,0.95),0 0 34px rgba(2,3,10,0.85),0 0 7px rgba(127,231,255,0.35);}
+  #fault{position:absolute;left:4%;top:4%;width:92%;z-index:8;display:none;background:#ff4d4d;color:#f4f7ff;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:bold;text-align:center;padding:8px 0;}
+  @font-face { font-family:"ApexDigital"; src:url(data:font/woff2;base64,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) format("woff2"); font-weight:700; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="sky"></canvas></div>
+<div id="clockWrap"><div id="halo"></div><div id="clock">--:--</div></div>
+<div id="fault"></div>
+<script>
+"use strict";
+/* ================================================================
+   THE SHAPE — BAKED AT PACKAGING, chosen at purchase.
+   This one constant is the whole shape mechanism. The store
+   build flips it; the app carries no shape control at all.
+   ================================================================ */
+var SHAPE = "square"; /* "square" | "round" | "rectangle" */
+
+/* Tuning constants — the ecology's dials, all in one place. */
+var START_POP = 8;          /* the slated starting population */
+var MAXCRAFT = 42;          /* renderer ceiling, nothing more */
+var SPAWN_EVERY = 2.2;      /* seconds of sim time per spawn */
+var COMBAT_R = 0.11;        /* co-location range (x min sky) */
+var FIGHT_DMG = 0.34;       /* damage per second while fighting */
+var FLUSH_R = 0.62;         /* capture radius (x galaxy radius) */
+
+/* Bench accelerator: ?accel=N multiplies simulation dt only. */
+var BENCH_ACCEL = 1;
+(function(){ var m = /[?&]accel=([0-9.]+)/.exec(location.search || "");
+  if (m){ var a = parseFloat(m[1]); if (a >= 1 && a <= 60) BENCH_ACCEL = a; } })();
+
+var cv = document.getElementById("sky");
+var ctx = cv.getContext("2d");
+var layout = null;
+
+var PAL = {
+  space:"#02030a", glass:"#060b1d", star:"#f4f7ff", starDim:"#8fa3c8",
+  hull:"#c7d2e0", dome:"#7fe7ff", lamp:"#ffd34d",
+  tri:"#ff5d47", triCore:"#ffe9a8",
+  alien:"#39ff6a", alienEye:"#03140a",
+  galCore:"#fff3c4", galArm:"#b18cff", galRim:"#4d6fff",
+  cyan:"#7fe7ff", red:"#ff4d4d", amber:"#ffb000",
+  laser:"#ff6a3d", hot:"#ff9a3d"
+};
+
+/* Three independent seeded streams: the starfield's (fixed sky)
+   and the ecology's (spawns, wander, fight luck) — the bench
+   reads positions, not luck, and the sky is the same sky on
+   every boot. */
+function lcg(seed){ var s = seed >>> 0; return function(){
+  s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x80000000; }; }
+var starRnd = lcg(987654321);
+var ecoRnd = lcg(20261110);
+
+/* Dense deterministic starfield: 420 stars. */
+var stars = [];
+for (var si = 0; si < 420; si++)
+  stars.push({ u:starRnd(), v:starRnd(), r:0.5 + starRnd()*1.6, ph:starRnd()*6.283 });
+
+/* EXTRA PINPOINT STARS — the owner's one permitted addition
+   (21:29 EST): a second, denser field of TINY SHARP stars laid
+   over the base field. Own seeded stream (seed apart from both
+   house streams) so the base sky stays byte-for-byte the V2
+   sky. Pinpoints are seasoning: small, dim, slow twinkle. */
+var pinRnd = lcg(777001);
+var pinpoints = [];
+for (var pi2 = 0; pi2 < 640; pi2++)
+  pinpoints.push({ u:pinRnd(), v:pinRnd(), r:0.4 + pinRnd()*0.5, ph:pinRnd()*6.283 });
+
+/* ---------------- layout: the wallpaper computation ------- */
+function computeLayout(W, H){
+  /* WALLPAPER LAYOUT: the sky IS the whole glass — the owner's
+     "just that running in the background". No rails, no boxes:
+     the face's only computed geometry is the full-canvas sky
+     plus the clock's fit numbers (digit size from the smaller
+     dimension so the readout is LARGE but never clipped). */
+  var L = { mode:"square", W:W, H:H };
+  var pad = Math.max(4, Math.round(Math.min(W, H) * 0.02));
+  L.pad = pad;
+  L.sky = { x:0, y:0, w:W, h:H };
+  L.cx = W / 2; L.cy = H / 2; L.R = Math.min(W, H) / 2;
+  var fs = Math.floor(Math.min(W, H) * 0.235);
+  L.clockFs = fs;
+  L.haloW = Math.round(Math.min(W, H) * 1.02);
+  L.haloH = Math.round(fs * 2.3);
+  return L;
+}
+
+/* ---------------- the cast ---------------------------------- */
+var SHIP_KINDS = ["saucer", "tri", "alien"];
+var craft = [], galaxies = [], sparks = [], flashes = [];
+var stats = { spawnCount:0, combatEvents:0, laserShots:0, explosions:0,
+              deathCount:0, accretionEvents:0, accretionDeaths:0 };
+var popHistory = [];        /* {t, pop} once per sim second */
+var spawnTimer = SPAWN_EVERY * 0.5, histTimer = 0, simT = 0;
+var shipSeq = 0;
+
+function spawnShip(initial){
+  if (craft.length >= MAXCRAFT) return null;
+  var kind = SHIP_KINDS[Math.floor(ecoRnd() * 3) % 3];
+  var u, v;
+  if (!initial && ecoRnd() < 0.6){
+    /* spawn near the action: on a ring around a galaxy, where
+       the sky is already interesting — density does the rest */
+    var g = galaxies[Math.floor(ecoRnd() * galaxies.length) % galaxies.length];
+    var a = ecoRnd() * 6.283, rr = 0.24 + ecoRnd() * 0.24;
+    u = g.u + Math.cos(a) * rr; v = g.v + Math.sin(a) * rr * 0.8;
+  } else { u = 0.06 + ecoRnd() * 0.88; v = 0.06 + ecoRnd() * 0.88; }
+  if (u < 0.03) u = 0.03; if (u > 0.97) u = 0.97;
+  if (v < 0.03) v = 0.03; if (v > 0.97) v = 0.97;
+  var ang = ecoRnd() * 6.283;
+  var spd = kind === "tri" ? 0.075 + ecoRnd()*0.03
+          : kind === "saucer" ? 0.050 + ecoRnd()*0.02
+          : 0.026 + ecoRnd()*0.012;
+  var c = { id:++shipSeq, kind:kind, u:u, v:v,
+            vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd*0.7,
+            hp:1, fightCd:0, fightWith:-1, shotT:0,
+            spin:ecoRnd()*6.28, wob:ecoRnd()*6.28,
+            size:0.040 + ecoRnd()*0.016,
+            cap:null };
+  craft.push(c);
+  if (!initial) stats.spawnCount++;
+  return c;
+}
+function makeGalaxy(i){
+  return { u:[0.27, 0.73][i%2], v:[0.32, 0.66][i%2], angle:i*1.31,
+           rotV:0.42 + 0.13*i,               /* faster than V1 */
+           vu:0.006*((i%2)?-1:1), vv:0.004*((i%2)?1:-1),
+           feedPh:i*31.0, pulsePh:i*2.4, size:0.185 - 0.03*i,
+           R:60, pulse:0 };
+}
+galaxies.push(makeGalaxy(0)); galaxies.push(makeGalaxy(1));
+for (var bi = 0; bi < START_POP; bi++) spawnShip(true);
+
+function skyPx(L, u, v){ return [L.sky.x + u*L.sky.w, L.sky.y + v*L.sky.h]; }
+function explode(c, why){
+  var p = skyPx(layout, c.u, c.v);
+  flashes.push({ x:p[0], y:p[1], r:4, life:0.55, max:0.55 });
+  for (var i = 0; i < 16; i++){
+    var a = ecoRnd()*6.283, s = 14 + ecoRnd()*46;
+    sparks.push({ x:p[0], y:p[1], vx:Math.cos(a)*s, vy:Math.sin(a)*s,
+                  life:0.5 + ecoRnd()*0.6, col: ecoRnd() < 0.5 ? PAL.hot : PAL.triCore });
+  }
+  stats.explosions++; stats.deathCount++;
+  if (why === "accretion") stats.accretionDeaths++;
+  c.dead = why;
+}
+
+/* ---------------- simulation -------------------------------- */
+function stepScene(dt){
+  simT += dt;
+  var L = layout, minSky = Math.min(L.sky.w, L.sky.h);
+  var i, j, c, g;
+
+  /* galaxies drift, turn, breathe */
+  for (i = 0; i < galaxies.length; i++){
+    g = galaxies[i];
+    g.u += g.vu * dt; g.v += g.vv * dt;
+    if (g.u < 0.12) { g.u = 0.12; g.vu = Math.abs(g.vu); }
+    if (g.u > 0.88) { g.u = 0.88; g.vu = -Math.abs(g.vu); }
+    if (g.v < 0.14) { g.v = 0.14; g.vv = Math.abs(g.vv); }
+    if (g.v > 0.86) { g.v = 0.86; g.vv = -Math.abs(g.vv); }
+    g.angle += g.rotV * dt;
+    g.pulse = 0.5 + 0.5 * Math.sin(simT * 0.45 + g.pulsePh);
+    g.feed = 0.5 + 0.5 * Math.sin(simT * 0.21 + g.feedPh);
+    g.R = g.size * minSky * (0.86 + 0.30 * g.pulse) * (1 + 0.05*(g.feed||0));
+  }
+
+  /* spawn pressure: continuous, ceilinged only for the renderer */
+  spawnTimer -= dt;
+  if (spawnTimer <= 0){
+    spawnTimer = SPAWN_EVERY * (0.7 + ecoRnd()*0.6);
+    spawnShip(false);
+  }
+
+  /* ships wander — random flight, no attraction, no steering */
+  for (i = 0; i < craft.length; i++){
+    c = craft[i];
+    if (c.cap){
+      /* THE ACCRETION TOILET FLUSH: caught by the arms,
+         free-spinning, spiralling down the drain. */
+      var cg = c.cap.g;
+      c.cap.a += c.cap.spin * dt;
+      c.cap.spin = 2.6 + 150 / Math.max(18, c.cap.r);
+      c.cap.r -= cg.R * 0.30 * dt;
+      var cp = skyPx(L, cg.u, cg.v);
+      var px = cp[0] + Math.cos(c.cap.a) * c.cap.r;
+      var py = cp[1] + Math.sin(c.cap.a) * c.cap.r * 0.62;
+      c.u = (px - L.sky.x) / L.sky.w; c.v = (py - L.sky.y) / L.sky.h;
+      if (c.cap.r < cg.R * 0.14){ explode(c, "accretion"); }
+      continue;
+    }
+    var turn = (ecoRnd() - 0.5) * 1.5 * dt;
+    var ca = Math.cos(turn), sa = Math.sin(turn);
+    var nvx = c.vx*ca - c.vy*sa, nvy = c.vx*sa + c.vy*ca;
+    c.vx = nvx; c.vy = nvy;
+    var slow = (c.fightWith >= 0) ? 0.3 : 1;
+    c.u += c.vx * slow * dt; c.v += c.vy * slow * dt;
+    if (c.u < -0.05) c.u += 1.10; if (c.u > 1.05) c.u -= 1.10;
+    if (c.v < -0.05) c.v += 1.10; if (c.v > 1.05) c.v -= 1.10;
+    c.spin += dt * 0.7; c.fightCd = Math.max(0, c.fightCd - dt);
+    c.shotT = Math.max(0, c.shotT - dt);
+
+    /* accretion capture: too close to a galaxy's heart */
+    var sp = skyPx(L, c.u, c.v);
+    for (j = 0; j < galaxies.length; j++){
+      g = galaxies[j];
+      var gp = skyPx(L, g.u, g.v);
+      var dx = sp[0]-gp[0], dy = (sp[1]-gp[1]) / 0.62;
+      var d = Math.sqrt(dx*dx + dy*dy);
+      if (d < g.R * FLUSH_R && d > 1){
+        c.cap = { g:g, r:d, a:Math.atan2(dy, dx), spin:2.6 };
+        stats.accretionEvents++;
+        break;
+      }
+    }
+  }
+
+  /* combat: co-located ships squabble — lasers, damage, death.
+     Nobody is steered into a fight; density makes them happen. */
+  var fighting = {};
+  for (i = 0; i < craft.length; i++){
+    if (craft[i].cap || craft[i].dead) continue;
+    for (j = i+1; j < craft.length; j++){
+      if (craft[j].cap || craft[j].dead) continue;
+      var a2 = craft[i], b2 = craft[j];
+      var ddx = (a2.u - b2.u) * L.sky.w, ddy = (a2.v - b2.v) * L.sky.h;
+      var dd = Math.sqrt(ddx*ddx + ddy*ddy);
+      if (dd < COMBAT_R * minSky){
+        if (a2.fightWith !== b2.id && a2.fightCd <= 0) stats.combatEvents++;
+        a2.fightWith = b2.id; b2.fightWith = a2.id;
+        a2.fightCd = 2.5; b2.fightCd = 2.5;
+        fighting[a2.id] = b2; fighting[b2.id] = a2;
+        a2.hp -= FIGHT_DMG * dt * (0.7 + ecoRnd()*0.6);
+        b2.hp -= FIGHT_DMG * dt * (0.7 + ecoRnd()*0.6);
+        if (a2.shotT <= 0){ a2.shotT = 0.16; stats.laserShots++; }
+        if (b2.shotT <= 0){ b2.shotT = 0.16; stats.laserShots++; }
+      }
+    }
+  }
+  window.__fighting = fighting;
+  for (i = craft.length - 1; i >= 0; i--){
+    if (craft[i].dead){ craft.splice(i, 1); continue; }
+    if (craft[i].hp <= 0 && !craft[i].cap) explode(craft[i], "combat");
+    if (craft[i].dead) craft.splice(i, 1);
+  }
+
+  /* sparks + flashes */
+  for (i = sparks.length - 1; i >= 0; i--){
+    var s2 = sparks[i]; s2.x += s2.vx*dt; s2.y += s2.vy*dt; s2.life -= dt;
+    if (s2.life <= 0) sparks.splice(i, 1);
+  }
+  for (i = flashes.length - 1; i >= 0; i--){
+    flashes[i].r += 90*dt; flashes[i].life -= dt;
+    if (flashes[i].life <= 0) flashes.splice(i, 1);
+  }
+
+  /* population curve: one sample per sim second */
+  histTimer -= dt;
+  if (histTimer <= 0){ histTimer = 1; popHistory.push({ t:+simT.toFixed(1), pop:craft.length });
+    if (popHistory.length > 900) popHistory.shift(); }
+}
+
+/* ---------------- drawing ----------------------------------- */
+function drawStars(L, t){
+  for (var i = 0; i < stars.length; i++){
+    var s = stars[i], p = skyPx(L, s.u, s.v);
+    var tw = 0.55 + 0.45 * Math.sin(t * 1.7 + s.ph);
+    ctx.globalAlpha = 0.30 + 0.55 * tw;
+    ctx.fillStyle = (i % 5 === 0) ? PAL.starDim : PAL.star;
+    ctx.beginPath(); ctx.arc(p[0], p[1], s.r, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawPinpoints(L, t){
+  /* tiny sharp pinpoints over the base field — drawn crisp
+     (small radius, high centre alpha, no blur), twinkling slow */
+  for (var i = 0; i < pinpoints.length; i++){
+    var s = pinpoints[i], p = skyPx(L, s.u, s.v);
+    var tw = 0.5 + 0.5 * Math.sin(t * 0.9 + s.ph);
+    ctx.globalAlpha = 0.28 + 0.50 * tw;
+    ctx.fillStyle = (i % 7 === 0) ? PAL.starDim : PAL.star;
+    ctx.beginPath(); ctx.arc(p[0], p[1], s.r, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawGalaxy(L, g, t){
+  var p = skyPx(L, g.u, g.v), R = g.R, feed = g.feed || 0;
+  /* layered rim: two offset discs — the dimension comes from
+     the layering, not from a wash */
+  ctx.globalAlpha = 0.34; ctx.fillStyle = PAL.galRim;
+  ctx.beginPath(); ctx.ellipse(p[0], p[1], R*1.04, R*0.66, 0, 0, 6.2832); ctx.fill();
+  ctx.globalAlpha = 0.30;
+  ctx.beginPath(); ctx.ellipse(p[0]-R*0.05, p[1]-R*0.05, R*0.92, R*0.58, 0, 0, 6.2832); ctx.fill();
+  /* FOUR arms, stretched long (sweep 3.4 rad, reach 1.12 R),
+     drawn in three overlapping passes: halo, body, bright
+     spine — progressive overlap is what makes it read deep */
+  var passes = [ {k:2.1, a:0.13}, {k:1.35, a:0.30}, {k:0.7, a:0.55} ];
+  for (var pi = 0; pi < passes.length; pi++){
+    var ps = passes[pi];
+    for (var arm = 0; arm < 4; arm++){
+      for (var k = 0; k < 26; k++){
+        var f = k / 26;
+        var a = g.angle + arm * 1.5708 + f * 3.4;
+        var rr = R * (0.13 + 1.02 * f) * (1 - 0.18 * feed * f);
+        var x = p[0] + Math.cos(a) * rr, y = p[1] + Math.sin(a) * rr * 0.62;
+        ctx.globalAlpha = ps.a * (1 - f * 0.75) * (0.8 + 0.4*feed);
+        ctx.fillStyle = PAL.galArm;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(0.8, R * 0.052 * ps.k * (1 - f * 0.45)), 0, 6.2832);
+        ctx.fill();
+      }
+    }
+  }
+  /* accretion core — brighter while it feeds */
+  ctx.globalAlpha = 1; ctx.fillStyle = PAL.galCore;
+  ctx.beginPath(); ctx.arc(p[0], p[1], R * (0.14 + 0.06 * feed), 0, 6.2832); ctx.fill();
+  ctx.globalAlpha = 0.9; ctx.fillStyle = PAL.star;
+  ctx.beginPath(); ctx.arc(p[0], p[1], R * 0.065, 0, 6.2832); ctx.fill();
+  ctx.globalAlpha = 1;
+}
+function drawSaucer(L, c, t){
+  var p = skyPx(L, c.u, c.v + 0.008 * Math.sin(t * 1.3 + c.wob));
+  var s = c.size * Math.min(L.sky.w, L.sky.h);
+  ctx.fillStyle = PAL.dome;
+  ctx.beginPath(); ctx.arc(p[0], p[1] - s*0.16, s*0.34, 3.1416, 0); ctx.fill();
+  ctx.fillStyle = PAL.hull;
+  ctx.beginPath(); ctx.ellipse(p[0], p[1], s, s*0.30, 0, 0, 6.2832); ctx.fill();
+  for (var i = 0; i < 5; i++){
+    var on = Math.sin(t * 4 + c.wob + i * 1.1) > 0;
+    ctx.fillStyle = on ? PAL.lamp : PAL.starDim;
+    ctx.beginPath(); ctx.arc(p[0] + (i-2)*s*0.34, p[1] + s*0.10, Math.max(1, s*0.07), 0, 6.2832); ctx.fill();
+  }
+  if (c.hp < 0.55){ /* battle damage smokes */
+    ctx.fillStyle = PAL.hot;
+    ctx.beginPath(); ctx.arc(p[0] + s*0.4, p[1] - s*0.2, Math.max(1, s*0.10), 0, 6.2832); ctx.fill();
+  }
+}
+function drawTriangle(L, c, t){
+  var p = skyPx(L, c.u, c.v);
+  var s = c.size * Math.min(L.sky.w, L.sky.h);
+  ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(c.spin * 0.12);
+  ctx.fillStyle = PAL.tri;
+  ctx.beginPath();
+  ctx.moveTo(0, -s); ctx.lineTo(s*0.9, s*0.7); ctx.lineTo(-s*0.9, s*0.7); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = PAL.triCore;
+  ctx.beginPath(); ctx.arc(0, s*0.12, s*0.26, 0, 6.2832); ctx.fill();
+  ctx.restore();
+}
+function drawAlien(L, c, t){
+  var p = skyPx(L, c.u, c.v);
+  var s = c.size * Math.min(L.sky.w, L.sky.h);
+  var wob = 1 + 0.06 * Math.sin(t * 2.2 + c.wob);
+  ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(-0.3 + 0.08 * Math.sin(t * 1.1 + c.wob));
+  ctx.fillStyle = PAL.alien;
+  ctx.beginPath(); ctx.ellipse(0, 0, s*0.52*wob, s*0.78, 0, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = PAL.alienEye;
+  ctx.save(); ctx.translate(-s*0.20, -s*0.10); ctx.rotate(-0.5);
+  ctx.beginPath(); ctx.ellipse(0, 0, s*0.16, s*0.055, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.translate(s*0.20, -s*0.10); ctx.rotate(0.5);
+  ctx.beginPath(); ctx.ellipse(0, 0, s*0.16, s*0.055, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+  ctx.fillStyle = PAL.alien;
+  ctx.beginPath(); ctx.moveTo(-s*0.30, s*0.55); ctx.lineTo(s*0.30, s*0.55); ctx.lineTo(0, s*0.95); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function drawShip(L, c, t){
+  if (c.kind === "saucer") drawSaucer(L, c, t);
+  else if (c.kind === "tri") drawTriangle(L, c, t);
+  else drawAlien(L, c, t);
+}
+function drawEffects(L){
+  var f = window.__fighting || {}, i, c;
+  /* laser fire between squabbling pairs — drawn once per pair */
+  var drawn = {};
+  for (i = 0; i < craft.length; i++){
+    c = craft[i]; var o = f[c.id];
+    if (!o || drawn[c.id]) continue;
+    drawn[c.id] = 1; drawn[o.id] = 1;
+    var p1 = skyPx(L, c.u, c.v), p2 = skyPx(L, o.u, o.v);
+    ctx.globalAlpha = 0.55 + 0.45 * Math.sin(simT * 47 + c.id);
+    ctx.strokeStyle = c.kind === "tri" ? PAL.laser : (c.kind === "alien" ? PAL.alien : PAL.cyan);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  for (i = 0; i < flashes.length; i++){
+    var fl = flashes[i];
+    ctx.globalAlpha = Math.max(0, fl.life / fl.max) * 0.9;
+    ctx.strokeStyle = PAL.hot; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 6.2832); ctx.stroke();
+    ctx.fillStyle = PAL.triCore;
+    ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r * 0.35, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  for (i = 0; i < sparks.length; i++){
+    var s = sparks[i];
+    ctx.globalAlpha = Math.max(0, Math.min(1, s.life));
+    ctx.fillStyle = s.col;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 1.6, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ================================================================
+   THE FAULT PLATE + THE FRAME (DOM fault, wallpaper frame).
+   ================================================================ */
+var faultText = "";
+var faultEl = document.getElementById("fault");
+function drawFault(L){
+  faultEl.textContent = "DRIVER FAULT — " + faultText;
+  faultEl.style.display = "block";
+}
+
+function renderFrame(t, now){
+  var L = layout, i;
+  ctx.fillStyle = PAL.space; ctx.fillRect(0, 0, L.W, L.H);
+  drawStars(L, t);
+  drawPinpoints(L, t);
+  for (i = 0; i < galaxies.length; i++) drawGalaxy(L, galaxies[i], t);
+  for (i = 0; i < craft.length; i++) drawShip(L, craft[i], t);
+  drawEffects(L);
+  if (window.__driverFault) drawFault(L);
+}
+
+/* ================================================================
+   THE ALWAYS-LIVE DRIVER — no governor, no REST, no observe
+   gate, no auto-exit. Battery care is the DIM ONLY, below.
+   ================================================================ */
+var state = "live", raf = 0, driverStart = 0, lastMs = -1, elapsed = 0;
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+window.__driverFault = null;
+var lastInteract = performance.now();
+function noteInteract(){ lastInteract = performance.now(); }
+
+var stage = document.getElementById("stage");
+var dimEl = document.createElement("div");
+dimEl.id = "faceDim";
+dimEl.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;background:#000;opacity:0;pointer-events:none;transition:opacity 0.8s ease;z-index:5;";
+stage.appendChild(dimEl);
+setInterval(function(){
+  dimEl.style.opacity = ((performance.now() - lastInteract) > 60000) ? "0.45" : "0";
+}, 1000);
+
+function refreshBench(now){
+  var acc = 0, i;
+  for (i = 0; i < craft.length; i++) if (craft[i].cap) acc++;
+  window.__uap = {
+    shape: SHAPE, pop: craft.length,
+    spawnCount: stats.spawnCount, combatEvents: stats.combatEvents,
+    laserShots: stats.laserShots, explosions: stats.explosions,
+    deathCount: stats.deathCount,
+    accretionEvents: stats.accretionEvents, accretionDeaths: stats.accretionDeaths,
+    accretionActive: acc, simT: +simT.toFixed(1),
+    benchAccel: BENCH_ACCEL, popHistory: popHistory, pinpointCount: pinpoints.length,
+    galaxies: galaxies.map(function(g){ return { angle:+g.angle.toFixed(2), pulse:+g.pulse.toFixed(2), R:+g.R.toFixed(1) }; }),
+    craft: craft.map(function(c){ return { id:c.id, kind:c.kind, u:+c.u.toFixed(3), v:+c.v.toFixed(3), hp:+c.hp.toFixed(2), cap:!!c.cap }; })
+  };
+  window.__state = { t:+elapsed.toFixed(2), state:state, driverFault:window.__driverFault,
+    shape:SHAPE, clock: (window.__clockStr || ""),
+    craft: window.__uap.craft,
+    galaxies: galaxies.map(function(g){ return { u:+g.u.toFixed(3), v:+g.v.toFixed(3), angle:+g.angle.toFixed(2) }; }) };
+}
+function frameBody(nowMs){
+  var dt = 0;
+  if (lastMs >= 0) dt = Math.min(0.05, (nowMs - lastMs) / 1000);
+  lastMs = nowMs;
+  elapsed = (nowMs - driverStart) / 1000;
+  var simDt = dt * BENCH_ACCEL;
+  var steps = Math.max(1, Math.ceil(simDt / 0.05));
+  var sub = simDt / steps;
+  for (var k = 0; k < steps; k++) stepScene(sub);
+  var now = new Date();
+  renderFrame(elapsed, now);
+  refreshBench(now);
+}
+function frame(nowMs){
+  try { frameBody(nowMs); }
+  catch(err){
+    window.__driverFault = { message:String(err && err.message || err), t:+elapsed.toFixed(2) };
+    faultText = window.__driverFault.message;
+    try { renderFrame(elapsed, new Date()); } catch(e){}
+    if (raf) cancelAnimationFrame(raf); raf = 0;
+    return;
+  }
+  raf = requestAnimationFrame(frame);
+}
+window.ApexFace = {
+  observe:function(){ noteInteract(); gov.lastSignal = "container-observe(noop)"; },
+  rest:function(){ noteInteract(); gov.lastSignal = "container-rest(noop)"; },
+  toggle:function(){ noteInteract(); },
+  state:function(){ return "live"; }
+};
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ noteInteract(); }, true);
+});
+window.addEventListener("focus", function(){ noteInteract(); });
+document.addEventListener("visibilitychange", function(){ if (!document.hidden) noteInteract(); });
+
+
+/* ---------------- the big digital clock (DOM) ------------------
+   DSEG7 segment digits via the house ApexDigital embed (SIL OFL
+   1.1), HOLLOW in the house treatment: OLED-black heart, bright
+   stroke in the scene's own clock cyan — the same stroke/fill
+   construction the hierographic engine's Casio readout wears.
+   Updated on the driver's own tick from the wall clock; the
+   digits are the face's ONLY readout. */
+function fmt2(n){ return (n < 10 ? "0" : "") + n; }
+var clockEl = document.getElementById("clock");
+var haloEl = document.getElementById("halo");
+var lastClockStr = "";
+function tickClock(){
+  var now = new Date();
+  var str = fmt2(now.getHours()) + ":" + fmt2(now.getMinutes());
+  if (str !== lastClockStr){ clockEl.textContent = str; lastClockStr = str; }
+  window.__clockStr = str + ":" + fmt2(now.getSeconds());
+}
+setInterval(tickClock, 250); tickClock();
+
+function sizeCanvas(){
+  var w = Math.max(1, Math.round(window.innerWidth)), h = Math.max(1, Math.round(window.innerHeight));
+  cv.width = w; cv.height = h;
+  stage.style.width = w + "px"; stage.style.height = h + "px";
+  layout = computeLayout(w, h);
+  clockEl.style.fontSize = layout.clockFs + "px";
+  clockEl.style.webkitTextStrokeWidth = Math.max(1.5, layout.clockFs * 0.045) + "px";
+  haloEl.style.width = layout.haloW + "px";
+  haloEl.style.height = layout.haloH + "px";
+}
+var resizeTimer = 0;
+window.addEventListener("resize", function(){
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(sizeCanvas, 60);
+});
+
+/* ---- Boot: layout from measured pixels, THE DRIVER STARTS
+   NOW, unconditionally — first paint is already a living sky. */
+sizeCanvas();
+driverStart = performance.now(); lastMs = -1; elapsed = 0;
+raf = requestAnimationFrame(frame);
+</script>
+</body>
+</html>

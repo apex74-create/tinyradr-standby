@@ -1,0 +1,1 @@
+import{t as e}from"./link-De8nA1so.js";import{t}from"./jsx-runtime-NZYk81nU.js";var n=t(),r=()=>(0,n.jsxs)(`main`,{className:`min-h-dvh bg-background px-4 py-8 text-[11px] text-muted-foreground`,children:[`No such paper.`,` `,(0,n.jsx)(e,{to:`/library`,className:`text-signal underline`,children:`Back to the library`}),`.`]});export{r as notFoundComponent};

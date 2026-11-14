@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apex Service Machinery Clock — SQUARE</title>
+<!--
+  SERVICE MACHINERY CLOCK — SQUARE EDITION v3 (Nov 8, 2026).
+
+  OWNER VERDICT ON v2 (Nov 8, 2026, 03:39 EST): "the square engine
+  build is completely wrong — the light-up boxes in the middle are
+  behind a bunch of wording — and there is no depiction of the
+  engine. I want just the engine and the title header with the
+  clock and the Detroit time and all that, the inception date and
+  all that stuff. I just want that shit. I don't want the big
+  column of text underneath it explaining everything. I just want
+  to see the engine and its little tachometers. That's it."
+  Amendments same hour: MORE gears / pinions / rings / worms with
+  tonal shading for dimension (03:40); the Matrix waterfall +
+  all his styling cues (03:40); the render check is a VM job
+  (03:40); the styling is a LIBRARY CARD call (03:43).
+
+  WHAT SHIPS — THE COMPLETE PIECE LIST (nothing else):
+    1. THE BANNER — Detroit clock (analog + Casio-weight digital,
+       steel-blue seconds), the Matrix waterfall falling behind
+       it, and the founding strip exactly as the main board
+       carries it (FOUNDED + live minutes = FACTORY ACTIVATED +
+       live minutes, the balance bar; CONFIG.founding below is
+       byte-identical to the main board's).
+    2. THE ENGINE, DEPICTED — a drawn machine: concentric cadence
+       RINGS with pinions inside, meshing GEARS and PINIONS, a
+       WORM driving its shaft and wheel, a flywheel. The output
+       line ENGINES -> APPLICATIONS -> THE STORE lights one stage
+       per pulse revolution ON the machine's own compartments —
+       stage names sit on raised name bars in clear space; no
+       text overlaps the engine or its lit stages; no wording
+       over, under, or beneath anything. A tiny x10 mark on the
+       plate is the only note the machine carries.
+    3. ITS LITTLE TACHOMETERS — the operational clocks as
+       instrument dials in upright columns (left: PULSE over
+       VOLLEY; right: HALF-HOUR), true ratios 3:10:30, one-line
+       caption under each dial: name + period. Nothing else.
+
+  CUT, by the owner's word: the honesty footer, every explanatory
+  sentence, the engine caption lines, the dial tick counters and
+  sub-lines, the SQUARE tag. If a line of text is not the header's
+  clock/founding facts, a stage name on the machine, the machine's
+  nameplate, or a dial caption — it does not ship.
+
+  STYLING IS A LIBRARY CALL: the LIBRARY CARD block at the top of
+  the script holds every styling parameter (palette, waterfall,
+  light + shadow depth, pin/bolt furniture, dial form, digit
+  weight). Every styled element in this build reads from that
+  block — change the card and the whole face follows.
+
+  LIGHT: one direction, from the NORTH-WEST — highlights on the
+  upper-left of every gear, dial and bolt; shadows fall to the
+  lower-right. Gear faces carry metallic tonal gradients, never
+  flat fills; recesses between teeth are darkened; dial faces
+  are recessed under shaded bezels.
+
+  The clock is REAL (America/Detroit). Motion is time-compressed
+  x10 with true ratios. All art is embedded — zero external
+  assets. One square screen, no scroll, at 480x480 and 360x360.
+  The main board file is untouched.
+-->
+<style>
+  :root{
+    --ink:#e6edf3; --dim:#8b949e; --line:#30363d;
+    --brass:#c9a227; --brass-hi:#f0c93f; --blue:#58a6ff; --blue-dk:#1f6feb;
+    --green:#3fb950; --amber:#d29922; --panel:rgba(13,17,23,.92);
+    --digit-w:800;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:#05070a; height:100%;}
+  body{font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace; color:var(--ink);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;}
+
+  /* the square: one screen, no scroll */
+  #panel{position:relative; width:100vmin; height:100vmin; max-width:680px; max-height:680px;
+    background:var(--panel); border:1px solid var(--line); overflow:hidden;
+    display:flex; flex-direction:column;}
+  #panel>*{position:relative; z-index:1;}
+  #panel>#waterfall{position:absolute; z-index:0;}
+
+  /* ---------- the Matrix waterfall — the header's ground ---------- */
+  #waterfall{position:absolute; inset:0; overflow:hidden; pointer-events:none;
+    opacity:.5;
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 46%, rgba(0,0,0,.45) 68%, transparent 88%);
+            mask-image:linear-gradient(180deg, #000 0%, #000 46%, rgba(0,0,0,.45) 68%, transparent 88%);}
+  .wfCol{position:absolute; top:0; height:200%; will-change:transform;
+    animation-name:wfFall; animation-timing-function:linear; animation-iteration-count:infinite;}
+  .wfIn{display:flex; flex-direction:column; align-items:center;
+    animation-name:wfBob; animation-timing-function:ease-in-out;
+    animation-iteration-count:infinite; animation-direction:alternate;}
+  .wfIn span{font-size:11px; line-height:1.5; font-weight:700; color:rgba(63,185,80,.32);}
+  .wfIn span.wfHead{color:rgba(126,231,135,.85); text-shadow:0 0 6px rgba(63,185,80,.8);}
+  @keyframes wfFall{from{transform:translateY(-55%);} to{transform:translateY(55%);}}
+  @keyframes wfBob{from{transform:translateY(0) scale(1);} to{transform:translateY(3px) scale(1.045);}}
+
+  /* ---------- header / clock (the banner) ---------- */
+  header{position:relative; overflow:hidden; display:flex; align-items:center; gap:10px; padding:9px 12px;
+    border-bottom:1px solid var(--line); background:rgba(31,111,235,.07);}
+  header::after{content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(105deg, transparent 42%, rgba(255,255,255,.07) 50%, transparent 58%);
+    transform:translateX(-110%); animation:sheen 7s ease-in-out infinite;}
+  @keyframes sheen{0%,52%{transform:translateX(-110%);} 88%,100%{transform:translateX(110%);}}
+  #analog{flex:0 0 auto; filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));}
+  .clocktxt{flex:1 1 auto; min-width:0;}
+  #digital{font-size:27px; font-weight:var(--digit-w); letter-spacing:3px; line-height:1; color:var(--ink);
+    text-shadow:0 2px 3px rgba(0,0,0,.65);}
+  #digital .sec{color:var(--blue);}
+  #dateline{font-size:10px; letter-spacing:2.5px; color:var(--dim); margin-top:4px;}
+  #tzlabel{font-size:9px; letter-spacing:2px; color:var(--brass); margin-top:2px;}
+
+  /* ---------- the founding strip (as the main board carries it) ---------- */
+  #founding{padding:8px 12px 9px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(88,166,255,.07), rgba(201,162,39,.05));
+    box-shadow:inset 0 -14px 18px -14px rgba(240,201,63,.30);}
+  #founding .feq{display:flex; align-items:baseline; flex-wrap:wrap; gap:3px 7px;
+    font-size:10.5px; letter-spacing:.6px; line-height:1.5;}
+  #founding .flab{font-size:8px; letter-spacing:1.6px; color:var(--dim);}
+  #founding .finc{color:var(--blue); font-weight:700; white-space:nowrap;}
+  #founding .fact{color:var(--green); font-weight:700; white-space:nowrap;}
+  #founding .fmin{color:var(--amber); font-weight:700; white-space:nowrap;}
+  #founding .fop{color:var(--brass-hi); font-weight:700;}
+  #founding .fnow{margin-left:auto; color:var(--ink); font-weight:700; letter-spacing:1.5px; white-space:nowrap;}
+  #founding .fplace{flex:1 0 100%; font-size:8px; letter-spacing:2.5px; color:var(--brass); margin-top:1px;}
+  #founding .fbar{display:flex; height:9px; margin-top:6px; border:1px solid rgba(48,54,61,.9);
+    border-radius:5px; overflow:hidden; background:rgba(255,255,255,.05);
+    box-shadow:0 1px 3px rgba(0,0,0,.45);}
+  #founding .fsegH{height:100%; background:linear-gradient(180deg, rgba(88,166,255,.55), rgba(31,111,235,.45));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25);}
+  #founding .fsegF{height:100%; background:linear-gradient(180deg, rgba(240,201,63,.55), rgba(210,153,34,.45));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25);}
+  #founding .fsegLab{display:flex; justify-content:space-between; gap:8px; margin-top:3px;
+    font-size:8px; letter-spacing:1.2px; color:var(--dim);}
+  #founding .fsegLab b{font-weight:400;}
+  #founding .segHand b{color:var(--blue);}
+  #founding .segFact b{color:var(--amber);}
+
+  /* ---------- the stage: dial columns upright, the engine between ---------- */
+  #stage{flex:1 1 auto; min-height:0; display:flex; gap:8px; padding:9px 10px;
+    background:radial-gradient(ellipse 90% 55% at 50% 92%, rgba(240,201,63,.08), rgba(31,111,235,.04) 55%, transparent 75%);}
+  .col{flex:0 0 108px; min-width:0; display:flex; flex-direction:column; gap:8px; min-height:0;}
+
+  /* an operational clock: an instrument dial, standing upright */
+  .opclock{flex:1 1 0; min-height:0; min-width:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; padding:7px 4px 6px; text-align:center;
+    background:rgba(255,255,255,.028); border:1px solid rgba(48,54,61,.8); border-radius:10px;
+    box-shadow:0 3px 8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);}
+  .opclock svg{display:block; width:min(64px, 56%); height:auto; aspect-ratio:1;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.55));}
+  .col .opclock.tall svg{width:min(98px, 90%);}
+  .opclock .lamp{fill:var(--green);}
+  .opclock .lamp.fire{fill:#e3ff9a; filter:drop-shadow(0 0 3px rgba(163,255,140,.95));}
+  .opclock .occap{font-size:7.6px; letter-spacing:.6px; color:var(--ink); white-space:nowrap;}
+  .opclock .occap .per{color:var(--brass);}
+  .opclock.fire{border-color:rgba(163,255,140,.75); box-shadow:0 0 9px rgba(63,185,80,.35) inset;}
+
+  /* ---------- the engine, centre: a bolted plate, the machine on it ---------- */
+  #engine{flex:1 1 auto; min-width:0; display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(88,166,255,.20); border-radius:12px; padding:6px;
+    background:linear-gradient(180deg, rgba(88,166,255,.07), rgba(88,166,255,.03) 55%, rgba(201,162,39,.06));
+    box-shadow:inset 0 -20px 26px -20px rgba(240,201,63,.38), 0 3px 8px rgba(0,0,0,.5);}
+  #machine{width:100%; height:100%; display:block;
+    font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;}
+  #machine .stagebg{transition:filter .25s;}
+  #machine text{user-select:none;}
+
+  /* watch-size square: same composition, tighter type; the finest
+     detail layer thins out rather than turning to mud */
+  @media (max-width:400px){
+    header{padding:6px 9px; gap:8px;}
+    #analog{width:36px; height:36px;}
+    #digital{font-size:20px; letter-spacing:2px;}
+    #dateline{font-size:8px; letter-spacing:1.8px; margin-top:2px;}
+    #tzlabel{font-size:7.5px; margin-top:1px;}
+    #founding{padding:5px 9px 6px;}
+    #founding .feq{font-size:8.5px; line-height:1.4;}
+    #founding .fbar{height:7px; margin-top:4px;}
+    #founding .fsegLab{font-size:7px; margin-top:2px;}
+    #stage{gap:5px; padding:6px 7px;}
+    .col{flex-basis:84px; gap:5px;}
+    .opclock{padding:5px 3px 4px; gap:2px;}
+    .opclock svg{width:min(50px, 60%);}
+    .col .opclock.tall svg{width:min(74px, 92%);}
+    .opclock .occap{font-size:6.4px; letter-spacing:.2px;}
+    #engine{padding:4px;}
+    #machine .fine{display:none;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .wfCol,.wfIn,header::after{animation:none;}
+    #machine .stagebg{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div id="panel">
+  <div id="waterfall" aria-hidden="true"></div>
+
+  <!-- ===== THE BANNER: the Detroit clock, the waterfall behind ===== -->
+  <header>
+    <svg id="analog" width="46" height="46" viewBox="0 0 46 46" aria-label="analog clock">
+      <circle cx="23" cy="23" r="21" fill="rgba(88,166,255,.06)" stroke="#58a6ff" stroke-width="1.4"/>
+      <circle cx="23" cy="23" r="17.5" fill="none" stroke="rgba(139,148,158,.35)" stroke-width=".7"/>
+      <g stroke="#8b949e" stroke-width="1">
+        <line x1="23" y1="3.6" x2="23" y2="6.4"/><line x1="23" y1="39.6" x2="23" y2="42.4"/>
+        <line x1="3.6" y1="23" x2="6.4" y2="23"/><line x1="39.6" y1="23" x2="42.4" y2="23"/>
+      </g>
+      <line id="ah" x1="23" y1="23" x2="23" y2="12.5" stroke="#e6edf3" stroke-width="2.6" stroke-linecap="round"/>
+      <line id="am" x1="23" y1="23" x2="23" y2="8.5"  stroke="#58a6ff" stroke-width="1.8" stroke-linecap="round"/>
+      <line id="as" x1="23" y1="26" x2="23" y2="7"   stroke="#f0c93f" stroke-width="1"   stroke-linecap="round"/>
+      <circle cx="23" cy="23" r="2" fill="#c9a227"/>
+      <!-- the center pin — a seated pin at the hub, caught light on its cap -->
+      <circle cx="23" cy="23" r="3.2" fill="none" stroke="rgba(0,0,0,.5)" stroke-width=".9"/>
+      <circle cx="23" cy="23" r=".95" fill="#ffe98a"/>
+    </svg>
+    <div class="clocktxt">
+      <div id="digital">--:--<span class="sec">:--</span></div>
+      <div id="dateline">— — —</div>
+      <div id="tzlabel">CAMP APEX — DETROIT TIME</div>
+    </div>
+  </header>
+
+  <!-- ===== the founding strip — FOUNDED + minutes = FACTORY
+       ACTIVATED + minutes, over the hand-era/factory-era balance.
+       Anchors live in CONFIG.founding; counts are live whole minutes ===== -->
+  <div id="founding">
+    <div class="feq">
+      <span class="flab">FOUNDED</span>
+      <span class="finc" id="fIncTxt">—</span>
+      <span class="fop">+</span>
+      <span class="fmin" id="fIncMin">0</span>
+      <span class="flab">MIN</span>
+      <span class="fop">=</span>
+      <span class="flab">FACTORY ACTIVATED</span>
+      <span class="fact" id="fActTxt">—</span>
+      <span class="fop">+</span>
+      <span class="fmin" id="fActMin">0</span>
+      <span class="flab">MIN</span>
+      <span class="fnow" id="fNow">--:--</span>
+      <span class="fplace">CAMP APEX — DETROIT</span>
+    </div>
+    <div class="fbar"><div class="fsegH" id="fSegH"></div><div class="fsegF" id="fSegF"></div></div>
+    <div class="fsegLab">
+      <span class="segHand">HAND-CRANKED — <b id="fHandLab">0 MIN</b></span>
+      <span class="segFact">FACTORY — <b id="fFactLab">0 MIN</b></span>
+    </div>
+  </div>
+
+  <!-- ===== THE STAGE: instrument dials in upright columns,
+       the engine between them. Nothing else. ===== -->
+  <div id="stage">
+
+    <!-- LEFT COLUMN, UPRIGHT: pulse over volley -->
+    <div class="col">
+      <div class="opclock" id="ocPulse">
+        <svg viewBox="0 0 60 60" aria-label="pulse dial — 3 minute cadence">
+          <circle cx="30" cy="30" r="29" fill="url(#dialBezel)"/>
+          <circle cx="30" cy="30" r="29" fill="none" stroke="rgba(0,0,0,.7)" stroke-width="1"/>
+          <path d="M 9.5 19.5 A 24 24 0 0 1 50.5 19.5" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="30" cy="30" r="24.5" fill="url(#dialFace)"/>
+          <path d="M 13.5 19 A 20.5 20.5 0 0 1 46.5 19" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="3"/>
+          <g stroke="rgba(230,237,243,.5)" stroke-width="1.1">
+            <line x1="30" y1="8.6" x2="30" y2="11.4"/><line x1="30" y1="48.6" x2="30" y2="51.4"/>
+            <line x1="8.6" y1="30" x2="11.4" y2="30"/><line x1="48.6" y1="30" x2="51.4" y2="30"/>
+          </g>
+          <circle class="arc" cx="30" cy="30" r="21.5" fill="none" stroke="#f0c93f" stroke-width="2.4"
+                  stroke-linecap="round" transform="rotate(-90 30 30)"/>
+          <circle class="lamp" cx="30" cy="3.4" r="1.8"/>
+          <g class="needle">
+            <line x1="30.9" y1="31.1" x2="30.9" y2="14.1" stroke="rgba(0,0,0,.55)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="30" y1="30" x2="30" y2="13" stroke="#f0c93f" stroke-width="2" stroke-linecap="round"/>
+          </g>
+          <circle cx="30" cy="30" r="2.6" fill="#c9a227" stroke="rgba(0,0,0,.55)" stroke-width=".7"/>
+          <circle cx="30" cy="30" r=".95" fill="#ffe98a"/>
+        </svg>
+        <div class="occap">PULSE CHECK · <span class="per">3 MIN</span></div>
+      </div>
+      <div class="opclock" id="ocVolley">
+        <svg viewBox="0 0 60 60" aria-label="volley dial — 10 minute cadence">
+          <circle cx="30" cy="30" r="29" fill="url(#dialBezel)"/>
+          <circle cx="30" cy="30" r="29" fill="none" stroke="rgba(0,0,0,.7)" stroke-width="1"/>
+          <path d="M 9.5 19.5 A 24 24 0 0 1 50.5 19.5" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="30" cy="30" r="24.5" fill="url(#dialFace)"/>
+          <path d="M 13.5 19 A 20.5 20.5 0 0 1 46.5 19" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="3"/>
+          <g stroke="rgba(230,237,243,.5)" stroke-width="1.1">
+            <line x1="30" y1="8.6" x2="30" y2="11.4"/><line x1="30" y1="48.6" x2="30" y2="51.4"/>
+            <line x1="8.6" y1="30" x2="11.4" y2="30"/><line x1="48.6" y1="30" x2="51.4" y2="30"/>
+          </g>
+          <circle class="arc" cx="30" cy="30" r="21.5" fill="none" stroke="#58a6ff" stroke-width="2.4"
+                  stroke-linecap="round" transform="rotate(-90 30 30)"/>
+          <circle class="lamp" cx="30" cy="3.4" r="1.8"/>
+          <g class="needle">
+            <line x1="30.9" y1="31.1" x2="30.9" y2="14.1" stroke="rgba(0,0,0,.55)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="30" y1="30" x2="30" y2="13" stroke="#58a6ff" stroke-width="2" stroke-linecap="round"/>
+          </g>
+          <circle cx="30" cy="30" r="2.6" fill="#c9a227" stroke="rgba(0,0,0,.55)" stroke-width=".7"/>
+          <circle cx="30" cy="30" r=".95" fill="#ffe98a"/>
+        </svg>
+        <div class="occap">VOLLEY · <span class="per">10 MIN</span></div>
+      </div>
+    </div>
+
+    <!-- CENTRE: THE ENGINE — a drawn machine on a bolted plate.
+         The whole machine is built by the script from the
+         LIBRARY CARD + the gear vocabulary of the main board. -->
+    <div id="engine">
+      <svg id="machine" viewBox="0 0 300 308" preserveAspectRatio="xMidYMid meet" aria-label="the Apex engine, drawn"></svg>
+    </div>
+
+    <!-- RIGHT COLUMN, UPRIGHT: the half-hour tier, standing tall -->
+    <div class="col">
+      <div class="opclock tall" id="ocHalf">
+        <svg viewBox="0 0 60 60" aria-label="half-hour dial — 30 minute cadence">
+          <circle cx="30" cy="30" r="29" fill="url(#dialBezel)"/>
+          <circle cx="30" cy="30" r="29" fill="none" stroke="rgba(0,0,0,.7)" stroke-width="1"/>
+          <path d="M 9.5 19.5 A 24 24 0 0 1 50.5 19.5" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="30" cy="30" r="24.5" fill="url(#dialFace)"/>
+          <path d="M 13.5 19 A 20.5 20.5 0 0 1 46.5 19" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="3"/>
+          <g stroke="rgba(230,237,243,.5)" stroke-width="1.1">
+            <line x1="30" y1="8.6" x2="30" y2="11.4"/><line x1="30" y1="48.6" x2="30" y2="51.4"/>
+            <line x1="8.6" y1="30" x2="11.4" y2="30"/><line x1="48.6" y1="30" x2="51.4" y2="30"/>
+          </g>
+          <circle class="arc" cx="30" cy="30" r="21.5" fill="none" stroke="#c9a227" stroke-width="2.4"
+                  stroke-linecap="round" transform="rotate(-90 30 30)"/>
+          <circle class="lamp" cx="30" cy="3.4" r="1.8"/>
+          <g class="needle">
+            <line x1="30.9" y1="31.1" x2="30.9" y2="14.1" stroke="rgba(0,0,0,.55)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="30" y1="30" x2="30" y2="13" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/>
+          </g>
+          <circle cx="30" cy="30" r="2.6" fill="#c9a227" stroke="rgba(0,0,0,.55)" stroke-width=".7"/>
+          <circle cx="30" cy="30" r=".95" fill="#ffe98a"/>
+        </svg>
+        <div class="occap">HALF-HOUR · <span class="per">30 MIN</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   LIBRARY CARD (owner, Nov 8, 2026) — a library call you can base a
+   call on. House Library Wing form: a named, parameterized styling
+   routine held in-house. THIS BUILD CALLS THIS CARD: every styled
+   element below — palette, waterfall, shadows, pins, bolts, dial
+   form, digit weight — derives from these parameters and from no
+   other place. Change a value on the card and the whole face
+   follows. First working instance: this square.
+   ===================================================================== */
+var LIBRARY_CARD = {
+  card: "APEX LIBRARY CARD — SQUARE FACE No.1 · machinery instrument face",
+  palette: { ink:"#e6edf3", dim:"#8b949e", line:"#30363d",
+             brass:"#c9a227", brassHi:"#f0c93f",
+             blue:"#58a6ff", blueDk:"#1f6feb",
+             green:"#3fb950", greenHi:"#7ee787",
+             amber:"#d29922",
+             ground:"#05070a", plate:"rgba(13,17,23,.92)" },
+  waterfall: { columns:22, minLen:14, maxLen:30, minDur:7.5, maxDur:16,
+               glyphs:"01", headLit:true },          /* the Matrix waterfall */
+  light: { from:"NW",                       /* one light, upper-left */
+           panelShadowDepth:1.0,            /* a little more drop shadow */
+           gearShadowDx:2.2, gearShadowDy:3.0, gearShadowBlur:1.2,
+           gearShadowOpacity:.5 },
+  furniture: { centerPin:true,              /* a pin at every hub */
+               plateBolts:"hex", boltR:5 }, /* bolted plate corners */
+  dial: { form:"instrument", bezel:true, recessedFace:true,
+          needleShadow:true, caption:"NAME · PERIOD",
+          fire:"#e3ff9a" },
+  digits: { weight:800, seconds:"steel-blue" },  /* Casio-weight digits */
+  motion: { compression:10, ratios:"3:10:30:1440" }
+};
+var CARD = LIBRARY_CARD;
+
+/* ---- the call: apply the card to the document ---- */
+(function applyCard(){
+  var P = CARD.palette, r = document.documentElement.style;
+  r.setProperty("--ink", P.ink);   r.setProperty("--dim", P.dim);
+  r.setProperty("--line", P.line); r.setProperty("--brass", P.brass);
+  r.setProperty("--brass-hi", P.brassHi); r.setProperty("--blue", P.blue);
+  r.setProperty("--blue-dk", P.blueDk);   r.setProperty("--green", P.green);
+  r.setProperty("--amber", P.amber);      r.setProperty("--panel", P.plate);
+  r.setProperty("--digit-w", CARD.digits.weight);
+  document.body.style.background = P.ground;
+  var d = CARD.light.panelShadowDepth;
+  document.getElementById("panel").style.boxShadow =
+    "0 0 0 1px rgba(88,166,255,.05)," +
+    "0 " + Math.round(18*d) + "px " + Math.round(44*d) + "px rgba(31,111,235,.14)," +
+    "0 " + Math.round(34*d) + "px " + Math.round(70*d) + "px -28px rgba(240,201,63,.22)," +
+    "inset 0 1px 0 rgba(190,255,235,.20), inset 0 -1px 0 rgba(88,166,255,.16)";
+})();
+
+/* ==================== CONFIG — carried from the main board ====================
+   founding is byte-identical to the main board's CONFIG.founding;
+   cadences are its display periods in SECONDS at the card's x10
+   compression, ratios true: 3m : 10m : 30m : 1440m. */
+var CONFIG = {
+  founding: { inceptionISO: "2026-10-31T22:17:00-04:00", activationISO: "2026-11-04T10:38:00-05:00" },
+  cadences: { pulse: 18, volley: 60, half: 180, daily: 8640 },
+  outputs: ["ENGINES", "APPLICATIONS", "THE STORE"],
+  clocks: [
+    { id: "ocPulse", per: "pulse" },
+    { id: "ocVolley", per: "volley" },
+    { id: "ocHalf",  per: "half" }
+  ]
+};
+var P_PULSE = CONFIG.cadences.pulse;
+
+/* ==================== colour helpers (the card's palette, toned) ===== */
+function hx(c){ return [parseInt(c.slice(1,3),16), parseInt(c.slice(3,5),16), parseInt(c.slice(5,7),16)]; }
+function mix(c1,c2,f){ var a=hx(c1), b=hx(c2);
+  return "rgb("+a.map(function(v,i){ return Math.round(v+(b[i]-v)*f); }).join(",")+")"; }
+function light(c,f){ return mix(c,"#ffffff",f); }
+function dark(c,f){ return mix(c,"#000000",f); }
+
+/* ==================== the Matrix waterfall — generated ONCE here
+   from the card's parameters; all its motion is CSS keyframes. ==== */
+(function(){ var wf=document.getElementById("waterfall");
+  if(!wf) return;
+  var W=CARD.waterfall, i, k;
+  for(i=0;i<W.columns;i++){
+    var col=document.createElement("div"); col.className="wfCol";
+    var len=W.minLen+Math.floor(Math.random()*(W.maxLen-W.minLen+1));
+    var dur=W.minDur+Math.random()*(W.maxDur-W.minDur);
+    col.style.left=((i+0.5)/W.columns*100+(Math.random()*2-1)).toFixed(2)+"%";
+    col.style.animationDuration=dur.toFixed(2)+"s";
+    col.style.animationDelay=(-Math.random()*dur).toFixed(2)+"s"; /* mid-fall at load */
+    var inner=document.createElement("div"); inner.className="wfIn";
+    inner.style.animationDuration=(1.6+Math.random()*1.4).toFixed(2)+"s";
+    for(k=0;k<len;k++){
+      var sp=document.createElement("span");
+      sp.textContent=W.glyphs.charAt(Math.random()<0.5?0:1);  /* ones and zeros only */
+      if(k===0 && W.headLit) sp.className="wfHead";           /* the ingesting head, lit */
+      inner.appendChild(sp);
+    }
+    col.appendChild(inner); wf.appendChild(col);
+  }
+})();
+
+/* ==================== Detroit clock ==================== */
+var dtf=new Intl.DateTimeFormat("en-US",{timeZone:"America/Detroit",hour12:false,
+  weekday:"short",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+function detroitNow(){
+  var parts=dtf.formatToParts(new Date()), o={};
+  parts.forEach(function(p){ o[p.type]=p.value; });
+  o.hour=(parseInt(o.hour,10)%24); o.minute=parseInt(o.minute,10); o.second=parseInt(o.second,10);
+  return o;
+}
+function pad(n){ return (n<10?"0":"")+n; }
+function setHand(id,deg){ document.getElementById(id).setAttribute("transform","rotate("+deg+" 23 23)"); }
+
+/* ==================== the founding strip ====================
+   Two fixed anchors; the counts between them and now are LIVE
+   TOTAL ELAPSED WHOLE MINUTES — floor(ms span / 60000), never a
+   minutes-of-the-hour remainder. Thousands separators, no decimals. */
+var FND_INC=Date.parse(CONFIG.founding.inceptionISO),
+    FND_ACT=Date.parse(CONFIG.founding.activationISO);
+var fIncTxt=document.getElementById("fIncTxt"), fActTxt=document.getElementById("fActTxt"),
+    fIncMin=document.getElementById("fIncMin"), fActMin=document.getElementById("fActMin"),
+    fNowEl =document.getElementById("fNow"),
+    fSegH  =document.getElementById("fSegH"),   fSegF  =document.getElementById("fSegF"),
+    fHandLab=document.getElementById("fHandLab"), fFactLab=document.getElementById("fFactLab");
+var fdtf=new Intl.DateTimeFormat("en-US",{timeZone:"America/Detroit",hour12:false,
+  month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
+function fmtAnchor(ms){ return fdtf.format(new Date(ms)).toUpperCase(); }
+function fmtWholeMin(m){ return m.toLocaleString("en-US"); }
+function elapsedWholeMin(fromMs,toMs){ return Math.max(0,Math.floor((toMs-fromMs)/60000)); }
+fIncTxt.textContent=fmtAnchor(FND_INC);
+fActTxt.textContent=fmtAnchor(FND_ACT);
+function drawFounding(t){
+  var nowMs=Date.now();
+  var handMin=elapsedWholeMin(FND_INC,FND_ACT);   /* fixed: the hand-cranked span */
+  var incMin =elapsedWholeMin(FND_INC,nowMs);     /* live: inception -> now */
+  var actMin =elapsedWholeMin(FND_ACT,nowMs);     /* live: activation -> now */
+  fIncMin.textContent=fmtWholeMin(incMin);
+  fActMin.textContent=fmtWholeMin(actMin);
+  fNowEl.textContent=pad(t.hour)+":"+pad(t.minute);
+  var tot=handMin+actMin, hPct=tot>0 ? (handMin/tot*100) : 50;
+  fSegH.style.width=hPct.toFixed(2)+"%";
+  fSegF.style.width=(100-hPct).toFixed(2)+"%";
+  fHandLab.textContent=fmtWholeMin(handMin)+" MIN";
+  fFactLab.textContent=fmtWholeMin(actMin)+" MIN";
+}
+
+var lastSec=-1;
+function drawClock(t){
+  if(t.second===lastSec) return; lastSec=t.second;
+  document.getElementById("digital").innerHTML=
+    pad(t.hour)+":"+pad(t.minute)+'<span class="sec">:'+pad(t.second)+"</span>";
+  document.getElementById("dateline").textContent=
+    (t.weekday+" · "+t.month+" "+t.day).toUpperCase();
+  drawFounding(t);
+  var sa=t.second*6, ma=t.minute*6+t.second*0.1, ha=(t.hour%12)*30+t.minute*0.5;
+  setHand("as",sa); setHand("am",ma); setHand("ah",ha);
+}
+
+/* =====================================================================
+   THE ENGINE, DEPICTED — built from the main board's own gear
+   vocabulary (gearPath / ring annulus / pinion / worm thread, from
+   service-machinery-clock-2026-11-03.html) and its fitted
+   population: the concentric cadence RINGS, pinion gangs, the Wish
+   pair, the Spindle pinion class, the Holly gear class, the Circle
+   ring class, the compression-chain WORM. Detail is drawn, never
+   labelled. Shading: the card's one light, from the NW — metallic
+   tonal gradients on every face, a shadow copy cast SE of every
+   gear, dark recesses, specular arcs, a pin at every hub.
+   ===================================================================== */
+var NS="http://www.w3.org/2000/svg";
+var machine=document.getElementById("machine");
+function mk(tag,attrs,parent){ var e=document.createElementNS(NS,tag);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  if(parent) parent.appendChild(e); return e; }
+
+/* ---- gear geometry — the main board's own functions ---- */
+function gearPath(cx,cy,rTip,rRoot,teeth){
+  var step=Math.PI*2/teeth, d="", i, k, pts, a, r, x, y;
+  for(i=0;i<teeth;i++){
+    a=i*step;
+    pts=[[a,rRoot],[a+step*0.30,rRoot],[a+step*0.42,rTip],[a+step*0.58,rTip],[a+step*0.70,rRoot]];
+    for(k=0;k<pts.length;k++){ r=pts[k][1]; a=pts[k][0];
+      x=(cx+Math.cos(a)*r).toFixed(1); y=(cy+Math.sin(a)*r).toFixed(1);
+      d+=(d?"L":"M")+x+" "+y; }
+  }
+  return d+"Z";
+}
+function arcPath(cx,cy,r,a0,a1){ /* degrees, screen coords (0=east, 90=south) */
+  var p0=[cx+r*Math.cos(a0*Math.PI/180), cy+r*Math.sin(a0*Math.PI/180)],
+      p1=[cx+r*Math.cos(a1*Math.PI/180), cy+r*Math.sin(a1*Math.PI/180)],
+      laf=(a1-a0)>180?1:0;
+  return "M"+p0[0].toFixed(1)+" "+p0[1].toFixed(1)+" A"+r+" "+r+" 0 "+laf+" 1 "+
+         p1[0].toFixed(1)+" "+p1[1].toFixed(1);
+}
+
+/* ---- gradients: every face toned from the card's palette ---- */
+var defs=mk("defs",{},machine);
+(function(){
+  var f=mk("filter",{id:"soft",x:"-40%",y:"-40%",width:"180%",height:"180%"},defs);
+  mk("feGaussianBlur",{stdDeviation:CARD.light.gearShadowBlur},f);
+  function lin(id,stops,vert){
+    var g=mk("linearGradient",{id:id,x1:"0",y1:"0",x2:vert?"0":"1",y2:"1"},defs);
+    stops.forEach(function(s){ mk("stop",{offset:s[0],"stop-color":s[1]},g); });
+  }
+  function rad(id,cx,cy,stops){
+    var g=mk("radialGradient",{id:id,cx:cx,cy:cy,r:"80%"},defs);
+    stops.forEach(function(s){ mk("stop",{offset:s[0],"stop-color":s[1]},g); });
+  }
+  var P=CARD.palette;
+  lin("plateGrad",[["0%","#171e28"],["55%","#0a0d12"],["100%","#05070a"]]);
+  lin("stageGrad",[["0%","#171d26"],["55%","#0b0e13"],["100%","#080a0e"]]);
+  lin("litGrad",  [["0%",light(P.brass,.5)],["50%",P.brassHi],["100%",dark(P.brass,.12)]]);
+  lin("barGrad",  [["0%","#2a323d"],["55%","#141a21"],["100%","#0d1117"]], true);
+  lin("wormGrad", [["0%",dark(P.brass,.55)],["28%",light(P.brass,.30)],["50%",P.brass],
+                   ["78%",dark(P.brass,.30)],["100%",dark(P.brass,.60)]], true);
+  rad("boltGrad","35%","30%",[["0%","#6b7684"],["55%","#39424e"],["100%","#171c23"]]);
+  lin("dialBezel",[["0%","#57606c"],["45%","#1a2029"],["80%","#39424e"],["100%","#12161d"]]);
+  rad("dialFace","42%","38%",[["0%","#131922"],["70%","#0a0e13"],["100%","#05070a"]]);
+})();
+var gradCache={};
+function gradFor(base){ /* a metallic face for one palette colour, lit NW */
+  var id="gr"+base.slice(1);
+  if(!gradCache[id]){
+    var g=mk("radialGradient",{id:id,cx:"35%",cy:"30%",r:"78%"},defs);
+    mk("stop",{offset:"0%","stop-color":light(base,.5)},g);
+    mk("stop",{offset:"45%","stop-color":base},g);
+    mk("stop",{offset:"100%","stop-color":dark(base,.48)},g);
+    gradCache[id]=1;
+  }
+  return "url(#"+id+")";
+}
+
+/* ---- rotation registry: every angle derives from absolute elapsed ---- */
+var spinners=[], orbitWrap=null, wormThread=null;
+function spinner(g,cx,cy,per,dir,ph){ spinners.push({g:g,cx:cx,cy:cy,per:per,dir:dir||1,ph:ph||0}); }
+
+/* ---- one gear or pinion, shaded: shadow cast SE, toned face,
+        bevel light NW, dark recess, light-holes on big gears,
+        the card's center pin at the hub ---- */
+function gear(parent,cx,cy,rTip,teeth,base,spin){
+  var rRoot=rTip*0.86, d=gearPath(cx,cy,rTip,rRoot,teeth), L=CARD.light;
+  var g=mk("g",{},parent);
+  mk("path",{d:d,fill:"#000",opacity:L.gearShadowOpacity,filter:"url(#soft)",
+             transform:"translate("+L.gearShadowDx+" "+L.gearShadowDy+")"},g);
+  mk("path",{d:d,fill:gradFor(base),stroke:light(base,.35),"stroke-width":1},g);
+  mk("path",{d:d,fill:"none",stroke:"rgba(255,255,255,.30)","stroke-width":.8,
+             transform:"translate(-.8 -.8)"},g);
+  mk("circle",{cx:cx,cy:cy,r:(rRoot*.68).toFixed(1),fill:"none",stroke:"rgba(0,0,0,.5)",
+               "stroke-width":Math.max(1.2,rTip*.09).toFixed(1)},g);
+  if(rTip>=14){ var hr=rRoot*.42, i, a;
+    for(i=0;i<4;i++){ a=i*Math.PI/2+0.4;
+      mk("circle",{cx:(cx+Math.cos(a)*hr).toFixed(1),cy:(cy+Math.sin(a)*hr).toFixed(1),
+                   r:(rRoot*.12).toFixed(1),fill:"rgba(3,5,8,.65)",stroke:"rgba(0,0,0,.6)","stroke-width":.6},g); } }
+  mk("path",{d:arcPath(cx,cy,rRoot*.88,-52,8),fill:"none",stroke:"rgba(255,255,255,.28)",
+             "stroke-width":1.6,"stroke-linecap":"round"},g);
+  mk("circle",{cx:cx,cy:cy,r:Math.max(2.8,rRoot*.17).toFixed(1),fill:"#0a0d12",
+               stroke:light(base,.2),"stroke-width":1},g);
+  if(CARD.furniture.centerPin)
+    mk("circle",{cx:cx,cy:cy,r:Math.max(1.1,rRoot*.07).toFixed(1),fill:"#ffe98a"},g);
+  if(spin) spinner(g,cx,cy,spin.per,spin.dir,spin.ph);
+  return g;
+}
+
+/* ---- a ring gear: annulus with INTERNAL teeth, the board's form ---- */
+function ring(parent,cx,cy,rOut,teeth,base,spin){
+  var rRoot=rOut*.93, rTip=rOut*.80, L=CARD.light;
+  var outer="M"+(cx-rOut)+" "+cy+" A"+rOut+" "+rOut+" 0 1 1 "+(cx+rOut)+" "+cy+
+            " A"+rOut+" "+rOut+" 0 1 1 "+(cx-rOut)+" "+cy+" Z";
+  var d=outer+" "+gearPath(cx,cy,rRoot,rTip,teeth);
+  var g=mk("g",{},parent);
+  mk("path",{d:d,"fill-rule":"evenodd",fill:"#000",opacity:L.gearShadowOpacity,filter:"url(#soft)",
+             transform:"translate("+L.gearShadowDx+" "+L.gearShadowDy+")"},g);
+  mk("path",{d:d,"fill-rule":"evenodd",fill:gradFor(base),stroke:light(base,.35),"stroke-width":1},g);
+  mk("circle",{cx:cx,cy:cy,r:rTip,fill:"none",stroke:"rgba(0,0,0,.45)","stroke-width":1.2},g);
+  mk("path",{d:arcPath(cx,cy,rOut-2.5,-34,12),fill:"none",stroke:"rgba(255,255,255,.30)",
+             "stroke-width":2,"stroke-linecap":"round"},g);
+  if(spin) spinner(g,cx,cy,spin.per,spin.dir,spin.ph);
+  return g;
+}
+
+/* ---- a hex bolt, the plate's furniture ---- */
+function bolt(parent,cx,cy){
+  var r=CARD.furniture.boltR, pts="", i, a;
+  for(i=0;i<6;i++){ a=Math.PI/6+i*Math.PI/3;
+    pts+=(i?"L":"M")+(cx+Math.cos(a)*r).toFixed(1)+" "+(cy+Math.sin(a)*r).toFixed(1); }
+  var g=mk("g",{},parent);
+  mk("path",{d:pts+"Z",fill:"#000",opacity:.5,transform:"translate(1.2 1.6)"},g);
+  mk("path",{d:pts+"Z",fill:"url(#boltGrad)",stroke:"rgba(0,0,0,.65)","stroke-width":.8},g);
+  mk("circle",{cx:cx,cy:cy,r:(r*.42).toFixed(1),fill:"rgba(3,5,8,.7)"},g);
+  mk("line",{x1:cx-r*.3,y1:cy,x2:cx+r*.3,y2:cy,stroke:"rgba(255,255,255,.35)","stroke-width":.9},g);
+}
+
+/* ---- the worm: a shaded cylinder, its thread advancing on the pulse ---- */
+var WORM_PITCH=9;
+function worm(parent,x0,x1,cy,r,base){
+  var g=mk("g",{},parent);
+  mk("rect",{x:x0,y:cy-r+3,width:x1-x0,height:2*r,rx:r,fill:"#000",opacity:.45,filter:"url(#soft)"},g);
+  mk("rect",{x:x0,y:cy-r,width:x1-x0,height:2*r,rx:6,fill:"url(#wormGrad)",stroke:"rgba(0,0,0,.5)","stroke-width":.8},g);
+  var clip=mk("clipPath",{id:"wormClip"},defs);
+  mk("rect",{x:x0,y:cy-r,width:x1-x0,height:2*r,rx:6},clip);
+  var tg=mk("g",{"clip-path":"url(#wormClip)"},g), x;
+  for(x=x0-WORM_PITCH;x<x1+WORM_PITCH;x+=WORM_PITCH){
+    mk("line",{x1:x,y1:cy+r+2,x2:x+7,y2:cy-r-2,stroke:"rgba(0,0,0,.55)","stroke-width":2.6},tg);
+    mk("line",{x1:x+3,y1:cy+r+2,x2:x+10,y2:cy-r-2,stroke:"rgba(255,255,255,.20)","stroke-width":1.1},tg);
+  }
+  wormThread=tg;
+  mk("ellipse",{cx:x0+2,cy:cy,rx:3.4,ry:r,fill:dark(base,.35),stroke:light(base,.3),"stroke-width":.8},g);
+  return g;
+}
+
+/* ---- the plate, its bolts, the compartments ---- */
+(function buildMachine(){
+  var P=CARD.palette;
+  mk("rect",{x:2,y:2,width:296,height:304,rx:11,fill:"url(#plateGrad)",
+             stroke:P.line,"stroke-width":1},machine);
+  mk("rect",{x:6.5,y:6.5,width:287,height:295,rx:8,fill:"none",
+             stroke:"rgba(255,255,255,.06)","stroke-width":1},machine);
+  bolt(machine,11,11); bolt(machine,289,11); bolt(machine,11,297); bolt(machine,289,297);
+  /* divider rails + rivets */
+  [105,203].forEach(function(y){
+    mk("line",{x1:10,y1:y,x2:290,y2:y,stroke:"rgba(139,148,158,.30)","stroke-width":1},machine);
+    [40,150,260].forEach(function(x){
+      mk("circle",{cx:x,cy:y,r:1.6,fill:"#39424e",stroke:"rgba(0,0,0,.6)","stroke-width":.6},machine);
+    });
+  });
+
+  var stageEls=[];
+  function compartment(y,name,buildFn){
+    var g=mk("g",{},machine);
+    var bg=mk("rect",{x:8,y:y,width:284,height:92,rx:9,fill:"url(#stageGrad)",
+                      stroke:"rgba(139,148,158,.28)","stroke-width":1,"class":"stagebg"},g);
+    var inner=mk("g",{},g);
+    buildFn(inner);
+    var bar=mk("rect",{x:20,y:y+6,width:100,height:20,rx:5,fill:"url(#barGrad)",
+                      stroke:"rgba(0,0,0,.6)","stroke-width":.8},g);
+    mk("line",{x1:23,y1:y+7.5,x2:117,y2:y+7.5,stroke:"rgba(255,255,255,.22)","stroke-width":.8},g);
+    var tx=mk("text",{x:70,y:y+20,"text-anchor":"middle","font-size":11,
+                      "letter-spacing":1.5,fill:"#9aa7b4","font-weight":700},g);
+    tx.textContent=name;
+    stageEls.push({bg:bg,bar:bar,tx:tx});
+    return g;
+  }
+
+  /* — ENGINES: the concentric cadence stack — three RINGS (half /
+       volley / pulse), pinions inside them, a hub gear at the
+       centre; a meshing gear-and-pinion pair at the west end — */
+  compartment(10,"ENGINES",function(g){
+    ring(g,200,56,44,30,P.brass,  {per:CONFIG.cadences.half,  dir: 1});
+    ring(g,200,56,33,24,P.blue,   {per:CONFIG.cadences.volley,dir:-1});
+    ring(g,200,56,23,16,P.brassHi,{per:CONFIG.cadences.pulse, dir: 1});
+    gear(g,200,56, 8.5,10,P.brassHi,{per:8.2, dir: 1});
+    gear(g,213,56, 5.5, 8,P.blue,   {per:6.5, dir: 1});
+    gear(g, 52,64,16,20,P.green,    {per:36,  dir: 1});
+    gear(g, 70,48, 9,11,P.brass,    {per:19.8,dir:-1});
+  });
+
+  /* — APPLICATIONS: a pinion gang in mesh, the Wish pair, a
+       ringlet with its pinion, and at the east end a RING with a
+       trio of pinions riding inside it (the fine detail) — */
+  compartment(108,"APPLICATIONS",function(g){
+    gear(g, 54,168,13,16,P.blue,   {per:24, dir: 1});
+    gear(g, 75,168,10,12,P.green,  {per:18, dir:-1});
+    gear(g, 99,168,16,20,P.brass,  {per:30, dir: 1});
+    gear(g,140,168,12,14,P.brassHi,{per:30, dir:-1});
+    gear(g,163,168,12,14,P.green,  {per:30, dir: 1});
+    ring(g,198,164,15,16,P.blue,   {per:90, dir: 1});
+    gear(g,198,164, 6, 8,P.brassHi,{per:45, dir: 1});
+    var fine=mk("g",{"class":"fine"},g);
+    ring(fine,256,156,26,24,P.brass,{per:120,dir:-1});
+    orbitWrap=mk("g",{},fine);
+    [[256,142],[268,163],[244,163]].forEach(function(xy){
+      gear(orbitWrap,xy[0],xy[1],5,8,P.green,{per:40,dir:1});
+    });
+  });
+
+  /* — THE STORE: the compression chain's WORM on its shaft,
+       its wheel above it, a step-up flywheel at the shaft's
+       east end — the worm feeds the store — */
+  compartment(206,"THE STORE",function(g){
+    worm(g,26,186,274,12,P.brass);
+    mk("rect",{x:186,y:271.5,width:76,height:5,fill:"url(#wormGrad)",stroke:"rgba(0,0,0,.5)","stroke-width":.6},g);
+    [200,226].forEach(function(x){
+      mk("circle",{cx:x,cy:274,r:4.6,fill:"url(#boltGrad)",stroke:"rgba(0,0,0,.6)","stroke-width":.7},g);
+    });
+    gear(g,106,248,15,18,P.blue,   {per:27,   dir: 1});
+    gear(g, 85,247, 8,10,P.green,  {per:15,   dir:-1});
+    gear(g,238,274, 8,10,P.brass,  {per:12,   dir: 1});
+    gear(g,238,255,13,18,P.brassHi,{per:4,    dir:-1});
+    gear(g,238,288, 7, 9,P.blue,   {per:10.8, dir:-1});
+  });
+
+  /* the machine's nameplate, riveted over the lower divider */
+  var np=mk("g",{},machine);
+  mk("rect",{x:112,y:193,width:76,height:18,rx:4,fill:"url(#barGrad)",stroke:"rgba(0,0,0,.6)","stroke-width":.8},np);
+  mk("line",{x1:115,y1:194.5,x2:185,y2:194.5,stroke:"rgba(255,255,255,.22)","stroke-width":.8},np);
+  var ntx=mk("text",{x:150,y:206.5,"text-anchor":"middle","font-size":10,
+                     "letter-spacing":1.6,fill:CARD.palette.brassHi,"font-weight":700},np);
+  ntx.textContent="APEX ENGINE";
+  /* the compression mark — a mark, not a sentence */
+  var xm=mk("text",{x:280,y:297,"text-anchor":"end","font-size":9,fill:CARD.palette.dim},machine);
+  xm.textContent="×"+CARD.motion.compression;
+
+  window.__stageEls=stageEls;
+})();
+
+/* ==================== the engine's light: one step per pulse === */
+var litIdx=-1;
+function drawEngine(elapsed){
+  var idx=Math.floor(elapsed/P_PULSE)%CONFIG.outputs.length;
+  window.__lit=idx;
+  if(idx===litIdx) return; litIdx=idx;
+  window.__stageEls.forEach(function(s,i){
+    if(i===idx){
+      s.bg.setAttribute("fill","url(#litGrad)");
+      s.bg.setAttribute("style","filter:drop-shadow(0 0 9px rgba(240,201,63,.5))");
+      s.bar.setAttribute("fill","url(#litGrad)");
+      s.tx.setAttribute("fill","#191104");
+    }else{
+      s.bg.setAttribute("fill","url(#stageGrad)");
+      s.bg.setAttribute("style","");
+      s.bar.setAttribute("fill","url(#barGrad)");
+      s.tx.setAttribute("fill","#9aa7b4");
+    }
+  });
+}
+
+/* ==================== the instrument dials ====================
+   Each dial: an arc filling its cycle, a needle (with its shadow)
+   turning one full turn per cycle, and a lamp jewel on the bezel
+   flashing at the wrap. Ratios true: pulse 3 : volley 10 : half 30. */
+var clockEls=CONFIG.clocks.map(function(c){
+  var root=document.getElementById(c.id);
+  return { per: CONFIG.cadences[c.per], root: root,
+           arc: root.querySelector(".arc"), needle: root.querySelector(".needle"),
+           lamp: root.querySelector(".lamp"),
+           CIRC: 2*Math.PI*21.5, cyc: -1, fireUntil: 0 };
+});
+function drawClocks(elapsed, nowMs){
+  clockEls.forEach(function(c){
+    var ph=((elapsed % c.per)+c.per)%c.per / c.per;
+    c.arc.setAttribute("stroke-dasharray",(c.CIRC*ph).toFixed(1)+" "+c.CIRC.toFixed(1));
+    c.needle.setAttribute("transform","rotate("+(ph*360).toFixed(1)+" 30 30)");
+    var cyc=Math.floor(elapsed/c.per);
+    if(c.cyc!==-1 && cyc!==c.cyc){ c.fireUntil=nowMs+700; }
+    c.cyc=cyc;
+    var firing=nowMs<c.fireUntil;
+    c.lamp.setAttribute("class","lamp"+(firing?" fire":""));
+    c.root.className=c.root.className.replace(/ ?\bfire\b/g,"")+(firing?" fire":"");
+  });
+}
+
+/* ==================== the frame loop ====================
+   Display elapsed runs at the card's x10: display seconds =
+   real elapsed x 10, so the display periods land on their true
+   ratios. Every angle and phase derives from absolute elapsed
+   time — no drift, no per-part timers. */
+var T0=Date.now();
+window.__lit=-1;
+function frame(){
+  var nowMs=Date.now();
+  drawClock(detroitNow());
+  var el=(nowMs-T0)/1000*CARD.motion.compression;
+  drawEngine(el);
+  for(var i=0;i<spinners.length;i++){ var s=spinners[i];
+    s.g.setAttribute("transform","rotate("+(s.ph+s.dir*(el/s.per)*360).toFixed(2)+" "+s.cx+" "+s.cy+")");
+  }
+  if(orbitWrap) orbitWrap.setAttribute("transform","rotate("+(-(el/120)*360).toFixed(2)+" 256 156)");
+  if(wormThread) wormThread.setAttribute("transform","translate("+(((el/P_PULSE)*WORM_PITCH)%WORM_PITCH).toFixed(2)+" 0)");
+  drawClocks(el, nowMs);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

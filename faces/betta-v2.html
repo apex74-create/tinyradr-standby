@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX GLASS HOUSE \u2014 Aquarium (Betta Yin-Yang Clock Face V2)</title>
+<!--
+  APEX GLASS HOUSE \u2014 AQUARIUM. Betta Yin-Yang Clock Face V2 (Nov 8, 2026).
+
+  THE NAME (owner coinage, Nov 8, 07:08 EST): APEX GLASS HOUSE \u2014 the
+  effect is his Glass House effect in aquarium form. His craft history:
+  mirrors sandblasted with the design, painted in fluorescent paint, a
+  UV light bounced off the piece so the painted fish GLOWED and looked
+  like they were FLOATING, then glass layers and mirror layers
+  sandwiched so each stratum held part of the scene at a different
+  depth. Here: glow-stepped wireframe line work over OLED black, strata
+  separated by line weight and brightness steps alone \u2014 the sandwich
+  made of strokes.
+
+  CONCEPT (owner, Nov 8, 06:27\u201306:31): two betta fish swimming a
+  yin-yang circuit in an OLED tank, neon grass springing from the
+  bottom, fish that fight, fall out, and fall back in; live digits
+  hovering. V1 (filled paint) shipped 06:55\u201307:03 and LANDED on his
+  watch \u2014 and his eye ruled it (07:05): "two flat fish that look dead
+  and stiff, floating around in the current eddies... very dead and
+  very inactive, with a yin-yang symbol in the background." His
+  standard: the generated animation (imagine_media, \u2026782.mp4) \u2014
+  "the video you showed me was killer."
+
+  OWNER VERDICT ON THE FIRST WIREFRAME ITERATION (07:13 EST) - THE
+  PLATE CURE: "That's very cool, that first iteration with the
+  wireframes - EXCEPT they're swimming around on STACKED OPAQUE
+  PLATES - the very fucking thing we don't want." The wire passed;
+  the strata failed. CURE APPLIED IN THIS FILE: depth comes from
+  LINE, LIGHT, and BACKLIGHT GLOW ONLY. The yin-yang is a LINE
+  drawing on the void (no filled lobes, no filled disc); the
+  backlight is a radial glow gradient whose edges dissolve into
+  black (light added, no panel); the oil slick is stroked
+  contours; the grass is curved lines from the void floor. NO
+  opaque filled plate sits in the stack as a visible stratum -
+  remaining fills are the void itself (true black), light points
+  (stars), the digits (standing legibility exception), and tints
+  INSIDE the wireframe contours only.
+
+  OWNER LIVE TUNING (07:13-07:14 EST): MORE TRANSLUCENT (tints
+  leaned down: A body 0.26 to 0.17, B body 0.24 to 0.16, fins to
+  0.11/0.10, school 0.12 to 0.08) - MORE FLUID (smootherstep
+  envelopes on every fight transient, splined SMIL ripples,
+  low-passed surge) - LESS POP, LESS JERK (no snapped onsets:
+  flare, dart and tumble all ride zero-slope envelopes) - A
+  LITTLE MORE FORWARD (circuit pace 64 s to 54 s loop, school
+  eddies x0.85).
+
+  DIRECTION CHANGE (owner, 07:06\u201307:08, supersedes V1's filled paint):
+  the fish are WIREFRAME \u2014 "like a mechanical drawing" \u2014 outline and
+  construction lines only, in a FLAT PLANE (a drawing-board elevation,
+  like his hero plate; no 3D, no volume program). Lines are light, so
+  the tank holds A BUNCH OF THEM: two hero principals on the circuit
+  plus a school of smaller wireframe bettas on slow eddies. Life comes
+  from articulation in the plane: a segmented spine chain (head / body
+  / tail pivots, travelling wave), fin-rib fans that ripple and spread,
+  pectoral flutter, surge-and-ease pacing. Wireframe does not excuse
+  stiffness \u2014 the construction lines SHOW the bend.
+
+  THE BACKLIGHT (owner permission, 07:08): each principal carries a
+  stepped glow field UNDER its wire \u2014 the UV bounce as its own layer.
+  A backlight ADDS light behind; the condemned dark sheet SUBTRACTED
+  light in front. Opposite acts; the sheet stays banned.
+
+  PALETTE TABLE (his semi-opaque custom colouring method, applied to
+  the wireframe fish ONLY; every tint a chosen colour, numbers showing):
+    Fish A (blue-green wire):  under-stroke #0d3a5c w3.4 / core #6fd8ff w1.5
+      body tint #1d5f9e @ 0.17 / fin membrane tint #3f8fd2 @ 0.11
+      backlight steps (solid): #051a12 outer / #092e1f inner
+    Fish B (amber-red wire):   under-stroke #5c1f0d w3.4 / core #ffb37c w1.5
+      body tint #c1441a @ 0.16 / fin membrane tint #e4572e @ 0.10
+      backlight steps (solid): #051a12 outer / #092e1f inner
+    School (dimmer strata):    line steps #14401f / #1d5c33 / #173f5c /
+      #4a3410 by fish, w1.7 / shared body tint #2f9e44 @ 0.08 /
+      backlight #051c14 solid
+    Yin-yang wallpaper:        lobes #04140f + #050816 / ring #123c26 w2
+    Digits: solid ice #c8fbff on solid glow step #0b5563 \u2014 never tinted.
+  Tint lives INSIDE the wire only. If tint muddied wire at glass scale
+  the instruction was: thin the tint, keep the wire.
+
+  ASSEMBLY ORDER (One-Shot Rule / Cupboard, largest to smallest \u2014
+  owner restatement 07:07: "Stacked out from the wallpaper first"):
+    1. WALLPAPER: OLED void + starfield + oil-slick steps + the
+       SUBDUED yin-yang (the circuit the heroes ride, riding WITH the
+       wallpaper now, not as a mid layer) + ambient bubbles
+    2. the grass field (neon blades, bottom edge, billowing)
+    3. the SCHOOL: six small wireframe bettas on slow eddies
+    4. the PRINCIPALS: two hero wireframe bettas (backlight field
+       first inside each fish group, then tint, then wire)
+    5. TONE/LIGHT LAST: the hovering digits (teacups) \u2014 date, time,
+       seconds, AM/PM, solid paint, solid glow step
+
+  MOTION: a small guarded JS driver (requestAnimationFrame, interval
+  fallback). Principals: arc-length swim with surge/ease pacing; spine
+  wave phase-locked to speed (fight = wave amplitude doubled, fin fans
+  spread, dart out, tumble, glide back). School: SMIL tail-wag inside
+  each fish + JS eddy transport. If script dies: fish stand posed on
+  the circuit in their static transforms, grass sways (CSS), slick
+  shimmers (SMIL), digits read honest dashes \u2014 the house blank.
+  Test pin: ?fight=1 locks fish A mid-flare for bench captures.
+  window.__wave(t, speed) and window.__state expose the pose math for
+  bench frame-state proof.
+
+  NO fake instruments. The generated art's HUD paint (DEPTH / OIL /
+  pH) was the generator's brushwork, never a spec. Live device time
+  and date only. Zero data calls. ONE FILE, ZERO EXTERNAL REFERENCES.
+
+  FIT: MEASURE-AND-JAM (visualViewport > inner > client), explicit
+  pixels, letterbox. Design stage 640x480 landscape (Lokmat by record).
+
+  TIMING BLOCK (house law): T0 = this V2 dispatch, Nov 8, 2026,
+  ~07:06 EST (owner's verdict + wireframe direction) -> finished
+  verified product: stamped at ship in the delivery report.
+-->
+<style>
+  html,body{margin:0;padding:0;background:#000;width:100%;height:100%;overflow:hidden}
+  #stage{position:absolute;background:#000;overflow:hidden}
+  svg{display:block}
+  text{font-family:"Courier New",monospace;font-weight:bold}
+  .sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 3.6s ease-in-out infinite alternate}
+  @keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(5deg)}}
+  .spring{transform-box:fill-box;transform-origin:50% 100%;animation:spring 128s linear infinite}
+  @keyframes spring{0%{transform:scaleY(0)}3%{transform:scaleY(1)}46%{transform:scaleY(1)}
+    49%{transform:scaleY(0)}52%{transform:scaleY(1)}96%{transform:scaleY(1)}
+    98%{transform:scaleY(0)}100%{transform:scaleY(0)}}
+  .rise{animation:rise 9s linear infinite}
+  @keyframes rise{from{transform:translateY(0)}to{transform:translateY(-300px)}}
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="scene" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid meet" width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <path id="circuit" d="M 320,107 A 118,118 0 0 1 320,343 A 59,59 0 0 1 320,225 A 59,59 0 0 0 320,107 Z"/>
+  <radialGradient id="glowA">
+    <stop offset="0" stop-color="#0f4d2f" stop-opacity="0.80"/>
+    <stop offset="0.55" stop-color="#093420" stop-opacity="0.36"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="glowS">
+    <stop offset="0" stop-color="#0a3524" stop-opacity="0.55"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+  <path id="blade" d="M0,0 C 8,-30 16,-62 12,-98" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+
+  <g id="artATail" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M-52,-6 C-80,-38 -104,-47 -117,-40 C-107,-18 -105,-6 -113,0 C-105,6 -107,18 -117,40 C-104,47 -80,38 -52,6 Z"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-110.0" y2="-37.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-103.0" y2="-23.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-111.0" y2="-9.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-114.0" y2="0.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-111.0" y2="9.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-103.0" y2="23.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-110.0" y2="37.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-94.0" y2="-15.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-94.0" y2="15.0"/>
+      <path d="M-52,-7 C-46,-3 -46,3 -52,7"/>
+  </g>
+  <g id="artABody" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M-52,0 C-40,-22 6,-28 34,-16 C52,-8 58,-2 58,0 C58,2 52,8 34,16 C6,28 -40,22 -52,0 Z"/>
+      <path d="M-50,0 C-16,-3.5 22,-3.5 55,-0.5"/>
+      <path d="M-32,-23 C-28.5,0 -32,23 -32,23"/>
+      <path d="M-8,-27 C-4.5,0 -8,27 -8,27"/>
+      <path d="M16,-25 C19.5,0 16,25 16,25"/>
+      <path d="M36,-16 C39.5,0 36,16 36,16"/>
+      <path d="M-29,-9 A5.5,4.5 0 0 1 -19,-9"/>
+      <path d="M-17,2 A5.5,4.5 0 0 1 -7,2"/>
+      <path d="M-29,11 A5.5,4.5 0 0 1 -19,11"/>
+      <path d="M-7,-13 A5.5,4.5 0 0 1 3,-13"/>
+      <path d="M-5,9 A5.5,4.5 0 0 1 5,9"/>
+      <path d="M5,-4 A5.5,4.5 0 0 1 15,-4"/>
+      <path d="M9,13 A5.5,4.5 0 0 1 19,13"/>
+      <path d="M-43,3 A5.5,4.5 0 0 1 -33,3"/>
+      <path d="M-33,-17 C-21,-43 9,-53 37,-34 C21,-28 -12,-24 -33,-17 Z"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="-27.0" y2="-38.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="-14.0" y2="-45.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="-1.0" y2="-48.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="11.0" y2="-46.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="23.0" y2="-40.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="32.0" y2="-32.0"/>
+      <path d="M-41,14 C-23,44 -3,61 29,63 C9,43 -15,26 -41,14 Z"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="-28.0" y2="38.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="-15.0" y2="47.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="-2.0" y2="54.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="10.0" y2="54.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="20.0" y2="45.0"/>
+      <path d="M4,19 C12,38 10,52 0,66"/><path d="M14,19 C20,34 18,46 10,56"/>
+  </g>
+  <g id="artAHead" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M31,-14 C25,-6 25,6 31,14"/><path d="M23,-11 C18,-5 18,5 23,11"/>
+      <circle cx="44" cy="-4" r="5.2"/><circle cx="44" cy="-4" r="1.9" fill="currentColor" stroke="none"/><circle cx="46" cy="-6" r="1" fill="#ffffff" stroke="none"/>
+      <path d="M58,0 C55,2 53,3.5 51,5.5"/>
+      <path d="M20,3 C33,7 38,18 34,30 C26,22 20,13 20,3 Z"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="33.0" y2="11.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="32.0" y2="19.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="28.0" y2="26.0"/>
+  </g>
+  <g id="artAPect" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M20,3 C33,7 38,18 34,30 C26,22 20,13 20,3 Z"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="33.0" y2="11.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="32.0" y2="19.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="28.0" y2="26.0"/>
+  </g>
+  <path id="tintABody" d="M-52,0 C-40,-22 6,-28 34,-16 C52,-8 58,-2 58,0 C58,2 52,8 34,16 C6,28 -40,22 -52,0 Z" fill="#1d5f9e" stroke="none"/>
+  <path id="tintADorsal" d="M-33,-17 C-21,-43 9,-53 37,-34 C21,-28 -12,-24 -33,-17 Z" fill="#3f8fd2" stroke="none"/>
+  <path id="tintAAnal" d="M-41,14 C-23,44 -3,61 29,63 C9,43 -15,26 -41,14 Z" fill="#3f8fd2" stroke="none"/>
+  <path id="tintACaudal" d="M-52,-6 C-80,-38 -104,-47 -117,-40 C-107,-18 -105,-6 -113,0 C-105,6 -107,18 -117,40 C-104,47 -80,38 -52,6 Z" fill="#3f8fd2" stroke="none"/>
+  <path id="tintAPect" d="M20,3 C33,7 38,18 34,30 C26,22 20,13 20,3 Z" fill="#3f8fd2" stroke="none"/>
+  <g id="artBTail" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M-52,-6 C-80,-38 -104,-47 -117,-40 C-107,-18 -105,-6 -113,0 C-105,6 -107,18 -117,40 C-104,47 -80,38 -52,6 Z"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-110.0" y2="-37.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-103.0" y2="-23.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-111.0" y2="-9.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-114.0" y2="0.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-111.0" y2="9.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-103.0" y2="23.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-110.0" y2="37.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-94.0" y2="-15.0"/>
+      <line class="rib" x1="-53.0" y1="0.0" x2="-94.0" y2="15.0"/>
+      <path d="M-52,-7 C-46,-3 -46,3 -52,7"/>
+  </g>
+  <g id="artBBody" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M-52,0 C-40,-22 6,-28 34,-16 C52,-8 58,-2 58,0 C58,2 52,8 34,16 C6,28 -40,22 -52,0 Z"/>
+      <path d="M-50,0 C-16,-3.5 22,-3.5 55,-0.5"/>
+      <path d="M-32,-23 C-28.5,0 -32,23 -32,23"/>
+      <path d="M-8,-27 C-4.5,0 -8,27 -8,27"/>
+      <path d="M16,-25 C19.5,0 16,25 16,25"/>
+      <path d="M36,-16 C39.5,0 36,16 36,16"/>
+      <path d="M-29,-9 A5.5,4.5 0 0 1 -19,-9"/>
+      <path d="M-17,2 A5.5,4.5 0 0 1 -7,2"/>
+      <path d="M-29,11 A5.5,4.5 0 0 1 -19,11"/>
+      <path d="M-7,-13 A5.5,4.5 0 0 1 3,-13"/>
+      <path d="M-5,9 A5.5,4.5 0 0 1 5,9"/>
+      <path d="M5,-4 A5.5,4.5 0 0 1 15,-4"/>
+      <path d="M9,13 A5.5,4.5 0 0 1 19,13"/>
+      <path d="M-43,3 A5.5,4.5 0 0 1 -33,3"/>
+      <path d="M-33,-17 C-21,-43 9,-53 37,-34 C21,-28 -12,-24 -33,-17 Z"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="-27.0" y2="-38.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="-14.0" y2="-45.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="-1.0" y2="-48.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="11.0" y2="-46.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="23.0" y2="-40.0"/>
+      <line class="rib" x1="-2.0" y1="-23.0" x2="32.0" y2="-32.0"/>
+      <path d="M-41,14 C-23,44 -3,61 29,63 C9,43 -15,26 -41,14 Z"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="-28.0" y2="38.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="-15.0" y2="47.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="-2.0" y2="54.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="10.0" y2="54.0"/>
+      <line class="rib" x1="-8.0" y1="22.0" x2="20.0" y2="45.0"/>
+      <path d="M4,19 C12,38 10,52 0,66"/><path d="M14,19 C20,34 18,46 10,56"/>
+  </g>
+  <g id="artBHead" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M31,-14 C25,-6 25,6 31,14"/><path d="M23,-11 C18,-5 18,5 23,11"/>
+      <circle cx="44" cy="-4" r="5.2"/><circle cx="44" cy="-4" r="1.9" fill="currentColor" stroke="none"/><circle cx="46" cy="-6" r="1" fill="#ffffff" stroke="none"/>
+      <path d="M58,0 C55,2 53,3.5 51,5.5"/>
+      <path d="M20,3 C33,7 38,18 34,30 C26,22 20,13 20,3 Z"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="33.0" y2="11.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="32.0" y2="19.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="28.0" y2="26.0"/>
+  </g>
+  <g id="artBPect" stroke="currentColor" fill="none" stroke-linecap="round">
+      <path d="M20,3 C33,7 38,18 34,30 C26,22 20,13 20,3 Z"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="33.0" y2="11.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="32.0" y2="19.0"/>
+      <line class="rib" x1="21.0" y1="5.0" x2="28.0" y2="26.0"/>
+  </g>
+  <path id="tintBBody" d="M-52,0 C-40,-22 6,-28 34,-16 C52,-8 58,-2 58,0 C58,2 52,8 34,16 C6,28 -40,22 -52,0 Z" fill="#c1441a" stroke="none"/>
+  <path id="tintBDorsal" d="M-33,-17 C-21,-43 9,-53 37,-34 C21,-28 -12,-24 -33,-17 Z" fill="#e4572e" stroke="none"/>
+  <path id="tintBAnal" d="M-41,14 C-23,44 -3,61 29,63 C9,43 -15,26 -41,14 Z" fill="#e4572e" stroke="none"/>
+  <path id="tintBCaudal" d="M-52,-6 C-80,-38 -104,-47 -117,-40 C-107,-18 -105,-6 -113,0 C-105,6 -107,18 -117,40 C-104,47 -80,38 -52,6 Z" fill="#e4572e" stroke="none"/>
+  <path id="tintBPect" d="M20,3 C33,7 38,18 34,30 C26,22 20,13 20,3 Z" fill="#e4572e" stroke="none"/>
+  <g id="schoolArt" stroke="currentColor" fill="none">
+      <path d="M-30,0 C-22,-12 4,-15 20,-9 C30,-5 34,-1 34,0 C34,1 30,5 20,9 C4,15 -22,12 -30,0 Z"/>
+      <path d="M-29,0 C-8,-2 16,-2 32,0"/>
+      <path d="M-30,-4 C-42,-16 -52,-19 -58,-15 C-53,-6 -52,-2 -56,0 C-52,2 -53,6 -58,15 C-52,19 -42,16 -30,4 Z"/>
+      <path d="M-31,-3 L-55,-13 M-31,0 L-57,0 M-31,3 L-55,13"/>
+      <path d="M-14,-11 C-6,-20 8,-22 18,-16"/>
+      <path d="M-16,10 C-8,19 4,22 14,18"/>
+      <circle cx="24" cy="-3" r="2.6"/>
+      <path d="M14,-7 C11,-3 11,3 14,7"/>
+  </g>
+  <path id="schoolTint" d="M-30,0 C-22,-12 4,-15 20,-9 C30,-5 34,-1 34,0 C34,1 30,5 20,9 C4,15 -22,12 -30,0 Z" fill="#2f9e44" stroke="none"/>
+  <g id="schoolTail" stroke="currentColor" fill="none">
+      <path d="M-30,-4 C-42,-16 -52,-19 -58,-15 C-53,-6 -52,-2 -56,0 C-52,2 -53,6 -58,15 C-52,19 -42,16 -30,4 Z"/>
+      <path d="M-31,-3 L-55,-13 M-31,0 L-57,0 M-31,3 L-55,13"/>
+  </g>
+  <g id="schoolBodyOnly" stroke="currentColor" fill="none">
+      <path d="M-30,0 C-22,-12 4,-15 20,-9 C30,-5 34,-1 34,0 C34,1 30,5 20,9 C4,15 -22,12 -30,0 Z"/>
+      <path d="M-29,0 C-8,-2 16,-2 32,0"/>
+      <path d="M-14,-11 C-6,-20 8,-22 18,-16"/>
+      <path d="M-16,10 C-8,19 4,22 14,18"/>
+      <circle cx="24" cy="-3" r="2.6"/>
+      <path d="M14,-7 C11,-3 11,3 14,7"/>
+  </g>
+</defs>
+
+<!-- 1. WALLPAPER: OLED void, starfield, oil-slick steps, SUBDUED yin-yang, bubbles -->
+<rect x="0" y="0" width="640" height="480" fill="#000000"/>
+<g fill="#33506b">
+  <circle cx="42" cy="38" r="1.6"/><circle cx="118" cy="70" r="1.1"/><circle cx="204" cy="30" r="1.4"/>
+  <circle cx="296" cy="58" r="1.0"/><circle cx="388" cy="26" r="1.5"/><circle cx="470" cy="64" r="1.1"/>
+  <circle cx="556" cy="34" r="1.6"/><circle cx="606" cy="86" r="1.0"/><circle cx="66" cy="140" r="1.2"/>
+  <circle cx="150" cy="118" r="0.9"/><circle cx="520" cy="128" r="1.3"/><circle cx="586" cy="176" r="1.0"/>
+  <circle cx="30" cy="220" r="1.3"/><circle cx="96" cy="262" r="0.9"/><circle cx="610" cy="250" r="1.2"/>
+  <circle cx="540" cy="300" r="0.9"/><circle cx="52" cy="330" r="1.1"/><circle cx="150" cy="356" r="1.0"/>
+  <circle cx="430" cy="368" r="1.2"/><circle cx="596" cy="352" r="1.4"/><circle cx="250" cy="392" r="0.9"/>
+  <circle cx="356" cy="404" r="1.1"/><circle cx="486" cy="396" r="1.0"/>
+</g>
+<g fill="#57481c">
+  <circle cx="180" cy="86" r="1.2"/><circle cx="420" cy="96" r="1.0"/><circle cx="330" cy="140" r="0.9"/>
+  <circle cx="88" cy="196" r="1.1"/><circle cx="566" cy="216" r="1.2"/><circle cx="238" cy="330" r="1.0"/>
+</g>
+<g fill="none" stroke-width="2">
+  <ellipse cx="320" cy="-34" rx="310" ry="58" stroke="#16283c">
+    <animate attributeName="stroke" values="#16283c;#17352a;#201a38;#16283c" dur="26s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="212" cy="-44" rx="180" ry="44" stroke="#1d1430">
+    <animate attributeName="stroke" values="#1d1430;#16283c;#17352a;#1d1430" dur="34s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="452" cy="-40" rx="170" ry="40" stroke="#123528">
+    <animate attributeName="stroke" values="#123528;#1d1430;#16283c;#123528" dur="30s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="320" cy="516" rx="320" ry="56" stroke="#122e20">
+    <animate attributeName="stroke" values="#122e20;#16283c;#201a38;#122e20" dur="28s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="150" cy="522" rx="190" ry="42" stroke="#182a42">
+    <animate attributeName="stroke" values="#182a42;#122e20;#1d1430;#182a42" dur="38s" repeatCount="indefinite"/>
+  </ellipse>
+</g>
+<g id="circuitPaint" fill="none">
+  <circle cx="320" cy="225" r="118" stroke="#14532a" stroke-width="1" stroke-dasharray="5 6"/>
+  <line x1="192" y1="225" x2="448" y2="225" stroke="#0b2417" stroke-width="1" stroke-dasharray="2 7"/>
+  <line x1="320" y1="97" x2="320" y2="353" stroke="#0b2417" stroke-width="1" stroke-dasharray="2 7"/>
+  <use href="#circuit" stroke="#1f7a3d" stroke-width="1.8"/>
+  <circle cx="320" cy="166" r="7" stroke="#1f7a3d" stroke-width="1.2"/>
+  <circle cx="320" cy="284" r="7" stroke="#1f7a3d" stroke-width="1.2"/>
+</g>
+<g fill="none" stroke="#3f8fd2" stroke-width="1.4">
+  <g class="rise" style="animation-duration:11s"><circle cx="508" cy="430" r="4"/></g>
+  <g class="rise" style="animation-duration:14s;animation-delay:-6s"><circle cx="140" cy="440" r="3"/></g>
+  <g class="rise" style="animation-duration:9s;animation-delay:-3s"><circle cx="420" cy="450" r="2.6"/></g>
+  <g class="rise" style="animation-duration:16s;animation-delay:-9s"><circle cx="238" cy="446" r="3.4"/></g>
+</g>
+
+<!-- 2. THE GRASS FIELD -->
+<g id="grass">
+  <g class="spring" style="animation-delay:-12s"><g class="sway" style="animation-duration:3.2s"><use href="#blade" transform="translate(16,484) scale(1.15,1.15)" color="#27c24c"/></g></g>
+  <g class="spring" style="animation-delay:-40s"><g class="sway" style="animation-duration:4.1s"><use href="#blade" transform="translate(44,484) scale(0.8,0.8)" color="#39ff6a"/></g></g>
+  <g class="spring" style="animation-delay:-70s"><g class="sway" style="animation-duration:3.7s"><use href="#blade" transform="translate(72,484) scale(-1.3,1.3)" color="#1f9d43"/></g></g>
+  <g class="spring" style="animation-delay:-24s"><g class="sway" style="animation-duration:3.4s"><use href="#blade" transform="translate(100,484) scale(0.95,0.95)" color="#7dff9a"/></g></g>
+  <g class="spring" style="animation-delay:-96s"><g class="sway" style="animation-duration:4.4s"><use href="#blade" transform="translate(128,484) scale(1.2,1.2)" color="#27c24c"/></g></g>
+  <g class="spring" style="animation-delay:-55s"><g class="sway" style="animation-duration:3.0s"><use href="#blade" transform="translate(156,484) scale(-0.75,0.75)" color="#39ff6a"/></g></g>
+  <g class="spring" style="animation-delay:-84s"><g class="sway" style="animation-duration:3.9s"><use href="#blade" transform="translate(184,484) scale(1.35,1.35)" color="#1f9d43"/></g></g>
+  <g class="spring" style="animation-delay:-8s"><g class="sway" style="animation-duration:3.5s"><use href="#blade" transform="translate(212,484) scale(0.9,0.9)" color="#7dff9a"/></g></g>
+  <g class="spring" style="animation-delay:-64s"><g class="sway" style="animation-duration:4.2s"><use href="#blade" transform="translate(240,484) scale(-1.1,1.1)" color="#27c24c"/></g></g>
+  <g class="spring" style="animation-delay:-33s"><g class="sway" style="animation-duration:3.1s"><use href="#blade" transform="translate(268,484) scale(0.7,0.7)" color="#39ff6a"/></g></g>
+  <g class="spring" style="animation-delay:-110s"><g class="sway" style="animation-duration:3.8s"><use href="#blade" transform="translate(296,484) scale(1.25,1.25)" color="#1f9d43"/></g></g>
+  <g class="spring" style="animation-delay:-47s"><g class="sway" style="animation-duration:3.3s"><use href="#blade" transform="translate(324,484) scale(-0.85,0.85)" color="#7dff9a"/></g></g>
+  <g class="spring" style="animation-delay:-78s"><g class="sway" style="animation-duration:3.2s"><use href="#blade" transform="translate(352,484) scale(1.15,1.15)" color="#27c24c"/></g></g>
+  <g class="spring" style="animation-delay:-18s"><g class="sway" style="animation-duration:4.1s"><use href="#blade" transform="translate(380,484) scale(0.8,0.8)" color="#39ff6a"/></g></g>
+  <g class="spring" style="animation-delay:-102s"><g class="sway" style="animation-duration:3.7s"><use href="#blade" transform="translate(408,484) scale(-1.3,1.3)" color="#1f9d43"/></g></g>
+  <g class="spring" style="animation-delay:-59s"><g class="sway" style="animation-duration:3.4s"><use href="#blade" transform="translate(436,484) scale(0.95,0.95)" color="#7dff9a"/></g></g>
+  <g class="spring" style="animation-delay:-29s"><g class="sway" style="animation-duration:4.4s"><use href="#blade" transform="translate(464,484) scale(1.2,1.2)" color="#27c24c"/></g></g>
+  <g class="spring" style="animation-delay:-88s"><g class="sway" style="animation-duration:3.0s"><use href="#blade" transform="translate(492,484) scale(-0.75,0.75)" color="#39ff6a"/></g></g>
+  <g class="spring" style="animation-delay:-5s"><g class="sway" style="animation-duration:3.9s"><use href="#blade" transform="translate(520,484) scale(1.35,1.35)" color="#1f9d43"/></g></g>
+  <g class="spring" style="animation-delay:-73s"><g class="sway" style="animation-duration:3.5s"><use href="#blade" transform="translate(548,484) scale(0.9,0.9)" color="#7dff9a"/></g></g>
+  <g class="spring" style="animation-delay:-44s"><g class="sway" style="animation-duration:4.2s"><use href="#blade" transform="translate(576,484) scale(-1.1,1.1)" color="#27c24c"/></g></g>
+  <g class="spring" style="animation-delay:-118s"><g class="sway" style="animation-duration:3.1s"><use href="#blade" transform="translate(604,484) scale(0.7,0.7)" color="#39ff6a"/></g></g>
+  <g class="spring" style="animation-delay:-91s"><g class="sway" style="animation-duration:3.8s"><use href="#blade" transform="translate(632,484) scale(1.25,1.25)" color="#1f9d43"/></g></g>
+  <g class="sway" style="animation-duration:4.6s"><use href="#blade" transform="translate(6,486) scale(1.9)" color="#27c24c"/></g>
+  <g class="sway" style="animation-duration:5.0s"><use href="#blade" transform="translate(636,486) scale(1.8)" color="#27c24c"/></g>
+</g>
+
+<!-- 3. THE SCHOOL: six small wireframe bettas on slow eddies -->
+
+<g id="school1" transform="translate(-200,-200)">
+  <ellipse cx="0" cy="0" rx="56" ry="28" fill="url(#glowS)"/>
+  <use href="#schoolTint" opacity="0.08" transform="scale(0.92)"/>
+  <g id="schoolBody1">
+    <use href="#schoolBodyOnly" color="#1d5c33" stroke-width="1.7" transform="scale(0.92)"/>
+    <g id="schoolTail1">
+      <animateTransform attributeName="transform" type="rotate" values="-9 -30 0;9 -30 0;-9 -30 0" dur="1.83s" begin="-0.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#schoolTail" color="#1d5c33" stroke-width="1.7" transform="scale(0.92)"/>
+    </g>
+  </g>
+</g>
+
+<g id="school2" transform="translate(-200,-200)">
+  <ellipse cx="0" cy="0" rx="56" ry="28" fill="url(#glowS)"/>
+  <use href="#schoolTint" opacity="0.08" transform="scale(0.82)"/>
+  <g id="schoolBody2">
+    <use href="#schoolBodyOnly" color="#173f5c" stroke-width="1.7" transform="scale(0.82)"/>
+    <g id="schoolTail2">
+      <animateTransform attributeName="transform" type="rotate" values="-9 -30 0;9 -30 0;-9 -30 0" dur="2.06s" begin="-0.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#schoolTail" color="#173f5c" stroke-width="1.7" transform="scale(0.82)"/>
+    </g>
+  </g>
+</g>
+
+<g id="school3" transform="translate(-200,-200)">
+  <ellipse cx="0" cy="0" rx="56" ry="28" fill="url(#glowS)"/>
+  <use href="#schoolTint" opacity="0.08" transform="scale(1.0)"/>
+  <g id="schoolBody3">
+    <use href="#schoolBodyOnly" color="#27c24c" stroke-width="1.7" transform="scale(1.0)"/>
+    <g id="schoolTail3">
+      <animateTransform attributeName="transform" type="rotate" values="-9 -30 0;9 -30 0;-9 -30 0" dur="2.29s" begin="-1.2000000000000002s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#schoolTail" color="#27c24c" stroke-width="1.7" transform="scale(1.0)"/>
+    </g>
+  </g>
+</g>
+
+<g id="school4" transform="translate(-200,-200)">
+  <ellipse cx="0" cy="0" rx="56" ry="28" fill="url(#glowS)"/>
+  <use href="#schoolTint" opacity="0.08" transform="scale(0.86)"/>
+  <g id="schoolBody4">
+    <use href="#schoolBodyOnly" color="#4a3410" stroke-width="1.7" transform="scale(0.86)"/>
+    <g id="schoolTail4">
+      <animateTransform attributeName="transform" type="rotate" values="-9 -30 0;9 -30 0;-9 -30 0" dur="2.52s" begin="-1.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#schoolTail" color="#4a3410" stroke-width="1.7" transform="scale(0.86)"/>
+    </g>
+  </g>
+</g>
+
+<g id="school5" transform="translate(-200,-200)">
+  <ellipse cx="0" cy="0" rx="56" ry="28" fill="url(#glowS)"/>
+  <use href="#schoolTint" opacity="0.08" transform="scale(0.76)"/>
+  <g id="schoolBody5">
+    <use href="#schoolBodyOnly" color="#14401f" stroke-width="1.7" transform="scale(0.76)"/>
+    <g id="schoolTail5">
+      <animateTransform attributeName="transform" type="rotate" values="-9 -30 0;9 -30 0;-9 -30 0" dur="2.75s" begin="-2.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#schoolTail" color="#14401f" stroke-width="1.7" transform="scale(0.76)"/>
+    </g>
+  </g>
+</g>
+
+<g id="school6" transform="translate(-200,-200)">
+  <ellipse cx="0" cy="0" rx="56" ry="28" fill="url(#glowS)"/>
+  <use href="#schoolTint" opacity="0.08" transform="scale(0.7)"/>
+  <g id="schoolBody6">
+    <use href="#schoolBodyOnly" color="#173f5c" stroke-width="1.7" transform="scale(0.7)"/>
+    <g id="schoolTail6">
+      <animateTransform attributeName="transform" type="rotate" values="-9 -30 0;9 -30 0;-9 -30 0" dur="2.9800000000000004s" begin="-2.4000000000000004s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#schoolTail" color="#173f5c" stroke-width="1.7" transform="scale(0.7)"/>
+    </g>
+  </g>
+</g>
+
+<!-- 4. THE PRINCIPALS: hero wireframe bettas on the circuit -->
+
+<g id="posA" transform="translate(320 107)">
+  <ellipse cx="-4" cy="0" rx="128" ry="70" fill="url(#glowA)"/>
+  <g id="bodySegA">
+    <use href="#tintABody" opacity="0.17"/>
+    <g id="fanDorsalA"><g>
+      <animateTransform attributeName="transform" type="rotate" values="-3 -2 -23;3.5 -2 -23;-3 -2 -23" dur="3.1s" begin="0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#tintADorsal" opacity="0.11"/>
+    </g></g>
+    <g id="fanAnalA"><g>
+      <animateTransform attributeName="transform" type="rotate" values="3 -8 22;-3.5 -8 22;3 -8 22" dur="3.6s" begin="-0.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#tintAAnal" opacity="0.11"/>
+    </g></g>
+    <use href="#artABody" color="#0d3a5c" stroke-width="3.4"/>
+    <use href="#artABody" color="#6fd8ff" stroke-width="1.5"/>
+    <g id="headSegA">
+      <use href="#tintAPect" opacity="0.11"/>
+      <use href="#artAHead" color="#0d3a5c" stroke-width="3.4"/>
+      <use href="#artAHead" color="#6fd8ff" stroke-width="1.5"/>
+      <g id="fanPectA">
+        <animateTransform attributeName="transform" type="rotate" values="-16 20 4;18 20 4;-16 20 4" dur="0.9s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" begin="-0.3s" repeatCount="indefinite"/>
+        <use href="#artAPect" color="#3fe08a" stroke-width="1.2"/>
+      </g>
+      <circle cx="57" cy="3" r="2.2" fill="none" stroke="#6fd8ff" stroke-width="1">
+        <animate attributeName="cy" values="3;-26" dur="7s" begin="-2s" repeatCount="indefinite"/>
+        <animate attributeName="cx" values="57;63" dur="7s" begin="-2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;0.9;0" keyTimes="0;0.25;1" dur="7s" begin="-2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    <g id="tailSegA">
+      <g id="fanCaudalA"><g>
+        <animateTransform attributeName="transform" type="rotate" values="-4 -53 0;4 -53 0;-4 -53 0" dur="2.7s" begin="-0.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+        <use href="#tintACaudal" opacity="0.11"/>
+      </g></g>
+      <use href="#artATail" color="#0d3a5c" stroke-width="3.4"/>
+      <use href="#artATail" color="#6fd8ff" stroke-width="1.5"/>
+    </g>
+  </g>
+</g>
+<g id="posB" transform="translate(320 343) rotate(180)">
+  <ellipse cx="-4" cy="0" rx="128" ry="70" fill="url(#glowA)"/>
+  <g id="bodySegB">
+    <use href="#tintBBody" opacity="0.16"/>
+    <g id="fanDorsalB"><g>
+      <animateTransform attributeName="transform" type="rotate" values="-3 -2 -23;3.5 -2 -23;-3 -2 -23" dur="3.7s" begin="-0.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#tintBDorsal" opacity="0.1"/>
+    </g></g>
+    <g id="fanAnalB"><g>
+      <animateTransform attributeName="transform" type="rotate" values="3 -8 22;-3.5 -8 22;3 -8 22" dur="4.2s" begin="-1.2999999999999998s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+      <use href="#tintBAnal" opacity="0.1"/>
+    </g></g>
+    <use href="#artBBody" color="#5c1f0d" stroke-width="3.4"/>
+    <use href="#artBBody" color="#ffb37c" stroke-width="1.5"/>
+    <g id="headSegB">
+      <use href="#tintBPect" opacity="0.1"/>
+      <use href="#artBHead" color="#5c1f0d" stroke-width="3.4"/>
+      <use href="#artBHead" color="#ffb37c" stroke-width="1.5"/>
+      <g id="fanPectB">
+        <animateTransform attributeName="transform" type="rotate" values="-16 20 4;18 20 4;-16 20 4" dur="0.9s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" begin="-0.8999999999999999s" repeatCount="indefinite"/>
+        <use href="#artBPect" color="#ff7847" stroke-width="1.2"/>
+      </g>
+      <circle cx="57" cy="3" r="2.2" fill="none" stroke="#ffb37c" stroke-width="1">
+        <animate attributeName="cy" values="3;-26" dur="7s" begin="-2.6s" repeatCount="indefinite"/>
+        <animate attributeName="cx" values="57;63" dur="7s" begin="-2.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;0.9;0" keyTimes="0;0.25;1" dur="7s" begin="-2.6s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    <g id="tailSegB">
+      <g id="fanCaudalB"><g>
+        <animateTransform attributeName="transform" type="rotate" values="-4 -53 0;4 -53 0;-4 -53 0" dur="3.3000000000000003s" begin="-1.1s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+        <use href="#tintBCaudal" opacity="0.1"/>
+      </g></g>
+      <use href="#artBTail" color="#5c1f0d" stroke-width="3.4"/>
+      <use href="#artBTail" color="#ffb37c" stroke-width="1.5"/>
+    </g>
+  </g>
+</g>
+
+<!-- 5. TONE/LIGHT LAST: the hovering digits -->
+<g id="digits">
+  <text id="dateGlow" x="320" y="54" font-size="30" letter-spacing="3" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="6">--- -- --</text>
+  <text id="dateText" x="320" y="54" font-size="30" letter-spacing="3" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="1">--- -- --</text>
+  <text id="ampmGlow" x="92" y="240" font-size="26" letter-spacing="2" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="6"></text>
+  <text id="ampmText" x="92" y="240" font-size="26" letter-spacing="2" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="1"></text>
+  <text id="timeGlow" x="292" y="240" font-size="74" text-anchor="middle" fill="#0b5563" stroke="#0b5563" stroke-width="9">--:--</text>
+  <text id="timeText" x="292" y="240" font-size="74" text-anchor="middle" fill="#c8fbff" stroke="#02303a" stroke-width="1.6">--:--</text>
+  <text id="secGlow" x="436" y="240" font-size="36" text-anchor="start" fill="#0b5563" stroke="#0b5563" stroke-width="6">--</text>
+  <text id="secText" x="436" y="240" font-size="36" text-anchor="start" fill="#c8fbff" stroke="#02303a" stroke-width="1">--</text>
+</g>
+</svg>
+</div>
+<script>
+(function(){
+"use strict";
+var stage=document.getElementById("stage"), scene=document.getElementById("scene");
+function layout(){
+  var vv=window.visualViewport;
+  var W=Math.floor(vv?vv.width:window.innerWidth);
+  var H=Math.floor(vv?vv.height:window.innerHeight);
+  if(!W||!H){W=document.documentElement.clientWidth||640;H=document.documentElement.clientHeight||480;}
+  var S=Math.min(W/640,H/480);
+  var sw=Math.round(640*S), sh=Math.round(480*S);
+  stage.style.width=sw+"px"; stage.style.height=sh+"px";
+  stage.style.left=Math.floor((W-sw)/2)+"px"; stage.style.top=Math.floor((H-sh)/2)+"px";
+  scene.style.width=sw+"px"; scene.style.height=sh+"px";
+  window.__fit={W:W,H:H,stageW:sw,stageH:sh,S:+S.toFixed(3)};
+}
+layout();
+window.addEventListener("resize",layout);
+if(window.visualViewport)window.visualViewport.addEventListener("resize",layout);
+
+var DAYS=["SU","MO","TU","WE","TH","FR","SA"];
+function pad(n){return (n<10?"0":"")+n;}
+function setPair(a,b,v){var e1=document.getElementById(a),e2=document.getElementById(b); if(e1)e1.textContent=v; if(e2)e2.textContent=v;}
+function tick(){
+  var d=new Date(), h=d.getHours(), ap=h>=12?"PM":"AM"; h=h%12; if(h===0)h=12;
+  setPair("dateGlow","dateText",DAYS[d.getDay()]+" "+pad(d.getMonth()+1)+"-"+pad(d.getDate()));
+  setPair("timeGlow","timeText",h+":"+pad(d.getMinutes()));
+  setPair("secGlow","secText",pad(d.getSeconds()));
+  setPair("ampmGlow","ampmText",ap);
+}
+tick(); setInterval(tick,200);
+
+/* THE WAVE - one pure function, exposed for bench frame-state proof.
+   Travelling wave down the spine: head leads, body follows, tail lags
+   most and swings widest. Frequency rises with swim speed. */
+function waveAt(w){
+  return {head:3.0*Math.sin(w), body:5.5*Math.sin(w-0.7), tail:13.0*Math.sin(w-1.5)};
+}
+window.__wave=function(t,sp){ return waveAt(t*(1.2+2.1*sp)); };
+
+try{
+  var circuit=document.getElementById("circuit");
+  var LEN=circuit.getTotalLength();
+  var PIN=/[?&]fight=1/.test(window.location.search);
+  function $(id){return document.getElementById(id);}
+  function sstep(x){ if(x<=0)return 0; if(x>=1)return 1; return x*x*x*(x*(x*6-15)+10); }
+  function fightEnv(p){ return sstep(p/0.30)*(1-sstep((p-0.55)/0.45)); }
+  function dartEnv(p){ return sstep(p/0.38)*(1-sstep((p-0.50)/0.50)); }
+  function makeFish(tag,dist0,w0,off,fightStart){
+    return {pos:$( "pos"+tag), body:$("bodySeg"+tag), head:$("headSeg"+tag), tail:$("tailSeg"+tag),
+      fanD:$("fanDorsal"+tag), fanA:$("fanAnal"+tag), fanC:$("fanCaudal"+tag),
+      dist:dist0, w:w0, off:off, fightStart:fightStart, flare:0, x:0, y:0, ang:0, wv:waveAt(0)};
+  }
+  var fishA=makeFish("A",0,0,0,32);
+  var fishB=makeFish("B",LEN/2,2.1,2.4,0);
+  var school=[];
+  var SC=[[120,118,55,24,98,0.0,1],[522,128,48,21,82,1.7,-1],[108,332,50,28,114,3.4,1],
+          [530,338,58,26,102,5.1,-1],[320,398,95,15,128,2.6,1],[320,76,115,13,119,4.4,-1]];
+  for(var i=0;i<6;i++){ school.push({el:$("school"+(i+1)), c:SC[i], ph:i*1.37}); }
+  var lastMs=-1;
+  function frame(nowMs){
+    var tSec=PIN?34.0:nowMs/1000;
+    var dt=0;
+    if(lastMs>=0&&!PIN){ dt=Math.min(0.05,(nowMs-lastMs)/1000); }
+    lastMs=nowMs;
+    var state={t:+tSec.toFixed(2)};
+    [fishA,fishB].forEach(function(f){
+      var cyc=tSec%64;
+      var fp=(cyc>=f.fightStart&&cyc<f.fightStart+5)?(cyc-f.fightStart)/5:-1;
+      var flare=fp>=0?fightEnv(fp):0;
+      f.flare=flare;
+      var surgeT=1+0.45*Math.sin(tSec*0.13+f.off)+0.20*Math.sin(tSec*0.047+f.off*2.0)+(fp>=0?0.9*fightEnv(fp):0);
+      if(f.surgeS===undefined)f.surgeS=surgeT; f.surgeS+=(surgeT-f.surgeS)*Math.min(1,dt*3+0.02); var surge=f.surgeS;
+      var rate=LEN/54*surge;
+      f.dist=(f.dist+rate*dt)%LEN;
+      f.w+=dt*(1.2+2.1*surge);
+      var pt=circuit.getPointAtLength(f.dist);
+      var pt2=circuit.getPointAtLength((f.dist+2.5)%LEN);
+      var ang=Math.atan2(pt2.y-pt.y,pt2.x-pt.x)*180/Math.PI;
+      var dx=0, dy=0, tumble=0;
+      if(fp>=0){
+        var vx=320-pt.x, vy=225-pt.y, dd=Math.sqrt(vx*vx+vy*vy)||1;
+        var k=54*dartEnv(fp);
+        dx=vx/dd*k; dy=vy/dd*k;
+        if(fp>0.30&&fp<0.70)tumble=26*Math.sin((fp-0.30)/0.40*Math.PI);
+        tumble*=fightEnv(fp);
+      }
+      var amp=1+1.1*flare;
+      var wv=waveAt(f.w);
+      f.wv={head:+(wv.head*amp).toFixed(2), body:+(wv.body*amp).toFixed(2), tail:+(wv.tail*amp).toFixed(2)};
+      f.x=+(pt.x+dx).toFixed(1); f.y=+(pt.y+dy).toFixed(1); f.ang=+(ang+tumble).toFixed(1);
+      f.pos.setAttribute("transform","translate("+f.x+" "+f.y+") rotate("+f.ang+")");
+      f.body.setAttribute("transform","rotate("+f.wv.body+" 0 0)");
+      f.head.setAttribute("transform","rotate("+(f.wv.head-5*flare).toFixed(2)+" 26 0)");
+      f.tail.setAttribute("transform","rotate("+f.wv.tail+" -40 0)");
+      if(f.fanD)f.fanD.setAttribute("transform","scale(1 "+(1+0.55*flare).toFixed(3)+")");
+      if(f.fanA)f.fanA.setAttribute("transform","scale(1 "+(1+0.55*flare).toFixed(3)+")");
+      if(f.fanC)f.fanC.setAttribute("transform","scale("+(1+0.30*flare).toFixed(3)+" "+(1+0.45*flare).toFixed(3)+")");
+    });
+    state.A={x:fishA.x,y:fishA.y,ang:fishA.ang,head:fishA.wv.head,body:fishA.wv.body,tail:fishA.wv.tail,flare:+fishA.flare.toFixed(2)};
+    state.B={x:fishB.x,y:fishB.y,ang:fishB.ang,head:fishB.wv.head,body:fishB.wv.body,tail:fishB.wv.tail,flare:+fishB.flare.toFixed(2)};
+    state.school=[];
+    school.forEach(function(s,idx){
+      var u=s.c[5]+s.c[6]*tSec*2*Math.PI/s.c[4];
+      var x=s.c[0]+s.c[2]*Math.cos(u), y=s.c[1]+s.c[3]*Math.sin(u);
+      var vx=-s.c[2]*Math.sin(u)*s.c[6], vy=s.c[3]*Math.cos(u)*s.c[6];
+      var hd=Math.atan2(vy,vx)*180/Math.PI+3*Math.sin(tSec*1.3+s.ph);
+      s.el.setAttribute("transform","translate("+x.toFixed(1)+" "+y.toFixed(1)+") rotate("+hd.toFixed(1)+")");
+      state.school.push({x:+x.toFixed(0),y:+y.toFixed(0),h:+hd.toFixed(0)});
+    });
+    window.__state=state;
+  }
+  frame(0);
+  if(window.requestAnimationFrame){
+    var loop=function(ms){ frame(ms); window.requestAnimationFrame(loop); };
+    window.requestAnimationFrame(loop);
+  } else {
+    setInterval(function(){ frame(Date.now()); },50);
+  }
+}catch(e){ /* driver absent: static poses, CSS grass, SMIL slick stand */ }
+})();
+</script>
+</body>
+</html>

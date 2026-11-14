@@ -1,0 +1,1 @@
+var e={tool:null,ready:!1,tilesLoaded:0,tileErrors:0,width:0,height:0,markers:0,fix:!1,at:null},t=e,n=new Set;function r(e){t={...t,...e,at:Date.now()},n.forEach(e=>e())}function i(){t={...e},n.forEach(e=>e())}function a(){return t}function o(e){return n.add(e),()=>n.delete(e)}export{o as i,r as n,i as r,a as t};

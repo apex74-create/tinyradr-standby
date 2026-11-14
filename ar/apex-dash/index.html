@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <title>ApexDash — TriStar Defense Router</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      overflow: hidden;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      height: 100vh;
+      gap: 1px;
+      background: #1a1a1a;
+    }
+
+    /* Second row of RF/Nav windows (COPILOT_HANDOFF_ADP_RF_MODULE.md) */
+    .container-rf {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      height: 46vh;
+      gap: 1px;
+      background: #1a1a1a;
+      border-top: 1px solid #00ff00;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+    }
+
+    body {
+      padding-bottom: 46vh;
+    }
+
+    body .container {
+      height: calc(100vh - 46vh);
+    }
+
+    /* ── RF/Nav panels ── */
+    .rf-panel {
+      transition: border-color 0.2s;
+    }
+
+    .rf-toolbar,
+    .rf-row,
+    .rf-preset-row,
+    .rf-overlay-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .rf-url-input {
+      flex: 1;
+      min-width: 80px;
+      padding: 6px;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+    }
+
+    .rf-select {
+      flex: 1;
+      margin: 0 !important;
+      font-size: 10px;
+      padding: 6px !important;
+    }
+
+    .rf-preset-btn {
+      flex: 1 1 30%;
+      font-size: 9px;
+      padding: 5px 2px;
+    }
+
+    .rf-region-btn {
+      flex: 1 1 40%;
+      font-size: 9px;
+      padding: 5px 2px;
+    }
+
+    .rf-frame-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 120px;
+    }
+
+    .rf-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 120px;
+      border: none;
+      background: #000;
+      display: block;
+    }
+
+    .rf-status {
+      font-size: 9px;
+      color: #00aa00;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .rf-content {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .rf-overlay-chip {
+      font-size: 9px;
+      border: 1px solid #00ffff;
+      color: #00ffff;
+      padding: 3px 6px;
+      letter-spacing: 1px;
+    }
+
+    .rf-overlay-chip.rf-fix {
+      border-color: #ffff00;
+      color: #ffff00;
+    }
+
+    .rf-ptt-btn {
+      width: 100%;
+      padding: 18px;
+      margin-top: 6px;
+      background: #0a0a0a;
+      border: 2px solid #ff4444;
+      color: #ff4444;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.1s;
+    }
+
+    .rf-ptt-btn.rf-ptt-active {
+      background: #ff4444;
+      color: #000;
+      box-shadow: 0 0 16px rgba(255, 68, 68, 0.8);
+    }
+
+    .rf-squelch {
+      flex: 1;
+      font-size: 10px;
+      color: #00ff00;
+      letter-spacing: 1px;
+      padding: 6px 4px;
+      border: 1px solid #1a3a1a;
+      text-align: center;
+    }
+
+    .rf-nightvision {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 0, 0, 0.22);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      display: none;
+    }
+
+    .rf-fix-body { flex: 2; }
+    .rf-fix-num  { flex: 1; }
+
+    .rf-capture-btn {
+      margin-top: 6px;
+      background: #ff2200;
+      font-size: 11px;
+    }
+
+    .rf-capture-btn:hover {
+      background: #cc1b00;
+    }
+
+    /* ── Geiger counter — fixed bottom-right (Apex overlay pattern) ── */
+    .geiger-counter {
+      position: fixed;
+      bottom: 8px;
+      right: 8px;
+      z-index: 200;
+      background: #0a0a0a;
+      border: 1px solid #aaff00;
+      padding: 8px 10px;
+      font-family: 'Courier New', monospace;
+      min-width: 110px;
+      transition: border-color 0.2s;
+    }
+
+    .geiger-label {
+      font-size: 9px;
+      color: #aaff00;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .geiger-cpm {
+      font-size: 14px;
+      color: #aaff00;
+      font-weight: bold;
+    }
+
+    .geiger-usvh {
+      font-size: 9px;
+      color: #557700;
+      margin-top: 2px;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #00ff00;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #1a1a1a;
+      border-bottom: 1px solid #00ff00;
+      padding: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    .server-list {
+      list-style: none;
+    }
+
+    .server-item {
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #00ff00;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #0a0a0a;
+    }
+
+    .server-item:hover {
+      background: #1a3a1a;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    }
+
+    .server-item.selected {
+      background: #00ff00;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .server-status {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-open {
+      background: #00ff00;
+    }
+
+    .status-throttled {
+      background: #ffaa00;
+    }
+
+    .status-locked {
+      background: #ff0000;
+    }
+
+    /* ── Thread Mesh Defense panel ── */
+    .thread-panel-section {
+      margin-top: 14px;
+      border: 1px solid #00ffff;
+      padding: 8px;
+    }
+
+    .thread-panel-title {
+      font-size: 10px;
+      color: #00ffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .nearby-panel-section {
+      margin-top: 10px;
+      border: 1px solid #ff00ff;
+      padding: 8px;
+    }
+
+    .nearby-panel-title {
+      font-size: 10px;
+      color: #ff00ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .accuracy-section {
+      margin-top: 10px;
+      border: 1px solid #ffff00;
+      padding: 8px;
+    }
+
+    .accuracy-title {
+      font-size: 10px;
+      color: #ffaa00;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .gate-control {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .gate-btn {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #00ff00;
+      background: #0a0a0a;
+      color: #00ff00;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .gate-btn:hover {
+      background: #1a3a1a;
+    }
+
+    .gate-btn.active {
+      background: #00ff00;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .routing-decision {
+      background: #1a1a1a;
+      border: 1px solid #00ff00;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      color: #00aa00;
+    }
+
+    .stat-value {
+      color: #00ff00;
+      font-weight: bold;
+    }
+
+    .pe-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px;
+      border: 1px solid #00ff00;
+    }
+
+    .pe-bar {
+      flex: 1;
+      height: 4px;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pe-fill {
+      height: 100%;
+      background: #00ff00;
+      width: 50%;
+      transition: width 0.1s linear;
+    }
+
+    .threat-input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+    }
+
+    .traffic-select {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+    }
+
+    .route-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      background: #00ff00;
+      color: #000;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-family: 'Courier New', monospace;
+      transition: all 0.2s;
+    }
+
+    .route-btn:hover {
+      background: #00aa00;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    }
+
+    .route-btn:active {
+      background: #008800;
+    }
+
+    .info-text {
+      font-size: 10px;
+      color: #00aa00;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
+    .tristar-index {
+      background: #1a1a1a;
+      border: 1px solid #00ff00;
+      padding: 8px;
+      margin-top: 8px;
+      font-size: 10px;
+    }
+
+    .index-block {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .index-value {
+      flex: 1;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      padding: 4px;
+      text-align: center;
+    }
+
+    /* ── Sovereign Chat Panel ── */
+    .chat-drawer {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 340px;
+      height: 380px;
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      border-bottom: none;
+      border-right: none;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      font-family: 'Courier New', monospace;
+      transition: height 0.2s;
+    }
+
+    .chat-drawer.collapsed {
+      height: 34px;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: #111;
+      border-bottom: 1px solid #00ff00;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .chat-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff4444;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .chat-status-dot.online { background: #00ff00; }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .chat-msg {
+      margin-bottom: 6px;
+      padding: 4px 6px;
+      border-left: 2px solid #00ff00;
+    }
+
+    .chat-msg.self {
+      border-left-color: #00ffff;
+      color: #00ffff;
+    }
+
+    .chat-msg .msg-from {
+      color: #00aa00;
+      font-size: 9px;
+      margin-bottom: 2px;
+    }
+
+    .chat-msg.self .msg-from { color: #007777; }
+
+    .chat-armor-badge {
+      font-size: 8px;
+      color: #333;
+      float: right;
+    }
+
+    .chat-input-row {
+      display: flex;
+      border-top: 1px solid #00ff00;
+      flex-shrink: 0;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: #0a0a0a;
+      border: none;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      padding: 8px;
+      outline: none;
+    }
+
+    .chat-send-btn {
+      background: #00ff00;
+      color: #000;
+      border: none;
+      padding: 0 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .chat-send-btn:hover { background: #00cc00; }
+
+    .chat-img-btn {
+      background: #0a0a0a;
+      color: #00ff00;
+      border: none;
+      border-left: 1px solid #00ff00;
+      padding: 0 10px;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .chat-img-btn:hover { background: #111; }
+
+    .chat-msg img {
+      max-width: 100%;
+      max-height: 180px;
+      display: block;
+      margin-top: 4px;
+      border: 1px solid #00ff00;
+    }
+
+    .chat-coinhole {
+      font-size: 8px;
+      color: #333;
+      padding: 3px 8px;
+      border-top: 1px solid #111;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+    .wifi-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .wifi-table th {
+      color: #00aa00;
+      text-align: left;
+      padding: 4px 6px;
+      border-bottom: 1px solid #00ff00;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .wifi-table td {
+      color: #00ff00;
+    }
+
+    .bridge-status {
+      font-size: 10px;
+      padding: 6px 0 10px;
+      color: #ff4444;
+    }
+
+    .shape-integrity-wrap {
+      margin-top: 12px;
+      border: 1px solid #00ff00;
+      padding: 8px;
+    }
+
+    .shape-integrity-label {
+      font-size: 10px;
+      color: #00aa00;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    #shapeIntegrityBars {
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+      .wifi-panel {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      body {
+        overflow: auto;
+      }
+    }
+    /* ── Mesh Node Counter — always-visible pinned bar ── */
+    #meshNodeCounter {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      background: #0a0a0a;
+      border-bottom: 2px solid #00ff00;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 24px;
+      font-weight: bold;
+      color: #00ff00;
+      letter-spacing: 2px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #meshNodeCounter.flash {
+      border-color: #ffff00;
+      box-shadow: 0 0 12px rgba(255, 255, 0, 0.7);
+    }
+
+    #meshNodeCounter .mnc-count { font-size: 28px; }
+    #meshNodeCounter .mnc-delta { font-size: 20px; margin-left: 12px; }
+    #meshNodeCounter .mnc-label { font-size: 12px; color: #00aa00; }
+    #meshNodeCounter .mnc-ts    { font-size: 11px; color: #556655; margin-left: auto; }
+
+    /* Push body content below the pinned counter */
+    body { padding-top: 40px; }
+    @supports (padding-top: env(safe-area-inset-top)) {
+      body { padding-top: calc(40px + env(safe-area-inset-top)); }
+    }
+    /* ── BARBWIRE panel ── */
+    .barbwire-panel {
+      margin-top: 14px;
+      border: 1px solid #ff4444;
+      padding: 8px;
+    }
+
+    .barbwire-title {
+      font-size: 10px;
+      color: #ff4444;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .barbwire-state {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid #ff4444;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #ff4444;
+      font-weight: bold;
+    }
+
+    .barbwire-state.scanning { border-color: #00ff00; color: #00ff00; }
+    .barbwire-state.alert    { border-color: #ffff00; color: #ffff00; animation: bwFlash 0.5s infinite alternate; }
+    .barbwire-state.offline  { border-color: #444;    color: #444; }
+
+    @keyframes bwFlash {
+      from { opacity: 1; }
+      to   { opacity: 0.4; }
+    }
+
+    .barbwire-alerts {
+      list-style: none;
+      margin-top: 6px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .barbwire-alerts li {
+      font-size: 10px;
+      padding: 4px 0;
+      border-bottom: 1px solid #1a1a1a;
+      line-height: 1.5;
+    }
+
+    .barbwire-alerts li.high   { color: #ff4444; }
+    .barbwire-alerts li.medium { color: #ffaa00; }
+    .barbwire-alerts li.low    { color: #ffff00; }
+
+  </style>
+</head>
+<body>
+  <!-- Mesh Node Counter — pinned top, always visible, never hidden -->
+  <div id="meshNodeCounter">
+    <span class="mnc-label">MESH NODES</span>
+    <span class="mnc-count" id="mncCount">—</span>
+    <span class="mnc-delta" id="mncDelta"></span>
+    <span class="mnc-ts"   id="mncTs">WAITING…</span>
+  </div>
+
+  <div class="container">
+    <!-- Map Panel — TriStar 3D Widget -->
+    <div class="panel">
+      <div class="header">📡 TriStar Superposition Mesh</div>
+      <div class="content">
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="panel">
+      <div class="header">⚙️ Routing Control</div>
+      <div class="content">
+        <!-- Server List -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 10px; color: #00aa00; margin-bottom: 8px; text-transform: uppercase;">Select Server</div>
+          <ul class="server-list" id="serverList"></ul>
+        </div>
+
+        <!-- Threat Level -->
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 10px; color: #00aa00; display: block; margin-bottom: 4px; text-transform: uppercase;">Threat Level (0-100)</label>
+          <input type="range" id="threatLevel" class="threat-input" min="0" max="100" value="50" style="padding: 0; height: 20px;">
+          <div style="font-size: 10px; color: #00ff00; margin-top: 4px;">Level: <span id="threatDisplay">50</span></div>
+        </div>
+
+        <!-- Traffic Density -->
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 10px; color: #00aa00; display: block; margin-bottom: 4px; text-transform: uppercase;">Traffic Density</label>
+          <select id="trafficDensity" class="traffic-select">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <!-- PE Oscillator + Coinhole Aperture -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 10px; color: #00aa00; margin-bottom: 4px; text-transform: uppercase;">PE Oscillation (368-370ms)</div>
+          <div class="pe-indicator">
+            <div class="pe-bar">
+              <div class="pe-fill" id="peFill"></div>
+            </div>
+            <div style="width: 40px; text-align: right;" id="peDisplay">369ms</div>
+          </div>
+          <div id="pe-status" style="margin-top:6px;padding:4px 8px;border:1px solid #00ff00;font-size:10px;text-align:center;letter-spacing:2px;color:#00ff00;">COINHOLE: CLOSED</div>
+        </div>
+
+        <!-- Route Button -->
+        <button class="route-btn" id="routeBtn">Calculate Route</button>
+
+        <!-- Routing Decision -->
+        <div class="routing-decision" id="routingDecision" style="display: none;">
+          <div style="color: #00ff00; font-weight: bold; margin-bottom: 8px;">ROUTING DECISION</div>
+          
+          <div class="stat-row">
+            <span class="stat-label">Selected Server:</span>
+            <span class="stat-value" id="selectedServer">-</span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-label">Score:</span>
+            <span class="stat-value" id="scoreValue">-</span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-label">Gate State:</span>
+            <span class="stat-value" id="gateStateValue">-</span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-label">Threat Cost:</span>
+            <span class="stat-value" id="threatCostValue">-</span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-label">PE Timing:</span>
+            <span class="stat-value" id="peTimingValue">-</span>
+          </div>
+
+          <div class="tristar-index">
+            <div style="color: #00aa00; font-size: 9px; margin-bottom: 4px; text-transform: uppercase;">TriStar Index</div>
+            <div class="index-block">
+              <div style="color: #00aa00;">Block:</div>
+              <div class="index-value" id="blockValue">-</div>
+            </div>
+            <div class="index-block">
+              <div style="color: #00aa00;">Tier:</div>
+              <div class="index-value" id="tierValue">-</div>
+            </div>
+            <div class="index-block">
+              <div style="color: #00aa00;">Position:</div>
+              <div class="index-value" id="positionValue">-</div>
+            </div>
+            <div class="stat-row" style="margin-top: 4px;">
+              <span class="stat-label">Value:</span>
+              <span class="stat-value" id="tristarValueDisplay">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-text">
+          TriStar uses pure mathematics to calculate optimal routes. No lookup tables, no memory overhead. Select servers, adjust threat level, and watch the engine work.
+        </div>
+
+        <!-- Thread Mesh Defense -->
+        <div class="thread-panel-section">
+          <div class="thread-panel-title">🔵 Thread Mesh Defense (L8)</div>
+          <div id="threadBridgeStatus" class="bridge-status">● THREAD BRIDGE OFFLINE</div>
+          <ul class="server-list" id="threadNodeList">
+            <li style="color:#444;font-size:10px;">No Thread border routers detected</li>
+          </ul>
+        </div>
+
+        <!-- Android Nearby BLE -->
+        <div class="nearby-panel-section">
+          <div class="nearby-panel-title">🟣 Android Nearby BLE Beacons</div>
+          <ul class="server-list" id="nearbyBeaconList">
+            <li style="color:#444;font-size:10px;">No Android Nearby beacons detected</li>
+          </ul>
+        </div>
+
+        <!-- Multi-Source Accuracy -->
+        <div class="accuracy-section">
+          <div class="accuracy-title">△ Multi-Source Accuracy</div>
+          <div class="stat-row">
+            <span class="stat-label">Active Sources:</span>
+            <span class="stat-value" id="multiSourceCount">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Triangle Arms:</span>
+            <span class="stat-value" id="triangleCount">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Accuracy Bonus:</span>
+            <span class="stat-value" id="accuracyBonus" style="color:#ffff00;">+0%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">L8 Thread Health:</span>
+            <span class="stat-value" id="l8ThreadHealth" style="color:#00ffff;">50</span>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;border:1px solid #ffaa00;padding:8px;">
+          <div style="font-size:10px;color:#ffaa00;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">◌ Navigation / Point-Cloud Modules</div>
+          <div class="stat-row">
+            <span class="stat-label">IR Cloud Nodes:</span>
+            <span class="stat-value" id="navPointCloudCount" style="color:#ffaa00;">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Magna Gyro Angle:</span>
+            <span class="stat-value" id="navGyroAngle" style="color:#ffff00;">0°</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">RF Fusion Score:</span>
+            <span class="stat-value" id="navRfFusionScore" style="color:#00ffff;">0%</span>
+          </div>
+          <div id="navIrFrameLabel" style="margin:6px 0 8px;font-size:10px;color:#ffdd88;letter-spacing:1px;">IR POINT-CLOUD VISION</div>
+          <ul class="server-list" id="navModuleList">
+            <li style="color:#444;font-size:10px;">Navigation modules waiting for anchor feeds</li>
+          </ul>
+        </div>
+
+        <!-- Hardware Isolation Panel (Fix 5) -->
+        <div style="margin-top:14px;border:1px solid #ff6600;padding:8px;">
+          <div style="font-size:10px;color:#ff6600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🖥️ Hardware Isolation</div>
+          <div class="stat-row">
+            <span class="stat-label">Simulated Wi-Fi:</span>
+            <span class="stat-value" style="color:#ff4444;">HONEYPOT ACTIVE</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">5G Sovereign GW:</span>
+            <span class="stat-value" style="color:#00ff00;">LINKED</span>
+          </div>
+          <div id="crostini-modulator" style="margin-top:6px;font-size:10px;color:#ff6600;letter-spacing:1px;">Crostini EW: IDLE</div>
+        </div>
+
+        <!-- BARBWIRE — IMSI Catcher / Stingray Detection (E018) -->
+        <div class="barbwire-panel">
+          <div class="barbwire-title">
+            🔴 BARBWIRE — Stingray Detection
+            <span class="barbwire-state" id="barbwireState">IDLE</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Scans:</span>
+            <span class="stat-value" id="barbwireScans">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Alerts:</span>
+            <span class="stat-value" id="barbwireAlertCount" style="color:#ff4444;">0</span>
+          </div>
+          <ul class="barbwire-alerts" id="barbwireAlertList">
+            <li style="color:#444;">No alerts — monitoring active</li>
+          </ul>
+          <div style="margin-top:6px;display:flex;gap:6px;">
+            <button class="gate-btn" id="barbwireClearBtn"
+                    style="border-color:#ff4444;color:#ff4444;font-size:9px;">
+              CLEAR ALERTS
+            </button>
+          </div>
+          <div style="margin-top:4px;font-size:8px;color:#333;letter-spacing:1px;">
+            E018 · PATENT PENDING · APEX AIR SOLUTIONS LLC
+          </div>
+        </div>
+
+        <!-- Self-Sustain Status (Fix 6) -->
+        <div style="margin-top:10px;border:1px solid #00ff00;padding:6px 8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:#00aa00;text-transform:uppercase;letter-spacing:1px;">Self-Sustain Mode</span>
+          <span id="self-sustain-status" style="font-size:10px;color:#00ff00;font-weight:bold;">● ACTIVE</span>
+        </div>
+
+        <!-- Vertex Filing System Active Tier (Fix 7) -->
+        <div style="margin-top:10px;border:1px solid #00ffff;padding:8px;">
+          <div style="font-size:10px;color:#00ffff;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⬡ Vertex Filing System</div>
+          <div id="vertex-active-tier" style="font-size:10px;color:#00ff00;letter-spacing:1px;">ACTIVE TIER: —</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wi-Fi Analyzer Panel — sandboxed open-source analyzer -->
+    <div class="panel wifi-panel" style="display:flex;flex-direction:column;">
+      <div class="header">📶 Wi-Fi Analyzer / Radar</div>
+
+      <!-- Sandboxed standalone analyzer; posts wifiScanUpdate to this parent -->
+      <iframe
+        id="wifiAnalyzerFrame"
+        src="../wifi-analyzer/index.html"
+        style="flex:1;width:100%;border:none;background:#000;"
+        sandbox="allow-scripts allow-same-origin"
+        title="Apex Defense Wi-Fi Signal Analyzer"
+      ></iframe>
+
+      <!-- Open-source credit — required attribution -->
+      <div style="
+        padding: 6px 12px;
+        border-top: 1px solid #1a2a1a;
+        background: #0a0a0a;
+        font-size: 9px;
+        color: #00aa00;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+      ">
+        <span>
+          📡 Wi-Fi Analyzer — Open Source // v1.0-free //
+          <a href="https://github.com/apex74-create/zapback-vpn4" target="_blank"
+             style="color:#00ff00;text-decoration:none;">apex74-create/zapback-vpn4</a>
+        </span>
+        <span style="color:#444;">
+          Bruce Firmware Core required for ESP32 hardware layer ·
+          Android companion (Mantis build) — coming soon
+        </span>
+        <span>
+          <a href="gateway.html" style="color:#00ffff;text-decoration:none;font-size:9px;margin-right:12px;">⚙ GATEWAY SETUP</a>
+          <a href="/pcap" style="color:#ffaa00;text-decoration:none;font-size:9px;">📡 PCAP RELAY</a>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RF/Navigation module row — COPILOT_HANDOFF_ADP_RF_MODULE.md build items 2–5 -->
+  <div class="container-rf">
+    <div class="panel">
+      <div class="header">📡 SDR Waterfall (OpenWebRX)</div>
+      <div class="content rf-content" id="rfSdrPanel"></div>
+    </div>
+    <div class="panel">
+      <div class="header">🗺 Offline Map (MapLibre)</div>
+      <div class="content rf-content" id="rfMapPanel"></div>
+    </div>
+    <div class="panel">
+      <div class="header">📻 Radio Control (Hamlib/CHIRP)</div>
+      <div class="content rf-content" id="rfRadioPanel"></div>
+    </div>
+    <div class="panel">
+      <div class="header">✦ Sextant (Stellarium)</div>
+      <div class="content rf-content" id="rfSextantPanel"></div>
+    </div>
+  </div>
+
+  <script src="../apex-ar-core/engine-dispatch.js"></script>
+  <script src="tristar-routing.js"></script>
+  <script src="tristar-widget.js"></script>
+  <script src="trusted-devices.js"></script>
+  <script src="barbwire.js"></script>
+  <script src="barbwire-panel.js"></script>
+  <script src="termux-bootstrap.js"></script>
+  <script src="mesh-tools.js"></script>
+  <script src="superposition-engine.js"></script>
+  <script src="maritime-source.js"></script>
+  <script src="hardware-bridge-client.js"></script>
+  <script src="navigation-modules.js"></script>
+  <script src="sovereign-chat.js"></script>
+  <script src="thread-analyzer.js"></script>
+  <script src="rf-sdr-panel.js"></script>
+  <script src="rf-map-panel.js"></script>
+  <script src="rf-radio-panel.js"></script>
+  <script src="rf-sextant-panel.js"></script>
+  <script src="geiger-counter.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Sovereign Chat Drawer — rides inside the CoinHole / Recursive Filing Tunnel -->
+  <div class="chat-drawer collapsed" id="chatDrawer">
+    <div class="chat-header" id="chatToggle">
+      <span><span class="chat-status-dot" id="chatDot"></span>SOVEREIGN CHAT</span>
+      <span id="chatPeerCount" style="color:#00aa00;">0 PEERS</span>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" type="text"
+             placeholder="message rides inside the coinhole..." maxlength="512" autocomplete="off">
+      <input type="file" accept="image/*" id="chatImageInput" style="display:none">
+      <button class="chat-img-btn" id="chatImgBtn" title="Send image">🖼</button>
+      <button class="chat-send-btn" id="chatSendBtn">SEND</button>
+    </div>
+    <div class="chat-coinhole" id="chatCoinholeLabel">COINHOLE: —  ·  12D ARMOR ACTIVE  ·  VFS TUNNEL</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex AR Quotations — Zero-SLAM + Superposition DOM</title>
+<!--
+  APEX AR QUOTATIONS — MICRObol D Sovereign Stack
+  Patent Pending · E026 / E027 · © 2026 Apex Air Solutions, LLC
+  Single-file sovereign shell.  CSS-in-HTML.  No frameworks.  Pure math.
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #000; color: #0f0; font-family: 'Courier New', monospace;
+    overflow-x: hidden; padding: 12px;
+  }
+  .hdr { border: 1px solid #0f0; padding: 10px; margin-bottom: 12px; }
+  .hdr h1 { font-size: 16px; letter-spacing: 2px; color: #0ff; }
+  .hdr .sub { font-size: 10px; color: #0f0; opacity: .8; margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 2fr 1fr; } }
+  .panel { border: 1px solid #0f0; padding: 10px; background: #020; }
+  .panel h2 { font-size: 11px; letter-spacing: 2px; color: #0ff;
+              border-bottom: 1px solid #040; padding-bottom: 4px; margin-bottom: 8px; }
+  .ar-stage { position: relative; width: 100%; height: 420px; }
+  #cameraUnderlay { position: absolute; inset: 0; width: 100%; height: 100%;
+                    object-fit: cover; z-index: 1; display: none;
+                    opacity: 0.55; pointer-events: none; }
+  #arCanvas { position: relative; z-index: 2; width: 100%; height: 420px;
+              background: #000; border: 1px solid #0f0; display: block; }
+  #arCanvas.passthrough { background: transparent; }
+  .btn {
+    background: #000; color: #0f0; border: 1px solid #0f0; padding: 12px 14px;
+    font-family: inherit; font-size: 13px; letter-spacing: 1px; cursor: pointer;
+    width: 100%; margin-top: 8px; min-height: 48px;   /* big tap target */
+  }
+  .btn:active { background: #0f0; color: #000; }
+  .btn.primary { border-color: #0ff; color: #0ff; }
+  input, select {
+    width: 100%; background: #000; border: 1px solid #0f0; color: #0f0;
+    font-family: inherit; font-size: 14px; padding: 10px; margin-top: 6px;
+    min-height: 44px;
+  }
+  label { font-size: 11px; color: #0f0; letter-spacing: 1px; display: block; margin-top: 8px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .stat { display: flex; justify-content: space-between; font-size: 11px;
+          padding: 4px 0; border-bottom: 1px solid #030; }
+  .stat .k { color: #0f0; opacity: .7; }
+  .stat .v { color: #0ff; }
+  ul.items { list-style: none; margin-top: 8px; max-height: 180px; overflow-y: auto; }
+  ul.items li { font-size: 11px; padding: 6px; border: 1px solid #030;
+                margin-bottom: 4px; display: flex; justify-content: space-between; }
+  ul.items li .rm { color: #f44; cursor: pointer; padding: 0 6px; }
+  .total { font-size: 18px; color: #ff0; text-align: right; margin-top: 8px;
+           letter-spacing: 1px; }
+  .note { font-size: 10px; color: #0f0; opacity: .6; margin-top: 8px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ APEX AR QUOTATIONS ◢</h1>
+  <div class="sub">ZERO-SLAM POSITIONING · SUPERPOSITION DOM · MICRObol D STACK</div>
+  <div class="sub" id="poseLine">POSE: INIT</div>
+</div>
+
+<div class="grid">
+  <!-- AR VIEW -->
+  <div class="panel">
+    <h2>AR VIEW — GLASSES CANVAS</h2>
+    <div class="ar-stage">
+      <video id="cameraUnderlay" autoplay playsinline muted></video>
+      <canvas id="arCanvas" width="800" height="420"></canvas>
+    </div>
+    <div class="note">
+      The canvas is what the glasses see. Green items are pinned to space.
+      Yellow = weak position lock. Move your device to see items stay put.
+    </div>
+    <button class="btn primary" id="startBtn">▶ START POSITIONING + AR</button>
+    <div class="row">
+      <button class="btn" id="stereoBtn">[🥽 CARDBOARD DUAL-VIEW]</button>
+      <button class="btn" id="cameraBtn">[📷 CAMERA PASSTHROUGH]</button>
+    </div>
+  </div>
+
+  <!-- QUOTATION BUILDER -->
+  <div class="panel">
+    <h2>QUOTATION BUILDER</h2>
+
+    <label for="qDesc">Line item description</label>
+    <input id="qDesc" type="text" placeholder="e.g. Router install" autocomplete="off">
+
+    <div class="row">
+      <div>
+        <label for="qQty">Qty</label>
+        <input id="qQty" type="number" min="1" value="1" inputmode="numeric">
+      </div>
+      <div>
+        <label for="qPrice">Price $</label>
+        <input id="qPrice" type="number" min="0" step="0.01" value="0" inputmode="decimal">
+      </div>
+    </div>
+
+    <label for="qNode">Pin to AR node (optional)</label>
+    <select id="qNode">
+      <option value="">— none —</option>
+    </select>
+
+    <button class="btn" id="addBtn">+ ADD LINE ITEM</button>
+
+    <label for="qTax">Tax rate %</label>
+    <input id="qTax" type="number" min="0" step="0.1" value="0" inputmode="decimal">
+
+    <h2 style="margin-top:14px;">OPERATOR LICENCE</h2>
+    <div class="stat"><span class="k">MODE</span><span class="v" id="licenseLine">DEMO (read-only export)</span></div>
+    <button class="btn" id="licenseBtn">🔑 UNLOCK OPERATOR MODE</button>
+
+    <h2 style="margin-top:14px;">LINE ITEMS</h2>
+    <ul class="items" id="itemList"></ul>
+    <div class="total" id="totalLine">TOTAL $0.00</div>
+
+    <button class="btn" id="exportBtn">⬇ EXPORT QUOTATION (JSON)</button>
+  </div>
+</div>
+
+<!-- Hidden spatial anchors: these DOM nodes are the Superposition DOM field.
+     Add data-ar-node to any element to make it a pin-able 3D location. -->
+<div style="display:none;">
+  <span data-ar-node="north">N</span>
+  <span data-ar-node="east">E</span>
+  <span data-ar-node="south">S</span>
+  <span data-ar-node="west">W</span>
+  <span data-ar-node="overhead">UP</span>
+  <span data-ar-node="ground">DN</span>
+  <span data-ar-node="center">C</span>
+</div>
+
+<script src="../apex-dash/tristar-routing.js"></script>
+<script src="../apex-ar-core/engine-dispatch.js"></script>
+<script src="superposition-dom.js"></script>
+<script src="zero-slam.js"></script>
+<script src="quotation-engine.js"></script>
+<script src="ar-overlay.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ── Boot the sovereign field ── */
+  SuperpositionDOM.init(document);
+  const Q = QuotationEngine.create({ meta: 'AR Quotation', taxRate: 0, currency: 'USD' });
+  AROverlay.attach('arCanvas');
+  AROverlay.setQuote(Q.id);
+
+  /* Populate the node picker from the Superposition DOM field. */
+  function refreshNodePicker() {
+    const sel = document.getElementById('qNode');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— none —</option>';
+    SuperpositionDOM.nodes().forEach((n) => {
+      const o = document.createElement('option');
+      o.value = n.id; o.textContent = n.id;
+      sel.appendChild(o);
+    });
+    sel.value = cur;
+  }
+  refreshNodePicker();
+  SuperpositionDOM.on('update', refreshNodePicker);
+
+  /* ── Start positioning (needs a user tap for sensor permissions) ── */
+  document.getElementById('startBtn').addEventListener('click', function () {
+    /* Request motion/orientation on iOS 13+ */
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().catch(function () {});
+    }
+    if (typeof DeviceMotionEvent !== 'undefined' &&
+        typeof DeviceMotionEvent.requestPermission === 'function') {
+      DeviceMotionEvent.requestPermission().catch(function () {});
+    }
+    /* Start the radio superposition engine if present, then Zero-SLAM. */
+    if (window.SuperpositionEngine && SuperpositionEngine.init) {
+      try { SuperpositionEngine.init(); } catch (e) {}
+    }
+    ZeroSLAM.start();
+    this.textContent = '● POSITIONING ACTIVE';
+    this.disabled = true;
+  });
+
+  /* ── Pose status line ── */
+  window.addEventListener('apexPoseUpdate', function (e) {
+    const p = e.detail;
+    document.getElementById('poseLine').textContent =
+      'POSE: ' + p.source + ' · conf ' + Math.round(p.conf * 100) + '%' +
+      ' · hdg ' + Math.round(p.heading) + '°' +
+      ' · x ' + p.x.toFixed(1) + 'm · y ' + p.y.toFixed(1) + 'm';
+  });
+
+  /* ── Quotation builder ── */
+  function money(n) { return '$' + n.toFixed(2); }
+
+  function renderItems() {
+    const ul = document.getElementById('itemList');
+    ul.innerHTML = '';
+    QuotationEngine.items(Q.id).forEach((it) => {
+      const li = document.createElement('li');
+      const pin = it.nodeId ? ' ⌖' + it.nodeId : '';
+      const span = document.createElement('span');
+      span.textContent = it.desc + pin + '\n' +
+        it.qty + it.unit + ' × ' + money(it.price) + ' = ' +
+        money(it.qty * it.price);
+      const rm = document.createElement('span');
+      rm.className = 'rm'; rm.textContent = '✕';
+      rm.setAttribute('role', 'button');
+      rm.setAttribute('aria-label', 'Remove ' + it.desc);
+      rm.addEventListener('click', function () {
+        QuotationEngine.removeItem(Q.id, it.id);
+      });
+      li.appendChild(span);
+      li.appendChild(rm);
+      ul.appendChild(li);
+    });
+    const t = QuotationEngine.totals(Q.id);
+    document.getElementById('totalLine').textContent =
+      'TOTAL ' + money(t.total) + ' ' + t.currency +
+      (t.tax > 0 ? ' (incl. tax ' + money(t.tax) + ')' : '');
+  }
+
+  document.getElementById('addBtn').addEventListener('click', function () {
+    const desc  = document.getElementById('qDesc').value.trim() || 'Item';
+    const qty   = parseFloat(document.getElementById('qQty').value) || 1;
+    const price = parseFloat(document.getElementById('qPrice').value) || 0;
+    const node  = document.getElementById('qNode').value || null;
+    QuotationEngine.addItem(Q.id, { desc: desc, qty: qty, price: price, nodeId: node });
+    document.getElementById('qDesc').value = '';
+    document.getElementById('qPrice').value = '0';
+    document.getElementById('qQty').value = '1';
+  });
+
+  document.getElementById('qTax').addEventListener('change', function () {
+    QuotationEngine.setTaxRate(Q.id, (parseFloat(this.value) || 0) / 100);
+  });
+
+  /* ── Operator licence gate ── */
+  const licenseLine = document.getElementById('licenseLine');
+  const licenseBtn  = document.getElementById('licenseBtn');
+  function syncLicenseUI() {
+    const op = QuotationEngine.isOperator();
+    licenseLine.textContent = op
+      ? 'OPERATOR (' + QuotationEngine.getEntitlement() + ')'
+      : 'DEMO (read-only export)';
+    licenseBtn.textContent = op ? '🔒 LOCK (DEMO MODE)' : '🔑 UNLOCK OPERATOR MODE';
+    /* watermark notice on export button when un-licensed */
+    document.getElementById('exportBtn').textContent = op
+      ? '⬇ EXPORT QUOTATION (JSON)'
+      : '⬇ EXPORT DEMO (WATERMARKED)';
+  }
+  licenseBtn.addEventListener('click', function () {
+    if (QuotationEngine.isOperator()) {
+      QuotationEngine.setEntitlement(null);            /* lock → demo */
+    } else {
+      /* Operator unlock: accepts the operator test entitlement tiers.
+       * In production this is verified against the licence daemon; here we
+       * accept the tier string directly (operator / apex-full-stack). */
+      const tier = (window.prompt(
+        'Enter operator licence tier (operator / apex-full-stack):', 'operator') || '').trim();
+      QuotationEngine.setEntitlement(tier);
+    }
+    syncLicenseUI();
+  });
+  syncLicenseUI();
+
+  document.getElementById('exportBtn').addEventListener('click', function () {
+    const json = QuotationEngine.exportJSON(Q.id);
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const stamp = QuotationEngine.isOperator() ? '' : '-DEMO';
+    a.download = 'apex-quotation-' + Q.id + stamp + '.json';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  /* ── Cardboard stereo toggle ── */
+  const stereoBtn = document.getElementById('stereoBtn');
+  function syncStereoBtn() {
+    const stereo = AROverlay.getRenderMode() === 'stereo';
+    stereoBtn.textContent = stereo ? '[📱 PHONE HANDHELD]' : '[🥽 CARDBOARD DUAL-VIEW]';
+  }
+  stereoBtn.addEventListener('click', function () {
+    AROverlay.setRenderMode(AROverlay.getRenderMode() === 'stereo' ? 'mono' : 'stereo');
+    syncStereoBtn();
+  });
+  syncStereoBtn();
+
+  /* ── Camera passthrough underlay ── */
+  const cameraBtn = document.getElementById('cameraBtn');
+  const cameraEl  = document.getElementById('cameraUnderlay');
+  const canvasEl  = document.getElementById('arCanvas');
+  let camStream = null;
+  function setPassthrough(on) {
+    canvasEl.dataset.passthrough = on ? '1' : '0';
+    canvasEl.classList.toggle('passthrough', on);
+    cameraEl.style.display = on ? 'block' : 'none';
+    cameraBtn.textContent = on ? '[⏹ STOP CAMERA]' : '[📷 CAMERA PASSTHROUGH]';
+  }
+  cameraBtn.addEventListener('click', function () {
+    if (camStream) {
+      camStream.getTracks().forEach(function (t) { t.stop(); });
+      camStream = null; cameraEl.srcObject = null;
+      setPassthrough(false);
+      return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+      .then(function (s) {
+        camStream = s; cameraEl.srcObject = s; setPassthrough(true);
+      })
+      .catch(function () { setPassthrough(false); });
+  });
+
+  /* ── Gaze / trigger selection feedback ── */
+  AROverlay.on('select', function (d) {
+    const it = QuotationEngine.items(Q.id).find(function (x) { return x.id === d.id; });
+    if (it) {
+      document.getElementById('poseLine').textContent =
+        'SELECTED: ' + it.desc + ' — ' + money(it.qty * it.price);
+    }
+  });
+
+  window.addEventListener('apexQuotationUpdate', renderItems);
+  renderItems();
+})();
+</script>
+</body>
+</html>

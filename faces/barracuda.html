@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Barracuda V8 · Motors Under Glass</title>
+<style>
+  /* BARRACUDA V8 FACE v1 (Nov 9, 2026) — FRONT view, at idle.
+     Family: Motors Under Glass (Compounding Pass #1 §B roster #5).
+     Determination: the founding motor — "the rocket under glass, the
+     implication was a V8" — drawn from the front under its glass
+     cover: two valve-cover banks, plug leads to a central distributor,
+     the round air cleaner on top, and at the bottom the crank pulley
+     and alternator pulley joined by their belt. The pulleys are REAL
+     rotating parts in this plane, geared by their diameters (30:14),
+     so this face's rotation is mechanism, not decoration. House-drawn
+     interpretation only — no badges, no logos (Pass §D flag).
+     Backdrop is this motor's own: a dark engine-bay plate with bay
+     seams — not wood, not galaxy, not titanium.
+     Motion (LIVE from first paint): pulleys turn at geared rates, the idle
+     tremor runs the block, firing pulses walk the eight exhaust tips.
+     Angles are pure functions of absolute time - clock-true at every instant.
+     Governor history: this face was born under Battery V2 (REST/
+     OBSERVED, 12 s auto-exit); the face-line sweep removed that
+     governor Nov 10, 2026 - machinery runs from first paint, nothing
+     holds the screen on. Colour CALLED from the palette — solids,
+     never layered. */
+  :root{
+    --void:#060505;        /* bay depth */
+    --plate:#100e0d;       /* warm bay plate */
+    --seam:#211d1a;        /* bay seams */
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --alloy:#c8ccd2; --alloy-lo:#7d838c;
+    --bay:#ff6a1a;         /* engine-paint orange, a called solid */
+    --laser:#57e6ff;
+    --digit:#ffb52e;
+    --cream:#f5ead2;
+    --panel:#000000;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none;cursor:pointer}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--steel);letter-spacing:.14em;text-align:right}
+  body.live #stateLamp{color:var(--laser)}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">BARRACUDA&nbsp;V8</div>
+  <div id="specLbl" class="lbl">GLASS-COVER EIGHT · AT IDLE</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="V8 under a glass cover, front view, at idle"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stateLamp">REST</div>
+</div>
+
+<script>
+"use strict";
+/* Palette in code — the same called colours as the CSS block. */
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  alloy:"#c8ccd2", alloyLo:"#7d838c", bay:"#ff6a1a", laser:"#57e6ff",
+  seam:"#211d1a", void:"#060505" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+
+var svg = document.getElementById("bore");
+var CX = 200, CY = 200;
+
+/* ---- Bay plate seams (this motor's own backdrop) -------------------- */
+[-110, 110].forEach(function(off){
+  el("line", {x1:CX+off, y1:56, x2:CX+off, y2:344, stroke:PAL.seam, "stroke-width":2}, svg);
+  el("line", {x1:56, y1:CY+off, x2:344, y2:CY+off, stroke:PAL.seam, "stroke-width":2}, svg);
+});
+
+/* ---- Bezel: brass ring, degree ticks, cardinal points, hour numerals
+   (the mariner treatment rides every face in this series). ---------- */
+el("circle", {cx:CX, cy:CY, r:196, fill:"none", stroke:PAL.brassLo, "stroke-width":7}, svg);
+var hdgRing = el("circle", {cx:CX, cy:CY, r:188, fill:"none", stroke:PAL.brass, "stroke-width":2.5}, svg);
+for(var d=0; d<360; d+=6){
+  var big = (d % 30 === 0), p1 = polar(CX, CY, big?176:181, d), p2 = polar(CX, CY, 186, d);
+  el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1],
+    stroke: big?PAL.brassHi:PAL.brassLo, "stroke-width": big?2.4:1.2}, svg);
+}
+var hdgNorth = null;
+["N","E","S","W"].forEach(function(card, i){
+  var p = polar(CX, CY, 165, i*90);
+  var t = el("text", {x:p[0], y:p[1]+5, "text-anchor":"middle",
+    fill:PAL.brassHi, "font-size":15, "font-weight":800,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = card;
+  if(card === "N") hdgNorth = t;
+});
+/* ---- Heading witness (Face Law 2): a needle inside the dial that
+   points at the stack's live heading, or sweeps in SEARCHING. The
+   cardinals above stay where the bezel's geometry puts them - the
+   witness, not the paint, carries the truth. Stack = the firewalled
+   script at the end of this file. ------------------------------- */
+var hdgNeedle = el("line", {x1:CX, y1:CY-138, x2:CX, y2:CY-118,
+  stroke:"#ff3d00", "stroke-width":3.4, "stroke-linecap":"round"}, svg);
+window.__hdgTargets = { needle:hdgNeedle, ring:hdgRing, north:hdgNorth,
+  cx:CX, cy:CY, green:PAL.brassHi, yellow:"#ffb52e", red:"#ff3d00" };
+for(var h=1; h<=12; h++){
+  var hp = polar(CX, CY, 147, h*30);
+  var ht = el("text", {x:hp[0], y:hp[1]+4.5, "text-anchor":"middle",
+    fill:"#f5ead2", "font-size":11, "font-weight":700,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  ht.textContent = String(h);
+}
+
+/* ---- The motor (tremor group), front view --------------------------- */
+var motor = el("g", {}, svg);
+var pulses = [];
+/* block */
+el("rect", {x:118, y:150, width:164, height:118, rx:8, fill:"none",
+  stroke:PAL.alloyLo, "stroke-width":2.6}, motor);
+/* valve-cover banks, angled ±24°, four bolts + four plug leads each */
+function vbank(sign){
+  var g = el("g", {transform:"rotate("+(sign*24)+" "+CX+" 196)"}, motor);
+  el("rect", {x:CX+sign*74-15, y:118, width:30, height:150, rx:9, fill:"none",
+    stroke:PAL.bay, "stroke-width":3}, g);
+  for(var i=0; i<4; i++){
+    var by = 138 + i*38;
+    el("circle", {cx:CX+sign*74, cy:by, r:2.8, fill:PAL.alloy, stroke:"none"}, g);
+    var tip = el("circle", {cx:CX+sign*96, cy:by+8, r:4.6, fill:"none",
+      stroke:PAL.bay, "stroke-width":2, opacity:"0.15"}, g);
+    pulses.push(tip);
+    el("path", {d:"M "+(CX+sign*60)+" "+by+" Q "+(CX+sign*38)+" "+(by-12)+" "+CX+" 176",
+      fill:"none", stroke:PAL.steelLo, "stroke-width":1.3}, g);
+  }
+  return g;
+}
+vbank(-1); vbank(1);
+/* distributor on the spine */
+el("circle", {cx:CX, cy:176, r:8, fill:PAL.void, stroke:PAL.brass, "stroke-width":2.2}, motor);
+el("circle", {cx:CX, cy:176, r:2.6, fill:PAL.brassHi, stroke:"none"}, motor);
+/* air cleaner: the big round hat (a still part — it does not turn) */
+el("circle", {cx:CX, cy:118, r:40, fill:PAL.void, stroke:PAL.alloy, "stroke-width":3}, motor);
+el("circle", {cx:CX, cy:118, r:31, fill:"none", stroke:PAL.alloyLo, "stroke-width":1.5}, motor);
+el("circle", {cx:CX, cy:118, r:6, fill:"none", stroke:PAL.brass, "stroke-width":2.2}, motor);
+el("line", {x1:CX-11, y1:118, x2:CX+11, y2:118, stroke:PAL.brass, "stroke-width":2.6}, motor);
+/* belt runs (static lines; the pulleys carry the motion) */
+el("line", {x1:172, y1:296, x2:280, y2:262, stroke:PAL.steelLo, "stroke-width":3}, motor);
+el("line", {x1:214, y1:322, x2:290, y2:282, stroke:PAL.steelLo, "stroke-width":3}, motor);
+/* pulleys: spoked groups — the SPIN entries, geared 30:14 by diameter */
+function pulley(cx, cy, r, spokes, colour){
+  var g = el("g", {}, motor);
+  el("circle", {cx:cx, cy:cy, r:r, fill:PAL.void, stroke:colour, "stroke-width":2.6}, g);
+  for(var sIdx=0; sIdx<spokes; sIdx++){
+    var p = polar(cx, cy, r-3, sIdx*(360/spokes));
+    el("line", {x1:cx, y1:cy, x2:p[0].toFixed(1), y2:p[1].toFixed(1),
+      stroke:colour, "stroke-width":2}, g);
+  }
+  el("circle", {cx:cx, cy:cy, r:3.4, fill:colour, stroke:"none"}, g);
+  return g;
+}
+var crankPulley = pulley(196, 302, 30, 6, PAL.steelHi);
+var altPulley = pulley(288, 268, 14, 5, PAL.steel);
+/* glass cover over the motor: outline, fasteners, sheen */
+el("rect", {x:82, y:60, width:236, height:284, rx:24, fill:"none",
+  stroke:PAL.steelHi, "stroke-width":2.2}, svg);
+el("rect", {x:90, y:68, width:220, height:268, rx:19, fill:"none",
+  stroke:PAL.steelLo, "stroke-width":1.1}, svg);
+[[96,74],[304,74],[96,330],[304,330]].forEach(function(pt){
+  el("circle", {cx:pt[0], cy:pt[1], r:5.5, fill:"none", stroke:PAL.brass, "stroke-width":2}, svg);
+  el("circle", {cx:pt[0], cy:pt[1], r:1.8, fill:PAL.brassHi, stroke:"none"}, svg);
+});
+el("path", {d:"M 108 306 L 208 84", fill:"none", stroke:PAL.steelHi, "stroke-width":2.4}, svg);
+el("path", {d:"M 132 316 L 224 102", fill:"none", stroke:PAL.steelLo, "stroke-width":1.3}, svg);
+
+/* ---- Face motion hooks: firing pulse walks the eight exhaust tips;
+   the idle tremor runs the block. Time functions both, so REST is
+   time-true. --------------------------------------------------------- */
+function pulseIndex(nowMs){ return Math.floor(nowMs/550) % 8; }
+function paintPulse(nowMs){
+  var k = pulseIndex(nowMs);
+  pulses.forEach(function(p, i){ p.setAttribute("opacity", i===k ? "1" : "0.15"); });
+}
+function extraStill(nowMs){ /* retained for the bench: poses the still frame on demand; the live driver never calls it */
+  motor.setAttribute("transform", "translate(0 0)");
+  paintPulse(nowMs);
+}
+function extraFrame(el_ms){
+  var now = Date.now();
+  var tx = Math.sin(el_ms/51)*0.6, ty = Math.cos(el_ms/44)*0.45;
+  motor.setAttribute("transform", "translate("+tx.toFixed(2)+" "+ty.toFixed(2)+")");
+  paintPulse(now);
+}
+
+/* ---- Spinners: crank pulley and alternator pulley, geared by their
+   diameters (30:14 — the alternator turns 30/14× the crank). REST
+   periods are display gearing from absolute time; the live
+   (formerly OBSERVED) periods are the same ratios, faster. ---------- */
+var SPIN = [
+  { g:crankPulley, cx:196, cy:302, restP:120,  obsP:1.6 },
+  { g:altPulley,   cx:288, cy:268, restP:56,   obsP:0.75 }
+];
+
+/* ---- Time read ------------------------------------------------------- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var lampEl = document.getElementById("stateLamp");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute && now.getSeconds() !== 0 && lastMinute !== -1 && paintedOnce) return;
+  lastMinute = m; paintedOnce = true;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+var paintedOnce = false;
+
+/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
+   This face previously ran the BATTERY V2 GOVERNOR: a two-state
+   REST/OBSERVED runtime. It booted into REST and ran its machinery
+   only while an observation signal (container hook, focus, touch,
+   ?face=observed) kept it awake, auto-exiting to REST 12 s after
+   the last signal. In any plain viewer it sat frozen behind a live
+   clock - the Betta V2 defect class, banned house-wide. The
+   governor is REMOVED on the flagship repair pattern: the driver
+   below is kicked at load and runs unconditionally while the face
+   is open; every angle is a pure function of absolute time, so a
+   returning face resumes exactly on cadence. The only pause left
+   is document.hidden (the platform stops rAF itself when the
+   screen sleeps). window.__faceRest is pinned false and
+   window.__governor reports state "live" - the bench handles stay
+   readable and now tell the truth. window.ApexFace keeps the old
+   container contract as NO-OP compatibility: its calls only note
+   the signal; state() always returns "live". Battery care,
+   honestly scoped: no auto-exit, no still-painting; while the
+   face is lit, it lives. */
+var bootMs = Date.now();
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+function liveAngles(nowMs){
+  var t = nowMs/1000;
+  return SPIN.map(function(c){ return ((t % c.obsP)/c.obsP)*360; });
+}
+function liveFrame(){
+  var now = Date.now();
+  applyAngles(liveAngles(now)); extraFrame(now - bootMs);
+  requestAnimationFrame(liveFrame);
+}
+function setLamp(){ lampEl.textContent = "LIVE"; }
+function note(sig){ gov.lastSignal = sig; }
+window.ApexFace = {
+  observe: function(){ note("container-observe(noop)"); },
+  rest:    function(){ note("container-rest(noop)"); },
+  toggle:  function(){ note("toggle(noop)"); },
+  state:   function(){ return "live"; }
+};
+window.addEventListener("apex-face-observe", function(){ note("event-observe(noop)"); });
+window.addEventListener("apex-face-rest", function(){ note("event-rest(noop)"); });
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ note(ev); }, true);
+});
+window.addEventListener("focus", function(){ note("focus"); });
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) paintTime(new Date());
+});
+
+/* ---- Boot: paint the clock, then the live loop runs from first
+   paint. No wake-lock of any kind - the system sleep governs
+   this face, never a governor inside it. ----------------------- */
+paintTime(new Date());
+setLamp();
+document.body.classList.add("live");
+requestAnimationFrame(liveFrame);
+setInterval(function(){
+  var now = new Date();
+  if(now.getMinutes() !== lastMinute) paintTime(now);
+}, 1000);
+function applyAngles(angles){
+  SPIN.forEach(function(c, i){
+    c.g.setAttribute("transform", "rotate("+angles[i].toFixed(2)+" "+c.cx+" "+c.cy+")");
+  });
+}
+
+</script>
+<script>
+/* =====================================================================
+   FACE LAW 2 - THE BEZEL IS WIRED (face-line sweep, Nov 10, 2026)
+   ---------------------------------------------------------------------
+   This bezel's cardinals were paint: N sat at the top because it was
+   drawn there. Under Face Law 2 (as amended, Nov 10, 2026) a compass
+   bezel must always show a LIVE heading state with an honest
+   confidence colour in the face's own palette - or honestly show
+   that it has nothing. The stack, in order:
+     (a) deviceorientation / deviceorientationabsolute - the
+         magnetometer answer, when the hardware answers;
+     (b) GPS course-over-ground while moving, fused with the
+         inertial carry;
+     (c) inertial carry from the last good anchor;
+     (d) no anchor: SEARCHING - the witness sweeps slowly and
+         asserts NO north. A fabricated heading is a firing offence
+         under the fabrication ban; this stack would rather sweep.
+   An accelerometer alone never originates north (deviceorientation
+   is only read when it carries an absolute/compass heading).
+   Confidence, in this face's called colours: brassHi (green-class)
+   = live anchor agreeing with the inertial read; #ffb52e
+   (yellow-class) = real but weak/intermittent anchor, or a recent
+   inertial carry; #ff3d00 (red-class) = stale, disagreeing, or no
+   anchor - searching. The stack is FIREWALLED: it lives in its own
+   script and touches only its own three elements (witness, ring,
+   the N glyph). Its failure changes nothing else on the face, and
+   nothing else on the face can stop it. Bench: window.__heading.
+   ===================================================================== */
+(function(){
+  "use strict";
+  var T = window.__hdgTargets;
+  if(!T || !T.needle || !T.ring || !T.north) return;   /* bezel absent: nothing to govern */
+  var hdg = { state:"searching", heading:null, source:"none",
+              confidence:"red", lastAnchorMs:0, disagreements:0 };
+  window.__heading = hdg;
+  var CXp = T.cx, CYp = T.cy;
+  function paint(now){
+    var col = hdg.confidence === "green" ? T.green :
+              hdg.confidence === "yellow" ? T.yellow : T.red;
+    T.ring.setAttribute("stroke", col);
+    T.north.setAttribute("fill", col);
+    T.needle.setAttribute("stroke", col);
+    var ang;
+    if(hdg.state === "live" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else if(hdg.state === "carry" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else {
+      hdg.state = "searching"; hdg.heading = null;
+      ang = ((now/1000) * 6) % 360;          /* one slow sweep per minute */
+    }
+    T.needle.setAttribute("transform", "rotate(" + ang.toFixed(2) + " " + CXp + " " + CYp + ")");
+  }
+  function anchor(deg, src, now){
+    if(typeof deg !== "number" || !isFinite(deg)) return;
+    deg = ((deg % 360) + 360) % 360;
+    if(typeof hdg.heading === "number" && hdg.state === "live"){
+      var d = Math.abs(deg - hdg.heading); if(d > 180) d = 360 - d;
+      if(d > 25){ hdg.disagreements++; } else { hdg.disagreements = 0; }
+    }
+    hdg.heading = deg; hdg.source = src; hdg.lastAnchorMs = now;
+    hdg.state = "live";
+    hdg.confidence = hdg.disagreements >= 3 ? "yellow" : "green";
+  }
+  function onOrient(e){
+    var deg = null;
+    if(typeof e.webkitCompassHeading === "number") deg = e.webkitCompassHeading;
+    else if(e.absolute && typeof e.alpha === "number") deg = 360 - e.alpha;
+    if(deg !== null) anchor(deg, "magnetometer", Date.now());
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientationabsolute", onOrient, true);
+    window.addEventListener("deviceorientation", onOrient, true);
+    if(typeof DeviceOrientationEvent.requestPermission === "function"){
+      /* iOS gate: permission is asked on the first press of the glass,
+         inside this stack only; a refusal leaves the stack searching. */
+      window.addEventListener("pointerdown", function ask(){
+        window.removeEventListener("pointerdown", ask, true);
+        try { DeviceOrientationEvent.requestPermission().catch(function(){}); } catch(e){}
+      }, true);
+    }
+  }
+  var lastFix = null;
+  function onGeo(pos){
+    var c = pos.coords, now = Date.now();
+    if(lastFix && typeof c.speed === "number" && c.speed >= 0.5){
+      var dt = (now - lastFix.t)/1000;
+      if(dt > 0){
+        var dy = (c.latitude - lastFix.lat) * 111320;
+        var dx = (c.longitude - lastFix.lon) * 111320 * Math.cos(c.latitude * Math.PI/180);
+        if(Math.sqrt(dx*dx + dy*dy) >= 2){
+          anchor((Math.atan2(dx, dy) * 180/Math.PI + 360) % 360, "gps-course", now);
+        }
+      }
+    }
+    lastFix = { lat:c.latitude, lon:c.longitude, t:now };
+  }
+  if(navigator.geolocation && navigator.geolocation.watchPosition){
+    try { navigator.geolocation.watchPosition(onGeo, function(){}, { enableHighAccuracy:true, maximumAge:2000 }); } catch(e){}
+  }
+  function tick(){
+    var now = Date.now();
+    if(hdg.state === "live" && now - hdg.lastAnchorMs > 5000){
+      hdg.state = "carry"; hdg.confidence = "yellow";   /* inertial carry: last anchored heading, honestly ageing */
+    }
+    if(hdg.state === "carry" && now - hdg.lastAnchorMs > 30000){
+      hdg.state = "searching"; hdg.confidence = "red"; hdg.heading = null; hdg.source = "none";
+    }
+    paint(now);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

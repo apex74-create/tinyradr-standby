@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#02030a">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — UAP SPACE SCENE (V2)</title>
+<!--
+  APEX — UAP SPACE SCENE V2 (Nov 10, 2026). Owner's V2 brief
+  (Nov 10, 2026, 20:27–20:28 EST), built on V1's living sky.
+
+  WHAT CHANGED FROM V1:
+   * GALAXIES: spin faster, FOUR arms (was two), arms stretched
+     longer and drawn in overlapping layered passes so the
+     galaxy reads DIMENSIONAL, and the whole galaxy breathes —
+     it GROWS with a pulse and RECEDES on a slow cycle.
+   * THE POPULATION IS ORGANIC, NOT HOMEOSTATIC (owner's
+     amendment, 20:28 EST): spawning continuously ADDS ships
+     (a spawn pressure, not a top-up). The sky FILLS UP until
+     ships cannot help but meet each other — laser fights and
+     explosions — or drift into a galaxy's arms and get the
+     ACCRETION TOILET FLUSH: caught, free-spinning, spiralling
+     down the drain. Deaths come in waves; a crowded sky
+     crashes its own population, then the spawn pressure
+     builds it back. Boom and bust, like the Betta tank.
+     No steering attraction forces encounters; density does.
+     A hard ceiling (MAXCRAFT) exists for the renderer only.
+   * COMBAT: two ships that co-locate closely squabble —
+     laser fire both ways, damage accumulates, the loser
+     explodes. EXPLOSIONS ARE THE ONLY DEATH BY COMBAT.
+   * STARFIELD: dense — 420 seeded stars (V1 had 90).
+   * THE SHAPE BUTTONS ARE GONE. Owner's ruling (20:28 EST):
+     the in-face shape control was junk — heavier app, dumb
+     UX. Shape is chosen AT PURCHASE (ROUND, RECTANGLE or
+     SQUARE) and ships BAKED INTO the build: the single SHAPE
+     constant at the top of the script below is the whole
+     mechanism. One source, three builds; the store packages
+     the one the buyer picked. Per-shape layouts are still
+     COMPUTED from measured pixels (geometry computed, never
+     stretched) — only the in-app choosing died.
+   * The menace aliens stay — as a ship class in the
+     population (the owner's "big dumb" turned out to be the
+     buttons, not the aliens).
+
+  FROZEN FROM V1: vanilla standalone single file, zero
+  external references; motion from first paint — NO REST /
+  observe governor, no auto-exit; battery care is a DIM-ONLY
+  overlay after 60 s idle (never stops motion); a driver throw
+  raises the loud DRIVER FAULT plate; clock exact — digital in
+  SQUARE/RECTANGLE builds, analog hands on the centre POST PIN
+  in the ROUND build (Face Law 1); NO compass bezel carried,
+  so Face Law 2 has nothing to govern and none was invented.
+
+  BENCH SURFACE: window.__uap carries the ecology counters
+  { pop, spawnCount, combatEvents, laserShots, explosions,
+  deathCount, accretionEvents, accretionDeaths, popHistory,
+  benchAccel }. A ?accel=N query multiplies SIMULATION time
+  only (never the clock) so a bench can watch the boom-bust
+  cycle in minutes; it is a bench accelerator, labelled in
+  __uap.benchAccel, NOT shipped behaviour — a plain open of
+  this file runs at accel 1.
+
+  PALETTE — CALLED COLOURS ONLY, solid tones, never washed:
+  deep space #02030a, glass tint #060b1d, star white #f4f7ff,
+  star dim #8fa3c8, saucer hull #c7d2e0, saucer dome #7fe7ff,
+  saucer lamp #ffd34d, triangle hull #ff5d47, triangle core
+  #ffe9a8, alien hull #39ff6a, alien eye #03140a, galaxy core
+  #fff3c4, galaxy arm #b18cff, galaxy rim #4d6fff, clock cyan
+  #7fe7ff, alarm red #ff4d4d, amber #ffb000, laser red #ff6a3d,
+  hot orange #ff9a3d.
+-->
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#02030a;}
+  #stage{position:absolute;left:0;top:0;}
+  canvas{display:block;}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="sky"></canvas></div>
+<script>
+"use strict";
+/* ================================================================
+   THE SHAPE — BAKED AT PACKAGING, chosen at purchase.
+   This one constant is the whole shape mechanism. The store
+   build flips it; the app carries no shape control at all.
+   ================================================================ */
+var SHAPE = "square"; /* "square" | "round" | "rectangle" */
+
+/* Tuning constants — the ecology's dials, all in one place. */
+var START_POP = 8;          /* the slated starting population */
+var MAXCRAFT = 42;          /* renderer ceiling, nothing more */
+var SPAWN_EVERY = 2.2;      /* seconds of sim time per spawn */
+var COMBAT_R = 0.11;        /* co-location range (x min sky) */
+var FIGHT_DMG = 0.34;       /* damage per second while fighting */
+var FLUSH_R = 0.62;         /* capture radius (x galaxy radius) */
+
+/* Bench accelerator: ?accel=N multiplies simulation dt only. */
+var BENCH_ACCEL = 1;
+(function(){ var m = /[?&]accel=([0-9.]+)/.exec(location.search || "");
+  if (m){ var a = parseFloat(m[1]); if (a >= 1 && a <= 60) BENCH_ACCEL = a; } })();
+
+var cv = document.getElementById("sky");
+var ctx = cv.getContext("2d");
+var layout = null;
+
+var PAL = {
+  space:"#02030a", glass:"#060b1d", star:"#f4f7ff", starDim:"#8fa3c8",
+  hull:"#c7d2e0", dome:"#7fe7ff", lamp:"#ffd34d",
+  tri:"#ff5d47", triCore:"#ffe9a8",
+  alien:"#39ff6a", alienEye:"#03140a",
+  galCore:"#fff3c4", galArm:"#b18cff", galRim:"#4d6fff",
+  cyan:"#7fe7ff", red:"#ff4d4d", amber:"#ffb000",
+  laser:"#ff6a3d", hot:"#ff9a3d"
+};
+
+/* Two independent seeded streams: the starfield's (fixed sky)
+   and the ecology's (spawns, wander, fight luck) — the bench
+   reads positions, not luck, and the sky is the same sky on
+   every boot. */
+function lcg(seed){ var s = seed >>> 0; return function(){
+  s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x80000000; }; }
+var starRnd = lcg(987654321);
+var ecoRnd = lcg(20261110);
+
+/* Dense deterministic starfield: 420 stars. */
+var stars = [];
+for (var si = 0; si < 420; si++)
+  stars.push({ u:starRnd(), v:starRnd(), r:0.5 + starRnd()*1.6, ph:starRnd()*6.283 });
+
+/* ---------------- layout: computed per baked shape ---------- */
+function computeLayout(W, H){
+  var L = { mode:SHAPE, W:W, H:H };
+  var pad = Math.max(4, Math.round(Math.min(W, H) * 0.02));
+  L.pad = pad;
+  if (SHAPE === "round"){
+    L.cx = W / 2; L.cy = H / 2; L.R = Math.min(W, H) / 2;
+    L.sky = { x:0, y:0, w:W, h:H };
+    var cw = L.R * 1.06;
+    L.clock = { x:L.cx - cw/2, y:L.cy - L.R*0.30, w:cw, h:L.R*0.60 };
+    L.label1 = { x:L.cx - cw/2, y:L.cy + L.R*0.34, w:cw, h:L.R*0.16 };
+    L.label2 = { x:L.cx - cw/2, y:L.cy + L.R*0.52, w:cw, h:L.R*0.14 };
+    L.analog = { cx:L.cx, cy:L.cy, R:L.R };
+  } else if (SHAPE === "rectangle"){
+    var railW = Math.round(W * 0.295);
+    L.clock = { x:pad, y:pad, w:railW - pad, h:Math.round(H * 0.34) };
+    var lh = Math.max(13, Math.round(H * 0.055));
+    L.label1 = { x:pad, y:L.clock.y + L.clock.h + 4, w:railW - pad, h:lh };
+    L.label2 = { x:pad, y:L.label1.y + lh + 2, w:railW - pad, h:lh };
+    L.sky = { x:railW + pad, y:pad, w:W - railW - 2*pad, h:H - 2*pad };
+    L.cx = W/2; L.cy = H/2; L.R = Math.min(W, H)/2; L.analog = null;
+  } else { /* square — the house's resident fit */
+    var kh = Math.max(40, Math.round(H * 0.155));
+    L.clock = { x:pad, y:pad, w:W - 2*pad, h:kh };
+    var lh2 = Math.max(13, Math.round(H * 0.042));
+    L.label1 = { x:pad, y:L.clock.y + kh + 2, w:W - 2*pad, h:lh2 };
+    L.label2 = { x:pad, y:L.label1.y + lh2 + 1, w:W - 2*pad, h:lh2 };
+    var sy = L.label2.y + lh2 + Math.round(H * 0.012);
+    L.sky = { x:pad, y:sy, w:W - 2*pad, h:H - pad - sy };
+    L.cx = W/2; L.cy = H/2; L.R = Math.min(W, H)/2; L.analog = null;
+  }
+  return L;
+}
+
+/* ---------------- the cast ---------------------------------- */
+var SHIP_KINDS = ["saucer", "tri", "alien"];
+var craft = [], galaxies = [], sparks = [], flashes = [];
+var stats = { spawnCount:0, combatEvents:0, laserShots:0, explosions:0,
+              deathCount:0, accretionEvents:0, accretionDeaths:0 };
+var popHistory = [];        /* {t, pop} once per sim second */
+var spawnTimer = SPAWN_EVERY * 0.5, histTimer = 0, simT = 0;
+var shipSeq = 0;
+
+function spawnShip(initial){
+  if (craft.length >= MAXCRAFT) return null;
+  var kind = SHIP_KINDS[Math.floor(ecoRnd() * 3) % 3];
+  var u, v;
+  if (!initial && ecoRnd() < 0.6){
+    /* spawn near the action: on a ring around a galaxy, where
+       the sky is already interesting — density does the rest */
+    var g = galaxies[Math.floor(ecoRnd() * galaxies.length) % galaxies.length];
+    var a = ecoRnd() * 6.283, rr = 0.24 + ecoRnd() * 0.24;
+    u = g.u + Math.cos(a) * rr; v = g.v + Math.sin(a) * rr * 0.8;
+  } else { u = 0.06 + ecoRnd() * 0.88; v = 0.06 + ecoRnd() * 0.88; }
+  if (u < 0.03) u = 0.03; if (u > 0.97) u = 0.97;
+  if (v < 0.03) v = 0.03; if (v > 0.97) v = 0.97;
+  var ang = ecoRnd() * 6.283;
+  var spd = kind === "tri" ? 0.075 + ecoRnd()*0.03
+          : kind === "saucer" ? 0.050 + ecoRnd()*0.02
+          : 0.026 + ecoRnd()*0.012;
+  var c = { id:++shipSeq, kind:kind, u:u, v:v,
+            vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd*0.7,
+            hp:1, fightCd:0, fightWith:-1, shotT:0,
+            spin:ecoRnd()*6.28, wob:ecoRnd()*6.28,
+            size:0.040 + ecoRnd()*0.016,
+            cap:null };
+  craft.push(c);
+  if (!initial) stats.spawnCount++;
+  return c;
+}
+function makeGalaxy(i){
+  return { u:[0.27, 0.73][i%2], v:[0.32, 0.66][i%2], angle:i*1.31,
+           rotV:0.42 + 0.13*i,               /* faster than V1 */
+           vu:0.006*((i%2)?-1:1), vv:0.004*((i%2)?1:-1),
+           feedPh:i*31.0, pulsePh:i*2.4, size:0.185 - 0.03*i,
+           R:60, pulse:0 };
+}
+galaxies.push(makeGalaxy(0)); galaxies.push(makeGalaxy(1));
+for (var bi = 0; bi < START_POP; bi++) spawnShip(true);
+
+function skyPx(L, u, v){ return [L.sky.x + u*L.sky.w, L.sky.y + v*L.sky.h]; }
+function explode(c, why){
+  var p = skyPx(layout, c.u, c.v);
+  flashes.push({ x:p[0], y:p[1], r:4, life:0.55, max:0.55 });
+  for (var i = 0; i < 16; i++){
+    var a = ecoRnd()*6.283, s = 14 + ecoRnd()*46;
+    sparks.push({ x:p[0], y:p[1], vx:Math.cos(a)*s, vy:Math.sin(a)*s,
+                  life:0.5 + ecoRnd()*0.6, col: ecoRnd() < 0.5 ? PAL.hot : PAL.triCore });
+  }
+  stats.explosions++; stats.deathCount++;
+  if (why === "accretion") stats.accretionDeaths++;
+  c.dead = why;
+}
+
+/* ---------------- simulation -------------------------------- */
+function stepScene(dt){
+  simT += dt;
+  var L = layout, minSky = Math.min(L.sky.w, L.sky.h);
+  var i, j, c, g;
+
+  /* galaxies drift, turn, breathe */
+  for (i = 0; i < galaxies.length; i++){
+    g = galaxies[i];
+    g.u += g.vu * dt; g.v += g.vv * dt;
+    if (g.u < 0.12) { g.u = 0.12; g.vu = Math.abs(g.vu); }
+    if (g.u > 0.88) { g.u = 0.88; g.vu = -Math.abs(g.vu); }
+    if (g.v < 0.14) { g.v = 0.14; g.vv = Math.abs(g.vv); }
+    if (g.v > 0.86) { g.v = 0.86; g.vv = -Math.abs(g.vv); }
+    g.angle += g.rotV * dt;
+    g.pulse = 0.5 + 0.5 * Math.sin(simT * 0.45 + g.pulsePh);
+    g.feed = 0.5 + 0.5 * Math.sin(simT * 0.21 + g.feedPh);
+    g.R = g.size * minSky * (0.86 + 0.30 * g.pulse) * (1 + 0.05*(g.feed||0));
+  }
+
+  /* spawn pressure: continuous, ceilinged only for the renderer */
+  spawnTimer -= dt;
+  if (spawnTimer <= 0){
+    spawnTimer = SPAWN_EVERY * (0.7 + ecoRnd()*0.6);
+    spawnShip(false);
+  }
+
+  /* ships wander — random flight, no attraction, no steering */
+  for (i = 0; i < craft.length; i++){
+    c = craft[i];
+    if (c.cap){
+      /* THE ACCRETION TOILET FLUSH: caught by the arms,
+         free-spinning, spiralling down the drain. */
+      var cg = c.cap.g;
+      c.cap.a += c.cap.spin * dt;
+      c.cap.spin = 2.6 + 150 / Math.max(18, c.cap.r);
+      c.cap.r -= cg.R * 0.30 * dt;
+      var cp = skyPx(L, cg.u, cg.v);
+      var px = cp[0] + Math.cos(c.cap.a) * c.cap.r;
+      var py = cp[1] + Math.sin(c.cap.a) * c.cap.r * 0.62;
+      c.u = (px - L.sky.x) / L.sky.w; c.v = (py - L.sky.y) / L.sky.h;
+      if (c.cap.r < cg.R * 0.14){ explode(c, "accretion"); }
+      continue;
+    }
+    var turn = (ecoRnd() - 0.5) * 1.5 * dt;
+    var ca = Math.cos(turn), sa = Math.sin(turn);
+    var nvx = c.vx*ca - c.vy*sa, nvy = c.vx*sa + c.vy*ca;
+    c.vx = nvx; c.vy = nvy;
+    var slow = (c.fightWith >= 0) ? 0.3 : 1;
+    c.u += c.vx * slow * dt; c.v += c.vy * slow * dt;
+    if (c.u < -0.05) c.u += 1.10; if (c.u > 1.05) c.u -= 1.10;
+    if (c.v < -0.05) c.v += 1.10; if (c.v > 1.05) c.v -= 1.10;
+    c.spin += dt * 0.7; c.fightCd = Math.max(0, c.fightCd - dt);
+    c.shotT = Math.max(0, c.shotT - dt);
+
+    /* accretion capture: too close to a galaxy's heart */
+    var sp = skyPx(L, c.u, c.v);
+    for (j = 0; j < galaxies.length; j++){
+      g = galaxies[j];
+      var gp = skyPx(L, g.u, g.v);
+      var dx = sp[0]-gp[0], dy = (sp[1]-gp[1]) / 0.62;
+      var d = Math.sqrt(dx*dx + dy*dy);
+      if (d < g.R * FLUSH_R && d > 1){
+        c.cap = { g:g, r:d, a:Math.atan2(dy, dx), spin:2.6 };
+        stats.accretionEvents++;
+        break;
+      }
+    }
+  }
+
+  /* combat: co-located ships squabble — lasers, damage, death.
+     Nobody is steered into a fight; density makes them happen. */
+  var fighting = {};
+  for (i = 0; i < craft.length; i++){
+    if (craft[i].cap || craft[i].dead) continue;
+    for (j = i+1; j < craft.length; j++){
+      if (craft[j].cap || craft[j].dead) continue;
+      var a2 = craft[i], b2 = craft[j];
+      var ddx = (a2.u - b2.u) * L.sky.w, ddy = (a2.v - b2.v) * L.sky.h;
+      var dd = Math.sqrt(ddx*ddx + ddy*ddy);
+      if (dd < COMBAT_R * minSky){
+        if (a2.fightWith !== b2.id && a2.fightCd <= 0) stats.combatEvents++;
+        a2.fightWith = b2.id; b2.fightWith = a2.id;
+        a2.fightCd = 2.5; b2.fightCd = 2.5;
+        fighting[a2.id] = b2; fighting[b2.id] = a2;
+        a2.hp -= FIGHT_DMG * dt * (0.7 + ecoRnd()*0.6);
+        b2.hp -= FIGHT_DMG * dt * (0.7 + ecoRnd()*0.6);
+        if (a2.shotT <= 0){ a2.shotT = 0.16; stats.laserShots++; }
+        if (b2.shotT <= 0){ b2.shotT = 0.16; stats.laserShots++; }
+      }
+    }
+  }
+  window.__fighting = fighting;
+  for (i = craft.length - 1; i >= 0; i--){
+    if (craft[i].dead){ craft.splice(i, 1); continue; }
+    if (craft[i].hp <= 0 && !craft[i].cap) explode(craft[i], "combat");
+    if (craft[i].dead) craft.splice(i, 1);
+  }
+
+  /* sparks + flashes */
+  for (i = sparks.length - 1; i >= 0; i--){
+    var s2 = sparks[i]; s2.x += s2.vx*dt; s2.y += s2.vy*dt; s2.life -= dt;
+    if (s2.life <= 0) sparks.splice(i, 1);
+  }
+  for (i = flashes.length - 1; i >= 0; i--){
+    flashes[i].r += 90*dt; flashes[i].life -= dt;
+    if (flashes[i].life <= 0) flashes.splice(i, 1);
+  }
+
+  /* population curve: one sample per sim second */
+  histTimer -= dt;
+  if (histTimer <= 0){ histTimer = 1; popHistory.push({ t:+simT.toFixed(1), pop:craft.length });
+    if (popHistory.length > 900) popHistory.shift(); }
+}
+
+/* ---------------- drawing ----------------------------------- */
+function drawStars(L, t){
+  for (var i = 0; i < stars.length; i++){
+    var s = stars[i], p = skyPx(L, s.u, s.v);
+    var tw = 0.55 + 0.45 * Math.sin(t * 1.7 + s.ph);
+    ctx.globalAlpha = 0.30 + 0.55 * tw;
+    ctx.fillStyle = (i % 5 === 0) ? PAL.starDim : PAL.star;
+    ctx.beginPath(); ctx.arc(p[0], p[1], s.r, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawGalaxy(L, g, t){
+  var p = skyPx(L, g.u, g.v), R = g.R, feed = g.feed || 0;
+  /* layered rim: two offset discs — the dimension comes from
+     the layering, not from a wash */
+  ctx.globalAlpha = 0.34; ctx.fillStyle = PAL.galRim;
+  ctx.beginPath(); ctx.ellipse(p[0], p[1], R*1.04, R*0.66, 0, 0, 6.2832); ctx.fill();
+  ctx.globalAlpha = 0.30;
+  ctx.beginPath(); ctx.ellipse(p[0]-R*0.05, p[1]-R*0.05, R*0.92, R*0.58, 0, 0, 6.2832); ctx.fill();
+  /* FOUR arms, stretched long (sweep 3.4 rad, reach 1.12 R),
+     drawn in three overlapping passes: halo, body, bright
+     spine — progressive overlap is what makes it read deep */
+  var passes = [ {k:2.1, a:0.13}, {k:1.35, a:0.30}, {k:0.7, a:0.55} ];
+  for (var pi = 0; pi < passes.length; pi++){
+    var ps = passes[pi];
+    for (var arm = 0; arm < 4; arm++){
+      for (var k = 0; k < 26; k++){
+        var f = k / 26;
+        var a = g.angle + arm * 1.5708 + f * 3.4;
+        var rr = R * (0.13 + 1.02 * f) * (1 - 0.18 * feed * f);
+        var x = p[0] + Math.cos(a) * rr, y = p[1] + Math.sin(a) * rr * 0.62;
+        ctx.globalAlpha = ps.a * (1 - f * 0.75) * (0.8 + 0.4*feed);
+        ctx.fillStyle = PAL.galArm;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(0.8, R * 0.052 * ps.k * (1 - f * 0.45)), 0, 6.2832);
+        ctx.fill();
+      }
+    }
+  }
+  /* accretion core — brighter while it feeds */
+  ctx.globalAlpha = 1; ctx.fillStyle = PAL.galCore;
+  ctx.beginPath(); ctx.arc(p[0], p[1], R * (0.14 + 0.06 * feed), 0, 6.2832); ctx.fill();
+  ctx.globalAlpha = 0.9; ctx.fillStyle = PAL.star;
+  ctx.beginPath(); ctx.arc(p[0], p[1], R * 0.065, 0, 6.2832); ctx.fill();
+  ctx.globalAlpha = 1;
+}
+function drawSaucer(L, c, t){
+  var p = skyPx(L, c.u, c.v + 0.008 * Math.sin(t * 1.3 + c.wob));
+  var s = c.size * Math.min(L.sky.w, L.sky.h);
+  ctx.fillStyle = PAL.dome;
+  ctx.beginPath(); ctx.arc(p[0], p[1] - s*0.16, s*0.34, 3.1416, 0); ctx.fill();
+  ctx.fillStyle = PAL.hull;
+  ctx.beginPath(); ctx.ellipse(p[0], p[1], s, s*0.30, 0, 0, 6.2832); ctx.fill();
+  for (var i = 0; i < 5; i++){
+    var on = Math.sin(t * 4 + c.wob + i * 1.1) > 0;
+    ctx.fillStyle = on ? PAL.lamp : PAL.starDim;
+    ctx.beginPath(); ctx.arc(p[0] + (i-2)*s*0.34, p[1] + s*0.10, Math.max(1, s*0.07), 0, 6.2832); ctx.fill();
+  }
+  if (c.hp < 0.55){ /* battle damage smokes */
+    ctx.fillStyle = PAL.hot;
+    ctx.beginPath(); ctx.arc(p[0] + s*0.4, p[1] - s*0.2, Math.max(1, s*0.10), 0, 6.2832); ctx.fill();
+  }
+}
+function drawTriangle(L, c, t){
+  var p = skyPx(L, c.u, c.v);
+  var s = c.size * Math.min(L.sky.w, L.sky.h);
+  ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(c.spin * 0.12);
+  ctx.fillStyle = PAL.tri;
+  ctx.beginPath();
+  ctx.moveTo(0, -s); ctx.lineTo(s*0.9, s*0.7); ctx.lineTo(-s*0.9, s*0.7); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = PAL.triCore;
+  ctx.beginPath(); ctx.arc(0, s*0.12, s*0.26, 0, 6.2832); ctx.fill();
+  ctx.restore();
+}
+function drawAlien(L, c, t){
+  var p = skyPx(L, c.u, c.v);
+  var s = c.size * Math.min(L.sky.w, L.sky.h);
+  var wob = 1 + 0.06 * Math.sin(t * 2.2 + c.wob);
+  ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(-0.3 + 0.08 * Math.sin(t * 1.1 + c.wob));
+  ctx.fillStyle = PAL.alien;
+  ctx.beginPath(); ctx.ellipse(0, 0, s*0.52*wob, s*0.78, 0, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = PAL.alienEye;
+  ctx.save(); ctx.translate(-s*0.20, -s*0.10); ctx.rotate(-0.5);
+  ctx.beginPath(); ctx.ellipse(0, 0, s*0.16, s*0.055, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.translate(s*0.20, -s*0.10); ctx.rotate(0.5);
+  ctx.beginPath(); ctx.ellipse(0, 0, s*0.16, s*0.055, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+  ctx.fillStyle = PAL.alien;
+  ctx.beginPath(); ctx.moveTo(-s*0.30, s*0.55); ctx.lineTo(s*0.30, s*0.55); ctx.lineTo(0, s*0.95); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function drawShip(L, c, t){
+  if (c.kind === "saucer") drawSaucer(L, c, t);
+  else if (c.kind === "tri") drawTriangle(L, c, t);
+  else drawAlien(L, c, t);
+}
+function drawEffects(L){
+  var f = window.__fighting || {}, i, c;
+  /* laser fire between squabbling pairs — drawn once per pair */
+  var drawn = {};
+  for (i = 0; i < craft.length; i++){
+    c = craft[i]; var o = f[c.id];
+    if (!o || drawn[c.id]) continue;
+    drawn[c.id] = 1; drawn[o.id] = 1;
+    var p1 = skyPx(L, c.u, c.v), p2 = skyPx(L, o.u, o.v);
+    ctx.globalAlpha = 0.55 + 0.45 * Math.sin(simT * 47 + c.id);
+    ctx.strokeStyle = c.kind === "tri" ? PAL.laser : (c.kind === "alien" ? PAL.alien : PAL.cyan);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  for (i = 0; i < flashes.length; i++){
+    var fl = flashes[i];
+    ctx.globalAlpha = Math.max(0, fl.life / fl.max) * 0.9;
+    ctx.strokeStyle = PAL.hot; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 6.2832); ctx.stroke();
+    ctx.fillStyle = PAL.triCore;
+    ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r * 0.35, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  for (i = 0; i < sparks.length; i++){
+    var s = sparks[i];
+    ctx.globalAlpha = Math.max(0, Math.min(1, s.life));
+    ctx.fillStyle = s.col;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 1.6, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ---------------- the clock --------------------------------- */
+function fmt2(n){ return (n < 10 ? "0" : "") + n; }
+function drawFitText(text, r, fsCap, bold, col){
+  var fs = Math.max(7, Math.floor(fsCap));
+  ctx.font = (bold ? "bold " : "") + fs + "px monospace";
+  while (fs > 7 && ctx.measureText(text).width > r.w - 4){
+    fs -= 1; ctx.font = (bold ? "bold " : "") + fs + "px monospace";
+  }
+  ctx.fillStyle = col; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.save();
+  ctx.beginPath(); ctx.rect(r.x, r.y - 1, r.w, r.h + 2); ctx.clip();
+  ctx.fillText(text, r.x + r.w/2, r.y + r.h/2);
+  ctx.restore();
+}
+function drawDigitalClock(L, now){
+  var r = L.clock;
+  ctx.fillStyle = PAL.glass; ctx.fillRect(r.x, r.y, r.w, r.h);
+  ctx.strokeStyle = PAL.cyan; ctx.lineWidth = 1; ctx.strokeRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
+  drawFitText(fmt2(now.getHours()) + ":" + fmt2(now.getMinutes()),
+              { x:r.x, y:r.y + r.h*0.06, w:r.w, h:r.h*0.56 }, r.h * 0.52, true, PAL.cyan);
+  drawFitText(fmt2(now.getSeconds()) + "s",
+              { x:r.x, y:r.y + r.h*0.64, w:r.w, h:r.h*0.30 }, r.h * 0.22, true, PAL.star);
+}
+function drawAnalogClock(L, now){
+  var A = L.analog, cx = A.cx, cy = A.cy, R = A.R;
+  L.clock.x = cx - L.clock.w / 2;
+  ctx.strokeStyle = PAL.cyan; ctx.lineWidth = Math.max(1.5, R*0.012);
+  ctx.beginPath(); ctx.arc(cx, cy, R*0.97, 0, 6.2832); ctx.stroke();
+  for (var i = 0; i < 60; i++){
+    var a = i * 6.2832 / 60, big = (i % 5 === 0);
+    var r1 = R * (big ? 0.86 : 0.91), r2 = R * 0.95;
+    ctx.strokeStyle = big ? PAL.star : PAL.starDim; ctx.lineWidth = big ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.sin(a)*r1, cy - Math.cos(a)*r1);
+    ctx.lineTo(cx + Math.sin(a)*r2, cy - Math.cos(a)*r2);
+    ctx.stroke();
+  }
+  var s = now.getSeconds() + now.getMilliseconds()/1000;
+  var m = now.getMinutes() + s/60;
+  var h = (now.getHours() % 12) + m/60;
+  function hand(ang, len, wdt, col){
+    ctx.strokeStyle = col; ctx.lineWidth = wdt; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.sin(ang)*len, cy - Math.cos(ang)*len); ctx.stroke();
+  }
+  hand(h * 6.2832/12, R*0.50, Math.max(2.5, R*0.030), PAL.star);
+  hand(m * 6.2832/60, R*0.74, Math.max(2, R*0.020), PAL.cyan);
+  hand(s * 6.2832/60, R*0.84, Math.max(1, R*0.008), PAL.red);
+  /* THE POST PIN — every hand above rotates about this point. */
+  ctx.fillStyle = PAL.amber;
+  ctx.beginPath(); ctx.arc(cx, cy, Math.max(2.5, R*0.035), 0, 6.2832); ctx.fill();
+  drawFitText(fmt2(now.getHours()) + ":" + fmt2(now.getMinutes()) + ":" + fmt2(now.getSeconds()),
+              L.clock, L.clock.h * 0.42, true, PAL.cyan);
+}
+function drawLabels(L){
+  drawFitText("UAP SPACE SCENE", L.label1, L.label1.h * 0.62, true, PAL.star);
+  drawFitText("SHAPE " + SHAPE.toUpperCase() + " · POP " + craft.length +
+              " · SPAWN " + stats.spawnCount + " · LOST " + stats.deathCount,
+              L.label2, L.label2.h * 0.58, false, PAL.starDim);
+}
+var faultText = "";
+function drawFault(L){
+  ctx.fillStyle = PAL.red; ctx.fillRect(L.pad, L.pad, L.W - 2*L.pad, Math.max(26, L.H*0.10));
+  ctx.fillStyle = PAL.star; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "bold " + Math.max(10, Math.floor(L.H*0.035)) + "px monospace";
+  ctx.fillText("DRIVER FAULT — " + faultText, L.W/2, L.pad + Math.max(13, L.H*0.05));
+}
+
+function renderFrame(t, now){
+  var L = layout, i;
+  ctx.fillStyle = PAL.space; ctx.fillRect(0, 0, L.W, L.H);
+  if (SHAPE === "round"){
+    ctx.save();
+    ctx.beginPath(); ctx.arc(L.cx, L.cy, L.R, 0, 6.2832); ctx.clip();
+    ctx.fillStyle = PAL.space; ctx.fillRect(0, 0, L.W, L.H);
+    drawStars(L, t);
+    for (i = 0; i < galaxies.length; i++) drawGalaxy(L, galaxies[i], t);
+    for (i = 0; i < craft.length; i++) drawShip(L, craft[i], t);
+    drawEffects(L);
+    ctx.restore();
+    drawAnalogClock(L, now);
+    drawLabels(L);
+  } else {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(L.sky.x, L.sky.y, L.sky.w, L.sky.h); ctx.clip();
+    ctx.fillStyle = PAL.glass; ctx.fillRect(L.sky.x, L.sky.y, L.sky.w, L.sky.h);
+    drawStars(L, t);
+    for (i = 0; i < galaxies.length; i++) drawGalaxy(L, galaxies[i], t);
+    for (i = 0; i < craft.length; i++) drawShip(L, craft[i], t);
+    drawEffects(L);
+    ctx.restore();
+    ctx.strokeStyle = PAL.cyan; ctx.lineWidth = 1;
+    ctx.strokeRect(L.sky.x + 0.5, L.sky.y + 0.5, L.sky.w - 1, L.sky.h - 1);
+    drawDigitalClock(L, now);
+    drawLabels(L);
+  }
+  if (window.__driverFault) drawFault(L);
+}
+
+/* ================================================================
+   THE ALWAYS-LIVE DRIVER — no governor, no REST, no observe
+   gate, no auto-exit. Battery care is the DIM ONLY, below.
+   ================================================================ */
+var state = "live", raf = 0, driverStart = 0, lastMs = -1, elapsed = 0;
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+window.__driverFault = null;
+var lastInteract = performance.now();
+function noteInteract(){ lastInteract = performance.now(); }
+
+var stage = document.getElementById("stage");
+var dimEl = document.createElement("div");
+dimEl.id = "faceDim";
+dimEl.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;background:#000;opacity:0;pointer-events:none;transition:opacity 0.8s ease;z-index:5;";
+stage.appendChild(dimEl);
+setInterval(function(){
+  dimEl.style.opacity = ((performance.now() - lastInteract) > 60000) ? "0.45" : "0";
+}, 1000);
+
+function refreshBench(now){
+  var acc = 0, i;
+  for (i = 0; i < craft.length; i++) if (craft[i].cap) acc++;
+  window.__uap = {
+    shape: SHAPE, pop: craft.length,
+    spawnCount: stats.spawnCount, combatEvents: stats.combatEvents,
+    laserShots: stats.laserShots, explosions: stats.explosions,
+    deathCount: stats.deathCount,
+    accretionEvents: stats.accretionEvents, accretionDeaths: stats.accretionDeaths,
+    accretionActive: acc, simT: +simT.toFixed(1),
+    benchAccel: BENCH_ACCEL, popHistory: popHistory,
+    galaxies: galaxies.map(function(g){ return { angle:+g.angle.toFixed(2), pulse:+g.pulse.toFixed(2), R:+g.R.toFixed(1) }; }),
+    craft: craft.map(function(c){ return { id:c.id, kind:c.kind, u:+c.u.toFixed(3), v:+c.v.toFixed(3), hp:+c.hp.toFixed(2), cap:!!c.cap }; })
+  };
+  window.__state = { t:+elapsed.toFixed(2), state:state, driverFault:window.__driverFault,
+    shape:SHAPE, clock: fmt2(now.getHours()) + ":" + fmt2(now.getMinutes()) + ":" + fmt2(now.getSeconds()),
+    craft: window.__uap.craft,
+    galaxies: galaxies.map(function(g){ return { u:+g.u.toFixed(3), v:+g.v.toFixed(3), angle:+g.angle.toFixed(2) }; }) };
+}
+function frameBody(nowMs){
+  var dt = 0;
+  if (lastMs >= 0) dt = Math.min(0.05, (nowMs - lastMs) / 1000);
+  lastMs = nowMs;
+  elapsed = (nowMs - driverStart) / 1000;
+  var simDt = dt * BENCH_ACCEL;
+  var steps = Math.max(1, Math.ceil(simDt / 0.05));
+  var sub = simDt / steps;
+  for (var k = 0; k < steps; k++) stepScene(sub);
+  var now = new Date();
+  renderFrame(elapsed, now);
+  refreshBench(now);
+}
+function frame(nowMs){
+  try { frameBody(nowMs); }
+  catch(err){
+    window.__driverFault = { message:String(err && err.message || err), t:+elapsed.toFixed(2) };
+    faultText = window.__driverFault.message;
+    try { renderFrame(elapsed, new Date()); } catch(e){}
+    if (raf) cancelAnimationFrame(raf); raf = 0;
+    return;
+  }
+  raf = requestAnimationFrame(frame);
+}
+window.ApexFace = {
+  observe:function(){ noteInteract(); gov.lastSignal = "container-observe(noop)"; },
+  rest:function(){ noteInteract(); gov.lastSignal = "container-rest(noop)"; },
+  toggle:function(){ noteInteract(); },
+  state:function(){ return "live"; }
+};
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ noteInteract(); }, true);
+});
+window.addEventListener("focus", function(){ noteInteract(); });
+document.addEventListener("visibilitychange", function(){ if (!document.hidden) noteInteract(); });
+
+function sizeCanvas(){
+  var w = Math.max(1, Math.round(window.innerWidth)), h = Math.max(1, Math.round(window.innerHeight));
+  cv.width = w; cv.height = h;
+  stage.style.width = w + "px"; stage.style.height = h + "px";
+  layout = computeLayout(w, h);
+}
+var resizeTimer = 0;
+window.addEventListener("resize", function(){
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(sizeCanvas, 60);
+});
+
+/* ---- Boot: layout from measured pixels, THE DRIVER STARTS
+   NOW, unconditionally — first paint is already a living sky. */
+sizeCanvas();
+driverStart = performance.now(); lastMs = -1; elapsed = 0;
+raf = requestAnimationFrame(frame);
+</script>
+</body>
+</html>

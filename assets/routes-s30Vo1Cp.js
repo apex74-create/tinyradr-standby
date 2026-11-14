@@ -1,0 +1,1 @@
+import{t as e}from"./link-De8nA1so.js";import{t}from"./jsx-runtime-NZYk81nU.js";var n=t(),r=()=>(0,n.jsxs)(`main`,{className:`min-h-app p-6 text-sm text-muted-foreground`,children:[`The Watch page could not be loaded right now.`,` `,(0,n.jsx)(e,{to:`/face`,className:`text-signal underline`,children:`Open Signal Watch`}),`.`]});export{r as errorComponent};

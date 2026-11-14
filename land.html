@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Apex Signal — Render Source Select</title>
+    <meta name="description" content="Plain-HTML boot page: detects watch, Wear OS, phone or tablet and launches Apex Signal on the render pathway that device can actually paint." />
+    <style>
+      /* No cascade layers, no custom properties in selectors that matter,
+         no modern syntax: this page must parse on an AOSP 10 WebView. */
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: #050d09; color: #b8ffcf; }
+      body {
+        font-family: ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace;
+        min-height: 100%;
+        padding: 10px;
+      }
+      h1 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 2px 0 2px; color: #00ff6a; }
+      p.sub { font-size: 10px; margin: 0 0 8px; color: #6f9c81; text-transform: uppercase; letter-spacing: 1px; }
+      #info { font-size: 9px; line-height: 1.5; color: #6f9c81; border: 1px solid #14432c; padding: 6px; margin-bottom: 8px; }
+      #info b { color: #b8ffcf; font-weight: normal; }
+      /* left-to-right strip; wraps only if it truly cannot fit */
+      #rail { display: block; white-space: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      a.card {
+        display: inline-block;
+        white-space: normal;
+        vertical-align: top;
+        width: 150px;
+        margin-right: 8px;
+        padding: 8px;
+        border: 1px solid #14ff7a;
+        background: #071a11;
+        color: #b8ffcf;
+        text-decoration: none;
+      }
+      a.card.pick { background: #0d3421; border-color: #00ff6a; }
+      a.card span.t { display: block; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #00ff6a; }
+      a.card span.d { display: block; font-size: 9px; margin-top: 4px; color: #6f9c81; }
+      a.card span.tag { display: inline-block; margin-top: 6px; font-size: 8px; letter-spacing: 1px; color: #050d09; background: #00ff6a; padding: 1px 4px; }
+      #auto { margin: 10px 0 6px; }
+      #auto button {
+        font-family: inherit;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #050d09;
+        background: #00ff6a;
+        border: 0;
+        padding: 8px 12px;
+        margin-right: 8px;
+      }
+      #auto button.ghost { color: #b8ffcf; background: #071a11; border: 1px solid #14ff7a; }
+      #ctl { border: 1px solid #14432c; padding: 6px; margin-bottom: 8px; }
+      #ctl .lab { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #6f9c81; }
+      #ctl .pad { margin-top: 4px; }
+      #ctl .pad button {
+        font-family: inherit;
+        font-size: 12px;
+        color: #b8ffcf;
+        background: #071a11;
+        border: 1px solid #14ff7a;
+        width: 34px;
+        height: 28px;
+        margin-right: 4px;
+      }
+      #ctl b { color: #00ff6a; font-weight: normal; font-size: 11px; }
+      #tools { margin-top: 10px; }
+      #tools a { display: inline-block; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #b8ffcf; border: 1px solid #14432c; padding: 4px 6px; margin: 0 6px 6px 0; text-decoration: none; }
+      @media (max-width: 420px) {
+        a.card { width: 132px; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Apex Signal · boot</h1>
+    <p class="sub">select render source</p>
+    <div id="info">detecting device…</div>
+    <div id="auto">
+      <button type="button" id="go">automate · launch</button>
+      <button type="button" class="ghost" id="hold">hold</button>
+      <button type="button" class="ghost" id="always">auto-boot: off</button>
+    </div>
+    <div id="ctl">
+      <span class="lab">face pitch · micro trim <b id="px">400 px</b></span>
+      <div class="pad">
+        <button type="button" id="m10">−10</button>
+        <button type="button" id="m1">−1</button>
+        <button type="button" id="p1">+1</button>
+        <button type="button" id="p10">+10</button>
+        <button type="button" id="pz">400</button>
+      </div>
+    </div>
+    <div id="ctl">
+      <span class="lab">compatibility self-test <b id="stres">not run</b></span>
+      <div class="pad">
+        <button type="button" id="selftest" style="width:auto;padding:0 8px">run self-test</button>
+      </div>
+    </div>
+    <div id="ctl">
+      <span class="lab">adb bridge <b id="brs">idle</b></span>
+      <div id="brerr" style="font-size:9px;color:#ff7a7a;margin-top:3px"></div>
+      <div class="pad">
+        <button type="button" id="brgo" style="width:auto;padding:0 8px">reconnect</button>
+        <button type="button" id="brcfg" style="width:auto;padding:0 8px">config</button>
+      </div>
+    </div>
+    <div id="rail">
+      <a class="card" id="c-svg" href="/"><span class="t">watch · svg</span><span class="d">DOM/SVG face only. Safest on AOSP 10 / legacy WebView. No canvas layer, no black-screen.</span></a>
+      <a class="card" id="c-canvas" href="/"><span class="t">full · canvas</span><span class="d">Accelerated canvas face with 3D octahedron and gyro compass. Phone, tablet, Wear OS 3+.</span></a>
+      <a class="card" id="c-auto" href="/"><span class="t">auto detect</span><span class="d">Clear the stored pathway and let the app probe canvas and retry on its own.</span></a>
+      <a class="card" id="c-bridge" href="/bridge"><span class="t">adb bridge</span><span class="d">Go straight to the bridge / device query screen and pick an agent endpoint.</span></a>
+      <a class="card" href="/ptt"><span class="t">ptt · cb radio</span><span class="d">Bridgeless push-to-talk: channels 1–20 free, 1–40 on the full trial. Voice or text, no phone agent required.</span></a>
+    </div>
+    <div id="tools">
+      <a href="/face">face</a><a href="/tool/stack">radar</a><a href="/ptt">ptt</a><a href="/tool/ssid">wifi</a><a href="/hardware">hardware</a>
+      <a href="/assembly">assembly</a><a href="/settings">settings</a><a href="/diag">diagnostics</a>
+      <a href="#" id="wipe">reset workers + cache</a>
+    </div>
+
+    <script>
+      /* Latch the real install prompt before the SPA loads so the bundle
+         button can fire the browser's installer instead of a manual hint. */
+      window.__apexInstallLatched = true;
+      window.addEventListener("beforeinstallprompt", function (e) {
+        e.preventDefault();
+        window.__apexInstallEvent = e;
+      });
+    </script>
+    <script>
+      (function () {
+        var ua = navigator.userAgent || "";
+        var w = Math.max(screen.width || 0, window.innerWidth || 0);
+        var h = Math.max(screen.height || 0, window.innerHeight || 0);
+        var big = Math.max(w, h);
+        var chrome = /Chrome\/(\d+)/.exec(ua);
+        var chromeMajor = chrome ? parseInt(chrome[1], 10) : 0;
+        var android = /Android (\d+)(?:\.(\d+))?/.exec(ua);
+        var androidVer = android ? android[1] + (android[2] ? "." + android[2] : "") : "";
+        var androidMajor = android ? parseInt(android[1], 10) : 0;
+        var small = Math.min(w, h);
+        var ratio = big > 0 ? small / big : 1;
+        /* --- Wear OS vs AOSP 10.7 watch vs phone browser ---------------
+           Wear OS reports an explicit UA token on 2.x/3+, and its browser
+           builds are modern Chrome. A "true build 10.7" LOKMAT face is plain
+           Android 10 AOSP: no Wear token, tiny near-square screen, old
+           WebView. A phone browser is never near-square at <=520 px. */
+        var wearToken = /Wear ?OS|Android Wear|WearOS/i.test(ua);
+        var square = ratio >= 0.92;                       /* watch faces are ~1:1 */
+        var tinySquare = square && big <= 520;
+        var mobileUa = /Android|Mobile/i.test(ua);
+        var wearOs = wearToken || (tinySquare && chromeMajor >= 90 && androidMajor >= 11);
+        /* AOSP watch: square, small, Android <= 10 (10.7 firmware) or a
+           WebView older than Chrome 80. */
+        var aospWatch = !wearToken && tinySquare && mobileUa && (androidMajor <= 10 || chromeMajor < 80);
+        var watch = wearOs || aospWatch || (tinySquare && mobileUa);
+        var legacy = (chromeMajor > 0 && chromeMajor < 80) || (androidMajor > 0 && androidMajor <= 10);
+
+        var kind = wearOs
+          ? "wear os watch"
+          : aospWatch
+            ? "aosp watch face (10.x)"
+            : watch
+              ? "small square device"
+              : big <= 900 && mobileUa
+                ? "phone browser"
+                : "tablet / desktop";
+        /* Wear OS 3+ on a modern WebView can hold an accelerated canvas.
+           AOSP 10 watch WebViews paint once and then drop the layer. */
+        var recommend = aospWatch || legacy || (watch && !wearOs) ? "svg" : "canvas";
+
+        var brokenBefore = false;
+        try { brokenBefore = localStorage.getItem("apex.canvas.broken") === "1"; } catch (e) {}
+        if (brokenBefore) recommend = "svg";
+
+        function drawInfo(extra) {
+          document.getElementById("info").innerHTML =
+            "device <b>" + kind + "</b> · " + w + "x" + h + " · aspect " + ratio.toFixed(2) +
+            "<br />android <b>" + (androidVer || "n/a") + "</b> · webview chrome <b>" + (chromeMajor || "unknown") + "</b>" +
+            "<br />pathway recommended: <b>" + recommend + "</b>" +
+            (legacy ? " (legacy webview)" : "") +
+            (brokenBefore ? " · locked by earlier failure" : "") +
+            (extra ? "<br />" + extra : "");
+        }
+        drawInfo("");
+
+        var pick = document.getElementById(recommend === "svg" ? "c-svg" : "c-canvas");
+        pick.className = "card pick";
+        var tag = document.createElement("span");
+        tag.className = "tag";
+        tag.appendChild(document.createTextNode("recommended"));
+        pick.appendChild(tag);
+
+        function set(key, value) {
+          try { localStorage.setItem(key, value); } catch (e) {}
+        }
+        function del(key) {
+          try { localStorage.removeItem(key); } catch (e) {}
+        }
+        function seedFace() {
+          // Round / thick-bezel faces need an inset so glyphs never clip.
+          try {
+            if (!localStorage.getItem("apex.watchSettings") && watch) {
+              set("apex.watchSettings", JSON.stringify({ scale: 1, inset: 8, lineHeight: 1.3, autonomy: "auto" }));
+            }
+          } catch (e) {}
+        }
+
+        function wire(id, fn) {
+          var el = document.getElementById(id);
+          el.onclick = function () { fn(); seedFace(); return true; };
+        }
+        // apex.canvas.broken = "1" forces the SVG face app-wide.
+        wire("c-svg", function () { set("apex.canvas.broken", "1"); });
+        wire("c-canvas", function () { del("apex.canvas.broken"); });
+        wire("c-auto", function () { del("apex.canvas.broken"); del("apex.renderTuning"); });
+        wire("c-bridge", function () { if (recommend === "svg") set("apex.canvas.broken", "1"); });
+
+        /* ---- face pitch micro trim (nominal 400 px, ±1 px steps) ---- */
+        var px = 0;
+        try { px = parseInt(localStorage.getItem("apex.facePx"), 10) || 0; } catch (e) {}
+        if (!px) px = Math.min(w, h) || 400;
+        function clampPx(n) { return Math.max(240, Math.min(720, n)); }
+        function drawPx() {
+          px = clampPx(px);
+          document.getElementById("px").innerHTML = px + " px";
+          set("apex.facePx", String(px));
+        }
+        function step(id, d) {
+          document.getElementById(id).onclick = function () {
+            px = d === 0 ? 400 : px + d;
+            drawPx();
+          };
+        }
+        step("m10", -10); step("m1", -1); step("p1", 1); step("p10", 10); step("pz", 0);
+        drawPx();
+
+        /* ---- one-tap automation: apply the recommended pathway and go ---- */
+        var held = false;
+        function applyRecommended() {
+          if (recommend === "svg") set("apex.canvas.broken", "1");
+          else del("apex.canvas.broken");
+          seedFace();
+          drawPx();
+        }
+        function launch() {
+          applyRecommended();
+          window.location.href = "/";
+        }
+        document.getElementById("go").onclick = launch;
+        document.getElementById("hold").onclick = function () {
+          held = true;
+          document.getElementById("info").innerHTML += "<br />auto-launch held · pick a source manually";
+        };
+
+        var autoKey = "apex.autoboot";
+        var autoOn = false;
+        try { autoOn = localStorage.getItem(autoKey) === "1"; } catch (e) {}
+        var alwaysBtn = document.getElementById("always");
+        function drawAlways() { alwaysBtn.innerHTML = "auto-boot: " + (autoOn ? "on" : "off"); }
+        alwaysBtn.onclick = function () {
+          autoOn = !autoOn;
+          if (autoOn) set(autoKey, "1"); else del(autoKey);
+          drawAlways();
+        };
+        drawAlways();
+
+        if (autoOn) {
+          var left = 3;
+          var t = setInterval(function () {
+            if (held) { clearInterval(t); return; }
+            left--;
+            document.getElementById("go").innerHTML = "automate · launch (" + left + ")";
+            if (left <= 0) { clearInterval(t); launch(); }
+          }, 700);
+        }
+
+        /* ---- one-tap compatibility self-test ------------------------------
+           Briefly attempts the recommended pathway. Canvas must both read back
+           the pixel it drew and produce animation frames; on any failure the
+           device is locked to the SVG-only pathway. */
+        var stres = document.getElementById("stres");
+        function lockSvg(why) {
+          set("apex.canvas.broken", "1");
+          recommend = "svg";
+          brokenBefore = true;
+          drawInfo("self-test: " + why + " · locked to svg");
+          document.getElementById("c-canvas").className = "card";
+          document.getElementById("c-svg").className = "card pick";
+        }
+        function frameProbe(cb) {
+          var frames = 0, done = false;
+          var raf = window.requestAnimationFrame;
+          if (!raf) { cb(0); return; }
+          var t0 = new Date().getTime();
+          function step() {
+            frames++;
+            if (new Date().getTime() - t0 >= 600) { if (!done) { done = true; cb(frames); } return; }
+            raf(step);
+          }
+          raf(step);
+          setTimeout(function () { if (!done) { done = true; cb(frames); } }, 1400);
+        }
+        document.getElementById("selftest").onclick = function () {
+          stres.innerHTML = "running…";
+          if (recommend === "svg") {
+            /* SVG pathway: confirm the DOM can measure a laid-out shape. */
+            var ok = false;
+            try {
+              var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+              svg.setAttribute("width", "20"); svg.setAttribute("height", "20");
+              var r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+              r.setAttribute("width", "10"); r.setAttribute("height", "10");
+              svg.appendChild(r); document.body.appendChild(svg);
+              ok = r.getBoundingClientRect().width > 0;
+              document.body.removeChild(svg);
+            } catch (e) { ok = false; }
+            frameProbe(function (frames) {
+              stres.innerHTML = ok ? "svg ok · " + frames + " frames/600ms" : "svg layout failed";
+            });
+            return;
+          }
+          var pixelOk = false, err = "";
+          try {
+            var c = document.createElement("canvas");
+            c.width = 32; c.height = 32;
+            var ctx = c.getContext("2d");
+            if (!ctx) throw new Error("no 2d context");
+            ctx.fillStyle = "#00ff6a";
+            ctx.fillRect(0, 0, 32, 32);
+            var d = ctx.getImageData(4, 4, 1, 1).data;
+            pixelOk = d[1] > 200 && d[3] > 200;
+            if (!pixelOk) err = "pixel readback blank";
+          } catch (e) { err = (e && e.message) || "canvas threw"; }
+          frameProbe(function (frames) {
+            if (pixelOk && frames >= 3) {
+              del("apex.canvas.broken");
+              brokenBefore = false;
+              stres.innerHTML = "canvas ok · " + frames + " frames/600ms";
+              drawInfo("self-test passed on canvas pathway");
+            } else {
+              stres.innerHTML = "failed (" + (err || frames + " frames") + ") · svg locked";
+              lockSvg(err || "only " + frames + " frames in 600ms");
+            }
+          });
+        };
+
+        /* ---- adb bridge status + reconnect -------------------------------- */
+        var brs = document.getElementById("brs");
+        var brerr = document.getElementById("brerr");
+        function bridgeUrls() {
+          var urls = [];
+          try {
+            var raw = localStorage.getItem("apex.bridge.endpoints");
+            if (raw) {
+              var list = JSON.parse(raw);
+              for (var i = 0; i < list.length; i++) {
+                if (list[i] && list[i].enabled && list[i].url) urls.push(list[i].url);
+              }
+            }
+          } catch (e) {}
+          if (!urls.length) {
+            var target = "192.168.12.211:33213";
+            try { target = localStorage.getItem("apex.bridge.target") || target; } catch (e) {}
+            var host = target.split(":")[0];
+            var scheme = location.protocol === "https:" ? "wss" : "ws";
+            urls.push(scheme + "://" + host + ":8787/adb");
+          }
+          return urls;
+        }
+        function probe(url, cb) {
+          var settled = false;
+          var ws;
+          var timer = setTimeout(function () {
+            if (settled) return;
+            settled = true;
+            try { ws && ws.close(); } catch (e) {}
+            cb(false, "timeout after 4s");
+          }, 4000);
+          try {
+            ws = new WebSocket(url);
+          } catch (e) {
+            clearTimeout(timer);
+            cb(false, (e && e.message) || "socket rejected");
+            return;
+          }
+          ws.onopen = function () {
+            if (settled) return;
+            settled = true; clearTimeout(timer);
+            try { ws.close(); } catch (e) {}
+            cb(true, "");
+          };
+          ws.onerror = function () {
+            if (settled) return;
+            settled = true; clearTimeout(timer);
+            cb(false, location.protocol === "https:" && url.indexOf("ws://") === 0
+              ? "blocked: https page cannot dial ws:// — use local file/http for ws:// work or expose the agent over wss://"
+              : "no route / agent not listening");
+          };
+        }
+        function checkBridge() {
+          var urls = bridgeUrls();
+          brs.innerHTML = "probing " + urls.length + " endpoint(s)…";
+          brerr.innerHTML = "";
+          var i = 0;
+          (function next() {
+            if (i >= urls.length) {
+              brs.innerHTML = "offline";
+              brerr.innerHTML = "bridge could not reach the agent / api repo config — check the agent is running and reachable at " + urls.join(", ");
+              return;
+            }
+            var url = urls[i++];
+            probe(url, function (ok, why) {
+              if (ok) {
+                brs.innerHTML = "online · " + url;
+                brerr.innerHTML = "";
+              } else {
+                brerr.innerHTML = url + " → " + why;
+                next();
+              }
+            });
+          })();
+        }
+        document.getElementById("brgo").onclick = checkBridge;
+        document.getElementById("brcfg").onclick = function () { window.location.href = "/bridge"; };
+        checkBridge();
+
+        document.getElementById("wipe").onclick = function () {
+          try {
+            if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+              navigator.serviceWorker.getRegistrations().then(function (regs) {
+                for (var i = 0; i < regs.length; i++) regs[i].unregister();
+              });
+            }
+            if (window.caches && caches.keys) {
+              caches.keys().then(function (names) {
+                for (var i = 0; i < names.length; i++) caches['delete'](names[i]);
+              });
+            }
+          } catch (e) {}
+          del("apex.canvas.broken");
+          del("apex.renderTuning");
+          document.getElementById("info").innerHTML = "workers + caches cleared · reload the app";
+          return false;
+        };
+      })();
+    </script>
+  </body>
+</html>

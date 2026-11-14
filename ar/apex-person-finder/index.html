@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Person Finder — Locate People Indoors</title>
+<!--
+  APEX PERSON FINDER — find people inside buildings where GPS fails.
+  CONSENT-BASED: each person runs this app and chooses to share their spot.
+  Patent Pending · E027/E028/E032 · © 2026 Apex Air Solutions, LLC
+-->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#000;color:#0f0;font-family:'Courier New',monospace;padding:12px;}
+  .hdr{border:1px solid #0f0;padding:12px;margin-bottom:12px;}
+  .hdr h1{font-size:18px;letter-spacing:2px;color:#0ff;}
+  .hdr .sub{font-size:11px;opacity:.8;margin-top:4px;}
+  #view{width:100%;height:44vh;background:#000;border:1px solid #0f0;display:block;}
+  .panel{border:1px solid #0f0;padding:12px;background:#020;margin-top:12px;}
+  .btn{width:100%;min-height:56px;margin-top:10px;background:#000;color:#0f0;border:2px solid #0f0;
+       font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;}
+  .btn:active{background:#0f0;color:#000;}
+  .btn.primary{border-color:#0ff;color:#0ff;}
+  .btn.big{min-height:72px;font-size:20px;}
+  .btn.danger{border-color:#f44;color:#f44;}
+  input{width:100%;background:#000;border:1px solid #0f0;color:#0f0;font-family:inherit;
+        font-size:16px;padding:12px;margin-top:8px;min-height:48px;}
+  label{font-size:13px;display:block;margin-top:10px;letter-spacing:1px;}
+  ul.list{list-style:none;margin-top:10px;}
+  ul.list li{border:1px solid #030;padding:10px;margin-bottom:6px;font-size:14px;}
+  ul.list li .d{color:#0ff;font-size:12px;}
+  .note{font-size:12px;opacity:.7;margin-top:8px;line-height:1.6;}
+  .shareOn{color:#0f0;} .shareOff{color:#f80;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>◤ PERSON FINDER ◢</h1>
+  <div class="sub">Find people indoors where GPS can't reach. Everyone shares by choice.</div>
+  <div class="sub" id="posLine">Position: not started</div>
+</div>
+
+<canvas id="view" width="800" height="380"></canvas>
+
+<div class="panel">
+  <label for="myName">Your name / callsign</label>
+  <input id="myName" type="text" placeholder="e.g. Mom, Guard-2, Medic" autocomplete="off">
+  <button class="btn primary big" id="startBtn">▶ START + SHARE MY LOCATION</button>
+  <button class="btn danger" id="stopShareBtn" style="display:none;">■ STOP SHARING</button>
+  <div class="note">You control sharing. Tap STOP any time and you drop off the map. Nothing is sent anywhere — this demo keeps positions on this device.</div>
+</div>
+
+<div class="panel">
+  <h2 style="font-size:12px;letter-spacing:2px;color:#0ff;">PEOPLE NEARBY</h2>
+  <ul class="list" id="peopleList"><li>— nobody sharing yet —</li></ul>
+</div>
+
+<script src="../apex-dash/tristar-routing.js"></script>
+<script src="../apex-ar-core/engine-dispatch.js"></script>
+<script src="../apex-ar-glasses/superposition-dom.js"></script>
+<script src="../apex-ar-glasses/zero-slam.js"></script>
+<script src="../apex-ar-core/anchor-engine.js"></script>
+<script src="../apex-ar-core/helical-lock.js"></script>
+<script>
+(function(){
+  'use strict';
+  SuperpositionDOM.init(document);
+  const canvas=document.getElementById('view'),ctx=canvas.getContext('2d');
+  let pose={x:0,y:0,z:0,heading:0,conf:0,source:'INIT'};
+  let sharing=false;
+  const PEOPLE_KEY='apex_people_v1';
+  const myId='me_'+Math.random().toString(36).slice(2,7);
+
+  /* shared, consented people list on this device (a real deployment syncs
+   * through the sovereign mesh / wifi-bridge). */
+  function loadPeople(){try{return JSON.parse(localStorage.getItem(PEOPLE_KEY)||'{}');}catch(_){return{};}}
+  function savePeople(p){try{localStorage.setItem(PEOPLE_KEY,JSON.stringify(p));}catch(_){}}
+
+  function publishMe(){
+    if(!sharing)return;
+    const p=loadPeople();
+    p[myId]={ name:document.getElementById('myName').value.trim()||'Me',
+              x:pose.x,y:pose.y,z:pose.z,conf:pose.conf,ts:Date.now() };
+    savePeople(p);
+  }
+  function unpublishMe(){const p=loadPeople();delete p[myId];savePeople(p);render();}
+
+  window.addEventListener('apexPoseUpdate',(e)=>{pose=e.detail;
+    document.getElementById('posLine').textContent='Position: '+pose.source+' · '+Math.round((pose.conf||0)*100)+'% sure';
+    publishMe(); render();
+  });
+
+  document.getElementById('startBtn').addEventListener('click',function(){
+    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().catch(function(){});}
+    if(window.SuperpositionEngine&&SuperpositionEngine.init){try{SuperpositionEngine.init();}catch(e){}}
+    ZeroSLAM.start();
+    /* anchor at entrance if a QR is provided */
+    const t=prompt('Optional: scan entrance/room QR to anchor everyone to the same map (or Cancel):');
+    if(t) AnchorEngine.scan(t);
+    sharing=true; this.style.display='none';
+    document.getElementById('stopShareBtn').style.display='block';
+  });
+  document.getElementById('stopShareBtn').addEventListener('click',function(){
+    sharing=false; unpublishMe();
+    this.style.display='none';
+    document.getElementById('startBtn').style.display='block';
+    document.getElementById('startBtn').disabled=false;
+    document.getElementById('startBtn').textContent='▶ START + SHARE MY LOCATION';
+  });
+
+  function render(){
+    const p=loadPeople();
+    const ul=document.getElementById('peopleList');ul.innerHTML='';
+    const ids=Object.keys(p).filter(id=>Date.now()-p[id].ts<30000);
+    if(!ids.length){ul.innerHTML='<li>— nobody sharing yet —</li>';}
+    ids.forEach((id)=>{
+      const o=p[id];
+      const dx=o.x-pose.x,dy=o.y-pose.y,d=Math.sqrt(dx*dx+dy*dy);
+      const li=document.createElement('li');
+      const who=document.createElement('span');
+      who.textContent=(id===myId?'📍 ':'' )+o.name+(id===myId?' (you)':'');
+      const dist=document.createElement('span');
+      dist.className='d';
+      dist.textContent=d.toFixed(1)+' m away · '+Math.round((o.conf||0)*100)+'%';
+      li.appendChild(who); li.appendChild(dist);
+      ul.appendChild(li);
+    });
+    draw(p);
+  }
+
+  function draw(p){
+    const w=canvas.width,h=canvas.height;
+    ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+    /* me at center */
+    ctx.fillStyle='#0ff';ctx.beginPath();ctx.arc(w/2,h/2,7,0,7);ctx.fill();
+    ctx.fillStyle='#0ff';ctx.font='11px monospace';ctx.fillText('YOU',w/2+12,h/2);
+    const yaw=-(pose.heading||0)*Math.PI/180;
+    const scale=8; /* pixels per metre */
+    Object.keys(p||{}).forEach((id)=>{
+      if(id===myId)return;
+      const o=p[id];if(Date.now()-o.ts>30000)return;
+      const rx=o.x-pose.x,ry=o.y-pose.y;
+      const X=rx*Math.cos(yaw)-ry*Math.sin(yaw),Y=rx*Math.sin(yaw)+ry*Math.cos(yaw);
+      const sx=w/2+X*scale, sy=h/2-Y*scale;
+      ctx.fillStyle='#0f0';ctx.beginPath();ctx.arc(sx,sy,6,0,7);ctx.fill();
+      ctx.fillText(o.name,sx+10,sy);
+    });
+  }
+  render();
+})();
+</script>
+</body>
+</html>

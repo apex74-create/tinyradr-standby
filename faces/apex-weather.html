@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — Static Weather Face</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#010409; }
+  body { font-family:"Segoe UI", system-ui, sans-serif; position:relative; }
+
+  /* STATIC WATERFALL — frozen mid-fall, dense ones and zeros, baked once by JS, never animated */
+  #falls { position:absolute; inset:0; display:flex; justify-content:space-between; padding:0 1vw; }
+  .col { writing-mode:vertical-rl; font-family:"Courier New", monospace; font-weight:bold;
+         font-size:2.6vmin; letter-spacing:.35em; line-height:1; white-space:nowrap; overflow:hidden; }
+  .col.bright { color:#39ff6a; text-shadow:0 0 8px rgba(57,255,106,.8); }
+  .col.mid    { color:#1db954; opacity:.75; }
+  .col.dim    { color:#0d7a34; opacity:.5; }
+  .col.faint  { color:#075e26; opacity:.32; }
+
+  /* vignette to seat the center */
+  #shade { position:absolute; inset:0;
+           background:radial-gradient(ellipse at center, rgba(1,4,9,.25) 0%, rgba(1,4,9,.78) 62%, rgba(1,4,9,.96) 100%); }
+
+  /* STATIC GEAR SET — drawn once, never moves */
+  #gears { position:absolute; inset:0; width:100%; height:100%; }
+  #gears .gear { fill:none; stroke:#6ea8d8; stroke-width:2.5; opacity:.34; }
+  #gears .gear2 { fill:none; stroke:#3d5a78; stroke-width:2; opacity:.3; }
+  #gears .hub { fill:#0b1220; stroke:#6ea8d8; stroke-width:2; opacity:.6; }
+
+  /* CENTER — giant digital, the only thing that ever changes (one text update per second) */
+  #center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #brand { color:#e8eef5; font-size:5.2vmin; font-weight:800; letter-spacing:.55em; text-indent:.55em;
+           text-shadow:0 0 18px rgba(110,168,216,.55); margin-bottom:1vmin; }
+  #clock { color:#f4f8fc; font-family:"Courier New", monospace; font-weight:bold;
+           font-size:17.5vmin; letter-spacing:.04em; line-height:1;
+           text-shadow:0 0 26px rgba(110,168,216,.65), 0 0 4px rgba(255,255,255,.6); }
+  #clock .sec { font-size:8vmin; color:#9ec5eb; vertical-align:top; }
+  #dateline { color:#9ec5eb; font-size:3.6vmin; letter-spacing:.3em; text-indent:.3em; margin-top:1.6vmin; }
+  #motto { color:#5f7astray; }
+  #motto2 { color:#63798f; font-size:2.4vmin; letter-spacing:.34em; text-indent:.34em; margin-top:2.6vmin; }
+  #strip { position:absolute; left:0; right:0; bottom:2.2vmin; text-align:center;
+           color:#4d637c; font-size:2vmin; letter-spacing:.26em; }
+
+  /* WEATHER BAND — painted once per fetch, plain text, no animation */
+  #wx { margin-top:2.2vmin; text-align:center; color:#dfe9f4; }
+  #wx .now { font-size:6.4vmin; font-weight:700; letter-spacing:.06em; }
+  #wx .now .cond { color:#9ec5eb; font-size:4.4vmin; font-weight:600; }
+  #wx .sub { margin-top:.8vmin; font-size:3vmin; color:#8fa9c4; letter-spacing:.14em; }
+  #wx .hrs { margin-top:1.2vmin; font-size:2.7vmin; color:#6f8dab; letter-spacing:.1em; }
+  #wx .src { margin-top:1vmin; font-size:1.7vmin; color:#43597a; letter-spacing:.22em; }
+</style>
+</head>
+<body>
+  <div id="falls"></div>
+  <div id="shade"></div>
+
+  <svg id="gears" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <!-- gear generator output is baked in by the script below as static paths -->
+    <g id="gearset"></g>
+  </svg>
+
+  <div id="center">
+    <div id="brand">APEX</div>
+    <div id="clock">--:--<span class="sec">--</span></div>
+    <div id="dateline">—</div>
+        <div id="wx">
+      <div class="now"><span id="wxTemp">--°</span> <span class="cond" id="wxCond">LOADING SKY…</span></div>
+      <div class="sub" id="wxSub">WIND — · FEELS —</div>
+      <div class="hrs" id="wxHrs">—</div>
+      <div class="src">CAMP APEX · LIVE CONDITIONS — OPEN DATA (PROOF BUILD)</div>
+    </div>
+    <div id="motto2">THE WHOLE CORPORATION, ON THE WRIST</div>
+  </div>
+  <div id="strip">FOUNDED OCT 31, 2026 · FACTORY ACTIVATED NOV 4, 2026</div>
+
+<script>
+  // ---- STATIC WATERFALL: build once, dense, then never touch it again ----
+  (function buildFalls() {
+    var falls = document.getElementById('falls');
+    var classes = ['bright','mid','dim','faint','mid','dim'];
+    var H = Math.max(document.documentElement.clientHeight, 200);
+    var rows = Math.ceil(H / (2.6 * Math.min(window.innerWidth, window.innerHeight) / 100)) + 14;
+    var cols = Math.floor(window.innerWidth / (2.2 * Math.min(window.innerWidth, window.innerHeight) / 100)) + 2;
+    if (cols < 14) cols = 14;
+    var html = '';
+    for (var c = 0; c < cols; c++) {
+      var s = '';
+      var runLen = rows + Math.floor(Math.random() * 10);
+      for (var r = 0; r < runLen; r++) s += (Math.random() < 0.52 ? '1' : '0');
+      html += '<div class="col ' + classes[c % classes.length] + '">' + s + '</div>';
+    }
+    falls.innerHTML = html;
+  })();
+
+  // ---- STATIC GEARS: draw three meshed gears once as SVG paths ----
+  (function drawGears() {
+    function gearPath(cx, cy, teeth, rOut, rIn) {
+      var d = '';
+      var step = (Math.PI * 2) / (teeth * 4);
+      for (var i = 0; i < teeth * 4; i++) {
+        var r = (i % 4 === 1 || i % 4 === 2) ? rOut : rIn;
+        var a = i * step;
+        var x = (cx + r * Math.cos(a)).toFixed(2), y = (cy + r * Math.sin(a)).toFixed(2);
+        d += (i === 0 ? 'M' : 'L') + x + ' ' + y;
+      }
+      return d + 'Z';
+    }
+    var g = document.getElementById('gearset');
+    var svg = '';
+    // big gear upper left, medium meshed lower right of it, small gear bottom right corner
+    svg += '<path class="gear"  d="' + gearPath(16, 15, 14, 15, 12.4) + '"/>';
+    svg += '<circle class="hub" cx="16" cy="15" r="4.4"/>';
+    svg += '<path class="gear2" d="' + gearPath(33, 30, 10, 9.5, 7.8) + '"/>';
+    svg += '<circle class="hub" cx="33" cy="30" r="2.8"/>';
+    svg += '<path class="gear"  d="' + gearPath(88, 86, 12, 12.5, 10.3) + '"/>';
+    svg += '<circle class="hub" cx="88" cy="86" r="3.6"/>';
+    svg += '<path class="gear2" d="' + gearPath(74, 70, 9, 8, 6.6) + '"/>';
+    svg += '<circle class="hub" cx="74" cy="70" r="2.4"/>';
+    g.innerHTML = svg;
+  })();
+
+  // ---- CLOCK: the only live element. One text write per second. Nothing animates. ----
+  var DAYS = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  var MONS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  function tick() {
+    var n = new Date();
+    var h = n.getHours() % 12; if (h === 0) h = 12;
+    var m = ('0' + n.getMinutes()).slice(-2);
+    var s = ('0' + n.getSeconds()).slice(-2);
+    document.getElementById('clock').innerHTML = h + ':' + m + '<span class="sec">' + s + '</span>';
+    document.getElementById('dateline').textContent =
+      DAYS[n.getDay()] + ' · ' + MONS[n.getMonth()] + ' ' + n.getDate() + ', ' + n.getFullYear();
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+<script>
+  // ---- WEATHER: one small JSON fetch on load, refresh every 15 minutes. Paints as plain text. ----
+  var WX_URL = 'https://api.open-meteo.com/v1/forecast?latitude=44.98096&longitude=-84.49608'
+    + '&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m'
+    + '&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min'
+    + '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDetroit&forecast_days=2';
+  var CODES = {0:'CLEAR',1:'MOSTLY CLEAR',2:'PARTLY CLOUDY',3:'OVERCAST',45:'FOG',48:'FOG',
+    51:'DRIZZLE',53:'DRIZZLE',55:'DRIZZLE',56:'FREEZING DRIZZLE',57:'FREEZING DRIZZLE',
+    61:'RAIN',63:'RAIN',65:'HEAVY RAIN',66:'FREEZING RAIN',67:'FREEZING RAIN',
+    71:'SNOW',73:'SNOW',75:'HEAVY SNOW',77:'SNOW GRAINS',80:'SHOWERS',81:'SHOWERS',82:'VIOLENT SHOWERS',
+    85:'SNOW SHOWERS',86:'SNOW SHOWERS',95:'THUNDERSTORM',96:'T-STORM + HAIL',99:'T-STORM + HAIL'};
+  var DIRS = ['N','NE','E','SE','S','SW','W','NW'];
+  function paintWx() {
+    var x = new XMLHttpRequest();
+    x.open('GET', WX_URL, true);
+    x.onreadystatechange = function() {
+      if (x.readyState !== 4 || x.status !== 200) return;
+      try {
+        var j = JSON.parse(x.responseText), c = j.current;
+        document.getElementById('wxTemp').textContent = Math.round(c.temperature_2m) + '°';
+        document.getElementById('wxCond').textContent = CODES[c.weather_code] || '—';
+        var dir = DIRS[Math.round(c.wind_direction_10m / 45) % 8];
+        document.getElementById('wxSub').textContent =
+          'WIND ' + dir + ' ' + Math.round(c.wind_speed_10m) + ' MPH · FEELS ' + Math.round(c.apparent_temperature) + '°'
+          + ' · HI ' + Math.round(j.daily.temperature_2m_max[0]) + '° / LO ' + Math.round(j.daily.temperature_2m_min[0]) + '°';
+        var nowH = new Date().getHours(), parts = [];
+        for (var k = 1; k <= 4; k++) {
+          var idx = nowH + k;
+          var hh = idx % 24, ap = hh >= 12 ? 'PM' : 'AM'; hh = hh % 12; if (hh === 0) hh = 12;
+          parts.push(hh + ap + ' ' + Math.round(j.hourly.temperature_2m[idx]) + '°');
+        }
+        document.getElementById('wxHrs').textContent = parts.join('  ·  ');
+      } catch (e) { /* keep last paint */ }
+    };
+    x.send();
+  }
+  paintWx();
+  setInterval(paintWx, 900000);
+</script>
+</body>
+</html>
