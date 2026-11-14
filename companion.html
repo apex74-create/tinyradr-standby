@@ -75,12 +75,30 @@ $("rparent").onclick=function(){setRole("parent")};$("rwatch").onclick=function(
 $("unp").onclick=function(){Comp.unpair();peer=null;ui();redraw()};
 function sendTxt(){var v=$("txt").value.trim();if(!v)return;Comp.send("text",{body:v}).then(function(ok){log(ok?"ME: "+v:"NOT SENT · OFFLINE")});$("txt").value=""}
 $("send").onclick=sendTxt;$("txt").addEventListener("keydown",function(e){if(e.key==="Enter")sendTxt()});
+// Position acquisition — the map's own eyes (2026-11-14). It starts at load
+// and STAYS alive: this used to be a watch that only started on the SHARE MY
+// SPOT tap, so indoors it never looked at all, and a failed first look was
+// the end of it until reload. Now a failed fix is not terminal — the watch
+// stays registered, and errors re-register on a bounded backoff — so the
+// first real fix, whenever it lands (e.g. stepping outside), paints the map
+// with no reload and no tap. Sharing stays a separate switch: acquisition
+// never sends; only SHARE MY SPOT sends, exactly as before. NO FEED
+// discipline: only a real browser fix is ever painted — a real fix or an
+// honest NO POSITIONS YET, nothing between.
+var sharing=false,gpsTries=0;
+function gpsFix(p){gpsTries=0;mine={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,at:Date.now()};CompRange.spots(mine,peer);redraw();
+  if(sharing&&Date.now()-lastSent>30000){lastSent=Date.now();Comp.send("pos",mine)}}
+function gpsErr(e){log("GPS: "+e.message);if(e.code===1)return; // denied — retrying cannot heal it
+  if(geo!==null){navigator.geolocation.clearWatch(geo);geo=null}
+  if(gpsTries<6){gpsTries++;setTimeout(startGps,15000)}}
+function startGps(){if(geo!==null||!navigator.geolocation)return;
+  geo=navigator.geolocation.watchPosition(gpsFix,gpsErr,{enableHighAccuracy:true,maximumAge:15000,timeout:27000})}
 $("spot").onclick=function(){
-  if(geo!==null){navigator.geolocation.clearWatch(geo);geo=null;$("spot").textContent="SHARE MY SPOT";return}
-  $("spot").textContent="STOP SHARING";
-  geo=navigator.geolocation.watchPosition(function(p){mine={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};redraw();
-    mine.at=Date.now();CompRange.spots(mine,peer);if(Date.now()-lastSent>30000){lastSent=Date.now();Comp.send("pos",mine)}},function(e){log("GPS: "+e.message)},{enableHighAccuracy:true,maximumAge:15000});
+  sharing=!sharing;
+  $("spot").textContent=sharing?"STOP SHARING":"SHARE MY SPOT";
+  if(sharing){startGps();if(mine){lastSent=Date.now();Comp.send("pos",mine)}log("sharing on")}else log("sharing off");
 };
+startGps();
 redraw();
 })();
 </script>
