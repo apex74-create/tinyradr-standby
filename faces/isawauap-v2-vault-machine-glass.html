@@ -47,7 +47,9 @@
   .vaultCopy{flex:1 1 280px}
   .gate{display:inline-block;padding:4px 12px;border:2px solid var(--amber);border-radius:8px;
     color:var(--amber);font-weight:800;font-size:20px;letter-spacing:.03em}
-  /* THE EXAMINATION MACHINE — DEMONSTRATION (v2) */
+  /* THE EXAMINATION MACHINE — LIVE SWEEP DEMONSTRATION (v3)
+     The stored-sample picker is gone. The machine now takes its input
+     from the wearer's own sensors and converts it on this device. */
   .demo{display:inline-block;padding:3px 10px;border:2px solid var(--magenta);border-radius:999px;
     color:var(--magenta);font-weight:800;font-size:12px;letter-spacing:.12em;vertical-align:middle}
   .stageWrap{border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#000;margin:12px 0}
@@ -59,12 +61,14 @@
   .mbtn:hover{background:rgba(25,240,200,.10)}
   .mbtn.run{border-color:var(--amber);color:var(--amber);font-size:16px;padding:12px 20px}
   .mbtn:disabled{opacity:.38;cursor:default;background:transparent}
-  .mbtn[aria-pressed="true"]{background:rgba(25,240,200,.16)}
-  .passes{list-style:none;padding:0;margin:10px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px}
-  .passes li{padding:5px 8px;border-left:3px solid var(--line);margin:0 0 5px;opacity:.45;line-height:1.45}
-  .passes li.on{border-left-color:var(--amber);opacity:1}
-  .passes li.done{border-left-color:var(--green);opacity:1}
-  .passes b{color:var(--cyan)}
+  .swpGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+  @media (max-width:560px){ .swpGrid{grid-template-columns:repeat(2,1fr)} }
+  .swpTile{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:rgba(0,0,0,.35)}
+  .swpTile .k{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--teal)}
+  .swpTile .v{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:21px;font-weight:700;line-height:1.25}
+  .swpTile .u{font-size:11px;opacity:.75;line-height:1.35}
+  .swpState{font-weight:800;letter-spacing:.05em}
+  .swpState.live{color:var(--green)} .swpState.carry{color:var(--amber)} .swpState.searching{color:#ff3d00}
   .readout{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.6;
     border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:none;word-break:break-all}
   .readout.show{display:block}
@@ -196,39 +200,37 @@
   </div></section>
 
   <section class="card" id="machine"><div class="plate">
-    <h2>THE EXAMINATION MACHINE <span class="demo">DEMONSTRATION</span></h2>
-    <p><b>Plain words first: this is a demonstration of the event, running entirely in your
-    browser.</b> Nothing you put here uploads anywhere — no file leaves this page, nothing is
-    sent to the station, nothing is kept. The demo shows you the passes a frame goes through.
-    A real examination read comes from the email station above — a machine here can show you
-    the shape of the work, it cannot grade your footage.</p>
-    <p>Feed the machine: pick a sample frame, or drop in one of your own images
-    (it is read on this device only, for the demo, and forgotten when you leave the page).</p>
-    <div class="mrow" role="group" aria-label="Choose a frame">
-      <button type="button" class="mbtn" data-sample="0" aria-pressed="true">SAMPLE A — TRIANGLE OVER THE TREELINE</button>
-      <button type="button" class="mbtn" data-sample="1" aria-pressed="false">SAMPLE B — DISC OVER THE HORIZON</button>
-      <button type="button" class="mbtn" data-sample="2" aria-pressed="false">SAMPLE C — LIGHTS IN FORMATION</button>
-      <label class="mbtn" for="fileIn">YOUR OWN FRAME…</label>
-      <input type="file" id="fileIn" accept="image/*" hidden>
-    </div>
+    <h2>THE EXAMINATION MACHINE <span class="demo">LIVE SWEEP DEMONSTRATION</span></h2>
+    <p><b>Plain words first: the machine now works on your own sweep.</b> Press BEGIN SWEEP
+    and turn slowly in a circle. The face reads this device's own compass and motion sensors,
+    takes its samples on the PE beat — one sample every 369&nbsp;ms across one 11-second
+    cycle — and converts them here, on this device, into the readouts below: heading, travel,
+    sweep rate, stability, and the sweep's own fingerprint. Nothing is uploaded, nothing is
+    stored, and no stored picture is shown: the trace on the scope is drawn from <b>your</b>
+    movement, while you make it. You bought the face; the face carries the machine.</p>
+    <p>If no sensor answers, the needle sweeps <b>SEARCHING</b> and the readouts say
+    NO MEASURE. This face would rather show you nothing than invent a heading.</p>
     <div class="stageWrap" id="stageWrap">
       <canvas id="stage" width="640" height="400"></canvas>
     </div>
     <div class="mrow">
-      <button type="button" class="mbtn run" id="runBtn">RUN THE MACHINE</button>
-      <span class="fine" id="frameName">Frame loaded: SAMPLE A — TRIANGLE OVER THE TREELINE (a drawing, built into this page as a demo fixture)</span>
+      <button type="button" class="mbtn run" id="runBtn">BEGIN SWEEP</button>
+      <span class="fine" id="swpStatus">Sweep idle. Sensors not asked yet.</span>
     </div>
-    <ol class="passes" id="passes">
-      <li data-pass="0"><b>PASS 1 — HASH &amp; LOG.</b> <span>The frame's fingerprint is computed here, in your browser.</span></li>
-      <li data-pass="1"><b>PASS 2 — STACK.</b> <span>The frame is re-laid over itself, aligned, the way stills from a film are stacked.</span></li>
-      <li data-pass="2"><b>PASS 3 — REFINE.</b> <span>Contrast and sharpness passes — the picture is cleaned, not altered.</span></li>
-      <li data-pass="3"><b>PASS 4 — TRACE &amp; MEASURE.</b> <span>The largest single drawn element is outlined and measured — its box, its centre, its size in this frame.</span></li>
-      <li data-pass="4"><b>OUT — INDICATED.</b> <span>The frame comes back marked: outline, measurements, and the demo stamp.</span></li>
-    </ol>
+    <div class="swpGrid" aria-live="polite">
+      <div class="swpTile"><div class="k">HEADING</div><div class="v" id="swpHeading">&mdash;</div><div class="u" id="swpCardinal">no measure</div></div>
+      <div class="swpTile"><div class="k">STATE</div><div class="v swpState searching" id="swpState">SEARCHING</div><div class="u" id="swpSource">no anchor</div></div>
+      <div class="swpTile"><div class="k">SAMPLES</div><div class="v" id="swpSamples">0 / 30</div><div class="u">PE beat 369 ms &middot; one 11 s cycle</div></div>
+      <div class="swpTile"><div class="k">TRAVEL</div><div class="v" id="swpTravel">&mdash;</div><div class="u">degrees swept over measured ticks</div></div>
+      <div class="swpTile"><div class="k">SWEEP RATE</div><div class="v" id="swpRate">&mdash;</div><div class="u">degrees per second, measured span</div></div>
+      <div class="swpTile"><div class="k">STABILITY</div><div class="v" id="swpStability">&mdash;</div><div class="u">steadiness of the measured arc</div></div>
+    </div>
     <div class="readout" id="readout" aria-live="polite"></div>
-    <p class="fine">Every number below the stamp is a measurement <b>of the demo image itself</b> —
-    pixels counted in the frame you just fed the machine. The machine makes no finding about any
-    real object in any real sky. That is the station's work, by email, on your originals.</p>
+    <p class="fine">Every number above is arithmetic over the samples this device just took —
+    counted here, not fetched. The conversion engine in this face is the station back end's
+    measurement code in miniature, running on this device: <b>this page makes no call to the
+    station's VM</b>, and nothing you sweep leaves this device. The full examination — your
+    footage, measured on the back end — is still the email station's work, above.</p>
   </div></section>
 
   <section class="card"><div class="plate">
@@ -493,306 +495,443 @@
 </script>
 
 <script>
-/* THE EXAMINATION MACHINE — DEMONSTRATION (v2)
-   Runs entirely in this page. Sample frames are drawings built here as demo
-   fixtures; a visitor's own image is read on-device only (object URL), never
-   uploaded. The hash is the frame's real SHA-256, computed in-browser. The
-   trace pass measures the demo image itself: bright-pixel bounding box,
-   centroid and counts, counted from the actual pixels — nothing else is
-   claimed, and the readout says so on its face. */
+/* THE EXAMINATION MACHINE — LIVE SWEEP DEMONSTRATION (v3)
+   The stored-sample picker is gone. INPUT is the wearer's own sensor
+   sweep: deviceorientationabsolute / deviceorientation (the
+   webkitCompassHeading answer first, then an absolute alpha), the
+   motion sensor, and a position fix while a sweep runs. Samples are
+   taken on the PE beat — one tick every 369 ms, 30 ticks across one
+   11,000 ms cycle (PE(t) = sin(2pi * (t mod 11000) / 11000)).
+   CONVERSION is real arithmetic over the captured samples, computed
+   in this page: circular mean heading, total travel, sweep rate,
+   stability from the mean resultant length, and a SHA-256 fingerprint
+   of the sample series. The trace on the scope is drawn from those
+   same samples — the frame is generated from the wearer's own sweep,
+   never from a stored exhibit, and no owner's data ships in this face.
+   HONESTY: the conversion engine here is the station back end's
+   measurement code in miniature, running on this device. This page
+   makes NO network call — there is no live VM call in this build and
+   none is simulated. The heading stack is the estate's witness stack:
+   a live anchor, an honestly ageing carry, and SEARCHING — a slow
+   sweep that asserts NO north. A fabricated heading is a firing
+   offence under the fabrication ban; this stack would rather sweep.
+   FIREWALL: this script touches only its own elements (stage, runBtn,
+   readout, swp*). Its failure changes nothing else on the face. */
 (function(){
   "use strict";
   var stage = document.getElementById("stage");
-  var sctx = stage.getContext("2d");
+  if(!stage) return;
+  var ctx = stage.getContext("2d");
   var W = stage.width, H = stage.height;
   var runBtn = document.getElementById("runBtn");
   var readout = document.getElementById("readout");
-  var frameName = document.getElementById("frameName");
-  var passLis = document.querySelectorAll("#passes li");
-  var fileIn = document.getElementById("fileIn");
-  var stageWrap = document.getElementById("stageWrap");
+  var statusEl = document.getElementById("swpStatus");
+  var elHeading = document.getElementById("swpHeading");
+  var elCardinal = document.getElementById("swpCardinal");
+  var elState = document.getElementById("swpState");
+  var elSource = document.getElementById("swpSource");
+  var elSamples = document.getElementById("swpSamples");
+  var elTravel = document.getElementById("swpTravel");
+  var elRate = document.getElementById("swpRate");
+  var elStability = document.getElementById("swpStability");
 
-  /* the frame currently in the machine, kept offstage at full fidelity */
-  var src = document.createElement("canvas"); src.width = W; src.height = H;
-  var srcCtx = src.getContext("2d");
-  var currentLabel = "";
-  var running = false;
+  var TICK_MS = 369, CYCLE_MS = 11000, TICKS = 30;
+  var COL = { cyan:"#22e6ff", teal:"#19f0c8", magenta:"#ff3df0",
+              green:"#52ff5e", amber:"#ffb52e", violet:"#9a6bff",
+              line:"#1d3a44", red:"#ff3d00", dim:"rgba(255,255,255,.62)" };
 
-  function skyBase(c){
-    c.fillStyle = "#010204"; c.fillRect(0,0,W,H);
-    for(var i=0;i<130;i++){
-      c.fillStyle = "rgba(255,255,255,"+(0.25+((i*29)%60)/100)+")";
-      c.fillRect((i*67)%W, (i*41)%(H-90), 1.6, 1.6);
+  /* ---------- the heading witness stack (pattern of record) ---------- */
+  var hdg = { state:"searching", heading:null, source:"no anchor", lastAnchorMs:0 };
+  function confColor(){
+    return hdg.state === "live" ? COL.green :
+           hdg.state === "carry" ? COL.amber : COL.red;
+  }
+  function anchor(deg, src, now){
+    if(typeof deg !== "number" || !isFinite(deg)) return;
+    hdg.heading = ((deg % 360) + 360) % 360;
+    hdg.source = src; hdg.lastAnchorMs = now; hdg.state = "live";
+  }
+  function onOrient(e){
+    var deg = null, src = null;
+    if(typeof e.webkitCompassHeading === "number"){ deg = e.webkitCompassHeading; src = "compass — webkit"; }
+    else if(e.absolute && typeof e.alpha === "number"){ deg = 360 - e.alpha; src = "compass — absolute"; }
+    if(deg !== null) anchor(deg, src, Date.now());
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientationabsolute", onOrient, true);
+    window.addEventListener("deviceorientation", onOrient, true);
+  }
+  function ageStack(now){
+    if(hdg.state === "live" && now - hdg.lastAnchorMs > 5000){
+      hdg.state = "carry"; hdg.source = "carry — last anchor, ageing";
+    }
+    if(hdg.state === "carry" && now - hdg.lastAnchorMs > 30000){
+      hdg.state = "searching"; hdg.heading = null; hdg.source = "no anchor";
     }
   }
-  function treeline(c, col){
-    c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
-    c.moveTo(0,H-38);
-    for(var x=0;x<=W;x+=32){ c.lineTo(x+8, H-38-((x*13)%34)); c.lineTo(x+20, H-38-((x*7)%16)); }
-    c.lineTo(W,H-38); c.stroke();
-    c.beginPath(); c.moveTo(0,H-38); c.lineTo(W,H-38); c.stroke();
-  }
-  function drawSample(n){
-    srcCtx.clearRect(0,0,W,H); skyBase(srcCtx);
-    if(n===0){ /* TRIANGLE OVER THE TREELINE */
-      /* fixture design: the scenery is drawn dim, under the trace floor —
-         the subject carries the light, the way the station would present it */
-      srcCtx.globalAlpha = 0.42; treeline(srcCtx, "#19f0c8"); srcCtx.globalAlpha = 1;
-      srcCtx.strokeStyle = "#22e6ff"; srcCtx.lineWidth = 3;
-      srcCtx.shadowColor = "#22e6ff"; srcCtx.shadowBlur = 14;
-      srcCtx.beginPath(); srcCtx.moveTo(320,96); srcCtx.lineTo(428,268); srcCtx.lineTo(212,268);
-      srcCtx.closePath(); srcCtx.stroke();
-      srcCtx.shadowBlur = 0;
-      [["#ff3df0",320,96],["#ffb52e",428,268],["#52ff5e",212,268]].forEach(function(p){
-        srcCtx.fillStyle = p[0]; srcCtx.beginPath(); srcCtx.arc(p[1],p[2],7,0,6.29); srcCtx.fill(); });
-      currentLabel = "SAMPLE A — TRIANGLE OVER THE TREELINE (a drawing, built into this page as a demo fixture)";
-    } else if(n===1){ /* DISC OVER THE HORIZON */
-      srcCtx.globalAlpha = 0.42;
-      srcCtx.strokeStyle = "#9a6bff"; srcCtx.lineWidth = 2;
-      srcCtx.beginPath(); srcCtx.moveTo(0,H-70); srcCtx.lineTo(W,H-70); srcCtx.stroke();
-      treeline(srcCtx, "#19f0c8");
-      srcCtx.globalAlpha = 1;
-      srcCtx.strokeStyle = "#ff3df0"; srcCtx.lineWidth = 3;
-      srcCtx.shadowColor = "#ff3df0"; srcCtx.shadowBlur = 14;
-      srcCtx.beginPath(); srcCtx.ellipse(320,178,132,34,0,0,6.29); srcCtx.stroke();
-      srcCtx.beginPath(); srcCtx.ellipse(320,158,58,30,0,3.14,6.29); srcCtx.stroke();
-      srcCtx.shadowBlur = 0;
-      for(var i=-2;i<=2;i++){ srcCtx.fillStyle = (i%2)? "#ffb52e":"#22e6ff";
-        srcCtx.beginPath(); srcCtx.arc(320+i*44,190,6,0,6.29); srcCtx.fill(); }
-      currentLabel = "SAMPLE B — DISC OVER THE HORIZON (a drawing, built into this page as a demo fixture)";
-    } else { /* LIGHTS IN FORMATION */
-      srcCtx.globalAlpha = 0.42; treeline(srcCtx, "#19f0c8"); srcCtx.globalAlpha = 1;
-      var pts = [[170,130],[268,104],[366,104],[464,130],[320,168]];
-      srcCtx.strokeStyle = "rgba(34,230,255,0.65)"; srcCtx.lineWidth = 1.6;
-      srcCtx.beginPath();
-      pts.forEach(function(p,i){ if(i===0) srcCtx.moveTo(p[0],p[1]); else srcCtx.lineTo(p[0],p[1]); });
-      srcCtx.closePath(); srcCtx.stroke();
-      pts.forEach(function(p){
-        var g = srcCtx.createRadialGradient(p[0],p[1],0,p[0],p[1],22);
-        g.addColorStop(0,"rgba(255,255,255,0.95)"); g.addColorStop(0.35,"rgba(255,181,46,0.55)");
-        g.addColorStop(1,"rgba(255,181,46,0)");
-        srcCtx.fillStyle = g; srcCtx.beginPath(); srcCtx.arc(p[0],p[1],22,0,6.29); srcCtx.fill();
-        srcCtx.fillStyle = "#ffffff"; srcCtx.beginPath(); srcCtx.arc(p[0],p[1],5,0,6.29); srcCtx.fill(); });
-      srcCtx.strokeStyle = "#ffb52e"; srcCtx.lineWidth = 3;
-      srcCtx.beginPath(); srcCtx.moveTo(66,84); srcCtx.lineTo(150,104); srcCtx.stroke();
-      currentLabel = "SAMPLE C — LIGHTS IN FORMATION (a drawing, built into this page as a demo fixture)";
-    }
-    showSrc("none");
-    frameName.textContent = "Frame loaded: " + currentLabel;
-    resetPasses();
-  }
-  function showSrc(filter){
-    sctx.save();
-    sctx.filter = filter || "none";
-    sctx.fillStyle = "#000"; sctx.fillRect(0,0,W,H);
-    sctx.drawImage(src,0,0);
-    sctx.restore();
-  }
-  function resetPasses(){
-    passLis.forEach(function(li){ li.classList.remove("on"); li.classList.remove("done"); });
-    readout.classList.remove("show"); readout.innerHTML = "";
-  }
-  function setPass(i, cls){
-    passLis.forEach(function(li, j){
-      li.classList.toggle("on", j===i && cls==="on");
-      if(j<i || (j===i && cls==="done")) li.classList.add("done");
-    });
-    var span = passLis[i].querySelector("span");
-    return span;
-  }
-  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 
-  /* real SHA-256 of the frame's raw pixels, computed in-browser */
-  function hashFrame(){
-    var data = srcCtx.getImageData(0,0,W,H).data;
+  /* ---------- motion: movement magnitude from rest ---------- */
+  var latestMove = null, motionLive = false;
+  function onMotion(e){
+    var a = e.accelerationIncludingGravity;
+    if(!a || typeof a.x !== "number" || typeof a.y !== "number" || typeof a.z !== "number") return;
+    var mag = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
+    latestMove = Math.abs(mag - 9.81);
+    motionLive = true;
+  }
+  if(window.DeviceMotionEvent) window.addEventListener("devicemotion", onMotion, true);
+
+  /* ---------- position fix, held only while a sweep runs ---------- */
+  var geoWatch = null, geoFix = null;
+  function startGeo(){
+    geoFix = null;
+    if(navigator.geolocation && navigator.geolocation.watchPosition){
+      try{
+        geoWatch = navigator.geolocation.watchPosition(function(pos){
+          geoFix = { lat:pos.coords.latitude, lon:pos.coords.longitude, acc:pos.coords.accuracy };
+        }, function(){}, { enableHighAccuracy:true, maximumAge:2000 });
+      }catch(e){ geoWatch = null; }
+    }
+  }
+  function stopGeo(){
+    if(geoWatch !== null && navigator.geolocation && navigator.geolocation.clearWatch){
+      try{ navigator.geolocation.clearWatch(geoWatch); }catch(e){}
+    }
+    geoWatch = null;
+  }
+
+  /* ---------- conversion: real arithmetic over the samples ---------- */
+  function computeStats(samples){
+    var sx = 0, sy = 0, n = 0, i, s;
+    for(i = 0; i < samples.length; i++){
+      s = samples[i];
+      if(typeof s.h === "number"){
+        var r = s.h * Math.PI / 180;
+        sx += Math.cos(r); sy += Math.sin(r); n++;
+      }
+    }
+    var out = { n:n, total:samples.length, mean:null, stability:null,
+                circDev:null, travel:null, rate:null, moveMean:null };
+    if(n > 0){
+      var mean = Math.atan2(sy, sx) * 180 / Math.PI;
+      if(mean < 0) mean += 360;
+      var R = Math.sqrt(sx*sx + sy*sy) / n;
+      out.mean = mean;
+      out.stability = R * 100;
+      out.circDev = (R > 0.0001) ? Math.sqrt(Math.max(0, -2 * Math.log(R))) * 180 / Math.PI : 180;
+    }
+    var travel = 0, pairs = 0, firstI = -1, lastI = -1;
+    for(i = 0; i < samples.length; i++){
+      if(typeof samples[i].h === "number"){ if(firstI < 0) firstI = i; lastI = i; }
+      if(i > 0 && typeof samples[i].h === "number" && typeof samples[i-1].h === "number"){
+        var d = Math.abs(samples[i].h - samples[i-1].h);
+        if(d > 180) d = 360 - d;
+        travel += d; pairs++;
+      }
+    }
+    if(pairs > 0){
+      out.travel = travel;
+      if(lastI > firstI) out.rate = travel / ((lastI - firstI) * TICK_MS / 1000);
+    }
+    var ms = 0, mn = 0;
+    for(i = 0; i < samples.length; i++){
+      if(typeof samples[i].m === "number"){ ms += samples[i].m; mn++; }
+    }
+    if(mn > 0) out.moveMean = ms / mn;
+    return out;
+  }
+  function cardinal(deg){
+    var dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    return dirs[Math.round(deg / 45) % 8];
+  }
+  function fmt(x, dp){ return (x === null || x === undefined) ? "—" : x.toFixed(dp); }
+
+  /* fingerprint of the sweep itself: SHA-256 of the canonical sample
+     series, computed here — the machine's HASH & LOG pass, over the
+     wearer's own numbers. FNV-1a fallback, labelled as what it is. */
+  function fingerprint(samples){
+    var parts = [];
+    for(var i = 0; i < samples.length; i++){
+      parts.push(samples[i].i + ":" + (typeof samples[i].h === "number" ? samples[i].h.toFixed(1) : "-"));
+    }
+    var text = "APEX-SWEEP-v3|" + parts.join(",");
+    var bytes = new TextEncoder().encode(text);
     if(window.crypto && crypto.subtle){
-      return crypto.subtle.digest("SHA-256", data).then(function(buf){
-        var hex = Array.prototype.map.call(new Uint8Array(buf), function(b){
-          return ("0"+b.toString(16)).slice(-2); }).join("");
-        return hex;
+      return crypto.subtle.digest("SHA-256", bytes).then(function(buf){
+        return "SHA-256: " + Array.prototype.map.call(new Uint8Array(buf), function(b){
+          return ("0" + b.toString(16)).slice(-2); }).join("");
       });
     }
-    /* fallback: FNV-1a over the same bytes, labelled as what it is */
     var h1 = 0x811c9dc5;
-    for(var i=0;i<data.length;i++){ h1 ^= data[i]; h1 = (h1*0x01000193)>>>0; }
+    for(var j = 0; j < bytes.length; j++){ h1 ^= bytes[j]; h1 = (h1 * 0x01000193) >>> 0; }
     return Promise.resolve("FNV-1a (SHA-256 unavailable in this browser): " +
-      ("0000000"+h1.toString(16)).slice(-8));
+      ("0000000" + h1.toString(16)).slice(-8));
   }
 
-  /* measure the demo image itself: the LARGEST single element formed by
-     pixels brighter than the sky floor (connected-component count over the
-     actual pixels — the treeline, stars and horizon are separate elements
-     and are never silently merged into the one being outlined) */
-  function measure(){
-    var d = srcCtx.getImageData(0,0,W,H).data;
-    var bright = new Uint8Array(W*H), total = 0, i, x, y;
-    for(y=0;y<H;y++) for(x=0;x<W;x++){
-      i = (y*W+x)*4;
-      var lum = 0.2126*d[i] + 0.7152*d[i+1] + 0.0722*d[i+2];
-      if(lum > 110){ bright[y*W+x] = 1; total++; }
+  /* ---------- the scope ---------- */
+  var CX = 160, CY = 156, RAD = 116;
+  function paintDial(now){
+    var col = confColor();
+    ctx.save();
+    ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(CX, CY, RAD, 0, 6.29); ctx.stroke();
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(CX, CY, RAD - 14, 0, 6.29); ctx.stroke();
+    for(var a = 0; a < 360; a += 15){
+      var len = (a % 90 === 0) ? 12 : ((a % 30 === 0) ? 8 : 4);
+      var rr = a * Math.PI / 180;
+      ctx.strokeStyle = (a % 90 === 0) ? col : COL.line; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(CX + (RAD - 2) * Math.sin(rr), CY - (RAD - 2) * Math.cos(rr));
+      ctx.lineTo(CX + (RAD - 2 - len) * Math.sin(rr), CY - (RAD - 2 - len) * Math.cos(rr));
+      ctx.stroke();
     }
-    if(!total) return null;
-    var seen = new Uint8Array(W*H), best = null, stack = [];
-    for(var start=0; start<W*H; start++){
-      if(!bright[start] || seen[start]) continue;
-      var count=0, sx=0, sy=0, minX=W, minY=H, maxX=-1, maxY=-1;
-      stack.length = 0; stack.push(start); seen[start] = 1;
-      while(stack.length){
-        var p = stack.pop(), px = p%W, py = (p/W)|0;
-        count++; sx+=px; sy+=py;
-        if(px<minX)minX=px; if(px>maxX)maxX=px; if(py<minY)minY=py; if(py>maxY)maxY=py;
-        if(px>0   && bright[p-1] && !seen[p-1]){ seen[p-1]=1; stack.push(p-1); }
-        if(px<W-1 && bright[p+1] && !seen[p+1]){ seen[p+1]=1; stack.push(p+1); }
-        if(py>0   && bright[p-W] && !seen[p-W]){ seen[p-W]=1; stack.push(p-W); }
-        if(py<H-1 && bright[p+W] && !seen[p+W]){ seen[p+W]=1; stack.push(p+W); }
-      }
-      if(!best || count > best.count)
-        best = { minX:minX, minY:minY, maxX:maxX, maxY:maxY, count:count,
-          cx: Math.round(sx/count), cy: Math.round(sy/count),
-          w: maxX-minX+1, h: maxY-minY+1 };
+    ctx.font = "800 16px ui-monospace, Menlo, Consolas, monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = col;  ctx.fillText("N", CX, CY - RAD + 30);
+    ctx.fillStyle = COL.dim;
+    ctx.fillText("E", CX + RAD - 30, CY); ctx.fillText("S", CX, CY + RAD - 30);
+    ctx.fillText("W", CX - RAD + 30, CY);
+    var ang, searching = (hdg.state === "searching" || typeof hdg.heading !== "number");
+    if(searching){ ang = ((now / 1000) * 6) % 360; }
+    else { ang = hdg.heading; }
+    var ar = ang * Math.PI / 180;
+    ctx.strokeStyle = col; ctx.lineWidth = 3;
+    if(searching) ctx.setLineDash([7, 6]);
+    ctx.beginPath();
+    ctx.moveTo(CX - 22 * Math.sin(ar), CY + 22 * Math.cos(ar));
+    ctx.lineTo(CX + (RAD - 20) * Math.sin(ar), CY - (RAD - 20) * Math.cos(ar));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(CX, CY, 5, 0, 6.29); ctx.fill();
+    ctx.font = "800 13px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = col;
+    ctx.fillText(searching ? "SEARCHING — NO NORTH ASSERTED" :
+      hdg.state.toUpperCase() + " — " + Math.round(hdg.heading) + "° " + cardinal(hdg.heading),
+      CX, CY + RAD + 22);
+    ctx.restore();
+  }
+  function paintPanel(now, epoch){
+    var x = 308;
+    ctx.save();
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.font = "800 11px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = COL.teal;
+    ctx.fillText("HEADING", x, 48);
+    if(typeof hdg.heading === "number" && hdg.state !== "searching"){
+      ctx.font = "700 46px ui-monospace, Menlo, Consolas, monospace";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(Math.round(hdg.heading) + "°", x, 96);
+      ctx.font = "800 16px ui-monospace, Menlo, Consolas, monospace";
+      ctx.fillStyle = COL.amber;
+      ctx.fillText(cardinal(hdg.heading) + " — by the device's own compass", x, 122);
+    } else {
+      ctx.font = "700 30px ui-monospace, Menlo, Consolas, monospace";
+      ctx.fillStyle = COL.red;
+      ctx.fillText("NO MEASURE", x, 92);
+      ctx.font = "13px ui-monospace, Menlo, Consolas, monospace";
+      ctx.fillStyle = COL.dim;
+      ctx.fillText("no sensor has answered", x, 118);
     }
-    best.total = total;
-    return best;
+    ctx.font = "13px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = COL.dim;
+    ctx.fillText("STATE", x, 152);
+    ctx.fillStyle = confColor();
+    ctx.font = "800 15px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillText(hdg.state.toUpperCase(), x + 58, 152);
+    ctx.font = "13px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = COL.dim;
+    ctx.fillText("SOURCE  " + hdg.source, x, 176);
+    /* the PE clock, drawn: one full cycle, the dot is now */
+    var pe = Math.sin(2 * Math.PI * ((now - epoch) % CYCLE_MS) / CYCLE_MS);
+    ctx.fillText("PE PHASE  " + (pe >= 0 ? "+" : "") + pe.toFixed(2), x, 206);
+    ctx.strokeStyle = COL.violet; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for(var px = 0; px <= 316; px += 4){
+      var ph = Math.sin(2 * Math.PI * px / 316);
+      var py = 232 - ph * 14;
+      if(px === 0) ctx.moveTo(x + px, py); else ctx.lineTo(x + px, py);
+    }
+    ctx.stroke();
+    var frac = ((now - epoch) % CYCLE_MS) / CYCLE_MS;
+    ctx.fillStyle = COL.amber;
+    ctx.beginPath(); ctx.arc(x + frac * 316, 232 - pe * 14, 4, 0, 6.29); ctx.fill();
+    /* sweep progress across the cycle */
+    ctx.fillStyle = COL.dim;
+    ctx.fillText("SWEEP  " + samples.length + " / " + TICKS + " TICKS", x, 278);
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    ctx.strokeRect(x, 288, 316, 10);
+    ctx.fillStyle = COL.teal;
+    ctx.fillRect(x + 1, 289, 314 * Math.min(1, samples.length / TICKS), 8);
+    ctx.restore();
   }
-
-  function drawIndicated(m){
-    showSrc("none");
-    sctx.save();
-    sctx.strokeStyle = "#ffb52e"; sctx.lineWidth = 2.5;
-    sctx.setLineDash([9,6]);
-    sctx.strokeRect(m.minX-8, m.minY-8, m.w+16, m.h+16);
-    sctx.setLineDash([]);
-    sctx.strokeStyle = "#52ff5e"; sctx.lineWidth = 2;
-    sctx.beginPath();
-    sctx.moveTo(m.cx-16, m.cy); sctx.lineTo(m.cx+16, m.cy);
-    sctx.moveTo(m.cx, m.cy-16); sctx.lineTo(m.cx, m.cy+16);
-    sctx.stroke();
-    sctx.beginPath(); sctx.arc(m.cx, m.cy, 10, 0, 6.29); sctx.stroke();
-    sctx.font = "700 15px ui-monospace, Menlo, Consolas, monospace";
-    sctx.fillStyle = "#ffb52e";
-    var label = m.w + " x " + m.h + " px";
-    var lx = Math.min(m.minX, W-150), ly = (m.minY > 34) ? m.minY-16 : m.maxY+30;
-    sctx.fillText(label, lx, ly);
-    sctx.save();
-    sctx.translate(W-118, 52); sctx.rotate(-0.32);
-    sctx.strokeStyle = "#ffb52e"; sctx.lineWidth = 2.5;
-    sctx.strokeRect(-104, -24, 208, 48);
-    sctx.fillStyle = "#ffb52e";
-    sctx.font = "800 21px ui-monospace, Menlo, Consolas, monospace";
-    sctx.textAlign = "center"; sctx.textBaseline = "middle";
-    sctx.fillText("INDICATED — DEMO", 0, 1);
-    sctx.restore();
-    sctx.restore();
-  }
-
-  function run(){
-    if(running) return;
-    running = true; runBtn.disabled = true;
-    resetPasses();
-    var span;
-    span = setPass(0, "on");
-    hashFrame().then(function(hex){
-      span.textContent = "SHA-256 of this frame's pixels, computed in your browser: " + hex;
-      setPass(0, "done");
-      return wait(650);
-    }).then(function(){
-      span = setPass(1, "on");
-      sctx.save(); sctx.fillStyle = "#000"; sctx.fillRect(0,0,W,H);
-      sctx.globalAlpha = 0.55;
-      [[0,0],[2,1],[-2,-1],[1,-2],[-1,2]].forEach(function(o){ sctx.drawImage(src, o[0], o[1]); });
-      sctx.restore();
-      span.textContent = "Five aligned re-lays of the same frame, composited on the stage — a visual pass, the original is untouched.";
-      return wait(800);
-    }).then(function(){
-      setPass(1, "done");
-      span = setPass(2, "on");
-      showSrc("contrast(1.28) saturate(1.35) brightness(1.06)");
-      span.textContent = "Contrast and colour passes drawn on the stage (contrast 1.28, saturate 1.35) — cleaned for the trace, nothing added, nothing removed.";
-      return wait(800);
-    }).then(function(){
-      setPass(2, "done");
-      span = setPass(3, "on");
-      var m = measure();
-      if(!m){
-        span.textContent = "No element in this frame rises above the demo's brightness floor (luminance 110) — the trace finds nothing to outline. That is a measurement of this image, stated plainly.";
-        setPass(3, "done");
-        return null;
-      }
-      span.textContent = "Largest drawn element outlined: box " + m.w + " x " + m.h +
-        " px, centre at (" + m.cx + ", " + m.cy + ") of a " + W + " x " + H + " frame, " +
-        m.count.toLocaleString("en-US") + " pixels in the element (" +
-        m.total.toLocaleString("en-US") + " pixels above the floor in the whole frame).";
-      setPass(3, "done");
-      return m;
-    }).then(function(m){
-      span = setPass(4, "on");
-      return wait(500).then(function(){ return m; });
-    }).then(function(m){
-      if(m){
-        drawIndicated(m);
-        readout.innerHTML =
-          "<span class=\"stamp\">INDICATED — DEMONSTRATION READOUT</span><br>" +
-          "Frame: " + currentLabel + "<br>" +
-          "Element box: " + m.w + " x " + m.h + " px (" +
-            (100*m.w/W).toFixed(1) + "% of frame width, " + (100*m.h/H).toFixed(1) + "% of frame height)<br>" +
-          "Element centre: (" + m.cx + ", " + m.cy + ") px from the top-left<br>" +
-          "Pixels in the element: " + m.count.toLocaleString("en-US") +
-          " — bright pixels in the whole frame: " + m.total.toLocaleString("en-US") + " of " + (W*H).toLocaleString("en-US") + "<br>" +
-          "These numbers were counted from the demo image's own pixels, in your browser. " +
-          "They describe the demo image — a drawing, or a copy of your image on this device — " +
-          "and make no finding about any real object. The real read is the station's, by email.";
+  function paintTrace(){
+    var x0 = 16, x1 = 624, yTop = 322, yBot = 382;
+    ctx.save();
+    ctx.font = "800 11px ui-monospace, Menlo, Consolas, monospace";
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = COL.teal;
+    ctx.fillText("SWEEP TRACE — YOUR HEADING, TICK BY TICK (DRAWN FROM YOUR OWN SAMPLES)", x0, 314);
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    ctx.strokeRect(x0, yTop, x1 - x0, yBot - yTop);
+    ctx.strokeStyle = "rgba(29,58,68,.55)";
+    [90, 180, 270].forEach(function(hh){
+      var gy = yBot - (hh / 360) * (yBot - yTop);
+      ctx.beginPath(); ctx.moveTo(x0, gy); ctx.lineTo(x1, gy); ctx.stroke();
+    });
+    function xFor(i){ return x0 + 8 + i * ((x1 - x0 - 16) / (TICKS - 1)); }
+    function yFor(h){ return yBot - 4 - (h / 360) * (yBot - yTop - 8); }
+    ctx.strokeStyle = COL.cyan; ctx.lineWidth = 2;
+    ctx.beginPath();
+    var pen = false;
+    for(var i = 0; i < samples.length; i++){
+      var s = samples[i];
+      if(typeof s.h === "number"){
+        if(pen) ctx.lineTo(xFor(s.i), yFor(s.h)); else { ctx.moveTo(xFor(s.i), yFor(s.h)); pen = true; }
+      } else { pen = false; }
+    }
+    ctx.stroke();
+    for(var j = 0; j < samples.length; j++){
+      var q = samples[j];
+      if(typeof q.h === "number"){
+        ctx.fillStyle = COL.teal;
+        ctx.beginPath(); ctx.arc(xFor(q.i), yFor(q.h), 2.4, 0, 6.29); ctx.fill();
       } else {
-        readout.innerHTML =
-          "<span class=\"stamp\">INDICATED — DEMONSTRATION READOUT</span><br>" +
-          "The trace pass found no element above the demo's brightness floor in this frame. " +
-          "Stated plainly, as the station would state it. The real read is the station's, by email.";
+        ctx.fillStyle = COL.red;
+        ctx.fillRect(xFor(q.i) - 1, yBot - 4, 2, 4);
       }
-      readout.classList.add("show");
-      setPass(4, "done");
-      running = false; runBtn.disabled = false;
-    }).catch(function(err){
-      readout.innerHTML = "The demonstration stopped on an error in your browser: " + err.message +
-        " — nothing was sent anywhere. The real read is the station's, by email.";
-      readout.classList.add("show");
-      running = false; runBtn.disabled = false;
-    });
+    }
+    if(running && samples.length > 0 && samples.length < TICKS){
+      ctx.strokeStyle = COL.amber; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xFor(samples.length - 1), yTop); ctx.lineTo(xFor(samples.length - 1), yBot);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  var epoch = Date.now();
+  function paint(){
+    var now = Date.now();
+    ageStack(now);
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+    paintDial(now);
+    paintPanel(now, epoch);
+    paintTrace();
+    syncTiles();
+    requestAnimationFrame(paint);
   }
 
-  document.querySelectorAll("[data-sample]").forEach(function(btn){
-    btn.addEventListener("click", function(){
-      document.querySelectorAll("[data-sample]").forEach(function(b){ b.setAttribute("aria-pressed","false"); });
-      btn.setAttribute("aria-pressed","true");
-      drawSample(parseInt(btn.getAttribute("data-sample"), 10));
-    });
-  });
-  function loadOwn(file){
-    if(!file) return;
-    var url = URL.createObjectURL(file);
-    var img = new Image();
-    img.onload = function(){
-      srcCtx.fillStyle = "#000"; srcCtx.fillRect(0,0,W,H);
-      var s = Math.min(W/img.width, H/img.height);
-      var dw = Math.round(img.width*s), dh = Math.round(img.height*s);
-      srcCtx.drawImage(img, Math.round((W-dw)/2), Math.round((H-dh)/2), dw, dh);
-      URL.revokeObjectURL(url);
-      document.querySelectorAll("[data-sample]").forEach(function(b){ b.setAttribute("aria-pressed","false"); });
-      currentLabel = "YOUR OWN FRAME — \"" + file.name + "\" (read on this device only; a scaled copy is what the demo measures)";
-      showSrc("none");
-      frameName.textContent = "Frame loaded: " + currentLabel;
-      resetPasses();
-    };
-    img.src = url;
+  /* ---------- tiles: numbers that move because the input moves ---------- */
+  var lastTileText = {};
+  function setTile(el, text){
+    if(lastTileText[el.id] !== text){ el.textContent = text; lastTileText[el.id] = text; }
   }
-  fileIn.addEventListener("change", function(){ loadOwn(fileIn.files[0]); });
-  ["dragover","dragleave","drop"].forEach(function(ev){
-    stageWrap.addEventListener(ev, function(e){
-      e.preventDefault();
-      stageWrap.style.borderColor = (ev==="dragover") ? "#ffb52e" : "";
-      if(ev==="drop" && e.dataTransfer.files.length) loadOwn(e.dataTransfer.files[0]);
+  function syncTiles(){
+    if(typeof hdg.heading === "number" && hdg.state !== "searching"){
+      setTile(elHeading, Math.round(hdg.heading) + "°");
+      setTile(elCardinal, cardinal(hdg.heading) + " — live from this device");
+    } else {
+      setTile(elHeading, "—");
+      setTile(elCardinal, "no measure");
+    }
+    setTile(elState, hdg.state.toUpperCase());
+    elState.className = "v swpState " + hdg.state;
+    setTile(elSource, hdg.source);
+    setTile(elSamples, samples.length + " / " + TICKS);
+    var st = computeStats(samples);
+    setTile(elTravel, st.travel === null ? "—" : Math.round(st.travel) + "°");
+    setTile(elRate, st.rate === null ? "—" : st.rate.toFixed(1) + "°/s");
+    setTile(elStability, (st.n >= 3 && st.stability !== null) ? st.stability.toFixed(0) + "%" : "—");
+  }
+  function setStatus(){
+    var compass = hdg.state === "searching" ? "compass: no answer" : "compass: " + hdg.state;
+    var motion = motionLive ? "motion: answering" : "motion: no answer yet";
+    var geo = geoFix ? "position: fix held" : "position: no fix";
+    statusEl.textContent = (running ? "Sweep running. " : "Sweep idle. ") +
+      "Sensors — " + compass + " · " + motion + " · " + geo + ".";
+  }
+
+  /* ---------- the sweep ---------- */
+  var samples = [], running = false, timer = null;
+  function tick(){
+    samples.push({ i:samples.length,
+                   h:(hdg.state !== "searching" && typeof hdg.heading === "number") ? hdg.heading : null,
+                   m:latestMove });
+    setStatus();
+    if(samples.length >= TICKS) endSweep(false);
+  }
+  function askPerms(){
+    var ps = [];
+    try{
+      if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function")
+        ps.push(DeviceOrientationEvent.requestPermission().then(function(){}, function(){}));
+      if(window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function")
+        ps.push(DeviceMotionEvent.requestPermission().then(function(){}, function(){}));
+    }catch(e){}
+    return Promise.all(ps);
+  }
+  function startSweep(){
+    samples = [];
+    epoch = Date.now();
+    running = true;
+    runBtn.textContent = "STOP SWEEP";
+    readout.classList.remove("show"); readout.innerHTML = "";
+    startGeo();
+    tick();
+    timer = setInterval(tick, TICK_MS);
+    setStatus();
+  }
+  function endSweep(partial){
+    if(timer){ clearInterval(timer); timer = null; }
+    running = false;
+    stopGeo();
+    runBtn.textContent = "BEGIN SWEEP";
+    var st = computeStats(samples);
+    var frozen = samples.slice();
+    setStatus();
+    fingerprint(frozen).then(function(fp){
+      var lines = [];
+      if(st.n > 0){
+        lines.push("<span class=\"stamp\">SWEEP CONVERTED — DEMONSTRATION READOUT</span><br>");
+        lines.push("Sweep: " + st.total + " ticks on the PE beat (369 ms)" +
+          (partial ? ", stopped early by hand" : ", one full 11 s cycle") +
+          " — " + st.n + " ticks measured, " + (st.total - st.n) + " no-measure.<br>");
+        lines.push("Mean heading: " + Math.round(st.mean) + "° (" + cardinal(st.mean) + ")" +
+          " · Stability: " + st.stability.toFixed(0) + "%" +
+          " (circular deviation " + st.circDev.toFixed(0) + "°)<br>");
+        lines.push(st.travel === null
+          ? "Travel: no two measured ticks in a row — NO MEASURE.<br>"
+          : "Total travel: " + Math.round(st.travel) + "°" +
+            (st.rate === null ? "" : " · Sweep rate: " + st.rate.toFixed(1) + "°/s over the measured span") + "<br>");
+        lines.push(st.moveMean === null
+          ? "Movement: the motion sensor offered no samples this sweep.<br>"
+          : "Movement: mean " + st.moveMean.toFixed(2) + " m/s² from rest, from the motion sensor.<br>");
+        lines.push(geoFix
+          ? "Position fix during the sweep: " + geoFix.lat.toFixed(4) + ", " + geoFix.lon.toFixed(4) +
+            " (±" + Math.round(geoFix.acc) + " m) — read on this device, kept nowhere.<br>"
+          : "Position: no fix during the sweep.<br>");
+      } else {
+        lines.push("<span class=\"stamp\">SWEEP COMPLETE — NO MEASURE</span><br>");
+        lines.push("The sweep ran its " + st.total + " ticks and this device's sensors never " +
+          "answered with a heading. Nothing is invented to fill the gap: the needle searched, " +
+          "and that is the whole of the read. On a device whose compass answers — a phone, " +
+          "a watch — the same sweep converts.<br>");
+      }
+      lines.push("Sweep fingerprint (" + fp + ")<br>");
+      lines.push("Converted here, from this device's own samples, by the measurement code in " +
+        "this face. No call was made to the station's VM and nothing left this device. " +
+        "The full examination of footage is the email station's work.");
+      readout.innerHTML = lines.join("");
+      readout.classList.add("show");
     });
+  }
+  runBtn.addEventListener("click", function(){
+    if(running){ endSweep(true); return; }
+    askPerms().then(startSweep);
   });
-  runBtn.addEventListener("click", run);
-  drawSample(0);
+  setStatus();
+  requestAnimationFrame(paint);
 })();
 </script>
 </body>
