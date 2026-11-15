@@ -19,18 +19,12 @@
   #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
   /* v2.2 — DIV SPACING HALVED (owner order): layout gap 26px -> 13px,
      layout vertical padding 28px/64px -> 14px/32px (horizontal 18px kept) */
-  .layout{position:relative;z-index:1;display:flex;gap:13px;align-items:flex-start;
+  .layout{position:relative;z-index:1;display:flex;gap:13px;align-items:flex-start;justify-content:center;
     max-width:1240px;margin:0 auto;padding:14px 18px 32px}
   main{position:relative;flex:1 1 860px;min-width:0;max-width:860px}
-  .samples{flex:0 1 320px;min-width:260px}
-  .samples h3{font-size:17px;margin:0 0 8px;color:var(--cyan);letter-spacing:.02em}
-  .runpasses{list-style:none;padding:0;margin:0 0 8px;
-    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
-  .runpasses li{padding:3px 0 3px 8px;border-left:3px solid var(--line);margin:0 0 4px;font-size:12.5px}
   @media (max-width:1023px){
     .layout{flex-direction:column}
     main{width:100%;margin:0 auto}
-    .samples{flex:none;width:100%;max-width:860px;margin:0 auto}
   }
   /* GLASS BACK-PANELS (v2): each card is a sliding reflective glass panel that
      floats over the live sky. The GLASS IS THE FRAME, NEVER THE WRITING
@@ -344,78 +338,6 @@
     <p class="fine">Coming soon means coming soon: no stock is claimed and no price is printed until the parts list and the drop-ship lane are measured and real.</p>
   </div></section>
 </main>
-
-
-<aside class="samples" aria-label="Sample runs">
-  <section class="card"><div class="plate">
-    <h2 class="gold">SAMPLE RUNS — OUR OWN MEDIA THROUGH THIS STATION</h2>
-    <p class="fine">Runs of record — November 2026.</p>
-    <p>Sample runs on the station's own media. Your media is examined the same way — and destroyed after delivery.</p>
-  </div></section>
-  <section class="card"><div class="plate">
-    <h3>Disc</h3>
-    <ul class="runpasses">
-      <li>FULL-RES MASTER READ</li>
-      <li>SCENE RECONSTRUCTION</li>
-      <li>ARTIFACT CENSUS</li>
-      <li>MEASUREMENT</li>
-      <li>ANNOTATED PLATE</li>
-    </ul>
-    <p class="fine">Annotated plate delivered — run of record, November 2, 2026.</p>
-
-  </div></section>
-  <section class="card"><div class="plate">
-    <h3>Tree</h3>
-    <ul class="runpasses">
-      <li>INTAKE + HASH</li>
-      <li>STACK &amp; REFINE</li>
-      <li>TRACE / OUTLINE</li>
-      <li>PARALLAX PAIR</li>
-    </ul>
-    <p class="fine">Findings kit delivered — hashed + logged.</p>
-
-  </div></section>
-  <section class="card"><div class="plate">
-    <h3>Yard Arc</h3>
-    <ul class="runpasses">
-      <li>INTAKE + HASH</li>
-      <li>STACK &amp; REFINE</li>
-      <li>TRACE / OUTLINE</li>
-      <li>PARALLAX PAIR</li>
-    </ul>
-    <p class="fine">Findings kit delivered — hashed + logged.</p>
-  </div></section>
-  <section class="card"><div class="plate">
-    <h3>Jun 4 Night Sequence</h3>
-    <ul class="runpasses">
-      <li>INTAKE + HASH</li>
-      <li>STACK &amp; REFINE</li>
-      <li>TRACE / OUTLINE</li>
-      <li>PARALLAX PAIR</li>
-    </ul>
-    <p class="fine">Findings kit delivered — hashed + logged.</p>
-  </div></section>
-  <section class="card"><div class="plate">
-    <h3>Seccam — Mom's Yard</h3>
-    <ul class="runpasses">
-      <li>INTAKE + HASH</li>
-      <li>STACK &amp; REFINE</li>
-      <li>TRACE / OUTLINE</li>
-      <li>PARALLAX PAIR</li>
-    </ul>
-    <p class="fine">Findings kit delivered — hashed + logged.</p>
-  </div></section>
-  <section class="card"><div class="plate">
-    <h3>Night Foliage</h3>
-    <ul class="runpasses">
-      <li>INTAKE + HASH</li>
-      <li>STACK &amp; REFINE</li>
-      <li>TRACE / OUTLINE</li>
-      <li>PARALLAX PAIR</li>
-    </ul>
-    <p class="fine">Findings kit delivered — hashed + logged.</p>
-  </div></section>
-</aside>
 </div>
 
 <footer>I Saw A UAP — a private photo &amp; film examination station. Apex Air Solutions · The front door for isawauap.com.</footer>
