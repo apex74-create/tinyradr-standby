@@ -55,7 +55,7 @@
       "key": "signal-scope-v4",
       "note": "Signal Scope V4 - the face that listens to the watch: bios column reads only what a real hook returns, honest blanks otherwise. Distinct from the seeded signal-scope entry, which is the V2 file.",
       "path": "/faces/signal-scope-v4.html",
-      "sha256": "3d01879ebe49fee55f5aa21d1c7ffb05f5c9eacd31918e0b988e21219d0b1877",
+      "sha256": "af63fd61a39f8fe79269ec0989f73234e199ea6777971e00210f9263aa346920",
       "source": "00-visual-stack-02-signal-scope-v4.html",
       "title": "APEX — Signal Watch · SIGNAL SCOPE V4",
       "version": "v4"
@@ -65,7 +65,7 @@
       "key": "machinery-clock-square",
       "note": "The Machinery Clock SQUARE edition: clock and falling digits on top, Pulse and Volley columns at the sides, motor centre, founding strip on the bottom edge.",
       "path": "/faces/machinery-clock-square.html",
-      "sha256": "a202e9fff58cdaea089f1d42819e7a126e98ff3c337534172e33e42001873c6c",
+      "sha256": "113031adbcb1c4069a5d862c814148ba8c6af36cb806042e5552c80c6621900b",
       "source": "00-visual-stack-10-machinery-clock-square.html",
       "title": "Apex Service Machinery Clock — SQUARE",
       "version": "v1"
@@ -265,7 +265,7 @@
       "key": "isawauap-v2-1-glass",
       "note": "UAP vault glass build V2.1, landed from the staged Nov 9 line.",
       "path": "/faces/isawauap-v2-1-glass.html",
-      "sha256": "5775585438e957d11cb9865d2177a81e133c5c666a2e5742589dd0c08f3fbf86",
+      "sha256": "8c26d018e7418bf9a893073ab7c1f4d239b57b692418ada67cff233decd30c73",
       "source": "isawauap-v2-1-glass-2026-11-09.html",
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "version": "v2.1"
@@ -275,7 +275,7 @@
       "key": "isawauap-v2-2-milkyway",
       "note": "UAP vault milkyway build V2.2, landed from the staged Nov 9 line.",
       "path": "/faces/isawauap-v2-2-milkyway.html",
-      "sha256": "0e15e990817aaf32a998ad44f9e788a1371b1791ce00eb25aad8351dfc43a30c",
+      "sha256": "2243c9119cfa12a34e8e9dcee71c0b78c37f14b802bde7a2395ab371d04322df",
       "source": "isawauap-v2-2-milkyway-2026-11-09.html",
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "version": "v2.2"
@@ -285,7 +285,7 @@
       "key": "isawauap-v2-3-tree-evidence",
       "note": "UAP tree-evidence build V2.3 (evidence assets embedded in the single file), landed from the staged Nov 9 line.",
       "path": "/faces/isawauap-v2-3-tree-evidence.html",
-      "sha256": "565af00749c8153658c4eb849bc0bedbb77bb00e43feebcfa78ec331372329fb",
+      "sha256": "ec1559c7c5d0288715364cf9e8a35c9cdd5a5d1b86070e1a83179f36356b11b1",
       "source": "isawauap-v2-3-tree-evidence-2026-11-09.html",
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "version": "v2.3"
@@ -295,7 +295,7 @@
       "key": "isawauap-v2-4-spacing-evidencefix",
       "note": "UAP evidence build V2.4 (spacing fix), landed from the staged Nov 9 line.",
       "path": "/faces/isawauap-v2-4-spacing-evidencefix.html",
-      "sha256": "e45ba95336b405c3b892ec6b46732d510c5f4c64202ea92ca5a54b062c4bfbe0",
+      "sha256": "9b4b4558af9da77e2360e5c43019a6a0f17260d890c20082d2eb0c5835bb7974",
       "source": "isawauap-v2-4-spacing-evidencefix-2026-11-09.html",
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "version": "v2.4"
@@ -375,7 +375,7 @@
       "key": "lighthouse",
       "note": "Lighthouse face from the visual stack, landed for the shelf.",
       "path": "/faces/lighthouse.html",
-      "sha256": "7c04c9f881d009a9aeb34557aae1c8729a7d35e814ce17d58e8115a709f4ac24",
+      "sha256": "d4058760afd19dcadf56971abd5a2feefed1ce45dbfe102bd15d1b14b3c448e2",
       "source": "00-visual-stack-09-lighthouse.html",
       "title": "The Provability Lighthouse — Wave 1: The Provenance Stack",
       "version": "v1"

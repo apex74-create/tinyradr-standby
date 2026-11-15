@@ -33,7 +33,7 @@
       "apkSha256": "67af2cd35ecdde02bbbd6b80f07292e82903db5ac9d4260deec4d5f6616df641",
       "apkSizeBytes": 33233,
       "facePath": "/faces/signal-scope-v4.html",
-      "faceSha256": "3d01879ebe49fee55f5aa21d1c7ffb05f5c9eacd31918e0b988e21219d0b1877",
+      "faceSha256": "af63fd61a39f8fe79269ec0989f73234e199ea6777971e00210f9263aa346920",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -52,7 +52,7 @@
       "apkSha256": "cca21c83f3cd17258a7590a36fe9c4654fb81b03383122381281b380eca5c23a",
       "apkSizeBytes": 3178577,
       "facePath": "/faces/machinery-clock-square.html",
-      "faceSha256": "a202e9fff58cdaea089f1d42819e7a126e98ff3c337534172e33e42001873c6c",
+      "faceSha256": "113031adbcb1c4069a5d862c814148ba8c6af36cb806042e5552c80c6621900b",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -607,7 +607,7 @@
       "apkSha256": "8135f8d4e1301b253e0949c9fbbc8960ff8af806e52da06cb9389a73340c283b",
       "apkSizeBytes": 25041,
       "facePath": "/faces/isawauap-v2-1-glass.html",
-      "faceSha256": "5775585438e957d11cb9865d2177a81e133c5c666a2e5742589dd0c08f3fbf86",
+      "faceSha256": "8c26d018e7418bf9a893073ab7c1f4d239b57b692418ada67cff233decd30c73",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -626,7 +626,7 @@
       "apkSha256": "9dc827ad300b9e1a1662c5b5317362e81b8aa6d2b6210688421b0bd895a50b27",
       "apkSizeBytes": 25041,
       "facePath": "/faces/isawauap-v2-2-milkyway.html",
-      "faceSha256": "0e15e990817aaf32a998ad44f9e788a1371b1791ce00eb25aad8351dfc43a30c",
+      "faceSha256": "2243c9119cfa12a34e8e9dcee71c0b78c37f14b802bde7a2395ab371d04322df",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -645,7 +645,7 @@
       "apkSha256": "4c9443ae95b59fe5a852d64b84ae6acf0708fcccec2ec51d758250f585e75c09",
       "apkSizeBytes": 754129,
       "facePath": "/faces/isawauap-v2-3-tree-evidence.html",
-      "faceSha256": "565af00749c8153658c4eb849bc0bedbb77bb00e43feebcfa78ec331372329fb",
+      "faceSha256": "ec1559c7c5d0288715364cf9e8a35c9cdd5a5d1b86070e1a83179f36356b11b1",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -664,7 +664,7 @@
       "apkSha256": "7aaac5c22de01ca48acfd74b17c5e99ae63d6ddf126a924bcf68e5e15e0584e7",
       "apkSizeBytes": 946641,
       "facePath": "/faces/isawauap-v2-4-spacing-evidencefix.html",
-      "faceSha256": "e45ba95336b405c3b892ec6b46732d510c5f4c64202ea92ca5a54b062c4bfbe0",
+      "faceSha256": "9b4b4558af9da77e2360e5c43019a6a0f17260d890c20082d2eb0c5835bb7974",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -819,7 +819,7 @@
       "apkSha256": "5097c3c2b41df8f57812c216a9503cdb2e636cbc349818f83219f66ebed6f81b",
       "apkSizeBytes": 20945,
       "facePath": "/faces/lighthouse.html",
-      "faceSha256": "7c04c9f881d009a9aeb34557aae1c8729a7d35e814ce17d58e8115a709f4ac24",
+      "faceSha256": "d4058760afd19dcadf56971abd5a2feefed1ce45dbfe102bd15d1b14b3c448e2",
       "priceUsd": 9.99,
       "functions": [
         "clock"

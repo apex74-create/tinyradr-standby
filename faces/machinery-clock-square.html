@@ -810,6 +810,13 @@ function frame(){
   drawClocks(el, nowMs);
   requestAnimationFrame(frame);
 }
+/* The banner clock also paints from a plain timer, not only from
+   animation frames: in throttled embeds (the catalogue preview, watch
+   webviews) requestAnimationFrame may never fire, which left this
+   readout frozen at --:--:-- while the interval-driven faces ticked.
+   drawClock guards itself to one paint per second. */
+drawClock(detroitNow());
+setInterval(function(){ drawClock(detroitNow()); }, 250);
 requestAnimationFrame(frame);
 </script>
 </body>
