@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-NZYk81nU.js";import{t}from"./AnomalyStation-Dn5AqbfU.js";var n=e(),r=()=>(0,n.jsx)(t,{edition:`ghost`});export{r as component};
