@@ -125,6 +125,60 @@
   //     phosphor-green line geometry, bloom on lit elements, the eyes
   //     bloom hardest) hovers in the background layer. Atmosphere lives
   //     on the fox layer only; the instruments stay crisp.
+  //
+  // V6 / TRUTH FIX (Nov 15, 2026, owner field charge: "word render
+  // overlap on signal scope version four — false data. Observation
+  // generated in a document object model. Law violation." — graded
+  // against his Nov 10 + Nov 13 rulings and the Nov 15 restatements):
+  //   * MOTION IS A CLAIM (owner, Nov 15): a running trace asserts a
+  //     live feed. Every animated element now binds to a real source,
+  //     runs as a DECLARED simulation (the SIM flag), or HOLDS STILL
+  //     at its honest state. The V5 LOCAL rung failed this test: its
+  //     metronome comb scrolled and its heart swelled with NO source
+  //     bound — movement dressed as a heartbeat. The comb is GONE.
+  //   * THE BEAT LADDER is now BIO -> AP PING -> FACTORY -> TICK:
+  //       BIO     — real HR (as V5). The heart is a heart.
+  //       AP PING — the ROUTER HEARTBEAT (owner, Nov 15): beats are
+  //                 real ping answers from the connected access point
+  //                 (ApexPing bridge / ApexNet.pingMs); the wearer sees
+  //                 the AP is alive because it keeps answering. The
+  //                 marker is a radio pip, never a heart.
+  //       FACTORY — the company heartbeat (owner's settled fallback:
+  //                 "the heartbeat of the Chevrolet"), labeled.
+  //       TICK    — no beat source answers: the strip HOLDS STILL —
+  //                 flat line + the words TICK · NO HEARTBEAT FEED.
+  //                 A tick never wears the heartbeat costume.
+  //   * THE GATE STATE WAVEFORM (owner, Nov 15): when no RF snapshot
+  //     is fresh but a ping series is bound, the bottom strip draws
+  //     THAT series — ping RTT history — labeled GATE with its RTT
+  //     (distance-to hint) and jitter (stability) printed. A waveform
+  //     with a source at last; unbound, it holds still (NO FEED).
+  //   * THE SWEEP PARKS: with no RF feed the needle rests at the top
+  //     and no wedge turns — a turning sweep over an empty dial
+  //     asserts a listening watch that is not listening (Nov 10:
+  //     "presence theatre"). It turns again when a snapshot binds.
+  //   * BOTTOM BAND REBUILT: the strips, button, and scope are now
+  //     ONE MEASURED STACK — strip heights are read from the laid-out
+  //     DOM and the scope shrinks to fit what remains, so wrapped
+  //     words can never stack onto the button or each other again
+  //     (the V5 fixed-offset stack collapsed at real widths). The
+  //     bios column starts below the clock block, and the beat
+  //     marker moved to the right cluster, under its source label —
+  //     out of the bios column's way.
+  //   * TABLE SERVICE (owner, Nov 15) + THE LOKMAT STANDARD: power
+  //     discipline WITHOUT thinning the data. Ingest is served in
+  //     full-quality timed services on ONE 1 s service timer (was:
+  //     250 ms tick + 500 ms reads + 500 ms scan + 700 ms hunt, all
+  //     free-running, all awake while hidden). Prepare the plate,
+  //     serve the meal at full quality, remove the plate, clean it,
+  //     invite back — ad infinitum. Draw loops STOP when hidden
+  //     (they no longer re-queue into the dark); still states are
+  //     drawn once per service instead of 60x/s; the factory fetch
+  //     backs off while unanswered. When the face closes, its own
+  //     code has already stopped everything — the device optimizer
+  //     should find nothing to forgive. (His warning, verbatim, for
+  //     the alternative: continuous grazing gets you "a fat baby
+  //     with a bad attitude that don't fit in nothing.")
   var stage = document.getElementById('stage');
   var fallEl = document.getElementById('fall');
   var cv = document.getElementById('scope');
@@ -186,9 +240,50 @@
     fxv.style.width = W + 'px'; fxv.style.height = H + 'px';
     fxv.style.left = '0px'; fxv.style.top = '0px';
     var vg = document.querySelector('.vignette'); vg.style.width = W + 'px'; vg.style.height = H + 'px';
-    var D = Math.floor(Math.min(W, H) * 0.94);
+    // ================================================================
+    // THE BOTTOM STACK, MEASURED (V6 truth fix). V5 positioned the
+    // strips, the button, and the scope from independent fixed
+    // offsets; at real widths the strips wrap taller than the
+    // offsets assumed and the words stack onto the button and each
+    // other (owner's field charge, Nov 15, 2026). Now the stack is
+    // built bottom-up from MEASURED heights: fonts are set first,
+    // the laid-out strip heights are read back from the DOM, the
+    // button is placed above them, and the scope is sized to fit
+    // the stage that remains. Wrapped words make the stack taller
+    // and the scope smaller — they can never overlap again.
+    // ================================================================
+    var M = Math.min(W, H);
+    var stripFont = Math.max(9, Math.min(13, Math.floor(H * 0.020)));
+    var strip1 = document.querySelector('.strip');
+    var strip2 = document.getElementById('strip2');
+    strip1.style.fontSize = stripFont + 'px'; strip1.style.lineHeight = '1.35';
+    strip2.style.fontSize = stripFont + 'px'; strip2.style.lineHeight = '1.35';
+    var gap = Math.max(4, Math.floor(H * 0.008));
+    var botM = Math.floor(H * 0.012);
+    var s1h = strip1.offsetHeight, s2h = strip2.offsetHeight;
+    strip1.style.bottom = botM + 'px';
+    strip2.style.bottom = (botM + s1h + gap) + 'px';
+    var inv = document.getElementById('invbtn');
+    var invW = Math.floor(M * 0.46), invH = Math.max(30, Math.floor(M * 0.058));
+    var stackTop = H - (botM + s1h + gap + s2h + gap + invH);
+    inv.style.width = invW + 'px'; inv.style.height = invH + 'px';
+    inv.style.lineHeight = invH + 'px';
+    inv.style.left = Math.floor(W / 2 - invW / 2) + 'px';
+    inv.style.top = stackTop + 'px';
+    inv.style.fontSize = Math.max(10, Math.floor(M * 0.030)) + 'px';
+    // corner fox mark: bottom-right, decorative only (pointer-events
+    // none in CSS), its foot aligned with the button's foot.
+    var fm = document.getElementById('foxmark');
+    var fms = Math.floor(M * 0.115);
+    fm.style.width = fms + 'px'; fm.style.height = fms + 'px';
+    fm.style.left = Math.floor(W - W * 0.03 - fms) + 'px';
+    fm.style.top = (stackTop + invH - fms) + 'px';
+    fm.innerHTML = foxSVG();
+    // The scope lives in the stage ABOVE the stack.
+    var availH = stackTop - Math.floor(H * 0.012);
+    var D = Math.floor(Math.min(W * 0.94, availH * 0.98));
     R = Math.floor(D / 2);
-    CX = Math.floor(W / 2); CY = Math.floor(H / 2);
+    CX = Math.floor(W / 2); CY = Math.floor(availH / 2) + Math.floor(H * 0.006);
     cv.width = D; cv.height = D;
     cv.style.width = D + 'px'; cv.style.height = D + 'px';
     cv.style.left = (CX - R) + 'px'; cv.style.top = (CY - R) + 'px';
@@ -198,7 +293,7 @@
     pv.style.width = PW + 'px'; pv.style.height = PH + 'px';
     pv.style.left = '0px';
     pv.style.top = Math.floor(CY - PH / 2) + 'px';
-    // frequency strip: along the BOTTOM, above the honesty strip
+    // frequency strip: along the BOTTOM of the dial, above the stack
     FW = Math.floor(D * 0.92); FH = Math.floor(D * 0.10);
     fv.width = FW; fv.height = FH;
     fv.style.width = FW + 'px'; fv.style.height = FH + 'px';
@@ -215,8 +310,8 @@
     batt.style.fontSize = Math.max(11, Math.floor(D * 0.042)) + 'px';
     var clock = document.getElementById('clock');
     clock.style.left = '0px'; clock.style.width = W + 'px';
-    clock.style.top = Math.floor(CY - D * 0.36) + 'px';
-    clock.style.fontSize = Math.floor(D * 0.145) + 'px';
+    clock.style.top = Math.floor(CY - D * 0.35) + 'px';
+    clock.style.fontSize = Math.floor(D * 0.135) + 'px';
     var date = document.getElementById('date');
     date.style.left = '0px'; date.style.width = W + 'px';
     date.style.top = Math.floor(CY - D * 0.225) + 'px';
@@ -225,41 +320,26 @@
     wx.style.left = '0px'; wx.style.width = W + 'px';
     wx.style.top = Math.floor(CY - D * 0.175) + 'px';
     wx.style.fontSize = Math.max(10, Math.floor(D * 0.034)) + 'px';
-    // bios column: down the LEFT edge, stacked small mono readouts
+    // bios column: down the LEFT edge — but it starts BELOW the
+    // clock/date/wx block (V6: in V5 it started at CY-0.33D and its
+    // first rows rendered under the clock's glyphs at watch widths).
     var bios = document.getElementById('bios');
     bios.style.left = Math.floor(W * 0.035) + 'px';
-    bios.style.top = Math.floor(CY - D * 0.33) + 'px';
-    bios.style.width = Math.floor(D * 0.40) + 'px';
-    bios.style.fontSize = Math.max(9, Math.floor(D * 0.031)) + 'px';
-    bios.style.lineHeight = '1.5';
+    bios.style.top = Math.floor(CY - D * 0.175 + Math.max(10, Math.floor(D * 0.034)) + D * 0.022) + 'px';
+    bios.style.width = Math.floor(D * 0.50) + 'px';
+    bios.style.fontSize = Math.max(9, Math.floor(D * 0.028)) + 'px';
+    bios.style.lineHeight = '1.42';
+    // mode line: its own uncontested row BETWEEN the freq strip
+    // and the button stack (V6). Inside the dial it fought the
+    // bios column's growth; below the strip nothing else lives.
+    // The indication must stay legible — a beat-source label
+    // buried in stacked words is not indicated (owner, Nov 15).
     var mode = document.getElementById('mode');
     mode.style.left = '0px'; mode.style.width = W + 'px';
-    mode.style.top = Math.floor(CY + D * 0.235) + 'px';
+    mode.style.top = (Math.floor(CY + D * 0.335) + FH + Math.floor(D * 0.016)) + 'px';
+    mode.style.bottom = 'auto';
     mode.style.fontSize = Math.max(10, Math.floor(D * 0.030)) + 'px';
-    // INVESTIGATE toggle: a real button, ABOVE the bottom no-fly band —
-    // its lower edge keeps a clear margin over the strips + Android nav.
-    var inv = document.getElementById('invbtn');
-    var invW = Math.floor(D * 0.46), invH = Math.max(28, Math.floor(D * 0.058));
-    inv.style.width = invW + 'px'; inv.style.height = invH + 'px';
-    inv.style.lineHeight = invH + 'px';
-    inv.style.left = Math.floor(CX - invW / 2) + 'px';
-    inv.style.top = Math.floor(H - H * 0.112 - invH) + 'px';
-    inv.style.fontSize = Math.max(10, Math.floor(D * 0.030)) + 'px';
-    // corner fox mark: bottom-right, decorative only (pointer-events
-    // none in CSS), lifted clear of the same no-fly margin.
-    var fm = document.getElementById('foxmark');
-    var fms = Math.floor(Math.min(W, H) * 0.115);
-    fm.style.width = fms + 'px'; fm.style.height = fms + 'px';
-    fm.style.left = Math.floor(W - W * 0.03 - fms) + 'px';
-    fm.style.top = Math.floor(H - H * 0.112 - fms) + 'px';
-    fm.innerHTML = foxSVG();
-    var strip = document.querySelector('.strip');
-    strip.style.fontSize = Math.max(9, Math.floor(H * 0.020)) + 'px';
-    strip.style.bottom = Math.floor(H * 0.014) + 'px';
-    var strip2 = document.getElementById('strip2');
-    strip2.style.fontSize = Math.max(9, Math.floor(H * 0.020)) + 'px';
-    // strip1 wraps to two lines at handset widths — strip2 must clear BOTH
-    strip2.style.bottom = Math.floor(H * 0.014 + H * 0.056) + 'px';
+    mode.style.lineHeight = '1.3';
     built = true;
     buildFall();
   }
@@ -516,7 +596,7 @@
   }
   function drawScope(now) {
     if (!built) return;
-    if (document.hidden) { requestAnimationFrame(drawScope); return; } // sleep when unobserved (V12 law)
+    if (document.hidden) { RUN.scope = false; return; } // LOKMAT STANDARD: the loop STOPS in the dark; it does not re-queue
     drawFox(now);
     var d = R * 2, c = R; // canvas-local center
     ctx.clearRect(0, 0, d, d);
@@ -569,9 +649,14 @@
     // stays one turn per 4s (90 deg/s); stalled frames cost at most 50ms.
     if (sweepPrev < 0) sweepPrev = performance.now();
     else { var sd = performance.now() - sweepPrev; sweepNow += sd > 500 ? 16.7 : Math.min(50, Math.max(0, sd)); sweepPrev = performance.now(); }
-    var ang = (sweepNow % 4000) / 4000 * Math.PI * 2 - Math.PI / 2;
+    // THE PARKED SWEEP (V6, motion-is-a-claim): with no live source
+    // bound, the needle rests at the top and NO wedge turns — a
+    // turning sweep over an empty dial asserts a listening watch
+    // that is not listening. It turns again when a source binds.
+    var parked = !scopeLive();
+    var ang = parked ? -Math.PI / 2 : (sweepNow % 4000) / 4000 * Math.PI * 2 - Math.PI / 2;
     var trail = Math.PI * 0.30, slices = 18;
-    for (var s = slices; s >= 1; s--) {
+    if (!parked) for (var s = slices; s >= 1; s--) {
       var a0 = ang - trail * s / slices, a1 = ang - trail * (s - 1) / slices;
       ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, R - 5, a0, a1); ctx.closePath();
       ctx.fillStyle = 'rgba(57,255,106,' + (0.006 + 0.069 * (1 - (s - 1) / slices)) + ')'; ctx.fill();
@@ -590,25 +675,41 @@
     ctx.fillStyle = GREEN;
     ctx.font = '700 ' + Math.max(10, Math.floor(R * 0.070)) + 'px ui-monospace,Menlo,Consolas,monospace';
     ctx.fillText('YOU', c, c + R * 0.16);
+    if (parked) { RUN.scope = false; return; } // drawn once per service while parked — no free-running loop
     stepFall();
     requestAnimationFrame(drawScope);
   }
+  // A live source is bound when anything on the face is being fed:
+  // a fresh RF snapshot, a beat above TICK, an open investigation,
+  // or a hunt selection. Otherwise the dial parks (see above).
+  function scopeLive() {
+    if (INVEST.on || HUNT.bssid) return true;
+    if (BEAT.src !== 'TICK') return true;
+    return !!(RF.snapAt && (Date.now() - RF.snapAt <= SNAP_FRESH_MS));
+  }
   // ================================================================
-  // THE HEARTBEAT MONITOR — climbs the SOURCE LADDER (amendment #2)
-  // and draws whose heart it is ON the strip:
+  // THE HEARTBEAT MONITOR — climbs the SOURCE LADDER and draws
+  // whose beat it is ON the strip (V6 ladder, owner Nov 15, 2026):
   //   BIO     — the registered device's real biometric HR (bridge /
   //             BT / sensor). ECG morphology, timed by the real BPM.
   //             The waveform stays stylized — NOT a medical ECG.
-  //   FACTORY — the house Phase-Envelope beat (pulse ~3m inside the
-  //             ~30m heartbeat), read from network-exposed factory
-  //             state. A slow swell wave + phase bar: real, but NOT a
-  //             heart rate, and never dressed as one.
-  //   LOCAL   — this device's own timer tick (the on-device cadence
-  //             the container honestly reads; 1 s local clock tick in
-  //             the web layer). A metronome comb, not a heart shape.
+  //   AP PING — THE ROUTER HEARTBEAT: one pip per ping the connected
+  //             access point actually ANSWERED (ApexPing bridge /
+  //             ApexNet.pingMs). The AP is alive because it keeps
+  //             answering; pip height is that answer's RTT. The
+  //             marker is a radio pip — never a heart.
+  //   FACTORY — the company heartbeat: the house Phase-Envelope beat
+  //             (pulse ~3m inside the ~30m heartbeat), read from
+  //             network-exposed factory state. A slow swell wave +
+  //             phase bar: real, but NOT a heart rate.
+  //   TICK    — no beat source answers. The strip HOLDS STILL: a
+  //             flat line and the words TICK · NO HEARTBEAT FEED.
+  //             (V5 drew a scrolling metronome comb here with a
+  //             swelling heart — motion in a heartbeat costume with
+  //             nothing bound. That was the charged violation; the
+  //             comb is gone. A tick says tick.)
   // The ladder steps DOWN as availability falls and back UP when a
-  // higher source returns; the heartbeat never disappears and never
-  // fabricates. (Beat state itself lives in the ingest block below.)
+  // higher source returns. (Beat state lives in the ingest block.)
   // ================================================================
   function heartPath(g, x, y, s) {
     g.beginPath();
@@ -629,8 +730,8 @@
     return base;
   }
   function drawPulse(now) {
-    if (!built || !PW) { requestAnimationFrame(drawPulse); return; }
-    if (document.hidden) { requestAnimationFrame(drawPulse); return; }
+    if (!built || !PW) { RUN.pulse = false; return; }
+    if (document.hidden) { RUN.pulse = false; return; } // stops in the dark (LOKMAT STANDARD)
     pctx.clearRect(0, 0, PW, PH);
     var base = PH * 0.60, amp = PH * 0.46, span = PW * 2.4;
     var src = BEAT.src, beat = 0;
@@ -676,74 +777,158 @@
       // phase bar: where the factory pulse stands, drawn not implied
       pctx.fillStyle = 'rgba(255,201,92,.75)';
       pctx.fillRect(0, PH - Math.max(2, PH * 0.05), PW * p01, Math.max(2, PH * 0.05));
-    } else {
-      // LOCAL — the device's own timer tick: a metronome comb.
-      var tickMs = BEAT.localTickMs || 1000;
-      var tph = (now % tickMs) / tickMs;
-      beat = Math.max(0, 1 - tph * 4);
-      pctx.lineJoin = 'round'; pctx.lineCap = 'butt';
-      for (var lp2 = 0; lp2 < 2; lp2++) {
-        pctx.beginPath();
-        for (var lx = 0; lx <= PW; lx += 2) {
-          var lph = ((lx / PW) * 4 + now / tickMs) % 1;
-          var ly = base - (lph < 0.10 ? amp * 0.55 : 0);
-          if (lx === 0) pctx.moveTo(lx, ly); else pctx.lineTo(lx, ly);
-        }
-        pctx.strokeStyle = lp2 === 0 ? 'rgba(57,255,106,.25)' : 'rgba(57,255,106,.8)';
-        pctx.lineWidth = lp2 === 0 ? Math.max(3, Math.floor(PH * 0.07)) : Math.max(2, Math.floor(PH * 0.04));
-        pctx.stroke();
+    } else if (src === 'APING') {
+      // THE ROUTER HEARTBEAT — one pip per ANSWERED ping, scrolling
+      // a 14 s window. Pip height is that answer's RTT (a fast AP
+      // stands tall). Nothing here moves unless an answer landed:
+      // the newest pip flashes once, the rest stand still.
+      var pnow = performance.now(), winMs = 14000;
+      pctx.lineJoin = 'round'; pctx.lineCap = 'round';
+      for (var pi = 0; pi < PING.series.length; pi++) {
+        var ans = PING.series[pi], ageMs = pnow - ans.pw;
+        if (ageMs < 0 || ageMs > winMs) continue;
+        var px = PW - (ageMs / winMs) * PW;
+        var ph2 = PH * 0.52 * clamp((170 - ans.rtt) / 170, 0.15, 1);
+        var freshPip = ageMs < 700;
+        pctx.beginPath(); pctx.moveTo(px, base); pctx.lineTo(px, base - ph2);
+        pctx.strokeStyle = freshPip ? '#eaffef' : 'rgba(57,255,106,.55)';
+        pctx.lineWidth = Math.max(2, Math.floor(PH * 0.05)); pctx.stroke();
+        pctx.beginPath(); pctx.arc(px, base - ph2, Math.max(1.5, PH * 0.045), 0, Math.PI * 2);
+        pctx.fillStyle = freshPip ? '#eaffef' : 'rgba(57,255,106,.7)'; pctx.fill();
       }
+      beat = (PING.series.length && (pnow - PING.series[PING.series.length - 1].pw) < 700) ? 1 : 0;
+    } else {
+      // TICK — no beat source answers: the strip HOLDS STILL.
+      // Flat line (drawn above) + the words. No comb, no hearts,
+      // no motion — a tick says tick, never heartbeat.
+      pctx.fillStyle = 'rgba(255,201,92,.85)';
+      pctx.font = '700 ' + Math.max(9, Math.floor(PH * 0.21)) + 'px ui-monospace,Menlo,Consolas,monospace';
+      pctx.textAlign = 'center'; pctx.textBaseline = 'middle';
+      pctx.fillText('TICK · NO HEARTBEAT FEED', PW / 2, PH * 0.40);
     }
-    // the marker heart — swells on the beat, like the video's hearts glow in the field
-    var hs = PH * 0.17 * (1 + 0.30 * beat);
-    pctx.save();
-    pctx.shadowColor = 'rgba(57,255,106,.9)'; pctx.shadowBlur = PH * 0.16 * (0.5 + beat);
-    heartPath(pctx, PW * 0.055, PH * 0.30, hs);
-    pctx.fillStyle = GREEN; pctx.fill();
-    pctx.restore();
-    // fainter hearts standing in the field at the strip's far end
-    heartPath(pctx, PW * 0.945, PH * 0.30, PH * 0.13);
-    pctx.strokeStyle = 'rgba(57,255,106,.55)'; pctx.lineWidth = Math.max(1, Math.floor(PH * 0.03)); pctx.stroke();
-    // THE SOURCE, drawn on the strip — whose heart this is, always.
-    // Right end of the band: the left end is bios-column territory.
-    pctx.fillStyle = src === 'BIO' ? 'rgba(182,255,208,.9)' : 'rgba(255,201,92,.9)';
+    // The marker, in the RIGHT cluster under the source label (V6:
+    // the V5 marker heart sat at the left end, inside the bios
+    // column's text). BIO and FACTORY wear the heart — one is a
+    // heart, the other is the company heartbeat by the owner's own
+    // naming. AP PING wears a radio pip. TICK wears nothing.
+    if (src === 'BIO' || src === 'FACTORY') {
+      var hs = PH * 0.15 * (1 + 0.30 * beat);
+      pctx.save();
+      pctx.shadowColor = 'rgba(57,255,106,.9)'; pctx.shadowBlur = PH * 0.16 * (0.5 + beat);
+      heartPath(pctx, PW * 0.945, PH * 0.68, hs);
+      pctx.fillStyle = GREEN; pctx.fill();
+      pctx.restore();
+    } else if (src === 'APING') {
+      var mx = PW * 0.945, my = PH * 0.68;
+      pctx.save();
+      pctx.globalAlpha = beat ? 1 : 0.45;
+      pctx.strokeStyle = GREEN; pctx.fillStyle = GREEN;
+      pctx.lineWidth = Math.max(1.5, PH * 0.05); pctx.lineCap = 'round';
+      pctx.beginPath(); pctx.arc(mx, my, Math.max(1.5, PH * 0.05), 0, Math.PI * 2); pctx.fill();
+      for (var ai = 1; ai <= 2; ai++) {
+        var rr = PH * 0.30 * ai * 0.55;
+        pctx.beginPath(); pctx.arc(mx, my, rr, -Math.PI * 0.78, -Math.PI * 0.22); pctx.stroke();
+        pctx.beginPath(); pctx.arc(mx, my, rr, Math.PI * 0.22, Math.PI * 0.78); pctx.stroke();
+      }
+      pctx.restore();
+    }
+    // THE SOURCE, drawn on the strip — whose beat this is, always.
+    var label = src === 'BIO' ? '♥ BIO' : src === 'APING' ? 'AP PING' + (PING.lastRtt !== null ? ' ' + PING.lastRtt + 'MS' : '') : src === 'FACTORY' ? '♥ FACTORY' : 'TICK';
+    pctx.fillStyle = (src === 'BIO' || src === 'APING') ? 'rgba(182,255,208,.9)' : 'rgba(255,201,92,.9)';
     pctx.font = '700 ' + Math.max(8, Math.floor(PH * 0.20)) + 'px ui-monospace,Menlo,Consolas,monospace';
     pctx.textAlign = 'right'; pctx.textBaseline = 'top';
-    pctx.fillText('♥ ' + src, PW * 0.90, PH * 0.06);
-    requestAnimationFrame(drawPulse);
+    pctx.fillText(label, PW * 0.985, PH * 0.06);
+    if (src !== 'TICK') requestAnimationFrame(drawPulse); else RUN.pulse = false;
   }
   // ================================================================
-  // THE FREQUENCY STRIP — a real sniffer display (truth fix): bars
-  // are the per-channel energy of the LATEST SCAN SNAPSHOT (strongest
-  // RSSI heard per channel wins the slot; the connected AP's channel
-  // is lit white). 2.4 GHz channels 1–13 left, 5 GHz channels right.
-  // (6 GHz APs pin on the scope; the strip's two groups are the
-  // sniffer's honest axes.) No fresh snapshot: a flat line and the
-  // words NO FEED. The strip never invents a waveform again.
+  // THE FREQUENCY STRIP — two honest modes (V6):
+  //   FREQ — a real sniffer display: bars are the per-channel energy
+  //     of the LATEST SCAN SNAPSHOT (strongest RSSI heard per channel
+  //     wins the slot; the connected AP's channel is lit white).
+  //     2.4 GHz channels 1–13 left, 5 GHz channels right. (6 GHz APs
+  //     pin on the scope; the strip's two groups are the sniffer's
+  //     honest axes.)
+  //   GATE — THE GATE STATE WAVEFORM (owner, Nov 15, 2026): when no
+  //     RF snapshot is fresh but a ping series is bound, the strip
+  //     draws THAT series — the connected AP's ping RTT history —
+  //     and says what it tells: the RTT (a labeled distance-to hint)
+  //     and the jitter (stability), under the GATE label. A waveform
+  //     with a source at last.
+  //   Neither bound: a flat line and the words NO FEED, drawn once
+  //   per service. The strip never invents a waveform.
   // ================================================================
   var CH5 = [36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165];
+  function pingBound() {
+    return PING.series.length >= 3 && PING.lastAt && (Date.now() - PING.lastAt <= 30000);
+  }
+  function pingJitter() {
+    if (PING.series.length < 2) return 0;
+    var sum = 0, n = 0;
+    for (var i = 1; i < PING.series.length; i++) { sum += Math.abs(PING.series[i].rtt - PING.series[i - 1].rtt); n++; }
+    return Math.round(sum / n);
+  }
+  function freqLive() {
+    if (RF.snapAt && (Date.now() - RF.snapAt <= SNAP_FRESH_MS)) return true;
+    return pingBound();
+  }
+  function drawGateWave(base, top) {
+    // The ping series as a waveform: x = answer time across the
+    // series' own span (min 20 s), y = RTT, 0 at the baseline,
+    // scaled to the series' own max (floor 100 ms). Only real
+    // answers are plotted; gaps stay gaps (the line breaks).
+    var ser = PING.series, now = Date.now();
+    var span = Math.max(20000, now - ser[0].at);
+    var maxR = 100;
+    for (var i = 0; i < ser.length; i++) if (ser[i].rtt > maxR) maxR = ser[i].rtt;
+    maxR *= 1.2;
+    fctx.lineJoin = 'round'; fctx.lineCap = 'round';
+    fctx.beginPath();
+    var pen = false;
+    for (var j = 0; j < ser.length; j++) {
+      var x = FW - ((now - ser[j].at) / span) * FW;
+      if (x < 0) { pen = false; continue; }
+      var y = base - (ser[j].rtt / maxR) * (base - top);
+      if (!pen) { fctx.moveTo(x, y); pen = true; } else fctx.lineTo(x, y);
+    }
+    fctx.strokeStyle = 'rgba(57,255,106,.85)';
+    fctx.lineWidth = Math.max(1.5, Math.floor(FH * 0.05)); fctx.stroke();
+    // the indication, printed: what this waveform tells
+    fctx.fillStyle = 'rgba(182,255,208,.9)';
+    fctx.font = '700 ' + Math.max(8, Math.floor(FH * 0.30)) + 'px ui-monospace,Menlo,Consolas,monospace';
+    fctx.textAlign = 'right'; fctx.textBaseline = 'top';
+    fctx.fillText('AP ' + PING.lastRtt + 'MS · JIT ±' + pingJitter() + 'MS', FW * 0.988, FH * 0.06);
+    fctx.fillStyle = 'rgba(143,217,164,.6)';
+    fctx.font = '700 ' + Math.max(7, Math.floor(FH * 0.22)) + 'px ui-monospace,Menlo,Consolas,monospace';
+    fctx.textAlign = 'left'; fctx.textBaseline = 'bottom';
+    fctx.fillText('PING RTT · STABILITY', FW * 0.012, FH * 0.995);
+  }
   function drawFreq(now) {
-    if (!built || !FW) { requestAnimationFrame(drawFreq); return; }
-    if (document.hidden) { requestAnimationFrame(drawFreq); return; }
+    if (!built || !FW) { RUN.freq = false; return; }
+    if (document.hidden) { RUN.freq = false; return; } // stops in the dark (LOKMAT STANDARD)
     fctx.clearRect(0, 0, FW, FH);
     var base = FH * 0.88, top = FH * 0.16;
     fctx.lineWidth = 1;
     fctx.strokeStyle = 'rgba(57,255,106,.14)';
     fctx.beginPath(); fctx.moveTo(0, base); fctx.lineTo(FW, base); fctx.stroke();
     fctx.beginPath(); fctx.moveTo(0, top); fctx.lineTo(FW, top); fctx.stroke();
-    // strip label, left edge, bios style
+    var age = Date.now() - RF.snapAt;
+    var rfFresh = !!RF.snapAt && age <= SNAP_FRESH_MS;
+    // strip label, left edge, bios style — the label names the mode
     fctx.fillStyle = 'rgba(143,217,164,.85)';
     fctx.font = '700 ' + Math.max(8, Math.floor(FH * 0.30)) + 'px ui-monospace,Menlo,Consolas,monospace';
     fctx.textAlign = 'left'; fctx.textBaseline = 'top';
-    fctx.fillText('FREQ', FW * 0.012, FH * 0.06);
-    var age = Date.now() - RF.snapAt;
+    fctx.fillText(rfFresh ? 'FREQ' : (pingBound() ? 'GATE' : 'FREQ'), FW * 0.012, FH * 0.06);
     fctx.textAlign = 'right';
-    if (!RF.snapAt || age > SNAP_FRESH_MS) {
-      fctx.fillStyle = 'rgba(255,201,92,.85)';
-      fctx.fillText('NO FEED', FW * 0.988, FH * 0.06);
-      fctx.beginPath(); fctx.moveTo(0, base); fctx.lineTo(FW, base);
-      fctx.strokeStyle = 'rgba(57,255,106,.30)'; fctx.stroke();
-      requestAnimationFrame(drawFreq);
+    if (!rfFresh) {
+      if (pingBound()) {
+        drawGateWave(base, top);
+      } else {
+        fctx.fillStyle = 'rgba(255,201,92,.85)';
+        fctx.fillText('NO FEED', FW * 0.988, FH * 0.06);
+        fctx.beginPath(); fctx.moveTo(0, base); fctx.lineTo(FW, base);
+        fctx.strokeStyle = 'rgba(57,255,106,.30)'; fctx.stroke();
+      }
+      if (freqLive()) requestAnimationFrame(drawFreq); else RUN.freq = false;
       return;
     }
     fctx.fillStyle = 'rgba(143,217,164,.7)';
@@ -778,7 +963,7 @@
     fctx.textAlign = 'left'; fctx.textBaseline = 'bottom';
     fctx.fillText('2.4', FW * 0.03, FH * 0.995);
     fctx.fillText('5', FW * 0.545, FH * 0.995);
-    requestAnimationFrame(drawFreq);
+    if (freqLive()) requestAnimationFrame(drawFreq); else RUN.freq = false;
   }
   // ================================================================
   // INGEST — every readout binds to the best REAL source reachable
@@ -803,7 +988,8 @@
   //   ordinary scan pathway, retried, is the whole design (spec §6).
   // FACTORY BEAT: window.ApexBeat (container-relayed house state) or
   //   a same-origin fetch of factory-beat.json — whichever honestly
-  //   answers; absent both, the ladder falls to LOCAL.
+  //   answers; absent both, the ladder falls through AP PING and
+  //   FACTORY to TICK (V6 ladder — see the heartbeat block).
   //
   // BRIDGE CONTRACTS (all fields optional; numbers only; anything
   // absent or non-numeric renders the honest empty state):
@@ -817,6 +1003,9 @@
   //   ApexWifi    { at, aps:[{ssid,bssid,bandGhz,channel,rssi}],
   //                 connectedBssid, sim }
   //   ApexBeat    { pulseMs, phaseMs, at, sim }
+  //   ApexPing    { rttMs, at, sim } — the connected AP's ping RTT,
+  //     one payload per answered ping (the ROUTER HEARTBEAT source,
+  //     V6). ApexNet payloads may carry the same reading as pingMs.
   //   Any payload may carry sim:true (container demo mode) -> the
   //   face flies the SIM flag while those values are on screen.
   // Freshness: every field keeps the time its value last CHANGED (or
@@ -830,7 +1019,9 @@
   var T = { hr: 0, spo2: 0, hrv: 0, steps: 0, sleep: 0, batt: 0 };
   var NET = { transport: '', ssid: '', bssid: '', bandGhz: null, channel: null, rssi: null, gen: '', at: 0, sig: '' };
   var FB = { pulseMs: 180000, phaseMs: 0, at: 0, freshAt: 0, sig: '' };
-  var BEAT = { src: 'LOCAL', localTickMs: 1000 };
+  var BEAT = { src: 'TICK' };
+  var PING = { series: [], lastAt: 0, lastRtt: null };
+  var RUN = { scope: false, pulse: false, freq: false };
   var SIM = { on: false };
   var INVEST = { on: false };
   var battPct = null;
@@ -955,13 +1146,14 @@
   // bandwidth class and is deliberately never read here.
   function applyNet(n) {
     if (!n) return;
-    var sig = [n.transport, n.ssid, n.bssid, n.bandGhz, n.channel, n.rssi, n.gen].join('|');
+    var sig = [n.transport, n.ssid, n.bssid, n.bandGhz, n.channel, n.rssi, n.gen, n.pingMs].join('|');
     if (sig === NET.sig && typeof n.at !== 'number') return; // set-once payload: let it age
     NET.sig = sig;
     NET.transport = n.transport || ''; NET.ssid = n.ssid || ''; NET.bssid = n.bssid || '';
     NET.bandGhz = num(n.bandGhz); NET.channel = num(n.channel); NET.rssi = num(n.rssi); NET.gen = n.gen || '';
     NET.at = (typeof n.at === 'number') ? n.at : Date.now();
     if (n.sim) SIM.on = true;
+    if (num(n.pingMs) !== null) applyPing({ rttMs: n.pingMs, at: NET.at, sim: n.sim });
     if (typeof n.headingDeg === 'number') { FRAME.headingDeg = n.headingDeg; FRAME.headingAt = Date.now(); }
     renderBios();
   }
@@ -1003,6 +1195,24 @@
     window.ApexWifi = snap;
     ingestWifi(snap);
   };
+  // ---- AP PING ingest (V6): the router heartbeat's raw series.
+  // One entry per ANSWERED ping; an unanswered ping leaves no entry
+  // (the gap in the series is the truth). Entries carry both the
+  // wall stamp (freshness, jitter) and a performance stamp (the
+  // pulse strip's scroll clock). Capped at 64 answers.
+  function applyPing(p) {
+    if (!p) return;
+    var rtt = num(p.rttMs);
+    if (rtt === null || rtt < 0) return;
+    var at = (typeof p.at === 'number') ? p.at : Date.now();
+    if (at <= PING.lastAt) return; // set-once payloads must not mint answers
+    PING.lastAt = at; PING.lastRtt = Math.round(rtt);
+    PING.series.push({ at: at, pw: performance.now(), rtt: Math.round(rtt) });
+    if (PING.series.length > 64) PING.series.shift();
+    if (p.sim) SIM.on = true;
+  }
+  function readPing() { if (window.ApexPing) applyPing(window.ApexPing); }
+  window.ApexPingPush = function (p) { window.ApexPing = p; applyPing(p); };
   // ---- FACTORY BEAT ingest (bridge relay, or the house state the
   // network serves at factory-beat.json next to the face).
   function applyBeat(b) {
@@ -1018,14 +1228,21 @@
   }
   function readBeat() { if (window.ApexBeat) applyBeat(window.ApexBeat); }
   window.ApexBeatPush = function (b) { window.ApexBeat = b; applyBeat(b); };
+  var FF = { fails: 0, nextAt: 0 };
   function fetchFactory() {
     if (!/^https?:$/.test(window.location.protocol)) return;
+    if (document.hidden) return; // no fetching in the dark (LOKMAT STANDARD)
+    var now = Date.now();
+    if (now < FF.nextAt) return; // backoff gate — the service calls us every second, we decide
     try {
       fetch('factory-beat.json', { cache: 'no-store' })
         .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (j) { if (j) applyBeat(j); })
-        .catch(function () { /* nothing served here — the ladder falls to LOCAL */ });
-    } catch (e) { /* fetch unavailable in this container */ }
+        .then(function (j) {
+          if (j) { applyBeat(j); FF.fails = 0; FF.nextAt = Date.now() + 30000; }
+          else { FF.fails++; FF.nextAt = Date.now() + Math.min(300000, 30000 * Math.pow(2, Math.min(FF.fails, 4))); }
+        })
+        .catch(function () { FF.fails++; FF.nextAt = Date.now() + Math.min(300000, 30000 * Math.pow(2, Math.min(FF.fails, 4))); /* nothing served here — the ladder falls through */ });
+    } catch (e) { FF.nextAt = Date.now() + 300000; /* fetch unavailable in this container */ }
   }
   function factoryPhase01() {
     if (!FB.at) return 0;
@@ -1033,12 +1250,15 @@
     var m = ph % FB.pulseMs;
     return (m < 0 ? m + FB.pulseMs : m) / FB.pulseMs;
   }
-  // THE LADDER (amendment #2): BIO -> FACTORY -> LOCAL, re-evaluated
-  // twice a second; steps down as sources fall, back up as they return.
+  // THE LADDER (V6): BIO -> AP PING -> FACTORY -> TICK, re-evaluated
+  // at every service; steps down as sources fall, back up as they
+  // return. AP PING binds when the AP has answered at least 3 pings
+  // and the last answer is under 15 s old.
   function evalBeat() {
     if (S.hr !== null && fresh(T.hr, 20000)) BEAT.src = 'BIO';
+    else if (PING.series.length >= 3 && PING.lastAt && (Date.now() - PING.lastAt <= 15000)) BEAT.src = 'APING';
     else if (FB.freshAt && (Date.now() - FB.freshAt < 90000) && navigator.onLine !== false) BEAT.src = 'FACTORY';
-    else BEAT.src = 'LOCAL';
+    else BEAT.src = 'TICK';
   }
   // ================================================================
   // SCAN SUPERVISOR — the battery governor + the promiscuous event
@@ -1175,18 +1395,20 @@
     rows += '<span class="bl">SLEEP</span> <span class="bv">' + (S.sleep !== null && fresh(T.sleep, 12 * 3600 * 1000) ? fmtSleep(S.sleep) : 'NO MEASURE') + '</span><br>';
     rows += '<span data-act="gps" style="cursor:pointer"><span class="bl">GPS</span> <span class="bv">' + (S.gps ? S.gps : '—') + '</span>' + (S.gps ? '' : ' <span class="bl">TAP</span>') + '</span><br>';
     rows += '<span class="bl">NET</span> <span class="bv">' + netText() + '</span><br>';
-    rows += '<span class="bl">RF</span> <span class="bv">' + rfText() + '</span><br>';
-    rows += '<span class="bl">TIME</span> <span class="bv">' + h + ':' + pad(d.getMinutes()) + '</span>';
+    rows += '<span class="bl">RF</span> <span class="bv">' + rfText() + '</span>';
+    // (V6: the bios TIME row is gone — it duplicated the big clock,
+    // and its line was one of the stack the column could not afford.)
     document.getElementById('bios').innerHTML = rows;
   }
   function renderMode() {
     var parts = [];
     if (SIM.on) parts.push('SIM');
     if (BEAT.src === 'BIO') parts.push('♥ BIO ' + (S.hr || '') + ' BPM');
+    else if (BEAT.src === 'APING') parts.push('AP PING · ' + (NET.ssid || 'AP') + ' ' + PING.lastRtt + 'MS');
     else if (BEAT.src === 'FACTORY') {
       var ph = Math.floor(factoryPhase01() * FB.pulseMs / 1000);
       parts.push('♥ FACTORY PULSE ' + pad(Math.floor(ph / 60)) + ':' + pad(ph % 60) + ' / ' + Math.round(FB.pulseMs / 60000) + 'M');
-    } else parts.push('♥ LOCAL TICK');
+    } else parts.push('TICK · NO HEARTBEAT FEED');
     if (INVEST.on) parts.push('INVESTIGATING');
     var age = RF.snapAt ? Math.floor((Date.now() - RF.snapAt) / 1000) : -1;
     parts.push((RF.snapAt && age * 1000 <= SNAP_FRESH_MS) ? 'RF ' + RF.order.length + 'AP ' + age + 'S' : 'RF NO FEED');
@@ -1219,6 +1441,8 @@
     state: function () {
       return {
         beat: BEAT.src,
+        ping: { n: PING.series.length, lastRtt: PING.lastRtt, jitter: pingJitter() },
+        heading: FRAME.headingDeg,
         beatPhase: BEAT.src === 'FACTORY' ? Math.round(factoryPhase01() * 1000) / 1000 : null,
         rfAgeS: RF.snapAt ? Math.round((Date.now() - RF.snapAt) / 100) / 10 : null,
         apCount: RF.order.length,
@@ -1247,22 +1471,63 @@
     select: function (bssid) { HUNT.bssid = bssid || null; renderBios(); },
     investigate: function (on) { setInvest(!!on); }
   };
+  // ================================================================
+  // TABLE SERVICE (V6) — ONE 1 s service timer runs the house, at
+  // FULL data quality: prepare the plate (every bridge read, the
+  // ladder evaluated, the scan supervisor ticked), serve the meal
+  // (clock, bios, mode, draw loops started), remove the plate (the
+  // draw loops stop THEMSELVES when their state goes still or the
+  // face hides), clean it, invite back in one second — ad
+  // infinitum. Nothing is thinned or downsampled; the rich data
+  // and the come-and-go all still arrive. What changed is that the
+  // face no longer grazes between meals. While hidden the service
+  // itself sleeps — a closed face leaves NOTHING running for the
+  // device optimizer to forgive (THE LOKMAT STANDARD, owner field
+  // benchmark, Nov 15, 2026). One deliberate exception: an active
+  // hunt the wearer opened runs its own 700 ms haptics session
+  // timer, started and cleared WITH the hunt — a session with a
+  // setup and a teardown, not a grazing loop.
+  // (V5 cadence, for the record: 250 ms tick + 500 ms bridge reads
+  // + 500 ms scan supervisor + 700 ms hunt + 30 s factory fetch,
+  // all free-running, all awake while hidden, three rAF loops
+  // re-queueing into the dark.)
+  // ================================================================
+  var huntTimer = null;
+  function manageHuntTimer() {
+    var want = !!(INVEST.on && HUNT.bssid && !document.hidden);
+    if (want && !huntTimer) huntTimer = setInterval(huntTick, 700);
+    if (!want && huntTimer) { clearInterval(huntTimer); huntTimer = null; }
+  }
+  function serviceDraws() {
+    if (document.hidden) return;
+    if (!RUN.scope) { RUN.scope = true; requestAnimationFrame(drawScope); }
+    if (!RUN.pulse) { RUN.pulse = true; requestAnimationFrame(drawPulse); }
+    if (!RUN.freq) { RUN.freq = true; requestAnimationFrame(drawFreq); }
+  }
+  function service() {
+    if (document.hidden) { manageHuntTimer(); return; }
+    readBridge(); readWifi(); readNet(); readBeat(); readPing(); evalBeat();
+    tick();
+    tickScan();
+    fetchFactory();
+    manageHuntTimer();
+    serviceDraws();
+  }
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden && navigator.vibrate) { try { navigator.vibrate(0); } catch (e) {} }
+    if (document.hidden) {
+      if (navigator.vibrate) { try { navigator.vibrate(0); } catch (e) {} }
+      manageHuntTimer(); // stops NOW; the draw loops stop themselves next frame and do not re-queue
+    } else {
+      layout();
+      service(); // a fresh plate the moment the face returns
+    }
   });
   // ---- boot
   layout();
   window.addEventListener('resize', layout);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', layout);
-  requestAnimationFrame(drawScope);
-  requestAnimationFrame(drawPulse);
-  requestAnimationFrame(drawFreq);
-  tick(); setInterval(tick, 250);
-  readBridge(); readWifi(); readNet(); readBeat(); evalBeat();
-  setInterval(function () { readBridge(); readWifi(); readNet(); readBeat(); evalBeat(); }, 500);
-  setInterval(tickScan, 500);
-  setInterval(huntTick, 700);
-  fetchFactory(); setInterval(fetchFactory, 30000);
+  service();
+  setInterval(service, 1000);
   fetchWX(); setInterval(fetchWX, 900000);
   if (navigator.getBattery) {
     navigator.getBattery().then(function (b) {
