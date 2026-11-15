@@ -179,6 +179,29 @@
   //     should find nothing to forgive. (His warning, verbatim, for
   //     the alternative: continuous grazing gets you "a fat baby
   //     with a bad attitude that don't fit in nothing.")
+  //
+  // V7 / ARC FIX (Nov 15, 2026, live visual check on the merged V6):
+  // the V6 bench proved the bottom stack at four viewports, but its
+  // collision filter charged only text x text / text x button
+  // ELEMENT boxes — canvas pairs were excluded as "glass
+  // composition", so drawn ink was never measured against glyphs.
+  // The mode row was placed by dial-relative math (top ≈ CY +
+  // 0.451D) while the circle's bottom is CY + 0.5D and the stage
+  // reservation never subtracted the row: the row lived INSIDE
+  // the dial's lower crescent at every size, and the outer bezel
+  // (radius R-2, the thick bright arc) struck its glyphs wherever
+  // the text ran wider than the chord at that height. The owner's
+  // eye caught it live at 1919x998 — crossings through HEARTBEAT
+  // and the separator before RF — a viewport class (wide/short
+  // desktop) the bench had never run. V7: the mode row JOINS THE
+  // MEASURED STACK (reserved above the button, below the stage);
+  // the scope is sized into the stage that remains above it, so
+  // the circle's full extent — bezel outer edge included — is
+  // contained above the row at every viewport. No honesty
+  // behavior changes: the ladder, the still states, the GATE
+  // waveform, table service, and compass registration are V6's,
+  // untouched. The bench now runs SIX viewports and an ARC test
+  // (bezel annulus vs mode ink) beside the charged set.
   var stage = document.getElementById('stage');
   var fallEl = document.getElementById('fall');
   var cv = document.getElementById('scope');
@@ -279,8 +302,37 @@
     fm.style.left = Math.floor(W - W * 0.03 - fms) + 'px';
     fm.style.top = (stackTop + invH - fms) + 'px';
     fm.innerHTML = foxSVG();
-    // The scope lives in the stage ABOVE the stack.
-    var availH = stackTop - Math.floor(H * 0.012);
+    // ================================================================
+    // THE MODE ROW JOINS THE STACK (V7 arc fix — see the V7 header
+    // note). V6 placed the row by dial-relative math: top =
+    // floor(CY + D*0.335) + FH + floor(D*0.016) ≈ CY + 0.451D,
+    // while the circle's bottom is CY + 0.5D and availH never
+    // reserved the row — inside the crescent by construction.
+    // Now the row is reserved like every other band in the stack:
+    // its font is set on the M basis (the button's basis; at every
+    // bench viewport it is >= the old D-basis size — the text is
+    // NOT shrunk), its height is reserved arithmetically
+    // (font x 1.3) and the row is pinned single-line (nowrap) —
+    // renderMode rewrites its text every service WITHOUT a layout
+    // pass, so a row whose height depends on its text can never
+    // be reserved. The stage the scope is sized into ends at the
+    // row's top.
+    // ================================================================
+    var mode = document.getElementById('mode');
+    var modeFont = Math.max(10, Math.floor(M * 0.030));
+    var modeH = Math.ceil(modeFont * 1.3);
+    var modeTop = stackTop - gap - modeH;
+    mode.style.left = '0px'; mode.style.width = W + 'px';
+    mode.style.top = modeTop + 'px';
+    mode.style.bottom = 'auto';
+    mode.style.height = modeH + 'px';
+    mode.style.fontSize = modeFont + 'px';
+    mode.style.lineHeight = '1.3';
+    mode.style.whiteSpace = 'nowrap';
+    // The scope lives in the stage ABOVE the stack — the stack
+    // now includes the mode row, so the circle's full extent
+    // (bezel outer edge included) stays above the row.
+    var availH = modeTop - Math.floor(H * 0.012);
     var D = Math.floor(Math.min(W * 0.94, availH * 0.98));
     R = Math.floor(D / 2);
     CX = Math.floor(W / 2); CY = Math.floor(availH / 2) + Math.floor(H * 0.006);
@@ -329,17 +381,12 @@
     bios.style.width = Math.floor(D * 0.50) + 'px';
     bios.style.fontSize = Math.max(9, Math.floor(D * 0.028)) + 'px';
     bios.style.lineHeight = '1.42';
-    // mode line: its own uncontested row BETWEEN the freq strip
-    // and the button stack (V6). Inside the dial it fought the
-    // bios column's growth; below the strip nothing else lives.
-    // The indication must stay legible — a beat-source label
-    // buried in stacked words is not indicated (owner, Nov 15).
-    var mode = document.getElementById('mode');
-    mode.style.left = '0px'; mode.style.width = W + 'px';
-    mode.style.top = (Math.floor(CY + D * 0.335) + FH + Math.floor(D * 0.016)) + 'px';
-    mode.style.bottom = 'auto';
-    mode.style.fontSize = Math.max(10, Math.floor(D * 0.030)) + 'px';
-    mode.style.lineHeight = '1.3';
+    // mode line: reserved and placed in the measured stack at
+    // the top of layout() (V7 — see THE MODE ROW JOINS THE STACK
+    // above). Its row sits between the stage and the button,
+    // uncontested by text AND by the dial's own rim; the
+    // indication stays legible — a beat-source label buried in
+    // stacked words is not indicated (owner, Nov 15).
     built = true;
     buildFall();
   }
