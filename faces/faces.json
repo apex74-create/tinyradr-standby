@@ -459,6 +459,26 @@
       "source": "00-visual-stack-06-hollys-face.html",
       "title": "HOLLYWOOD — Holly's Face · Game Skin",
       "version": "v1"
+    },
+    {
+      "access": "public-standalone",
+      "key": "the-sextant",
+      "note": "The Sextant (Nov 16, 2026) - a navigation-instrument face in the Digiframe template line (folder B9): brass horizon dome, computed sun, moon and 20-star sky from the real clock and a named position input, sidereal time, and a fix labelled COMPUTED with its inputs named on the face. Position input: the device position when the host grants it (labelled GPS INPUT); otherwise the house default, Johannesburg, MI 44.981 N 84.496 W, labelled NO FIX - position is NO MEASURE until a field fix is compared against a known position, and the face says so. The math is shown in the readouts: the SUN, MOON and SKY UP lines carry altitude and azimuth as computed. Worked example, two independent workings filed with the build: 2026-11-16 15:00 UTC at the house position - the face's sun reads alt 18.39 / az 144.42 against an independent NOAA-form computation at 18.39 / 144.41 (arcminute class); the moon agrees with an independent Schlyter-form computation within half a degree across three instants, which is the compact lunar series' stated grade. No controls anywhere on the face; nothing in the bottom navigation band. Vanilla single file, real time driven off the frame clock.",
+      "path": "/faces/the-sextant.html",
+      "sha256": "7fd4b0720cfa2231b0c9e05baf053ca29c960066370d98ad8a1ab2b0e096d184",
+      "source": "the-sextant.html (digiframe template B9 build, 2026-11-16)",
+      "title": "APEX — THE SEXTANT",
+      "version": "v1"
+    },
+    {
+      "access": "public-standalone",
+      "key": "radiosphere",
+      "note": "Radiosphere (Nov 16, 2026) - the signal-sphere face: the owner's bench proof of the same name (spinning sphere, height = strength, colour = plane) wired for production to the APEX SCAN FEED contract v1, the same contract Globe Tracker reads. The face paints ONLY what the shell publishes and re-reads the feed every frame: height is measured strength on the spec scale (h = 3 + (dBm + 95) x 30/65, floored at 2), colour is the plane (WIFI / BLE / RID / CELL / GNSS), width is a fixed footing stated on the face and never read as data, entries with no strength in the feed stand as footing dots and count as NO MEASURE, unknown planes are never plotted, and at most the 24 strongest are shown with the count stated on the face. Honest states hold in every build: SCAN - NO FEED (the web build has no shell and reports exactly that), SCAN - NO SIGNALS, and FEED STALE when the feed ages past 15 seconds. Receive-only: the face never connects, pairs, probes or transmits. No bench data ships in the production file. Vanilla single file; the clock rides the title box.",
+      "path": "/faces/radiosphere.html",
+      "sha256": "c52957e6345b7bd8c912fd8d47400d24f8ac9a5b8975762c98de9f2a4ac92a48",
+      "source": "radiosphere.html (radiosphere production build, APEX SCAN FEED contract v1, 2026-11-16)",
+      "title": "APEX — RADIOSPHERE",
+      "version": "v1"
     }
   ],
   "notSeeded": [

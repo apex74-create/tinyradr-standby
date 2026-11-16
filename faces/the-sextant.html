@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — THE SEXTANT · Celestial Fix</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#04070d; }
+  body { font-family:ui-monospace,Menlo,Consolas,monospace; overflow:hidden; }
+  #stage { position:absolute; left:0; top:0; overflow:hidden; background:#04070d; }
+  #head { position:absolute; left:0; top:0; width:100%; text-align:center; }
+  .brand { color:#c9a227; font-weight:700; letter-spacing:.35em; text-shadow:0 0 12px rgba(201,162,39,.45); }
+  #clock { color:#f2e9cf; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; text-shadow:0 0 16px rgba(201,162,39,.35); }
+  #date { color:#8d99b5; font-variant-numeric:tabular-nums; }
+  #sky { position:absolute; display:block; }
+  #read { position:absolute; left:0; width:100%; text-align:center; }
+  #read .row { color:#cfd8ea; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  #read .row b { color:#f2e9cf; font-weight:700; }
+  #read .gold { color:#c9a227; }
+  #read .dim { color:#7a86a0; }
+  .strip { position:absolute; left:0; width:100%; text-align:center; color:#4d5872; }
+</style></head>
+<body>
+<div id="stage">
+  <div id="head">
+    <div class="brand">APEX — THE SEXTANT</div>
+    <div id="clock">--:--</div>
+    <div id="date">—</div>
+  </div>
+  <canvas id="sky"></canvas>
+  <div id="read">
+    <div class="row" id="rowSun">SUN —</div>
+    <div class="row" id="rowMoon">MOON —</div>
+    <div class="row" id="rowStar">SKY UP —</div>
+    <div class="row dim" id="rowPos">POSITION INPUT —</div>
+    <div class="row gold" id="rowFix">FIX — COMPUTED FROM THE INPUTS ABOVE</div>
+  </div>
+  <div class="strip">CELESTIAL NAVIGATION · THE MATH IS SHOWN · NO MEASURE UNTIL A FIELD CHECK</div>
+</div>
+<script>
+  // THE SEXTANT — celestial navigation face (depot build, Nov 16, 2026).
+  // Sun, moon and catalogue-star positions are COMPUTED from real math:
+  // the face's real clock and a named position input. Nothing here is a
+  // measurement. The position input is the host's geolocation when the
+  // host grants it (labelled GPS INPUT, as reported by the host); in
+  // this web build there is no host fix, so the input is the labelled
+  // DEFAULT — Johannesburg, Michigan — and the face says so on its face.
+  // A fix is labelled COMPUTED, with its inputs named, never presented
+  // as a measurement: NO MEASURE applies to position until a field fix
+  // is compared against a known position. One self-contained page,
+  // plain JavaScript, no external requests. No controls — nothing sits
+  // in the bottom navigation band.
+  "use strict";
+  var DEFAULT_POS = { lat: 44.9810, lon: -84.4960, label: "DEFAULT — JOHANNESBURG, MI · NO FIX" };
+  var pos = { lat: DEFAULT_POS.lat, lon: DEFAULT_POS.lon, label: DEFAULT_POS.label, fix: false };
+
+  /* MATH-BEGIN — pure functions of (dateMs, latDeg, lonDeg); the worked
+     example in the build record exercises exactly this section. */
+  var RAD = Math.PI / 180, DEG = 180 / Math.PI;
+  function norm360(x) { x = x % 360; return x < 0 ? x + 360 : x; }
+  function julianDay(ms) { return ms / 86400000 + 2440587.5; }
+  function gmstDeg(ms) {
+    var d = julianDay(ms) - 2451545.0;
+    return norm360(280.46061837 + 360.98564736629 * d);
+  }
+  // Ecliptic longitude/latitude -> equatorial RA (deg) / Dec (deg).
+  function eclToEq(lonDeg, latDeg, oblDeg) {
+    var l = lonDeg * RAD, b = latDeg * RAD, e = oblDeg * RAD;
+    var ra = Math.atan2(Math.cos(e) * Math.sin(l) - Math.sin(e) * Math.tan(b), Math.cos(l));
+    var dec = Math.asin(Math.sin(b) * Math.cos(e) + Math.cos(b) * Math.sin(e) * Math.sin(l));
+    return { ra: norm360(ra * DEG), dec: dec * DEG };
+  }
+  function sunPos(ms) {
+    var d = julianDay(ms) - 2451545.0;
+    var L = norm360(280.460 + 0.9856474 * d);
+    var g = norm360(357.528 + 0.9856003 * d) * RAD;
+    var lam = L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g);
+    var obl = 23.439 - 0.0000004 * d;
+    var eq = eclToEq(lam, 0, obl);
+    eq.distanceAU = 1.00014 - 0.01671 * Math.cos(g) - 0.00014 * Math.cos(2 * g);
+    return eq;
+  }
+  function moonPos(ms) {
+    var d = julianDay(ms) - 2451545.0;
+    var Lp = norm360(218.316 + 13.176396 * d);          // mean longitude
+    var Mm = norm360(134.963 + 13.064993 * d);          // mean anomaly, moon
+    var Ms = norm360(357.528 + 0.9856003 * d);          // mean anomaly, sun
+    var F  = norm360(93.272 + 13.229350 * d);           // argument of latitude
+    var Ls = norm360(280.460 + 0.9856474 * d);          // mean longitude, sun
+    var D  = norm360(Lp - Ls);                          // mean elongation
+    var rD = D * RAD, rMm = Mm * RAD, rMs = Ms * RAD, rF = F * RAD;
+    // Principal periodic terms (the standard low-precision lunar series —
+    // the worked example in the build record grades this against an
+    // independent formulation; agreement is arcminute-class for the sun
+    // and a few tenths of a degree for the moon, which is what a face
+    // that labels itself COMPUTED may claim).
+    var lam = Lp + 6.289 * Math.sin(rMm)
+      - 1.274 * Math.sin(rMm - 2 * rD) + 0.658 * Math.sin(2 * rD)
+      - 0.186 * Math.sin(rMs) - 0.059 * Math.sin(2 * rMm - 2 * rD)
+      - 0.057 * Math.sin(rMm - 2 * rD + rMs) + 0.053 * Math.sin(rMm + 2 * rD)
+      + 0.046 * Math.sin(2 * rD - rMs) + 0.041 * Math.sin(rMm - rF)
+      - 0.035 * Math.sin(rD) - 0.031 * Math.sin(rMm + rF)
+      - 0.015 * Math.sin(2 * rF - 2 * rD) + 0.011 * Math.sin(rMm - 4 * rD);
+    var bet = 5.128 * Math.sin(rF)
+      - 0.173 * Math.sin(rF - 2 * rD) - 0.055 * Math.sin(rMm - rF - 2 * rD)
+      - 0.046 * Math.sin(rMm + rF - 2 * rD) + 0.033 * Math.sin(rF + 2 * rD)
+      + 0.017 * Math.sin(2 * rMm + rF);
+    var obl = 23.439 - 0.0000004 * d;
+    var eq = eclToEq(lam, bet, obl);
+    // Phase: synodic age from the new moon of Jan 6, 2000 (JD 2451550.1).
+    var age = (julianDay(ms) - 2451550.1) % 29.530588853;
+    if (age < 0) age += 29.530588853;
+    eq.ageDays = age;
+    eq.illum = (1 - Math.cos(2 * Math.PI * age / 29.530588853)) / 2;
+    return eq;
+  }
+  // Bright-star catalogue, J2000 (RA in hours, Dec in degrees, mag).
+  var STARS = [
+    ["Sirius", 6.752, -16.72, -1.46], ["Canopus", 6.399, -52.70, -0.74],
+    ["Arcturus", 14.261, 19.18, -0.05], ["Vega", 18.616, 38.78, 0.03],
+    ["Capella", 5.278, 45.99, 0.08], ["Rigel", 5.242, -8.20, 0.13],
+    ["Procyon", 7.655, 5.22, 0.34], ["Betelgeuse", 5.919, 7.41, 0.42],
+    ["Altair", 19.846, 8.87, 0.76], ["Aldebaran", 4.599, 16.51, 0.86],
+    ["Antares", 16.490, -26.43, 0.96], ["Spica", 13.420, -11.16, 0.97],
+    ["Pollux", 7.755, 28.03, 1.14], ["Fomalhaut", 22.961, -29.62, 1.16],
+    ["Deneb", 20.690, 45.28, 1.25], ["Regulus", 10.139, 11.97, 1.35],
+    ["Dubhe", 11.062, 61.75, 1.79], ["Polaris", 2.530, 89.26, 1.98],
+    ["Mirfak", 3.405, 49.86, 1.81], ["Denebola", 11.817, 14.57, 2.11]
+  ];
+  function altAz(raDeg, decDeg, ms, latDeg, lonDeg) {
+    var lst = norm360(gmstDeg(ms) + lonDeg);
+    var H = (lst - raDeg) * RAD;
+    if (H > Math.PI) H -= 2 * Math.PI;
+    var dec = decDeg * RAD, lat = latDeg * RAD;
+    var alt = Math.asin(Math.sin(dec) * Math.sin(lat) + Math.cos(dec) * Math.cos(lat) * Math.cos(H));
+    var az = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(lat) - Math.tan(dec) * Math.cos(lat));
+    return { alt: alt * DEG, az: norm360(az * DEG + 180), lst: lst };
+  }
+  function skyState(ms, latDeg, lonDeg) {
+    var sun = sunPos(ms), moon = moonPos(ms);
+    var sA = altAz(sun.ra, sun.dec, ms, latDeg, lonDeg);
+    var mA = altAz(moon.ra, moon.dec, ms, latDeg, lonDeg);
+    var stars = STARS.map(function (s) {
+      var a = altAz(s[1] * 15, s[2], ms, latDeg, lonDeg);
+      return { name: s[0], mag: s[3], alt: a.alt, az: a.az };
+    });
+    return { sun: { alt: sA.alt, az: sA.az }, moon: { alt: mA.alt, az: mA.az, illum: moon.illum, age: moon.ageDays },
+             stars: stars, lst: sA.lst };
+  }
+  /* MATH-END */
+
+  var stage = document.getElementById('stage');
+  var sky = document.getElementById('sky');
+  var ctx = sky.getContext('2d');
+  var W = 0, H = 0, skySize = 0, skyX = 0, skyY = 0;
+  function measure() {
+    var vv = window.visualViewport;
+    W = Math.floor(vv ? vv.width : window.innerWidth);
+    H = Math.floor(vv ? vv.height : window.innerHeight);
+    if (!W || !H) { W = document.documentElement.clientWidth || 300; H = document.documentElement.clientHeight || 400; }
+  }
+  function layout() {
+    measure();
+    stage.style.width = W + 'px'; stage.style.height = H + 'px';
+    var headH = Math.floor(H * 0.20);
+    document.querySelector('.brand').style.fontSize = Math.max(10, Math.floor(H * 0.026)) + 'px';
+    document.getElementById('clock').style.fontSize = Math.floor(Math.min(W * 0.20, H * 0.105)) + 'px';
+    document.getElementById('date').style.fontSize = Math.max(9, Math.floor(H * 0.026)) + 'px';
+    skySize = Math.floor(Math.min(W * 0.94, H * 0.47));
+    skyX = Math.floor((W - skySize) / 2);
+    skyY = headH;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    sky.style.left = skyX + 'px'; sky.style.top = skyY + 'px';
+    sky.style.width = skySize + 'px'; sky.style.height = skySize + 'px';
+    sky.width = Math.round(skySize * dpr); sky.height = Math.round(skySize * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var read = document.getElementById('read');
+    read.style.top = (skyY + skySize + Math.floor(H * 0.015)) + 'px';
+    var rows = read.querySelectorAll('.row');
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].style.fontSize = Math.max(9, Math.floor(H * 0.027)) + 'px';
+      rows[i].style.lineHeight = '1.55';
+    }
+    var strip = document.querySelector('.strip');
+    strip.style.fontSize = Math.max(8, Math.floor(H * 0.020)) + 'px';
+    strip.style.bottom = Math.floor(H * 0.018) + 'px';
+  }
+  function fmt(n, digits) { return (n < 0 ? '−' : '+') + Math.abs(n).toFixed(digits) + '°'; }
+  function fmtAz(n) { return n.toFixed(1) + '°'; }
+  function plot(alt, az, cx, cy, R) {
+    var r = (90 - Math.max(alt, -2)) / 90 * R;
+    var a = az * RAD;
+    return { x: cx + r * Math.sin(a), y: cy - r * Math.cos(a), out: alt < 0 };
+  }
+  function draw(state) {
+    var cx = skySize / 2, cy = skySize / 2, R = skySize / 2 - 6;
+    ctx.clearRect(0, 0, skySize, skySize);
+    // Dome: horizon circle, altitude rings, cardinal cross.
+    ctx.strokeStyle = 'rgba(201,162,39,0.75)'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(141,153,181,0.35)'; ctx.lineWidth = 1;
+    [30, 60].forEach(function (alt) {
+      ctx.beginPath(); ctx.arc(cx, cy, (90 - alt) / 90 * R, 0, Math.PI * 2); ctx.stroke();
+    });
+    ctx.beginPath();
+    ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy);
+    ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R);
+    ctx.strokeStyle = 'rgba(141,153,181,0.22)'; ctx.stroke();
+    ctx.fillStyle = '#c9a227'; ctx.font = '700 ' + Math.max(10, skySize * 0.045) + 'px ui-monospace,Menlo,Consolas,monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('N', cx, cy - R + skySize * 0.032);
+    ctx.fillText('S', cx, cy + R - skySize * 0.032);
+    ctx.fillText('E', cx + R - skySize * 0.032, cy);
+    ctx.fillText('W', cx - R + skySize * 0.032, cy);
+    // Stars above the horizon.
+    state.stars.forEach(function (s) {
+      if (s.alt <= 0) return;
+      var p = plot(s.alt, s.az, cx, cy, R);
+      var r = Math.max(1.1, 3.1 - s.mag * 0.75);
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(226,234,250,0.92)'; ctx.fill();
+    });
+    // Sun.
+    var sp = plot(state.sun.alt, state.sun.az, cx, cy, R);
+    ctx.beginPath(); ctx.arc(sp.x, sp.y, Math.max(4, skySize * 0.016), 0, Math.PI * 2);
+    ctx.fillStyle = state.sun.alt > 0 ? '#ffd75e' : 'rgba(255,215,94,0.35)';
+    ctx.shadowColor = 'rgba(255,215,94,0.8)'; ctx.shadowBlur = state.sun.alt > 0 ? 14 : 0;
+    ctx.fill(); ctx.shadowBlur = 0;
+    // Moon, with the computed phase shaded.
+    var mp = plot(state.moon.alt, state.moon.az, cx, cy, R);
+    var mr = Math.max(3.4, skySize * 0.013);
+    ctx.beginPath(); ctx.arc(mp.x, mp.y, mr, 0, Math.PI * 2);
+    ctx.fillStyle = state.moon.alt > 0 ? '#e8ecf5' : 'rgba(232,236,245,0.30)'; ctx.fill();
+    var shade = (1 - state.moon.illum) * 2 * mr;
+    ctx.beginPath(); ctx.arc(mp.x + (state.moon.age < 14.77 ? shade : -shade) * 0.9, mp.y, mr * 0.96, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(4,7,13,0.78)'; ctx.fill();
+    // Labels for sun and moon.
+    ctx.font = '700 ' + Math.max(9, skySize * 0.036) + 'px ui-monospace,Menlo,Consolas,monospace';
+    ctx.fillStyle = '#ffd75e'; ctx.fillText('SUN', sp.x, sp.y - mr - 9);
+    ctx.fillStyle = '#e8ecf5'; ctx.fillText('MOON', mp.x, mp.y - mr - 9);
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function tick() {
+    var now = new Date();
+    var state = skyState(now.getTime(), pos.lat, pos.lon);
+    draw(state);
+    var h = now.getHours() % 12; if (h === 0) h = 12;
+    document.getElementById('clock').textContent = h + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    document.getElementById('date').textContent =
+      now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() +
+      ' · LST ' + pad(Math.floor(state.lst / 15)) + ':' + pad(Math.floor((state.lst % 15) * 4));
+    document.getElementById('rowSun').innerHTML =
+      'SUN <b>ALT ' + fmt(state.sun.alt, 1) + '</b> · <b>AZ ' + fmtAz(state.sun.az) + '</b>' +
+      (state.sun.alt <= 0 ? ' · BELOW HORIZON' : '');
+    document.getElementById('rowMoon').innerHTML =
+      'MOON <b>ALT ' + fmt(state.moon.alt, 1) + '</b> · <b>AZ ' + fmtAz(state.moon.az) + '</b> · PHASE ' +
+      Math.round(state.moon.illum * 100) + '%';
+    var up = state.stars.filter(function (s) { return s.alt > 0; })
+                        .sort(function (a, b) { return b.alt - a.alt; })[0];
+    document.getElementById('rowStar').innerHTML = up
+      ? 'SKY UP <b>' + up.name.toUpperCase() + '</b> · ALT ' + fmt(up.alt, 1) + ' · AZ ' + fmtAz(up.az)
+      : 'SKY UP — NO CATALOGUE STAR ABOVE THE HORIZON';
+    document.getElementById('rowPos').textContent =
+      'POSITION INPUT: ' + pos.label + ' · ' + Math.abs(pos.lat).toFixed(3) + '° ' + (pos.lat >= 0 ? 'N' : 'S') +
+      ' ' + Math.abs(pos.lon).toFixed(3) + '° ' + (pos.lon >= 0 ? 'E' : 'W');
+  }
+  if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+    navigator.geolocation.getCurrentPosition(function (g) {
+      pos = { lat: g.coords.latitude, lon: g.coords.longitude, label: 'GPS INPUT — AS REPORTED BY HOST', fix: true };
+      tick();
+    }, function () { /* denied or unavailable: the labelled default stands */ }, { maximumAge: 60000, timeout: 8000 });
+  }
+  layout();
+  window.addEventListener('resize', layout);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', layout);
+  tick();
+  // Self-correcting tick: align to the wall second, then hold the phase.
+  (function hold() {
+    var ms = 1000 - (Date.now() % 1000);
+    setTimeout(function () { tick(); setInterval(tick, 1000); }, ms);
+  })();
+</script>
+</body></html>

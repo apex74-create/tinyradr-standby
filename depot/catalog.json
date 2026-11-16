@@ -776,6 +776,40 @@
       ],
       "status": "BUILT",
       "note": "Holly's face from the visual stack. File landed in the faces line Nov 13 (PR #91) and held off the sales catalogue as the owner's explicit call; listed for sale Nov 13, 2026 on his blanket go (15:43 EST) — the catalogue flip."
+    },
+    {
+      "slug": "the-sextant",
+      "name": "Apex Face — The Sextant",
+      "title": "APEX — THE SEXTANT",
+      "package": "app.lovable.apexsignal.face.thesextant",
+      "apkPath": "/depot/the-sextant.apk",
+      "apkSha256": "b5d820ecc3716e448890fd4555b4aab21065e798db973e6f7c472f1e313f7227",
+      "apkSizeBytes": 16873,
+      "facePath": "/faces/the-sextant.html",
+      "faceSha256": "7fd4b0720cfa2231b0c9e05baf053ca29c960066370d98ad8a1ab2b0e096d184",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The Sextant (Nov 16, 2026) - a navigation-instrument face in the Digiframe template line (folder B9): brass horizon dome, computed sun, moon and 20-star sky from the real clock and a named position input, sidereal time, and a fix labelled COMPUTED with its inputs named on the face. Position input: the device position when the host grants it (labelled GPS INPUT); otherwise the house default, Johannesburg, MI 44.981 N 84.496 W, labelled NO FIX - position is NO MEASURE until a field fix is compared against a known position, and the face says so. The math is shown in the readouts: the SUN, MOON and SKY UP lines carry altitude and azimuth as computed. Worked example, two independent workings filed with the build: 2026-11-16 15:00 UTC at the house position - the face's sun reads alt 18.39 / az 144.42 against an independent NOAA-form computation at 18.39 / 144.41 (arcminute class); the moon agrees with an independent Schlyter-form computation within half a degree across three instants, which is the compact lunar series' stated grade. No controls anywhere on the face; nothing in the bottom navigation band. Vanilla single file, real time driven off the frame clock."
+    },
+    {
+      "slug": "radiosphere",
+      "name": "Apex Face — Radiosphere",
+      "title": "APEX — RADIOSPHERE",
+      "package": "app.lovable.apexsignal.face.radiosphere",
+      "apkPath": "/depot/radiosphere.apk",
+      "apkSha256": "b1ced883f003485962e171474d8ec89962d07a47917f13703e11c0aa8e51f65a",
+      "apkSizeBytes": 16873,
+      "facePath": "/faces/radiosphere.html",
+      "faceSha256": "c52957e6345b7bd8c912fd8d47400d24f8ac9a5b8975762c98de9f2a4ac92a48",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Radiosphere (Nov 16, 2026) - the signal-sphere face: the owner's bench proof of the same name (spinning sphere, height = strength, colour = plane) wired for production to the APEX SCAN FEED contract v1, the same contract Globe Tracker reads. The face paints ONLY what the shell publishes and re-reads the feed every frame: height is measured strength on the spec scale (h = 3 + (dBm + 95) x 30/65, floored at 2), colour is the plane (WIFI / BLE / RID / CELL / GNSS), width is a fixed footing stated on the face and never read as data, entries with no strength in the feed stand as footing dots and count as NO MEASURE, unknown planes are never plotted, and at most the 24 strongest are shown with the count stated on the face. Honest states hold in every build: SCAN - NO FEED (the web build has no shell and reports exactly that), SCAN - NO SIGNALS, and FEED STALE when the feed ages past 15 seconds. Receive-only: the face never connects, pairs, probes or transmits. No bench data ships in the production file. Vanilla single file; the clock rides the title box."
     }
   ]
 }

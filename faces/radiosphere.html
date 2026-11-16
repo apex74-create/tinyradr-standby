@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — RADIOSPHERE · Scan Field</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    background: #04070a;
+    font-family: ui-monospace, "Consolas", "Menlo", Consolas, monospace;
+    color: #c9ffe0;
+    -webkit-user-select: none; user-select: none;
+  }
+  #field { position: absolute; inset: 0; display: block; cursor: grab; touch-action: none; }
+  #field:active { cursor: grabbing; }
+  .panel {
+    position: absolute; z-index: 5; pointer-events: none;
+    background: rgba(4, 12, 9, 0.72);
+    border: 1px solid rgba(64, 255, 150, 0.35);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.6), inset 0 0 24px rgba(64, 255, 150, 0.04);
+    padding: 10px 14px;
+  }
+  #titlebox { top: 14px; left: 14px; }
+  #titlebox h1 {
+    margin: 0; font-size: 20px; letter-spacing: 4px; font-weight: 700;
+    color: #eafff2; text-shadow: 0 0 12px rgba(64, 255, 150, 0.55);
+  }
+  #titlebox h1 .gold { color: #ffcf5c; text-shadow: 0 0 12px rgba(255, 207, 92, 0.5); }
+  #titlebox p { margin: 4px 0 0 0; font-size: 11px; letter-spacing: 2px; color: #7de8ab; }
+  #clock {
+    margin-top: 5px; font-size: 26px; font-weight: 800; line-height: 1;
+    color: #eafff2; font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 10px rgba(64, 255, 150, 0.65);
+  }
+  #legend { top: 14px; right: 14px; font-size: 11px; line-height: 1.75; min-width: 150px; }
+  #legend .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; margin-bottom: 2px; }
+  #legend .sw {
+    display: inline-block; width: 10px; height: 10px; margin-right: 7px;
+    border: 1px solid rgba(255,255,255,0.35); vertical-align: -1px;
+  }
+  #keybox { left: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; }
+  #keybox .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; }
+  #keybox b { color: #eafff2; }
+  #statbox { right: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; text-align: right; }
+  #statbox .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; }
+  #statbox b { color: #eafff2; }
+  #state {
+    position: absolute; z-index: 6; left: 50%; bottom: 14px; transform: translateX(-50%);
+    pointer-events: none; white-space: nowrap;
+    color: #ffcf5c; border: 1px solid rgba(255, 207, 92, 0.65);
+    background: rgba(20, 14, 2, 0.78);
+    padding: 6px 16px; font-size: 13px; letter-spacing: 3px;
+    text-shadow: 0 0 8px rgba(255, 207, 92, 0.45);
+  }
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+
+<div class="panel" id="titlebox">
+  <h1>APEX <span class="gold">RADIOSPHERE</span></h1>
+  <p>SCAN FIELD &middot; SPINNING 3D &middot; DRAG TO SPIN</p>
+  <div id="clock">--:--:--</div>
+</div>
+
+<div class="panel" id="legend"><div class="head">COLOR = PLANE</div><div id="legendRows"></div></div>
+
+<div class="panel" id="keybox">
+  <div class="head">HOW TO READ IT</div>
+  <div><b>TALLER</b> hump = <b>STRONGER</b> signal</div>
+  <div><b>COLOR</b> = the <b>PLANE</b> it sits on</div>
+  <div>WIDTH &mdash; NOT IN FEED (FIXED FOOTING)</div>
+</div>
+
+<div class="panel" id="statbox">
+  <div class="head">FIELD READOUT</div>
+  <div id="strongestLine">STRONGEST: &mdash;</div>
+  <div id="countLine">SIGNALS: &mdash;</div>
+  <div>VIEW ANGLE: <b id="angleOut">0&deg;</b></div>
+</div>
+
+<div id="state">SCAN &mdash; NO FEED</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   APEX RADIOSPHERE — production depot build, Nov 16, 2026.
+   Built to the feed-integration specification of the same date: the
+   bench-proven spinning sphere (hand-rolled projection, plain
+   JavaScript, no framework, no library, no external requests) wired
+   to the APEX SCAN FEED contract v1 in place of any bench data.
+   No bench data exists in this file, in any form (spec rule B1).
+
+   ================================================================
+   APEX SCAN FEED CONTRACT — window.__apexScanFeed (v1)
+   ================================================================
+   The shell owns the radios; the face owns the painting. The shell
+   publishes ONE object and replaces the whole object when its scan
+   state changes:
+
+       window.__apexScanFeed = { on: Boolean, entries: [...] }
+
+   entry = { plane: "wifi" | "ble" | "rid" | "cell" | "gnss",
+             type, id, label (as broadcast), strength (dBm or null),
+             firstSeen, lastSeen }
+
+   The face re-reads the object every animation frame and rebuilds
+   the plotted set when the object changes. An entry the shell stops
+   publishing stops being painted — no ghosts. The face never writes
+   to the feed object (read-only).
+
+   Contract v1 carries NO channel, NO frequency, NO bandwidth. The
+   sphere's axes are therefore ruled, and the rulings are printed on
+   the face: HEIGHT from strength (the bench function); COLOR from
+   plane, in the contract palette; base WIDTH a fixed footing for
+   every hump, with the legend line WIDTH — NOT IN FEED (FIXED
+   FOOTING). Nothing is inferred from label, id, or type.
+
+   TRUTHFUL STATES, PAINTED AS THEMSELVES: feed absent or on:false
+   -> SCAN — NO FEED, zero humps. Feed on with zero entries ->
+   SCAN — NO SIGNALS, zero humps. A null-strength entry gets its
+   base footing dot only, and its readout treatment prints
+   NO MEASURE — a null is never clamped or defaulted to a number.
+
+   PASSIVE LAW (owner, Nov 16, 2026): receive-only, all the way
+   down. No connect, no pair, no probe, no transmit. The sphere's
+   only user control is drag-to-spin, which touches only the camera.
+
+   THIS WEB BUILD HAS NO SHELL: window.__apexScanFeed is never set
+   here, the feed reads OFF, and the face paints SCAN — NO FEED with
+   zero humps — the honest state.
+   ===================================================================== */
+var PLANES = ["wifi", "ble", "rid", "cell", "gnss"];
+var PLANE_NAMES = { wifi: "WIFI", ble: "BLE", rid: "RID", cell: "CELL", gnss: "GNSS" };
+var PLANE_COLORS = {
+  wifi: "#57a7d7", ble: "#9a7fd7", rid: "#f5b83d", cell: "#35d07f", gnss: "#d77f9a"
+};
+var SIGMA_FIXED = 3.8;      /* the bench's 20 MHz footing, as a constant — not a claim */
+var CAP = 24;               /* at most the 24 strongest entries plot */
+
+function hexRgb(hex) {
+  return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+}
+function planeRgba(plane, alpha) {
+  var c = hexRgb(PLANE_COLORS[plane]);
+  return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + alpha + ")";
+}
+function strengthToHeight(dbm) {
+  var h = 3 + (dbm + 95) * (30 / 65);      /* -95 dBm -> 3, -30 dBm -> 33 */
+  return Math.max(2, h);
+}
+function hashStr(s) {
+  var h = 0;
+  for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+/* ---- Feed state -------------------------------------------------------
+   plotted: the entries the current feed object puts on the sphere,
+   each with its presentation spot (band, x, z) resolved at rebuild. */
+var plotted = [];
+var feedState = "nofeed";        /* "nofeed" | "nosignals" | "live" */
+var feedStale = false;
+var staleClock = "";
+var feedTotal = 0;               /* entries in the feed (known planes) */
+var feedNulls = 0;               /* null-strength entries in the feed */
+var feedFingerprint = null;
+
+function rebuild() {
+  var f = window.__apexScanFeed;
+  plotted = []; feedTotal = 0; feedNulls = 0; feedStale = false; staleClock = "";
+  if (!f || !f.on) { feedState = "nofeed"; updateHud(); return; }
+  var entries = Array.isArray(f.entries) ? f.entries : [];
+  var known = entries.filter(function (e) { return e && PLANES.indexOf(e.plane) >= 0; });
+  feedTotal = known.length;
+  if (!known.length) { feedState = "nosignals"; updateHud(); return; }
+  feedState = "live";
+  known.forEach(function (e) { if (e.strength === null || e.strength === undefined) feedNulls++; });
+  /* Measured entries outrank null-strength entries; weakest drop first. */
+  var measured = known.filter(function (e) { return typeof e.strength === "number"; })
+                      .sort(function (a, b) { return b.strength - a.strength; });
+  var nulls = known.filter(function (e) { return typeof e.strength !== "number"; });
+  var chosen = measured.concat(nulls).slice(0, CAP);
+  /* Bands: one per plane present, in contract order, across the floor. */
+  var present = PLANES.filter(function (p) {
+    return chosen.some(function (e) { return e.plane === p; });
+  });
+  var span = 108, bandW = span / present.length;
+  present.forEach(function (p, bi) {
+    var inBand = chosen.filter(function (e) { return e.plane === p; });
+    /* Within a band: strongest first, left to right (the faces' plot rule). */
+    inBand.sort(function (a, b) {
+      var sa = typeof a.strength === "number" ? a.strength : -Infinity;
+      var sb = typeof b.strength === "number" ? b.strength : -Infinity;
+      return sb - sa;
+    });
+    inBand.forEach(function (e, i) {
+      var frac = inBand.length === 1 ? 0.5 : i / (inBand.length - 1);
+      var x = -54 + bandW * bi + bandW * (0.14 + 0.72 * frac);
+      var jitter = (hashStr(String(e.id || e.label || "")) % 9) - 4;
+      var z = -22 + (hashStr(String(e.id || e.label || "") + "#z") % 45) + jitter * 0.4;
+      plotted.push({
+        plane: p, label: e.label || "", strength: (typeof e.strength === "number" ? e.strength : null),
+        x: x, z: Math.max(-27, Math.min(27, z)),
+        h: typeof e.strength === "number" ? strengthToHeight(e.strength) : 0,
+        band: bi, bandX0: -54 + bandW * bi, bandX1: -54 + bandW * (bi + 1)
+      });
+    });
+  });
+  /* Staleness: newest lastSeen in the feed vs the wall clock. */
+  var newest = 0;
+  known.forEach(function (e) { if (typeof e.lastSeen === "number" && e.lastSeen > newest) newest = e.lastSeen; });
+  if (newest && Date.now() - newest > 15000) {
+    feedStale = true;
+    var d = new Date(newest);
+    staleClock = pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
+  }
+  updateHud();
+}
+function fingerprint(f) {
+  if (!f) return "absent";
+  var parts = [f.on ? "on" : "off", (f.entries || []).length];
+  (f.entries || []).forEach(function (e) { parts.push((e && e.id) + "@" + (e && e.lastSeen)); });
+  return parts.join("|");
+}
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+/* ---- Camera (the bench's, unchanged) -------------------------------- */
+var params = new URLSearchParams(window.location.search);
+var theta = (parseFloat(params.get("rot") || "0") * Math.PI / 180) || 0;
+var AUTO_SPEED = params.get("still") === "1" ? 0 : 0.12;   /* rad / sec */
+var vel = AUTO_SPEED;
+var PITCH = 0.46;
+var FOCAL = 175;
+
+var canvas = document.getElementById("field");
+var ctx = canvas.getContext("2d");
+var W = 0, H = 0;
+function resize() {
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  canvas.style.width = W + "px"; canvas.style.height = H + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener("resize", resize);
+resize();
+
+function project(x, y, z) {
+  var ct = Math.cos(theta), st = Math.sin(theta);
+  var xr = x * ct + z * st;
+  var zr = -x * st + z * ct;
+  var cp = Math.cos(PITCH), sp = Math.sin(PITCH);
+  var y2 = y * cp - zr * sp;
+  var z2 = y * sp + zr * cp;
+  var s = FOCAL / (FOCAL + z2);
+  var baseScale = Math.min(W, H) / 118;
+  return {
+    sx: W / 2 + xr * s * baseScale,
+    sy: H * 0.66 - y2 * s * baseScale,
+    depth: z2,
+    scale: s
+  };
+}
+
+/* ---- Drawing --------------------------------------------------------- */
+function drawGround(faces) {
+  /* Band floors: one per plane present, tinted with the plane color. */
+  var seen = {};
+  plotted.forEach(function (s) {
+    if (seen[s.plane]) return;
+    seen[s.plane] = true;
+    var corners = [
+      project(s.bandX0 + 1, 0, -30), project(s.bandX1 - 1, 0, -30),
+      project(s.bandX1 - 1, 0, 30), project(s.bandX0 + 1, 0, 30)
+    ];
+    var d = 0; corners.forEach(function (c) { d += c.depth; });
+    faces.push({ depth: d / 4 + 0.01, draw: function () {
+      ctx.beginPath();
+      corners.forEach(function (c, i) { i ? ctx.lineTo(c.sx, c.sy) : ctx.moveTo(c.sx, c.sy); });
+      ctx.closePath(); ctx.fillStyle = planeRgba(s.plane, 0.05); ctx.fill();
+    }});
+    var lp = project((s.bandX0 + s.bandX1) / 2, 0, 33);
+    faces.push({ depth: lp.depth - 0.02, draw: function () {
+      ctx.font = "700 13px ui-monospace, Consolas, Menlo, monospace";
+      ctx.textAlign = "center";
+      ctx.fillStyle = planeRgba(s.plane, 0.85);
+      ctx.fillText(PLANE_NAMES[s.plane], lp.sx, lp.sy);
+    }});
+  });
+  /* Mesh grid lines — the instrument's ground, in every state. */
+  var gx, gz;
+  for (gx = -56; gx <= 56; gx += 7) {
+    (function (x) {
+      var a = project(x, 0, -30), b = project(x, 0, 30);
+      faces.push({ depth: (a.depth + b.depth) / 2, draw: function () {
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy);
+        ctx.strokeStyle = "rgba(64, 255, 150, 0.12)"; ctx.lineWidth = 1; ctx.stroke();
+      }});
+    })(gx);
+  }
+  for (gz = -30; gz <= 30; gz += 6) {
+    (function (z) {
+      var a = project(-56, 0, z), b = project(56, 0, z);
+      faces.push({ depth: (a.depth + b.depth) / 2 - 0.01, draw: function () {
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy);
+        ctx.strokeStyle = "rgba(64, 255, 150, 0.12)"; ctx.lineWidth = 1; ctx.stroke();
+      }});
+    })(gz);
+  }
+}
+
+var SLICES = [-4.5, -3, -1.5, 0, 1.5, 3, 4.5];
+function drawHump(faces, s) {
+  if (s.strength !== null) {
+    SLICES.forEach(function (dz) {
+      var zScale = Math.exp(-(dz * dz) / (2 * 3.1 * 3.1));
+      var h = s.h * zScale;
+      if (h < 0.4) return;
+      var mid = project(s.x, 0, s.z + dz);
+      var alpha = 0.10 + 0.30 * zScale;
+      faces.push({ depth: mid.depth, draw: function () {
+        var N = 26, i, gx, gy, top = [];
+        ctx.beginPath();
+        for (i = 0; i <= N; i++) {
+          gx = s.x - 3 * SIGMA_FIXED + (6 * SIGMA_FIXED * i) / N;
+          gy = h * Math.exp(-((gx - s.x) * (gx - s.x)) / (2 * SIGMA_FIXED * SIGMA_FIXED));
+          var p = project(gx, gy, s.z + dz);
+          top.push(p);
+          if (i === 0) ctx.moveTo(p.sx, p.sy); else ctx.lineTo(p.sx, p.sy);
+        }
+        var b1 = project(s.x + 3 * SIGMA_FIXED, 0, s.z + dz);
+        var b0 = project(s.x - 3 * SIGMA_FIXED, 0, s.z + dz);
+        ctx.lineTo(b1.sx, b1.sy); ctx.lineTo(b0.sx, b0.sy); ctx.closePath();
+        ctx.fillStyle = planeRgba(s.plane, alpha); ctx.fill();
+        ctx.beginPath();
+        top.forEach(function (p, i) { i ? ctx.lineTo(p.sx, p.sy) : ctx.moveTo(p.sx, p.sy); });
+        ctx.strokeStyle = planeRgba(s.plane, 0.25 + 0.65 * zScale); ctx.lineWidth = 1.2; ctx.stroke();
+      }});
+    });
+  }
+  /* Footing dot at the base — every plotted entry gets one; for a
+     null-strength entry it is the whole painting (NO MEASURE). */
+  var bp = project(s.x, 0, s.z);
+  faces.push({ depth: bp.depth - 0.03, draw: function () {
+    ctx.beginPath(); ctx.arc(bp.sx, bp.sy, 2.4, 0, Math.PI * 2);
+    ctx.fillStyle = planeRgba(s.plane, 0.9); ctx.fill();
+  }});
+}
+
+/* Peak tags for the four strongest MEASURED entries. */
+function drawLabels(faces) {
+  var top = plotted.filter(function (s) { return s.strength !== null; })
+                   .sort(function (a, b) { return b.strength - a.strength; }).slice(0, 4);
+  top.forEach(function (s, li) {
+    var p = project(s.x, s.h + 2.5, s.z);
+    faces.push({ depth: -1000 - li, draw: function () {
+      ctx.font = "700 11px ui-monospace, Consolas, Menlo, monospace";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "rgba(234, 255, 242, 0.95)";
+      ctx.fillText(s.label, p.sx, p.sy - 12);
+      ctx.font = "10px ui-monospace, Consolas, Menlo, monospace";
+      ctx.fillStyle = planeRgba(s.plane, 0.95);
+      ctx.fillText(s.strength + " dBm", p.sx, p.sy);
+      ctx.beginPath(); ctx.moveTo(p.sx, p.sy + 3);
+      var pk = project(s.x, s.h, s.z); ctx.lineTo(pk.sx, pk.sy);
+      ctx.strokeStyle = "rgba(234,255,242,0.35)"; ctx.lineWidth = 1; ctx.stroke();
+    }});
+  });
+}
+
+var angleOut = document.getElementById("angleOut");
+var stateEl = document.getElementById("state");
+var clockEl = document.getElementById("clock");
+function frame() {
+  /* Re-read the feed every frame; rebuild only when it changed. */
+  var fp = fingerprint(window.__apexScanFeed);
+  if (fp !== feedFingerprint) { feedFingerprint = fp; rebuild(); }
+  else if (feedState === "live") {
+    /* Staleness can arrive while the object stands still. */
+    var f = window.__apexScanFeed;
+    var newest = 0;
+    (f.entries || []).forEach(function (e) { if (e && typeof e.lastSeen === "number" && e.lastSeen > newest) newest = e.lastSeen; });
+    var stale = !!(newest && Date.now() - newest > 15000);
+    if (stale !== feedStale) rebuild();
+  }
+  ctx.fillStyle = "#04070a";
+  ctx.fillRect(0, 0, W, H);
+  var faces = [];
+  drawGround(faces);
+  plotted.forEach(function (s) { drawHump(faces, s); });
+  drawLabels(faces);
+  faces.sort(function (a, b) { return b.depth - a.depth; });
+  faces.forEach(function (f) { f.draw(); });
+  var deg = ((theta * 180 / Math.PI) % 360 + 360) % 360;
+  angleOut.textContent = deg.toFixed(0) + "°";
+  stateEl.textContent =
+    feedState === "nofeed" ? "SCAN — NO FEED" :
+    feedState === "nosignals" ? "SCAN — NO SIGNALS" :
+    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "");
+}
+
+/* ---- HUD text -------------------------------------------------------- */
+function updateHud() {
+  var legendRows = document.getElementById("legendRows");
+  var strongestLine = document.getElementById("strongestLine");
+  var countLine = document.getElementById("countLine");
+  if (feedState === "nofeed") {
+    legendRows.innerHTML = "<div>NO FEED</div>";
+    strongestLine.innerHTML = "STRONGEST: &mdash;";
+    countLine.textContent = "SIGNALS: —";
+    return;
+  }
+  if (feedState === "nosignals") {
+    legendRows.innerHTML = "<div>NO SIGNALS</div>";
+    strongestLine.innerHTML = "STRONGEST: &mdash;";
+    countLine.textContent = "SIGNALS: 0";
+    return;
+  }
+  var present = PLANES.filter(function (p) {
+    return plotted.some(function (e) { return e.plane === p; });
+  });
+  legendRows.innerHTML = present.map(function (p) {
+    return '<div><span class="sw" style="background:' + PLANE_COLORS[p] + '"></span>' + PLANE_NAMES[p] + "</div>";
+  }).join("");
+  var measured = plotted.filter(function (s) { return s.strength !== null; })
+                        .sort(function (a, b) { return b.strength - a.strength; });
+  if (measured.length) {
+    var s0 = measured[0];
+    strongestLine.innerHTML = "STRONGEST: <b>" + s0.label + "</b> · " + s0.strength + " dBm · " + PLANE_NAMES[s0.plane];
+  } else {
+    strongestLine.innerHTML = "STRONGEST: &mdash;";
+  }
+  var line;
+  if (feedTotal > plotted.length) line = "SIGNALS: " + plotted.length + " SHOWN / " + feedTotal + " IN FEED";
+  else line = "SIGNALS: " + feedTotal;
+  if (feedNulls) line += " · " + feedNulls + " NO MEASURE";
+  countLine.textContent = line;
+}
+
+/* ---- Clock ------------------------------------------------------------ */
+function tickClock() {
+  var d = new Date();
+  clockEl.textContent = pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ---- Motion: slow auto-spin, drag to spin, inertia on release ------- */
+var dragging = false, lastX = 0, lastT = 0, prevTs = null;
+canvas.addEventListener("pointerdown", function (e) {
+  dragging = true; lastX = e.clientX; lastT = performance.now();
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointermove", function (e) {
+  if (!dragging) return;
+  var now = performance.now(), dx = e.clientX - lastX, dt = Math.max(1, now - lastT);
+  theta += dx * 0.006;
+  vel = (dx * 0.006) / (dt / 1000);
+  lastX = e.clientX; lastT = now;
+});
+function endDrag() { dragging = false; }
+canvas.addEventListener("pointerup", endDrag);
+canvas.addEventListener("pointercancel", endDrag);
+
+function loop(ts) {
+  if (prevTs === null) prevTs = ts;
+  var dt = Math.min(0.05, (ts - prevTs) / 1000); prevTs = ts;
+  if (!dragging) {
+    theta += vel * dt;
+    vel += (AUTO_SPEED - vel) * Math.min(1, dt * 1.6);
+  }
+  frame();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
