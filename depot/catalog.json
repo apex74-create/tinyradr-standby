@@ -185,10 +185,10 @@
       "title": "APEX — Dumb Agachi · Virtual Pony Watch Face",
       "package": "app.lovable.apexsignal.face.dumbagachi",
       "apkPath": "/depot/dumb-agachi.apk",
-      "apkSha256": "631d414dfa58e482e1eb2d8723c7dce0dd6e3981fc6d7ae5a34aa7fca248032e",
+      "apkSha256": "403741dd1b6624007316b776d9bc7870672898a2dc248003a1e0d1bc160a64ba",
       "apkSizeBytes": 2911977,
       "facePath": "/faces/dumb-agachi.html",
-      "faceSha256": "51cde957b2ca764809334cb49c112daf7f78818bce1c04bdae2c14f4d3c6f376",
+      "faceSha256": "c912ef3b29062808c459acb1c1ea20dc6e7acd2e8f5b1fb71859307232954447",
       "priceUsd": 9.99,
       "functions": [
         "clock"
