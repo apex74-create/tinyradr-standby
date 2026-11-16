@@ -30,10 +30,10 @@
       "title": "APEX — Signal Watch · SIGNAL SCOPE V4",
       "package": "app.lovable.apexsignal.face.signalscopev4",
       "apkPath": "/depot/signal-scope-v4.apk",
-      "apkSha256": "1b31e7eb61063c06b71f5afafb71f5f50da817eef59a617afc093e2dc47be525",
-      "apkSizeBytes": 33233,
+      "apkSha256": "e3973e43ff6c9eb7bf704c23caf6b61dc98e7dc6f2c395d68801f06638039759",
+      "apkSizeBytes": 41425,
       "facePath": "/faces/signal-scope-v4.html",
-      "faceSha256": "af63fd61a39f8fe79269ec0989f73234e199ea6777971e00210f9263aa346920",
+      "faceSha256": "6a3b4719f9ccd89d61302d55bc0a0de05401b035317b0a5b2f4cb87880a71117",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -126,10 +126,10 @@
       "title": "APEX GLASS HOUSE — FLAGSHIP (Engine + Aquarium)",
       "package": "app.lovable.apexsignal.face.glasshouseflagship",
       "apkPath": "/depot/glass-house-flagship.apk",
-      "apkSha256": "7ee0cbce38d4746ed248fdecefb237445142b44c2be2e0db5e7068b3f953ea24",
-      "apkSizeBytes": 3375413,
+      "apkSha256": "b62a71320321e2506111063425ea9ad975ce194ebbfc89f5c8bd0070afecde63",
+      "apkSizeBytes": 3108585,
       "facePath": "/faces/glass-house-flagship.html",
-      "faceSha256": "d5c41e8728a51527abad83968a42376d33d913dec7c1188b5432a3211b7e5c1a",
+      "faceSha256": "64a77cf226721f1fb613bf1dbe8c3e62a84f5011e4a785a198b24263b0cdfafa",
       "priceUsd": 9.99,
       "functions": [
         "clock",
@@ -146,10 +146,10 @@
       "title": "APEX GLASS HOUSE — FLAGSHIP MACHINERY (Working Train + Aquarium)",
       "package": "app.lovable.apexsignal.face.glasshouseflagshipmachinery",
       "apkPath": "/depot/glass-house-flagship-machinery.apk",
-      "apkSha256": "9b17501c950a72de21b76fdb4c3a9fd4558c6d8aabc59b3cc8d49810a703304e",
-      "apkSizeBytes": 3377389,
+      "apkSha256": "fc39737dba6affc11b2511e532122b80241895c375bebf21bc95d629633ca814",
+      "apkSizeBytes": 3112681,
       "facePath": "/faces/glass-house-flagship-machinery.html",
-      "faceSha256": "d6d62b3a1fb8ad251e59a72ed958b51af101a4437cdba53573ec1905d44be943",
+      "faceSha256": "fa01b82264630e5aec1ea7b0d22562498b69c00b93871354c9e18244f99d51b5",
       "priceUsd": 9.99,
       "functions": [
         "clock",
@@ -166,10 +166,10 @@
       "title": "APEX GLASS HOUSE — FLAGSHIP MACHINERY DARK (The Machine Eats)",
       "package": "app.lovable.apexsignal.face.glasshouseflagshipdark",
       "apkPath": "/depot/glass-house-flagship-dark.apk",
-      "apkSha256": "bee48a7cef70d8d10f57282152a2cfbe41ed7ff607cb0d1e61602c6b65308184",
-      "apkSizeBytes": 3380273,
+      "apkSha256": "bdcd936922a02d13132722602e8859a314f52373418fa8729e0f2efbfb310044",
+      "apkSizeBytes": 3112681,
       "facePath": "/faces/glass-house-flagship-dark.html",
-      "faceSha256": "68da991beb9bba70c00529bf762fdb88b161dc17554ac2569f3a01e9fb8bd64c",
+      "faceSha256": "61f6039d1aabe2c95279b536eee86c000c378669e16baaed406647202e83a5cf",
       "priceUsd": 9.99,
       "functions": [
         "clock",
@@ -186,10 +186,10 @@
       "title": "APEX — Barracuda V8 · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.barracuda",
       "apkPath": "/depot/barracuda.apk",
-      "apkSha256": "13aede566690dab726b0a0994d90a0713709b8565bc399201b29c85e738b1bad",
-      "apkSizeBytes": 3169225,
+      "apkSha256": "cc613e7bfaccbd2d1e03d3372cfdc4d387bef1e78529f5eb8f7f3603071d3b6c",
+      "apkSizeBytes": 2911977,
       "facePath": "/faces/barracuda.html",
-      "faceSha256": "dfa4bfd72e354c89982145886108fa86e29e0eb01b19ce9b56d8eb46ade7ac41",
+      "faceSha256": "2c6f76e2f21cc7586aeedec9c574e949795442d89a27d83123a2df6b0e90ad06",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -205,10 +205,10 @@
       "title": "APEX — Dumb Agachi · Virtual Pony Watch Face",
       "package": "app.lovable.apexsignal.face.dumbagachi",
       "apkPath": "/depot/dumb-agachi.apk",
-      "apkSha256": "e252b73970ea7cbd9c355e7c8edd10f66ddf9939631b44299c15f6085c1c725c",
-      "apkSizeBytes": 3172949,
+      "apkSha256": "631d414dfa58e482e1eb2d8723c7dce0dd6e3981fc6d7ae5a34aa7fca248032e",
+      "apkSizeBytes": 2911977,
       "facePath": "/faces/dumb-agachi.html",
-      "faceSha256": "0893cb3a48efdc013f639c9f20a96d2741e605057c209b9fb7ceecbf6f558589",
+      "faceSha256": "51cde957b2ca764809334cb49c112daf7f78818bce1c04bdae2c14f4d3c6f376",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -224,10 +224,10 @@
       "title": "APEX — P&W J58 · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.j58",
       "apkPath": "/depot/j58.apk",
-      "apkSha256": "cb7d9c675c747681c0bbd72d3245d8ce2c1422112f1e8cc7b155d1239f181b69",
-      "apkSizeBytes": 3169085,
+      "apkSha256": "81d5343d302979e0013d6779b276d864ea73c5336afe24012df14fe3aeffd0ad",
+      "apkSizeBytes": 2911977,
       "facePath": "/faces/j58.html",
-      "faceSha256": "2604bd768c7ebb1244fd72020298c246068f44ee0b3c433f0df2aec5f2f315c7",
+      "faceSha256": "68126da3923296e04e925ceeeb3aae1727688981f3e9653a3fc18f5cf4b89e55",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -243,10 +243,10 @@
       "title": "APEX — GE J79 · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.j79blackbird",
       "apkPath": "/depot/j79-blackbird.apk",
-      "apkSha256": "f5f406d3555081c426b6e7d512a1740b813181748f8e9aa4294277fbfc0c36aa",
-      "apkSizeBytes": 3168305,
+      "apkSha256": "5fcec1656f835ac25955ec3861ae93332713a92dff87bf782cfe9c7587add8b9",
+      "apkSizeBytes": 2911977,
       "facePath": "/faces/j79-blackbird.html",
-      "faceSha256": "194db2c2b5cb9c0366dfce58129c102b342da649f9f3933eb36205b7ebcc55dc",
+      "faceSha256": "56c7b3ecb46f9184cf117e8ebb4d0582bb6674f6ab27cb4c9b7dd64a4d9351b8",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -262,10 +262,10 @@
       "title": "APEX — Lamborghini V12 · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.lamborghiniv12",
       "apkPath": "/depot/lamborghini-v12.apk",
-      "apkSha256": "c1bca388b212e7a25178043e67faf24c365aa083f018ac34be52bef15fccf4d1",
-      "apkSizeBytes": 3168849,
+      "apkSha256": "42ca3bf980aaf0e9d7b8282b82bd606b6b1fd6b6a4481d13459c4f2db8173d8c",
+      "apkSizeBytes": 3178241,
       "facePath": "/faces/lamborghini-v12.html",
-      "faceSha256": "efed6a4057ff44aeb8ce49f2022e1c8b7b1e68322ea241db60e02d9c28f250e1",
+      "faceSha256": "cb83f8098c70752d59334d4985c4f9109ff898a79b44ab7fb48f519fe4528107",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -281,10 +281,10 @@
       "title": "APEX — Raptor · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.raptor",
       "apkPath": "/depot/raptor.apk",
-      "apkSha256": "af612d62fa20b48c9eb2ccfe04c8f045a48e56525c24b693729984daf40cf790",
-      "apkSizeBytes": 3168893,
+      "apkSha256": "05e06e269eceb9be17840a8ec4ebb66216223d076b31304ce72be7ed79a26259",
+      "apkSizeBytes": 2911977,
       "facePath": "/faces/raptor.html",
-      "faceSha256": "4875dee820ec84af48bbaeb626c78212a71ff10c6046f8d56c3d9e3a92bf5546",
+      "faceSha256": "f15e5681b98468fb17659a0a4778984751d80b845fe0dbb20bf09584b9fbfb7e",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -604,10 +604,10 @@
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "package": "app.lovable.apexsignal.face.isawauapv21glass",
       "apkPath": "/depot/isawauap-v2-1-glass.apk",
-      "apkSha256": "1e54651161fddf02f58fda4acc069a20eef334a306bdfcf265f43f1ad23d65e5",
+      "apkSha256": "5f6de4c3402c55fdceb59ca9bbd55b722f05b7eeea5cee645448a89535d5e0b9",
       "apkSizeBytes": 25041,
       "facePath": "/faces/isawauap-v2-1-glass.html",
-      "faceSha256": "8c26d018e7418bf9a893073ab7c1f4d239b57b692418ada67cff233decd30c73",
+      "faceSha256": "b425d1daf804d83e1a8be15a7ff03a228369d45dde0937e64317ad90f990c5b3",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -623,10 +623,10 @@
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "package": "app.lovable.apexsignal.face.isawauapv22milkyway",
       "apkPath": "/depot/isawauap-v2-2-milkyway.apk",
-      "apkSha256": "2d8a844962ce789ad4bfef03a02db54cc9f60a249289c07d8d405ad7dbb4e1ff",
-      "apkSizeBytes": 25041,
+      "apkSha256": "0ce79ea0f7f74e26d483ff21c13212261b9b13a3e0eeb106874f047152f85202",
+      "apkSizeBytes": 29137,
       "facePath": "/faces/isawauap-v2-2-milkyway.html",
-      "faceSha256": "2243c9119cfa12a34e8e9dcee71c0b78c37f14b802bde7a2395ab371d04322df",
+      "faceSha256": "a9c776b058a404d9e9de10b56bc730fee61f732283b65f1c4a77cccdbbbc0f50",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -642,10 +642,10 @@
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "package": "app.lovable.apexsignal.face.isawauapv23treeevidence",
       "apkPath": "/depot/isawauap-v2-3-tree-evidence.apk",
-      "apkSha256": "6dc764d3dabe1d342ab6874df7956aa40785f38968ae63c2123070cf8488fcb5",
-      "apkSizeBytes": 25041,
+      "apkSha256": "6cac6cfcf48b8b4e1bf00c5fa52e668cbf700761bd2fe9adcdbe7c13850470c5",
+      "apkSizeBytes": 29137,
       "facePath": "/faces/isawauap-v2-3-tree-evidence.html",
-      "faceSha256": "ec1559c7c5d0288715364cf9e8a35c9cdd5a5d1b86070e1a83179f36356b11b1",
+      "faceSha256": "5ded61771f91b35233bcf4897c473743436298343de8522858b97854a1219398",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -661,10 +661,10 @@
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "package": "app.lovable.apexsignal.face.isawauapv24spacingevidencefix",
       "apkPath": "/depot/isawauap-v2-4-spacing-evidencefix.apk",
-      "apkSha256": "fbd8b52d23fd16ab3d1733ec4a300dbe91e1617a5a5bf8b9b273c681c58fce81",
+      "apkSha256": "e56f401aaaff837200e8a3eb018459eb72e2926f2f4b711680388a16d02d5696",
       "apkSizeBytes": 29137,
       "facePath": "/faces/isawauap-v2-4-spacing-evidencefix.html",
-      "faceSha256": "9b4b4558af9da77e2360e5c43019a6a0f17260d890c20082d2eb0c5835bb7974",
+      "faceSha256": "8583a103b95c2e447ceb8fad343e4a6d4d8e5d3a2c64479c194bae4c84279600",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -680,10 +680,10 @@
       "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
       "package": "app.lovable.apexsignal.face.isawauapv2vaultmachineglass",
       "apkPath": "/depot/isawauap-v2-vault-machine-glass.apk",
-      "apkSha256": "5480dfb6041c049c3c7f6af46e2a285237c56cef8efaae6a16d17f583e593ef3",
+      "apkSha256": "e62132a0900b95a31c5cc82ff0c3cb0cd5bd4201d0a0681278c7ec1546afc592",
       "apkSizeBytes": 25041,
       "facePath": "/faces/isawauap-v2-vault-machine-glass.html",
-      "faceSha256": "8b480a0bd59c6db197cdbb8a3bc33c949e1b7308f1d398f4673c8c59f749988f",
+      "faceSha256": "d5d600ea60f63f60bcac26ee13143a6f580d8177402abaf3776f7711a2a807af",
       "priceUsd": 9.99,
       "functions": [
         "clock"

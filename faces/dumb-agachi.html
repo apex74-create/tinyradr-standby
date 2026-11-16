@@ -302,8 +302,17 @@ var feedG = el("g", {visibility:"hidden"}, bob);
 function pose(){
   var st = stageOf();
   var sc = STAGE_SCALE[st];
+  /* HORSE VISIBILITY REPAIR (Nov 16, 2026): the old chain carried an
+     extra translate(0 -272) translate(0 118) INSIDE the scale, which
+     lifted the whole pony 154*sc units up the frame - head and ears
+     clipped above the viewBox, hooves floating ~120 units over the
+     ground line (owner field report: "the graphics on the horse are
+     all fucked up - you never even see it"). The art is drawn around
+     a local origin at hoof level and the ground sits at y=272, so
+     the placement is just: hooves on the ground line, scaled about
+     that point. Nothing else moves. */
   pony.setAttribute("transform",
-    "translate(230 272) scale("+sc+") translate(0 -272) translate(0 118)");
+    "translate(230 272) scale("+sc+")");
 }
 
 /* ---- Meters + stage line ---------------------------------------------- */
