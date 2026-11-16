@@ -727,40 +727,6 @@
       "note": "The original (non-square) Machinery Clock from the visual stack; the SQUARE edition is a separate listing."
     },
     {
-      "slug": "lighthouse",
-      "name": "Apex Face — Lighthouse",
-      "title": "The Provability Lighthouse — Wave 1: The Provenance Stack",
-      "package": "app.lovable.apexsignal.face.lighthouse",
-      "apkPath": "/depot/lighthouse.apk",
-      "apkSha256": "95c2e6fbea8651190cb77a4ef06033c0b13ff18214efceea5fd92f7d5556b5c7",
-      "apkSizeBytes": 12753,
-      "facePath": "/faces/lighthouse.html",
-      "faceSha256": "d4058760afd19dcadf56971abd5a2feefed1ce45dbfe102bd15d1b14b3c448e2",
-      "priceUsd": 9.99,
-      "functions": [
-        "clock"
-      ],
-      "status": "BUILT",
-      "note": "Lighthouse face from the visual stack, landed for the shelf."
-    },
-    {
-      "slug": "productivity-waves",
-      "name": "Apex Face — Productivity Waves",
-      "title": "Productivity Waves — Laid Over Each Other",
-      "package": "app.lovable.apexsignal.face.productivitywaves",
-      "apkPath": "/depot/productivity-waves.apk",
-      "apkSha256": "3b0e0847de7ac164cb168f39901bfe0ca7857de5e7421f6fe73b2374a3488af6",
-      "apkSizeBytes": 12753,
-      "facePath": "/faces/productivity-waves.html",
-      "faceSha256": "ab009e6ba2637df97874dcf5c09f938f89fa6c9e9ee432a1c2358ab27348c0b3",
-      "priceUsd": 9.99,
-      "functions": [
-        "clock"
-      ],
-      "status": "BUILT",
-      "note": "Productivity Waves face from the visual stack, landed for the shelf."
-    },
-    {
       "slug": "motion-wallpaper",
       "name": "Apex Face — Motion Wallpaper",
       "title": "House Library · Entry #1 — Glint Chasing Screen Mesh (Motion Wallpaper)",

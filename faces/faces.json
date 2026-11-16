@@ -372,26 +372,6 @@
     },
     {
       "access": "public-standalone",
-      "key": "lighthouse",
-      "note": "Lighthouse face from the visual stack, landed for the shelf.",
-      "path": "/faces/lighthouse.html",
-      "sha256": "d4058760afd19dcadf56971abd5a2feefed1ce45dbfe102bd15d1b14b3c448e2",
-      "source": "00-visual-stack-09-lighthouse.html",
-      "title": "The Provability Lighthouse — Wave 1: The Provenance Stack",
-      "version": "v1"
-    },
-    {
-      "access": "public-standalone",
-      "key": "productivity-waves",
-      "note": "Productivity Waves face from the visual stack, landed for the shelf.",
-      "path": "/faces/productivity-waves.html",
-      "sha256": "ab009e6ba2637df97874dcf5c09f938f89fa6c9e9ee432a1c2358ab27348c0b3",
-      "source": "00-visual-stack-16-productivity-waves.html",
-      "title": "Productivity Waves — Laid Over Each Other",
-      "version": "v1"
-    },
-    {
-      "access": "public-standalone",
       "key": "motion-wallpaper",
       "note": "Motion wallpaper from the visual stack, landed for the shelf.",
       "path": "/faces/motion-wallpaper.html",

@@ -811,44 +811,6 @@
       "garageStatus": "IN THE GARAGE"
     },
     {
-      "slug": "lighthouse",
-      "name": "Apex Face — Lighthouse",
-      "title": "The Provability Lighthouse — Wave 1: The Provenance Stack",
-      "package": "app.lovable.apexsignal.face.lighthouse",
-      "apkPath": "/depot/lighthouse.apk",
-      "apkSha256": "95c2e6fbea8651190cb77a4ef06033c0b13ff18214efceea5fd92f7d5556b5c7",
-      "apkSizeBytes": 12753,
-      "facePath": "/faces/lighthouse.html",
-      "faceSha256": "d4058760afd19dcadf56971abd5a2feefed1ce45dbfe102bd15d1b14b3c448e2",
-      "priceUsd": 9.99,
-      "functions": [
-        "clock"
-      ],
-      "status": "BUILT",
-      "note": "Lighthouse face from the visual stack, landed for the shelf.",
-      "bay": 43,
-      "garageStatus": "IN THE GARAGE"
-    },
-    {
-      "slug": "productivity-waves",
-      "name": "Apex Face — Productivity Waves",
-      "title": "Productivity Waves — Laid Over Each Other",
-      "package": "app.lovable.apexsignal.face.productivitywaves",
-      "apkPath": "/depot/productivity-waves.apk",
-      "apkSha256": "3b0e0847de7ac164cb168f39901bfe0ca7857de5e7421f6fe73b2374a3488af6",
-      "apkSizeBytes": 12753,
-      "facePath": "/faces/productivity-waves.html",
-      "faceSha256": "ab009e6ba2637df97874dcf5c09f938f89fa6c9e9ee432a1c2358ab27348c0b3",
-      "priceUsd": 9.99,
-      "functions": [
-        "clock"
-      ],
-      "status": "BUILT",
-      "note": "Productivity Waves face from the visual stack, landed for the shelf.",
-      "bay": 44,
-      "garageStatus": "IN THE GARAGE"
-    },
-    {
       "slug": "motion-wallpaper",
       "name": "Apex Face — Motion Wallpaper",
       "title": "House Library · Entry #1 — Glint Chasing Screen Mesh (Motion Wallpaper)",
@@ -864,7 +826,7 @@
       ],
       "status": "BUILT",
       "note": "Motion wallpaper from the visual stack, landed for the shelf.",
-      "bay": 45,
+      "bay": 43,
       "garageStatus": "IN THE GARAGE"
     },
     {
@@ -883,7 +845,7 @@
       ],
       "status": "BUILT",
       "note": "Condensed engine face wallpaper edition from the visual stack.",
-      "bay": 46,
+      "bay": 44,
       "garageStatus": "IN THE GARAGE"
     },
     {
@@ -902,7 +864,7 @@
       ],
       "status": "BUILT",
       "note": "Holly's face from the visual stack. File landed in the faces line Nov 13 (PR #91) and held off the sales catalogue as the owner's explicit call; listed for sale Nov 13, 2026 on his blanket go (15:43 EST) — the catalogue flip.",
-      "bay": 47,
+      "bay": 45,
       "garageStatus": "IN THE GARAGE"
     }
   ],
