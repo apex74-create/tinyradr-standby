@@ -29,13 +29,16 @@
      A plate is a PLATE: a static hang behind the face's own moving
      elements (owner rule, Nov 8 — the plate does not need its own
      motion and gets none). Everything else on the face — readout,
-     pulse, GPS, drones, glyphs, frame — is identical on both.
+     pulse, GPS, scan markers, glyphs, frame — is identical on both.
 
-   * WIREFRAME DRONES: line-art quadcopters in the plate's green
-     that FLY — smooth closed patrol loops with bank and bob — each
-     carrying a TRACKING treatment: a lock bracket that follows it,
-     a fading trail, and a small label tag. Labels come from the
-     NATIVE BUCKET contract below.
+   * SCAN MARKERS (Nov 16, 2026 — the patrol craft are RETIRED):
+     the markers are REAL nearby signals from the APEX SCAN FEED
+     contract below — one marker per heard emitter, plotted by
+     plane and strength, each carrying the lock-bracket tracking
+     treatment and a tag with its broadcast label and measured
+     strength. No feed, no markers: the field paints its state
+     (SCAN — NO FEED / SCAN — NO SIGNALS) instead. A marker is
+     never decoration.
 
    * BIG CASIO READOUT: the time in DSEG7 Classic segment digits
      (the house embed, SIL OFL 1.1, zero external calls), HOLLOW in
@@ -75,31 +78,65 @@
      have nothing to govern and none was invented.
 
   ================================================================
-  NATIVE BUCKET CONTRACT — readNativeBucket()
+  APEX SCAN FEED CONTRACT — window.__apexScanFeed (v1)
   ================================================================
-  The drone label tags read from ONE function:
+  The TRK markers on this face are REAL nearby signals or they
+  are nothing. The APK shell owns the radios; the face owns the
+  painting. The shell publishes ONE object:
 
-      readNativeBucket() -> Array of { id, label, rssi }
+      window.__apexScanFeed = { on: Boolean, entries: [...] }
 
-  EXPECTED ENTRIES (when a real bucket feeds it):
-    id    — stable string id of the tracked emitter/contact.
-    label — display string for the tag, e.g. a Wi-Fi SSID read by
-            the native container's Wi-Fi analyzer bucket.
-    rssi  — signal strength in dBm (negative number) or null.
+  ENTRY FIELDS (one entry = one heard emitter):
+    plane     — "wifi" | "ble" | "rid" | "cell" | "gnss": the
+                radio plane the emitter was heard on.
+    type      — the shell's class string for the emitter
+                (e.g. "ap", "ble-device", "remote-id").
+    id        — stable string id of the emitter as broadcast
+                (BSSID, BLE address, Remote ID serial).
+    label     — display string for the tag, AS BROADCAST (an
+                SSID, an advertised name) — never invented.
+    strength  — signal strength in dBm (negative number) or
+                null when the plane reports none.
+    firstSeen / lastSeen — shell timestamps (ms) bracketing
+                the entry's life in the feed.
 
-  THIS WEB BUILD RETURNS THE EMPTY ARRAY, ALWAYS. A browser face
-  has no radio access; there is nothing honest to report. When the
-  bucket is empty, every drone flies with a GENERIC track tag
-  (TRK-01, TRK-02, TRK-03) — a tag that claims nothing about the
-  world. NO sample SSIDs, NO invented networks, NO placeholder
-  "real-looking" entries may ever be hardcoded here — fabricated
-  entries are forbidden by the estate fabrication ban.
+  CADENCE: the shell replaces the object when its scan state
+  changes (a scan cycle completing, an entry arriving or
+  expiring); the face re-reads it every animation frame and
+  re-plots from the object alone. Entries the shell stops
+  publishing stop being painted — the face holds no ghosts.
 
-  THE NATIVE ANDROID CONTAINER is where a real Wi-Fi scan bucket
-  will feed this contract later: the container polls its scan
-  results and republishes them through this same function shape;
-  the face code does not change. Until then: empty bucket,
-  generic tags, honest face.
+  EMPTY STATES, PAINTED AS THEMSELVES: feed absent or
+  on:false -> the marker field paints SCAN — NO FEED and zero
+  markers. Feed on with zero entries -> SCAN — NO SIGNALS and
+  zero markers. NO decorative positions, NO sample SSIDs, NO
+  invented networks, NO placeholder "real-looking" entries
+  may ever be hardcoded here — fabricated entries are
+  forbidden by the estate fabrication ban.
+
+  PASSIVE LAW (owner, Nov 16, 2026): this device NEVER acts
+  on another signal source — receive-only, all the way down.
+  No field in this contract implies interaction with a
+  source: no connect, no pair, no probe, no transmit. The
+  single exception class — connecting to an OPEN access
+  point through a normal standard protocol for a normal file
+  transfer (Quick Share and its kin) — lives at the shell/OS
+  layer and is never a face behavior. The lineage is the
+  house's passive-where-defensive doctrine for the whole
+  signal line: what the face paints is the SEEING — every
+  signal around the wearer, separated into planes and laid
+  out by strength; the layered read itself is the product.
+
+  PRECEDENT: the house's Apex Wi-Fi Analyzer v1.0 already
+  scans Wi-Fi inside an Apex APK — the wifi plane of this
+  feed is proven in-house work, not a new invention. The
+  other planes (BLE scan, Remote ID reception, cell and
+  GNSS reads) are shell work to be proven the same way
+  before their entries are trusted.
+
+  THIS WEB BUILD HAS NO SHELL: window.__apexScanFeed is
+  never set here, the feed reads OFF, and the face paints
+  SCAN — NO FEED with zero markers — the honest state.
 
   PALETTE — CALLED COLOURS ONLY, solid tones, never washed:
   void #010403, chip #020a06 (readout backing, near-black green),
@@ -219,17 +256,22 @@ window.__cycleBackdrop = function(){
 };
 
 /* ================================================================
-   NATIVE BUCKET CONTRACT — see the header comment block for the
-   full contract. readNativeBucket() returns an array of
-   { id, label, rssi }. THIS WEB BUILD RETURNS [] — a browser
-   face has no radio access, and fabricated entries are
-   forbidden. The native Android container will feed real Wi-Fi
-   scan results through this same shape later.
+   APEX SCAN FEED — see the header comment block for the full
+   contract. readScanFeed() returns the shell-supplied feed
+   ({ on, entries }) or the honest off state. THIS WEB BUILD
+   HAS NO SHELL: window.__apexScanFeed is never set here, the
+   feed reads OFF, and the scan layer paints SCAN — NO FEED
+   with zero markers. No sample entries, no invented networks,
+   no placeholder "real-looking" data may ever be hardcoded
+   here — fabricated entries are forbidden by the estate
+   fabrication ban.
    ================================================================ */
-function readNativeBucket(){
-  return [];
+function readScanFeed(){
+  var f = window.__apexScanFeed;
+  if (!f || f.on !== true || Object.prototype.toString.call(f.entries) !== "[object Array]")
+    return { on: false, entries: [] };
+  return f;
 }
-var bucket = readNativeBucket();
 
 /* ---------------- stage + sizing ---------------- */
 var stage = document.getElementById("stage");
@@ -285,7 +327,7 @@ function sizeStage(){
   /* the patrol is fraction-seeded against the stage, so a real
      viewport change reseeds it — but a bare frame toggle is not
      a viewport change and must not teleport the craft */
-  if (moved) seedDrones();
+  /* (the scan layer lays out from the live feed every frame — nothing seeds) */
 }
 function layoutHud(){
   var m = Math.min(VW, VH);
@@ -306,71 +348,72 @@ window.addEventListener("resize", function(){
   resizeTimer = setTimeout(sizeStage, 60);
 });
 
-/* ---------------- wireframe drones ----------------
-   Three patrol craft on smooth closed Lissajous loops (the
-   bench reads these same parameters, so what it samples is what
-   flies). Each drone: a line-art quadcopter — body diamond, four
-   arms, four rotor rings that shimmer, a belly eye — drawn in
-   the plate's green, thin strokes. The TRACKING treatment rides
-   with it: corner-bracket lock box, a fading trail of past
-   positions, and a label tag under the box. */
-function makeDrone(i, cx, cy, rx, ry, sp, ph){
-  return { i:i, cx:cx, cy:cy, rx:rx, ry:ry, sp:sp, ph:ph,
-           x:0, y:0, vx:0, vy:0, trail:[] };
+/* ---------------- THE SCAN LAYER — real signals only --------
+   The markers are not patrol craft and they are not decoration:
+   each marker IS one entry of the scan feed the shell supplies
+   (window.__apexScanFeed — the contract in the header). The
+   layer re-reads the feed every frame; a marker exists only
+   while its entry exists. Placement encodes PLANE (one
+   horizontal band per plane that has entries, stacked in
+   contract order) and RELATIVE STRENGTH (strongest first, left
+   to right, and printed in the tag) — never a bearing, never a
+   position in the world: the feed carries no bearing and the
+   face invents none. No trails: a trail would claim movement
+   through space the face cannot know. Feed off or absent ->
+   NO markers, and the layer paints its state instead:
+   SCAN — NO FEED. Feed on, zero entries -> SCAN — NO SIGNALS.
+   Both states are the truth of the radio space as the face
+   can know it. (This layer replaces the retired Lissajous
+   patrol craft, whose positions were a formula, not signals —
+   the owner's charge, Nov 16, 2026: "no real pipes bringing
+   in the real numbers.") */
+var SCAN_PLANES = [
+  { id: "wifi", label: "WIFI" },
+  { id: "ble",  label: "BLE" },
+  { id: "rid",  label: "RID" },
+  { id: "cell", label: "CELL" },
+  { id: "gnss", label: "GNSS" }
+];
+var SCAN_MAX_MARKERS = 8;
+var scanPlotted = [];    /* bench mirror of the last plotted set */
+var scanBenchState = { on: false, entries: 0 };
+function scanBands(feed){
+  /* entries grouped by plane (contract order), strongest first
+     inside each plane; the plot caps at SCAN_MAX_MARKERS,
+     strongest entries kept */
+  var byPlane = {};
+  for (var i = 0; i < SCAN_PLANES.length; i++) byPlane[SCAN_PLANES[i].id] = [];
+  for (var j = 0; j < feed.entries.length; j++){
+    var e = feed.entries[j];
+    if (e && byPlane[e.plane]) byPlane[e.plane].push(e);
+  }
+  var bands = [], used = 0;
+  for (var p = 0; p < SCAN_PLANES.length; p++){
+    var list = byPlane[SCAN_PLANES[p].id];
+    if (!list.length) continue;
+    list.sort(function(a, b){
+      var sa = (typeof a.strength === "number") ? a.strength : -999;
+      var sb = (typeof b.strength === "number") ? b.strength : -999;
+      return sb - sa;
+    });
+    var take = Math.min(list.length, SCAN_MAX_MARKERS - used);
+    if (take > 0){ bands.push({ plane: SCAN_PLANES[p], entries: list.slice(0, take) }); used += take; }
+    if (used >= SCAN_MAX_MARKERS) break;
+  }
+  return bands;
 }
-var drones = [];
-function seedDrones(){
+function drawScanState(txt){
   var W = innerW(), H = innerH();
-  drones = [
-    makeDrone(0, 0.66*W, 0.30*H, 0.150*W, 0.085*H, 0.55, 0.0),
-    makeDrone(1, 0.40*W, 0.52*H, 0.170*W, 0.100*H, 0.42, 2.1),
-    makeDrone(2, 0.72*W, 0.60*H, 0.120*W, 0.075*H, 0.68, 4.2)
-  ];
-}
-function dronePos(d, t){
-  var x = d.cx + d.rx * Math.sin(d.sp * t + d.ph);
-  var y = d.cy + d.ry * Math.sin(2 * d.sp * t + d.ph * 1.7);
-  return [x, y];
-}
-function droneTag(d){
-  var b = bucket[d.i];
-  if (b && b.label) return String(b.label).slice(0, 14);
-  return "TRK-0" + (d.i + 1);
-}
-function drawDrone(d, t, nowMs){
-  var W = innerW();
-  var s = Math.max(9, W * 0.021);              /* drone half-size */
-  var x = d.x, y = d.y;
-  var bank = Math.max(-0.45, Math.min(0.45, d.vx * 0.0016));
-  /* trail — past positions, fading */
-  ctx.lineWidth = 1;
-  for (var i = 1; i < d.trail.length; i++){
-    var a = i / d.trail.length;
-    ctx.strokeStyle = PAL.trail; ctx.globalAlpha = 0.05 + 0.20 * a;
-    ctx.beginPath();
-    ctx.moveTo(d.trail[i-1][0], d.trail[i-1][1]);
-    ctx.lineTo(d.trail[i][0], d.trail[i][1]);
-    ctx.stroke();
-  }
+  ctx.font = "600 " + Math.max(10, Math.round(W * 0.026)) + "px ui-monospace, Menlo, Consolas, monospace";
+  ctx.fillStyle = PAL.tag; ctx.globalAlpha = 0.85;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(txt, W / 2, H * 0.52);
   ctx.globalAlpha = 1;
-  /* the craft — wireframe, thin strokes in the plate's green */
-  ctx.save();
-  ctx.translate(x, y); ctx.rotate(bank);
-  ctx.strokeStyle = PAL.drone; ctx.lineWidth = 1.3;
-  ctx.beginPath();                              /* body diamond */
-  ctx.moveTo(0, -s*0.45); ctx.lineTo(s*0.55, 0); ctx.lineTo(0, s*0.45); ctx.lineTo(-s*0.55, 0);
-  ctx.closePath(); ctx.stroke();
-  var arms = [[-1,-1],[1,-1],[-1,1],[1,1]];
-  for (var k = 0; k < 4; k++){
-    var ax = arms[k][0] * s, ay = arms[k][1] * s * 0.72;
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ax, ay); ctx.stroke();
-    var rr = s * 0.34 * (1 + 0.10 * Math.sin(nowMs * 0.05 + k * 1.7 + d.i));
-    ctx.beginPath(); ctx.ellipse(ax, ay, rr, rr * 0.36, 0, 0, 6.2832); ctx.stroke();
-  }
-  ctx.fillStyle = PAL.drone;                    /* belly eye */
-  ctx.beginPath(); ctx.arc(0, 0, Math.max(1.2, s * 0.10), 0, 6.2832); ctx.fill();
-  ctx.restore();
-  /* tracking lock — corner brackets that ride the craft */
+}
+function drawMarker(e, x, y, nowMs){
+  var W = innerW();
+  var s = Math.max(9, W * 0.021);              /* marker half-size */
+  /* tracking lock — corner brackets around the heard emitter */
   var b = s * 1.9, bl = s * 0.55;
   ctx.strokeStyle = PAL.drone; ctx.lineWidth = 1.4;
   var cs = [[-1,-1],[1,-1],[-1,1],[1,1]];
@@ -382,14 +425,37 @@ function drawDrone(d, t, nowMs){
     ctx.lineTo(px, py - cs[c][1] * bl);
     ctx.stroke();
   }
-  /* dashed track line from the box down to the tag */
+  ctx.strokeStyle = PAL.drone; ctx.lineWidth = 1.3;
+  if (e.plane === "rid"){
+    /* a Remote ID entry IS a drone: the wireframe craft glyph,
+       rotor shimmer phased to the real millisecond clock */
+    ctx.beginPath();                            /* body diamond */
+    ctx.moveTo(x, y - s*0.45); ctx.lineTo(x + s*0.55, y); ctx.lineTo(x, y + s*0.45); ctx.lineTo(x - s*0.55, y);
+    ctx.closePath(); ctx.stroke();
+    var arms = [[-1,-1],[1,-1],[-1,1],[1,1]];
+    for (var k = 0; k < 4; k++){
+      var ax = x + arms[k][0] * s, ay = y + arms[k][1] * s * 0.72;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(ax, ay); ctx.stroke();
+      var rr = s * 0.34 * (1 + 0.10 * Math.sin(nowMs * 0.05 + k * 1.7));
+      ctx.beginPath(); ctx.ellipse(ax, ay, rr, rr * 0.36, 0, 0, 6.2832); ctx.stroke();
+    }
+  } else {
+    /* every other plane: the signal diamond */
+    ctx.beginPath();
+    ctx.moveTo(x, y - s*0.6); ctx.lineTo(x + s*0.6, y); ctx.lineTo(x, y + s*0.6); ctx.lineTo(x - s*0.6, y);
+    ctx.closePath(); ctx.stroke();
+  }
+  ctx.fillStyle = PAL.drone;                    /* centre eye */
+  ctx.beginPath(); ctx.arc(x, y, Math.max(1.2, s * 0.10), 0, 6.2832); ctx.fill();
+  /* dashed line from the box down to the tag */
   ctx.save();
   ctx.setLineDash([2, 3]);
   ctx.strokeStyle = PAL.trail; ctx.globalAlpha = 0.6; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(x, y + b); ctx.lineTo(x, y + b + 7); ctx.stroke();
   ctx.restore(); ctx.globalAlpha = 1;
-  /* label tag */
-  var tag = droneTag(d);
+  /* label tag — the broadcast label, and the measured strength */
+  var tag = String(e.label || e.id || "?").slice(0, 14);
+  if (typeof e.strength === "number") tag += " " + Math.round(e.strength);
   ctx.font = "600 " + Math.max(8, Math.round(W * 0.017)) + "px ui-monospace, Menlo, Consolas, monospace";
   var tw = ctx.measureText(tag).width;
   var tx = Math.max(2, Math.min(innerW() - tw - 8, x - tw / 2 - 4));
@@ -400,6 +466,34 @@ function drawDrone(d, t, nowMs){
   ctx.strokeRect(tx + 0.5, ty + 0.5, tw + 7, 12);
   ctx.fillStyle = PAL.tag; ctx.textAlign = "left"; ctx.textBaseline = "middle";
   ctx.fillText(tag, tx + 4, ty + 7);
+}
+function drawScanLayer(nowMs){
+  var feed = readScanFeed();
+  scanBenchState = { on: feed.on, entries: feed.entries.length };
+  scanPlotted = [];
+  if (!feed.on){ drawScanState("SCAN — NO FEED"); return; }
+  var bands = scanBands(feed);
+  if (!bands.length){ drawScanState("SCAN — NO SIGNALS"); return; }
+  var W = innerW(), H = innerH();
+  var fieldTop = H * 0.30, fieldBot = H * 0.80;
+  var bandH = (fieldBot - fieldTop) / bands.length;
+  for (var bi = 0; bi < bands.length; bi++){
+    var band = bands[bi], cy = fieldTop + bandH * (bi + 0.5);
+    /* the plane's name rides its band, right of the glyph column */
+    ctx.font = "600 " + Math.max(8, Math.round(W * 0.016)) + "px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = PAL.glyph; ctx.globalAlpha = 0.9;
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.fillText(band.plane.label, W * 0.085, cy);
+    ctx.globalAlpha = 1;
+    var n = band.entries.length;
+    for (var mi = 0; mi < n; mi++){
+      var e = band.entries[mi];
+      var x = W * (0.26 + 0.67 * (n === 1 ? 0.5 : mi / (n - 1)));
+      drawMarker(e, x, cy, nowMs);
+      scanPlotted.push({ plane: e.plane, label: String(e.label || e.id || "?"),
+                         strength: (typeof e.strength === "number") ? e.strength : null });
+    }
+  }
 }
 
 /* ---------------- the pulse curve ----------------
@@ -461,8 +555,27 @@ function drawPulse(now, nowMs){
      trim words and bolts ride the case at its real edges on any
      stage aspect (a square viewBox stretched over a tall stage
      would pull the bolts off the glass corners). */
-  var K = Math.min(VW, VH) / 640;
-  caseSvg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
+  /* CLIP FIX (Nov 16, 2026): the geometry below is BUILT, not
+     baked — buildFrameGeometry() derives K, the case and the
+     glass from the CURRENT measured stage (VW/VH) every time it
+     runs, and applyFrame() measures first, then builds, then
+     seats. The shipped defect: this block ran ONCE at boot,
+     when VW/VH were still the 512x512 defaults (the first real
+     sizeStage() measurement happens inside applyFrame, after
+     the geometry was already computed), so on any screen that
+     was not 512x512 the case stayed 512px wide, the glass kept
+     its 512-stage rect, and the world seated as a fixed
+     329.6x329.6 square offset 91.2px right and down — the left
+     quarter of the glass empty, the face's right side off the
+     stage and clipped. At exactly 512x512 the numbers agreed,
+     which is why the bench never saw it. */
+  var caseG = null, trim = null;
+  var GLASS = { x:0, y:0, width:0, height:0 };
+  function buildFrameGeometry(){
+    while (caseSvg.firstChild) caseSvg.removeChild(caseSvg.firstChild);
+    while (trimSvg.firstChild) trimSvg.removeChild(trimSvg.firstChild);
+    var K = Math.min(VW, VH) / 640;
+    caseSvg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
   trimSvg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
   caseSvg.style.width = VW + "px"; caseSvg.style.height = VH + "px";
   trimSvg.style.width = VW + "px"; trimSvg.style.height = VH + "px";
@@ -502,7 +615,7 @@ function drawPulse(now, nowMs){
   var caseX = (VW - caseW) / 2, caseY = (VH - caseH) / 2;
   var glassW = 572*K, glassH = 412*K;
   var glassX = (VW - glassW) / 2, glassY = (VH - glassH) / 2;
-  var caseG = mk("g", { id:"apexFrameCase" }, caseSvg);
+  caseG = mk("g", { id:"apexFrameCase" }, caseSvg);
   /* the case body as ONE hollow ring (Betta's construction):
      outer case path minus the glass window, even-odd — opaque
      case metal out to the bezel, the window punched genuinely
@@ -525,7 +638,7 @@ function drawPulse(now, nowMs){
                     ringPath(glassX, glassY, glassW, glassH, 22*K),
                "fill-rule":"evenodd",
                fill:"#0a0c0e", stroke:"rgba(255,181,46,.35)", "stroke-width":1.5 }, caseG);
-  var trim = mk("g", { id:"apexFrameTrim" }, trimSvg);
+  trim = mk("g", { id:"apexFrameTrim" }, trimSvg);
   mk("rect", { x:caseX + 15*K, y:caseY + 15*K, width:600*K, height:440*K, rx:30*K,
                fill:"none", stroke:"rgba(255,181,46,.35)", "stroke-width":1.5 }, trim);
   var words = mk("g", { fill:"#565b63" }, trim);
@@ -553,11 +666,14 @@ function drawPulse(now, nowMs){
     mk("circle", { cx:cx, cy:cy, r:4*K, fill:"#14161a", stroke:"#3a3e46", "stroke-width":1.2 }, bolts);
   });
 
+    GLASS = { x:glassX, y:glassY, width:glassW, height:glassH };
+  }
   var worldEl = document.getElementById("world");
   var btn = document.getElementById("frameBtn");
-  var GLASS = { x:glassX, y:glassY, width:glassW, height:glassH };
   var frameOn = true;
   function applyFrame(){
+    sizeStage();
+    buildFrameGeometry();
     var wEl = document.getElementById("world");
     if (frameOn){
       var sx = GLASS.width / VW, sy = GLASS.height / VH;
@@ -583,6 +699,11 @@ function drawPulse(now, nowMs){
   window.__toggleFrame = function(){ frameOn = !frameOn; applyFrame(); };
   if (btn) btn.addEventListener("click", function(ev){ ev.stopPropagation(); window.__toggleFrame(); });
   window.__applyFrame = applyFrame;
+  var frameResizeTimer = 0;
+  window.addEventListener("resize", function(){
+    if (frameResizeTimer) clearTimeout(frameResizeTimer);
+    frameResizeTimer = setTimeout(applyFrame, 60);
+  });
   applyFrame();
 })();
 </script>
@@ -692,10 +813,8 @@ function refreshBench(now, nowMs){
     clock: fmt2(now.getHours()) + ":" + fmt2(now.getMinutes()) + ":" + fmt2(now.getSeconds()),
     clockMs: now.getMilliseconds(),
     phase: +(((now.getSeconds() % 60) + now.getMilliseconds() / 1000) / 60).toFixed(4),
-    drones: drones.map(function(d){
-      return { i: d.i, x: +d.x.toFixed(1), y: +d.y.toFixed(1), tag: droneTag(d) };
-    }),
-    bucket: bucket.length,
+    markers: scanPlotted,
+    scan: scanBenchState,
     gps: gpsState.mode,
     backdrop: window.__backdrop ? window.__backdrop.name : null,
     frameOn: window.__apexFrame ? window.__apexFrame.on : null,
@@ -713,15 +832,7 @@ function frameBody(nowMs){
   var t = nowMs / 1000;
   ctx.clearRect(0, 0, innerW(), innerH());
   drawGlyphs();
-  for (var i = 0; i < drones.length; i++){
-    var d = drones[i];
-    var p = dronePos(d, t);
-    d.vx = (p[0] - d.x) * 60; d.vy = (p[1] - d.y) * 60;
-    d.x = p[0]; d.y = p[1];
-    d.trail.push([d.x, d.y]);
-    if (d.trail.length > 26) d.trail.shift();
-  }
-  for (var j = 0; j < drones.length; j++) drawDrone(drones[j], t, nowMs);
+  drawScanLayer(nowMs);
   drawPulse(now, nowMs);
   drawClock(now);
   drawGps();
@@ -753,12 +864,12 @@ window.ApexFace = {
 window.addEventListener("focus", function(){ noteInteract(); });
 document.addEventListener("visibilitychange", function(){ if (!document.hidden) noteInteract(); });
 
-/* ---- Boot: size from measured pixels, seed the patrol, THE
-   DRIVER STARTS NOW, unconditionally — first paint already has
-   drones in the air and the pulse running. */
+/* ---- Boot: size from measured pixels, THE DRIVER STARTS NOW,
+   unconditionally — first paint already has the pulse running
+   and the scan layer reading whatever feed the shell offers
+   (none, in this web build: SCAN — NO FEED, honestly). */
 sizeStage();
 if (window.__applyFrame) window.__applyFrame();
-seedDrones();
 raf = requestAnimationFrame(frame);
 </script>
 </body>

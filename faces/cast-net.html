@@ -611,8 +611,27 @@ function drawPulse(now, nowMs){
      trim words and bolts ride the case at its real edges on any
      stage aspect (a square viewBox stretched over a tall stage
      would pull the bolts off the glass corners). */
-  var K = Math.min(VW, VH) / 640;
-  caseSvg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
+  /* CLIP FIX (Nov 16, 2026): the geometry below is BUILT, not
+     baked — buildFrameGeometry() derives K, the case and the
+     glass from the CURRENT measured stage (VW/VH) every time it
+     runs, and applyFrame() measures first, then builds, then
+     seats. The shipped defect: this block ran ONCE at boot,
+     when VW/VH were still the 512x512 defaults (the first real
+     sizeStage() measurement happens inside applyFrame, after
+     the geometry was already computed), so on any screen that
+     was not 512x512 the case stayed 512px wide, the glass kept
+     its 512-stage rect, and the world seated as a fixed
+     329.6x329.6 square offset 91.2px right and down — the left
+     quarter of the glass empty, the face's right side off the
+     stage and clipped. At exactly 512x512 the numbers agreed,
+     which is why the bench never saw it. */
+  var caseG = null, trim = null;
+  var GLASS = { x:0, y:0, width:0, height:0 };
+  function buildFrameGeometry(){
+    while (caseSvg.firstChild) caseSvg.removeChild(caseSvg.firstChild);
+    while (trimSvg.firstChild) trimSvg.removeChild(trimSvg.firstChild);
+    var K = Math.min(VW, VH) / 640;
+    caseSvg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
   trimSvg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
   caseSvg.style.width = VW + "px"; caseSvg.style.height = VH + "px";
   trimSvg.style.width = VW + "px"; trimSvg.style.height = VH + "px";
@@ -652,7 +671,7 @@ function drawPulse(now, nowMs){
   var caseX = (VW - caseW) / 2, caseY = (VH - caseH) / 2;
   var glassW = 572*K, glassH = 412*K;
   var glassX = (VW - glassW) / 2, glassY = (VH - glassH) / 2;
-  var caseG = mk("g", { id:"apexFrameCase" }, caseSvg);
+  caseG = mk("g", { id:"apexFrameCase" }, caseSvg);
   /* the case body as ONE hollow ring (Betta's construction):
      outer case path minus the glass window, even-odd — opaque
      case metal out to the bezel, the window punched genuinely
@@ -675,7 +694,7 @@ function drawPulse(now, nowMs){
                     ringPath(glassX, glassY, glassW, glassH, 22*K),
                "fill-rule":"evenodd",
                fill:"#0a0c0e", stroke:"rgba(255,181,46,.35)", "stroke-width":1.5 }, caseG);
-  var trim = mk("g", { id:"apexFrameTrim" }, trimSvg);
+  trim = mk("g", { id:"apexFrameTrim" }, trimSvg);
   mk("rect", { x:caseX + 15*K, y:caseY + 15*K, width:600*K, height:440*K, rx:30*K,
                fill:"none", stroke:"rgba(255,181,46,.35)", "stroke-width":1.5 }, trim);
   var words = mk("g", { fill:"#565b63" }, trim);
@@ -703,11 +722,14 @@ function drawPulse(now, nowMs){
     mk("circle", { cx:cx, cy:cy, r:4*K, fill:"#14161a", stroke:"#3a3e46", "stroke-width":1.2 }, bolts);
   });
 
+    GLASS = { x:glassX, y:glassY, width:glassW, height:glassH };
+  }
   var worldEl = document.getElementById("world");
   var btn = document.getElementById("frameBtn");
-  var GLASS = { x:glassX, y:glassY, width:glassW, height:glassH };
   var frameOn = true;
   function applyFrame(){
+    sizeStage();
+    buildFrameGeometry();
     var wEl = document.getElementById("world");
     if (frameOn){
       var sx = GLASS.width / VW, sy = GLASS.height / VH;
@@ -733,6 +755,11 @@ function drawPulse(now, nowMs){
   window.__toggleFrame = function(){ frameOn = !frameOn; applyFrame(); };
   if (btn) btn.addEventListener("click", function(ev){ ev.stopPropagation(); window.__toggleFrame(); });
   window.__applyFrame = applyFrame;
+  var frameResizeTimer = 0;
+  window.addEventListener("resize", function(){
+    if (frameResizeTimer) clearTimeout(frameResizeTimer);
+    frameResizeTimer = setTimeout(applyFrame, 60);
+  });
   applyFrame();
 })();
 </script>
