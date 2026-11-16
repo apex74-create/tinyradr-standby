@@ -376,10 +376,10 @@
       "title": "APEX — CAST NET · Hierographic",
       "package": "app.lovable.apexsignal.face.castnet",
       "apkPath": "/depot/cast-net.apk",
-      "apkSha256": "2dee8cb373fcbe584eeb29fec292ddff76335ce277b6aa30ec47ec3a49b583d0",
-      "apkSizeBytes": 3301905,
+      "apkSha256": "b11d831bbbb9c9426fcec6641468fe3c97ab5c4a968289a13f1592878853b22c",
+      "apkSizeBytes": 3038953,
       "facePath": "/faces/cast-net.html",
-      "faceSha256": "02f2621b6e70ff3a2f13292dc8c93c50c7e88a511f6ee316aeac89ef976e4293",
+      "faceSha256": "dbd3ce4b79fa88d7265ccbcea693530c023c2498a336150fcabb523ef5d62ba0",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -414,10 +414,10 @@
       "title": "APEX — GLOBE TRACKER · Hierographic 01",
       "package": "app.lovable.apexsignal.face.globetracker",
       "apkPath": "/depot/globe-tracker.apk",
-      "apkSha256": "89c806f6c82d7e3b8ee3451129d0df6aed9077e72421d47a3f2335b1bed7e41b",
-      "apkSizeBytes": 3396933,
+      "apkSha256": "c07b169e9714f1f4df4bc08a01715fa2d0b5d40c469363c746587de5829b496a",
+      "apkSizeBytes": 3133161,
       "facePath": "/faces/globe-tracker.html",
-      "faceSha256": "3a83ac7620abf88ff7cb58a512ff7b77732078a945a553d00f672f3b4b868109",
+      "faceSha256": "bc2e6c3663a2bef20d1fdb53cf610f6947f12c3e74dd47367e60a8e6e715ada8",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -433,10 +433,10 @@
       "title": "APEX — THE 19 · Hierographic",
       "package": "app.lovable.apexsignal.face.the19",
       "apkPath": "/depot/the-19.apk",
-      "apkSha256": "602cf8e8173eb8d7d683807c3a16f804355e9384df7263483c23c22455670e0c",
-      "apkSizeBytes": 3300289,
+      "apkSha256": "13e161a79da79a55e30e76fc6ff1bfbf57104bcb95ef06022c2ae3aa28fc7a7f",
+      "apkSizeBytes": 3038953,
       "facePath": "/faces/the-19.html",
-      "faceSha256": "ee4385b138e435f06b4493fd11c1b034011a1375b4ecdb51d7a380af89b79e29",
+      "faceSha256": "eda07d3f3e26947b2021585882c37e3dfee3e47ee14bf914908ddb0e32a70bd3",
       "priceUsd": 9.99,
       "functions": [
         "clock"
