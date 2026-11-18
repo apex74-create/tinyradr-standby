@@ -1,7 +1,7 @@
 {
   "property": "tinyradr.com",
-  "builtFromSha": "f8274c0bf47b95fd6c35aec8b6eb85a075380755",
-  "builtAt": "2026-11-17T20:27:08.848Z",
+  "builtFromSha": "e91e6f33435015e6d0fa79b0b4fd52a0481c4341",
+  "builtAt": "2026-11-18T01:51:57.062Z",
   "routes": {
     "/": {
       "status": 200,
