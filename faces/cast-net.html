@@ -139,11 +139,18 @@
   #secLine{margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:4px;color:#7dffb0;}
   #gpsLine{position:absolute;left:50%;transform:translateX(-50%);bottom:26.5%;z-index:4;background:rgba(2,10,6,.82);border:1px solid rgba(57,255,142,.28);padding:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:2px;color:#9fe8c0;white-space:nowrap;}
   #fault{position:absolute;left:4%;top:5%;width:92%;z-index:8;display:none;background:#ff4d4d;color:#f2fff7;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:13px;text-align:center;padding:6px 0;letter-spacing:1px;}
-  #frameBtn{position:absolute;right:10px;bottom:10px;z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  /* BOTTOM NO-FLY ZONE (house law, Nov 11 2026; fix Nov 18 2026): the
+     bottom row - this button, its READOUT mirror, and the mesh panel -
+     must never sit in the band where Android's three-button navigation
+     lands. Clearance = the live safe-area bottom inset plus the row's
+     own design offset; the native shell also pads the WebView by the
+     same window inset (faces-library module MainActivity), so the row
+     clears the bar in the APK and in the browser alike. */
+  #frameBtn{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
   #frameBtn:active{color:#baffd9;}
   /* THE READOUT SWITCH — bottom-left, the frame button's mirror.
      A mode control, not a shape control: SHAPE stays baked. */
-  #readoutBtn{position:absolute;left:10px;bottom:10px;z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  #readoutBtn{position:absolute;left:10px;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
   #readoutBtn:active{color:#baffd9;}
   /* THE ANALOG-SMOOTH READOUT — hands swept on the real clock,
      mounted on the centre post pin (Face Law 1), riding the same
@@ -155,7 +162,7 @@
      a sensor: every state word is NO STATE while the native
      bucket is empty (see the contract in the header). Its one
      live element is THE CALL button (Rung A, below). */
-  #meshPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:6.2%;z-index:4;background:rgba(2,10,6,.88);border:1px solid rgba(57,255,142,.40);padding:6px 12px 7px;text-align:center;}
+  #meshPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(6.2% + env(safe-area-inset-bottom, 0px));z-index:4;background:rgba(2,10,6,.88);border:1px solid rgba(57,255,142,.40);padding:6px 12px 7px;text-align:center;}
   #meshHead{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:3px;color:#2bd97c;white-space:nowrap;}
   #meshLegs{display:flex;gap:14px;justify-content:center;margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:1.5px;color:#9fe8c0;white-space:nowrap;}
   #meshLegs b{color:#baffd9;font-weight:700;}
