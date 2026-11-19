@@ -266,6 +266,30 @@ window.__cycleBackdrop = function(){
    here — fabricated entries are forbidden by the estate
    fabrication ban.
    ================================================================ */
+/* ================================================================
+   APEX CONTAINER INDEX DRAW (Nov 19, 2026 — direction corrected,
+   GAP-3): inside the Apex container this document DRAWS the scan
+   feed from the container's own index service (window.__apexIndex)
+   on its own cadence and seats the contract v1 object itself. The
+   shell no longer publishes into this document — the document is
+   its own; the feeds are its senses, not its landlord. On the web
+   there is no index service: nothing is drawn, the feed reads OFF,
+   exactly as before.
+   ================================================================ */
+(function () {
+  function drawFeed() {
+    try {
+      var ix = window.__apexIndex;
+      if (ix && typeof ix.scanFeed === "function") {
+        var raw = ix.scanFeed();
+        if (raw) window.__apexScanFeed = JSON.parse(raw);
+      }
+    } catch (e) { /* keep the last drawn snapshot */ }
+  }
+  drawFeed();
+  setInterval(drawFeed, 1000);
+})();
+
 function readScanFeed(){
   var f = window.__apexScanFeed;
   if (!f || f.on !== true || Object.prototype.toString.call(f.entries) !== "[object Array]")
