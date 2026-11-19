@@ -873,10 +873,10 @@
       "title": "APEX — THE SEXTANT",
       "package": "app.lovable.apexsignal.face.thesextant",
       "apkPath": "/depot/the-sextant.apk",
-      "apkSha256": "b5d820ecc3716e448890fd4555b4aab21065e798db973e6f7c472f1e313f7227",
-      "apkSizeBytes": 16873,
+      "apkSha256": "0297121334313efd112fc09c94e9999b50bcc789b994689de6309df5ad4b96f3",
+      "apkSizeBytes": 3180877,
       "facePath": "/faces/the-sextant.html",
-      "faceSha256": "7fd4b0720cfa2231b0c9e05baf053ca29c960066370d98ad8a1ab2b0e096d184",
+      "faceSha256": "ad3d31af6c330d940e922584b4ca0373fe39cdb7ea13f215782067b746319a95",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -892,10 +892,10 @@
       "title": "APEX — RADIOSPHERE",
       "package": "app.lovable.apexsignal.face.radiosphere",
       "apkPath": "/depot/radiosphere.apk",
-      "apkSha256": "b1ced883f003485962e171474d8ec89962d07a47917f13703e11c0aa8e51f65a",
-      "apkSizeBytes": 16873,
+      "apkSha256": "9488987131fd052636596fe26fa2cd42c554839b1bf12c82d1bdfe03fcf3e025",
+      "apkSizeBytes": 3181445,
       "facePath": "/faces/radiosphere.html",
-      "faceSha256": "c52957e6345b7bd8c912fd8d47400d24f8ac9a5b8975762c98de9f2a4ac92a48",
+      "faceSha256": "9cad6a0cdac90b7996c8fc58068e3238a14226bc68ab25ec567307815fc2907b",
       "priceUsd": 9.99,
       "functions": [
         "clock"
