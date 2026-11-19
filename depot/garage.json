@@ -376,10 +376,10 @@
       "title": "APEX — CAST NET · Hierographic",
       "package": "app.lovable.apexsignal.face.castnet",
       "apkPath": "/depot/cast-net.apk",
-      "apkSha256": "b11d831bbbb9c9426fcec6641468fe3c97ab5c4a968289a13f1592878853b22c",
-      "apkSizeBytes": 3038953,
+      "apkSha256": "45de792de634d8c6866652b4c5f0a2e0411180e3c2bcd23be7574b3fd2dbfc3e",
+      "apkSizeBytes": 3303337,
       "facePath": "/faces/cast-net.html",
-      "faceSha256": "dbd3ce4b79fa88d7265ccbcea693530c023c2498a336150fcabb523ef5d62ba0",
+      "faceSha256": "0e272392d6eb5c1f47bb68a228f178b994925cb312f7cb12721719870673331b",
       "priceUsd": 9.99,
       "functions": [
         "clock"
