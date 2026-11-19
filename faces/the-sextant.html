@@ -14,6 +14,7 @@
   #sky { position:absolute; display:block; }
   #read { position:absolute; left:0; width:100%; text-align:center; }
   #read .row { color:#cfd8ea; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  #read .wrap { white-space:normal; padding:0 10px; }
   #read .row b { color:#f2e9cf; font-weight:700; }
   #read .gold { color:#c9a227; }
   #read .dim { color:#7a86a0; }
@@ -31,27 +32,42 @@
     <div class="row" id="rowSun">SUN —</div>
     <div class="row" id="rowMoon">MOON —</div>
     <div class="row" id="rowStar">SKY UP —</div>
-    <div class="row dim" id="rowPos">POSITION INPUT —</div>
-    <div class="row gold" id="rowFix">FIX — COMPUTED FROM THE INPUTS ABOVE</div>
+    <div class="row" id="rowSight">SIGHT —</div>
+    <div class="row dim wrap" id="rowPos">POSITION INPUT —</div>
+    <div class="row gold wrap" id="rowFix">FIX — COMPUTED FROM THE INPUTS ABOVE</div>
   </div>
-  <div class="strip">CELESTIAL NAVIGATION · THE MATH IS SHOWN · NO MEASURE UNTIL A FIELD CHECK</div>
+  <div class="strip">CELESTIAL NAVIGATION · THE MATH IS SHOWN · THE FIX IS COMPUTED FROM THE INPUTS NAMED ABOVE</div>
 </div>
 <script>
-  // THE SEXTANT — celestial navigation face (depot build, Nov 16, 2026).
+  // THE SEXTANT — celestial navigation face (depot build, Nov 16, 2026;
+  // self-assessment rebuild, Nov 18, 2026, on the owner's field verdict:
+  // a native app in a native container assesses itself — it does not
+  // sit at a default input waiting for a field report).
   // Sun, moon and catalogue-star positions are COMPUTED from real math:
-  // the face's real clock and a named position input. Nothing here is a
-  // measurement. The position input is the host's geolocation when the
-  // host grants it (labelled GPS INPUT, as reported by the host); in
-  // this web build there is no host fix, so the input is the labelled
-  // DEFAULT — Johannesburg, Michigan — and the face says so on its face.
+  // the face's real clock and the device's own position. The position
+  // input is the host's geolocation, watched continuously (labelled
+  // GPS INPUT, as reported by the host); the face-library shell grants
+  // the prompt from the OS location permission it holds. The labelled
+  // DEFAULT — Johannesburg, Michigan — survives only as a fallback,
+  // and the face names the exact call that failed and why (denied,
+  // timed out, unavailable, or no geolocation call exposed) instead of
+  // punting silently. A second live input rides the orientation
+  // sensors: SIGHT altitude/azimuth from the device's own tilt and
+  // magnetometer, painted on the dome where the top edge is pointing.
   // A fix is labelled COMPUTED, with its inputs named, never presented
-  // as a measurement: NO MEASURE applies to position until a field fix
-  // is compared against a known position. One self-contained page,
-  // plain JavaScript, no external requests. No controls — nothing sits
-  // in the bottom navigation band.
+  // as a measurement. One self-contained page, plain JavaScript, no
+  // external requests. No controls — nothing sits in the bottom
+  // navigation band.
   "use strict";
-  var DEFAULT_POS = { lat: 44.9810, lon: -84.4960, label: "DEFAULT — JOHANNESBURG, MI · NO FIX" };
+  var DEFAULT_POS = { lat: 44.9810, lon: -84.4960, label: "DEFAULT — JOHANNESBURG, MI" };
   var pos = { lat: DEFAULT_POS.lat, lon: DEFAULT_POS.lon, label: DEFAULT_POS.label, fix: false };
+  // Geolocation state machine: asking | fix | denied | timeout |
+  // unavailable | nocall. Anything but "fix" is printed on the face
+  // with the default it fell back to.
+  var geoState = "asking";
+  // Orientation sight state, fed by deviceorientation events.
+  var sight = { live: false, alt: null, az: null };
+  var bootMs = Date.now();
 
   /* MATH-BEGIN — pure functions of (dateMs, latDeg, lonDeg); the worked
      example in the build record exercises exactly this section. */
@@ -161,11 +177,37 @@
   function layout() {
     measure();
     stage.style.width = W + 'px'; stage.style.height = H + 'px';
-    var headH = Math.floor(H * 0.20);
-    document.querySelector('.brand').style.fontSize = Math.max(10, Math.floor(H * 0.026)) + 'px';
-    document.getElementById('clock').style.fontSize = Math.floor(Math.min(W * 0.20, H * 0.105)) + 'px';
-    document.getElementById('date').style.fontSize = Math.max(9, Math.floor(H * 0.026)) + 'px';
-    skySize = Math.floor(Math.min(W * 0.94, H * 0.47));
+    // Head block height is MEASURED from the type it carries — the old
+    // build reserved a flat 20% and the date/LST line wrapped down over
+    // the dome's north point on tall handsets.
+    var brandFs = Math.max(10, Math.floor(H * 0.024));
+    var clockFs = Math.floor(Math.min(W * 0.19, H * 0.095));
+    var dateFs = Math.max(9, Math.floor(H * 0.023));
+    document.querySelector('.brand').style.fontSize = brandFs + 'px';
+    document.getElementById('clock').style.fontSize = clockFs + 'px';
+    document.getElementById('date').style.fontSize = dateFs + 'px';
+    var headH = Math.ceil(brandFs * 1.3 + clockFs * 1.05 + dateFs * 2.6) + Math.floor(H * 0.012);
+    // Readout rows are sized by BOTH axes: the old build sized by
+    // height alone and the rows ran off the right edge of the handset
+    // (AZ values clipped mid-digit in the owner's field shot).
+    var rowFs = Math.max(9, Math.floor(Math.min(H * 0.025, W * 0.040)));
+    var read = document.getElementById('read');
+    var rows = read.querySelectorAll('.row');
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].style.fontSize = rowFs + 'px';
+      rows[i].style.lineHeight = '1.5';
+    }
+    var stripFs = Math.max(8, Math.floor(Math.min(H * 0.018, W * 0.030)));
+    var strip = document.querySelector('.strip');
+    strip.style.fontSize = stripFs + 'px';
+    strip.style.bottom = Math.floor(H * 0.016) + 'px';
+    // The dome gets what is actually left between the head block and
+    // the readout block (6 rows; the two fallback rows may wrap to 2
+    // lines each, so reserve for 8) above the footer strip.
+    var readH = Math.ceil(rowFs * 1.5 * 8) + Math.floor(H * 0.02);
+    var stripH = Math.ceil(stripFs * 1.4) + Math.floor(H * 0.016);
+    var avail = H - headH - readH - stripH - Math.floor(H * 0.02);
+    skySize = Math.max(120, Math.floor(Math.min(W * 0.94, avail)));
     skyX = Math.floor((W - skySize) / 2);
     skyY = headH;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -173,16 +215,7 @@
     sky.style.width = skySize + 'px'; sky.style.height = skySize + 'px';
     sky.width = Math.round(skySize * dpr); sky.height = Math.round(skySize * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var read = document.getElementById('read');
-    read.style.top = (skyY + skySize + Math.floor(H * 0.015)) + 'px';
-    var rows = read.querySelectorAll('.row');
-    for (var i = 0; i < rows.length; i++) {
-      rows[i].style.fontSize = Math.max(9, Math.floor(H * 0.027)) + 'px';
-      rows[i].style.lineHeight = '1.55';
-    }
-    var strip = document.querySelector('.strip');
-    strip.style.fontSize = Math.max(8, Math.floor(H * 0.020)) + 'px';
-    strip.style.bottom = Math.floor(H * 0.018) + 'px';
+    read.style.top = (skyY + skySize + Math.floor(H * 0.012)) + 'px';
   }
   function fmt(n, digits) { return (n < 0 ? '−' : '+') + Math.abs(n).toFixed(digits) + '°'; }
   function fmtAz(n) { return n.toFixed(1) + '°'; }
@@ -237,6 +270,18 @@
     ctx.font = '700 ' + Math.max(9, skySize * 0.036) + 'px ui-monospace,Menlo,Consolas,monospace';
     ctx.fillStyle = '#ffd75e'; ctx.fillText('SUN', sp.x, sp.y - mr - 9);
     ctx.fillStyle = '#e8ecf5'; ctx.fillText('MOON', mp.x, mp.y - mr - 9);
+    // The sight mark: where the device's top edge is pointing, from
+    // its own orientation sensors — the sextant's live reading.
+    if (sight.live && sight.alt !== null && sight.az !== null) {
+      var vp = plot(Math.max(sight.alt, 0), sight.az, cx, cy, R);
+      var vr = Math.max(5, skySize * 0.020);
+      ctx.beginPath(); ctx.arc(vp.x, vp.y, vr, 0, Math.PI * 2);
+      ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(vp.x - vr - 3, vp.y); ctx.lineTo(vp.x + vr + 3, vp.y);
+      ctx.moveTo(vp.x, vp.y - vr - 3); ctx.lineTo(vp.x, vp.y + vr + 3);
+      ctx.strokeStyle = 'rgba(201,162,39,0.65)'; ctx.lineWidth = 1; ctx.stroke();
+    }
   }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function tick() {
@@ -259,15 +304,71 @@
     document.getElementById('rowStar').innerHTML = up
       ? 'SKY UP <b>' + up.name.toUpperCase() + '</b> · ALT ' + fmt(up.alt, 1) + ' · AZ ' + fmtAz(up.az)
       : 'SKY UP — NO CATALOGUE STAR ABOVE THE HORIZON';
-    document.getElementById('rowPos').textContent =
-      'POSITION INPUT: ' + pos.label + ' · ' + Math.abs(pos.lat).toFixed(3) + '° ' + (pos.lat >= 0 ? 'N' : 'S') +
+    var coords = Math.abs(pos.lat).toFixed(3) + '° ' + (pos.lat >= 0 ? 'N' : 'S') +
       ' ' + Math.abs(pos.lon).toFixed(3) + '° ' + (pos.lon >= 0 ? 'E' : 'W');
+    if (pos.fix) {
+      document.getElementById('rowPos').textContent = 'POSITION INPUT: ' + pos.label + ' · ' + coords;
+    } else {
+      // The fallback is never silent: the face names the call that
+      // failed, what it fell back to, and where it fell back to.
+      var why =
+        geoState === 'denied' ? 'GPS DENIED BY HOST' :
+        geoState === 'timeout' ? 'GPS TIMED OUT' :
+        geoState === 'unavailable' ? 'GPS UNAVAILABLE FROM HOST' :
+        geoState === 'nocall' ? 'HOST EXPOSES NO GEOLOCATION CALL' :
+        'GPS ASKED — NO ANSWER YET';
+      document.getElementById('rowPos').textContent =
+        'POSITION INPUT: ' + why + ' — SHOWING ' + pos.label + ' · ' + coords;
+    }
+    var sightEl = document.getElementById('rowSight');
+    if (sight.live && sight.alt !== null && sight.az !== null) {
+      sightEl.innerHTML =
+        'SIGHT <b>ALT ' + fmt(sight.alt, 1) + '</b> · <b>AZ ' + fmtAz(sight.az) + '</b> · TOP EDGE';
+    } else if (Date.now() - bootMs > 5000) {
+      sightEl.textContent = 'SIGHT — NO ORIENTATION EVENTS FROM HOST';
+    } else {
+      sightEl.textContent = 'SIGHT — ASKING THE ORIENTATION SENSORS…';
+    }
   }
-  if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
-    navigator.geolocation.getCurrentPosition(function (g) {
-      pos = { lat: g.coords.latitude, lon: g.coords.longitude, label: 'GPS INPUT — AS REPORTED BY HOST', fix: true };
-      tick();
-    }, function () { /* denied or unavailable: the labelled default stands */ }, { maximumAge: 60000, timeout: 8000 });
+  // Position: watch the host's own fix continuously. The shell grants
+  // the WebView prompt from the OS permission; a denial is a named
+  // state on the face, not a silent default.
+  if (navigator.geolocation && navigator.geolocation.watchPosition) {
+    try {
+      navigator.geolocation.watchPosition(function (g) {
+        pos = { lat: g.coords.latitude, lon: g.coords.longitude, label: 'GPS INPUT — AS REPORTED BY HOST', fix: true };
+        geoState = 'fix';
+        tick();
+      }, function (err) {
+        geoState = err && err.code === 1 ? 'denied' : err && err.code === 3 ? 'timeout' : 'unavailable';
+        tick();
+      }, { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 });
+    } catch (e) {
+      geoState = 'unavailable';
+    }
+  } else {
+    geoState = 'nocall';
+  }
+  // Orientation: the sextant's own senses. Sighting along the top
+  // edge in portrait, elevation = 90° − beta; azimuth from the
+  // magnetometer heading (webkitCompassHeading where the host gives
+  // it, else alpha run backwards, the standard conversion).
+  window.addEventListener('deviceorientation', function (e) {
+    if (!e || (e.beta === null && e.gamma === null && e.alpha === null)) return;
+    sight.live = true;
+    if (typeof e.beta === 'number') sight.alt = Math.max(-90, Math.min(90, 90 - e.beta));
+    var wc = e.webkitCompassHeading;
+    if (typeof wc === 'number') sight.az = wc;
+    else if (typeof e.alpha === 'number') sight.az = (360 - e.alpha) % 360;
+  });
+  // Hosts that gate orientation behind a tap (iOS-style) get asked on
+  // the first touch anywhere; Android hosts grant without a prompt.
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    window.addEventListener('pointerdown', function askOnce() {
+      window.removeEventListener('pointerdown', askOnce);
+      DeviceOrientationEvent.requestPermission().catch(function () { /* the SIGHT row names the state */ });
+    });
   }
   layout();
   window.addEventListener('resize', layout);

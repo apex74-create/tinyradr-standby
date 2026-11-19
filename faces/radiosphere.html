@@ -16,12 +16,19 @@
   #field:active { cursor: grabbing; }
   .panel {
     position: absolute; z-index: 5; pointer-events: none;
+    box-sizing: border-box;
     background: rgba(4, 12, 9, 0.72);
     border: 1px solid rgba(64, 255, 150, 0.35);
     box-shadow: 0 0 18px rgba(0, 0, 0, 0.6), inset 0 0 24px rgba(64, 255, 150, 0.04);
     padding: 10px 14px;
   }
-  #titlebox { top: 14px; left: 14px; }
+  /* Panel geometry (rebuilt Nov 18, 2026, on the owner's field shot:
+     the four panels were sized by their content and collided pairwise
+     at handset width — title into legend, HOW TO READ IT into FIELD
+     READOUT. Every panel now carries a hard width share of the
+     viewport and wraps inside it; the pairs can never meet. Graded
+     at the worst handset, not the widest. */
+  #titlebox { top: 14px; left: 14px; max-width: 55vw; }
   #titlebox h1 {
     margin: 0; font-size: 20px; letter-spacing: 4px; font-weight: 700;
     color: #eafff2; text-shadow: 0 0 12px rgba(64, 255, 150, 0.55);
@@ -33,25 +40,37 @@
     color: #eafff2; font-variant-numeric: tabular-nums;
     text-shadow: 0 0 10px rgba(64, 255, 150, 0.65);
   }
-  #legend { top: 14px; right: 14px; font-size: 11px; line-height: 1.75; min-width: 150px; }
+  #legend { top: 14px; right: 14px; font-size: 11px; line-height: 1.75; max-width: 37vw; }
+  #legend .denied { color: #e08a8a; }
+  #legend .off { color: #8a94a6; }
   #legend .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; margin-bottom: 2px; }
   #legend .sw {
     display: inline-block; width: 10px; height: 10px; margin-right: 7px;
     border: 1px solid rgba(255,255,255,0.35); vertical-align: -1px;
   }
-  #keybox { left: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; }
+  #keybox { left: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; max-width: 45vw; }
   #keybox .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; }
   #keybox b { color: #eafff2; }
-  #statbox { right: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; text-align: right; }
+  #statbox { right: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; text-align: right; max-width: 45vw; }
   #statbox .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; }
   #statbox b { color: #eafff2; }
   #state {
     position: absolute; z-index: 6; left: 50%; bottom: 14px; transform: translateX(-50%);
-    pointer-events: none; white-space: nowrap;
+    pointer-events: none; white-space: normal; text-align: center; max-width: 94vw;
     color: #ffcf5c; border: 1px solid rgba(255, 207, 92, 0.65);
     background: rgba(20, 14, 2, 0.78);
     padding: 6px 16px; font-size: 13px; letter-spacing: 3px;
     text-shadow: 0 0 8px rgba(255, 207, 92, 0.45);
+  }
+  @media (max-width: 620px) {
+    #titlebox { max-width: 57vw; padding: 8px 10px; }
+    #titlebox h1 { font-size: 14px; letter-spacing: 2px; }
+    #titlebox p { font-size: 9px; letter-spacing: 1px; }
+    #clock { font-size: 20px; }
+    #legend { max-width: 36vw; padding: 8px 10px; font-size: 9.5px; line-height: 1.6; }
+    #keybox { max-width: 46vw; padding: 8px 10px; font-size: 10px; line-height: 1.65; }
+    #statbox { max-width: 46vw; padding: 8px 10px; font-size: 10px; line-height: 1.65; }
+    #state { font-size: 11px; letter-spacing: 2px; }
   }
 </style>
 </head>
@@ -99,11 +118,17 @@
    publishes ONE object and replaces the whole object when its scan
    state changes:
 
-       window.__apexScanFeed = { on: Boolean, entries: [...] }
+       window.__apexScanFeed = { on: Boolean, entries: [...],
+                                 denied: [...], off: [...] }
 
    entry = { plane: "wifi" | "ble" | "rid" | "cell" | "gnss",
              type, id, label (as broadcast), strength (dBm or null),
              firstSeen, lastSeen }
+
+   "denied" names the planes whose permission the user refused;
+   "off" names the planes whose radio is off or absent. Both are
+   printed on the face (legend + state line): a dead plane is a
+   named state, never a silent hole.
 
    The face re-reads the object every animation frame and rebuilds
    the plotted set when the object changes. An entry the shell stops
@@ -127,9 +152,16 @@
    down. No connect, no pair, no probe, no transmit. The sphere's
    only user control is drag-to-spin, which touches only the camera.
 
-   THIS WEB BUILD HAS NO SHELL: window.__apexScanFeed is never set
-   here, the feed reads OFF, and the face paints SCAN — NO FEED with
-   zero humps — the honest state.
+   THE SHELL (Nov 18, 2026): the face-library container now owns the
+   radios and publishes this feed from the device itself — Wi-Fi from
+   the system's scan results (read, never triggered: passive law),
+   BLE from listen-only advertisement scans, CELL from the registered
+   cell list, GNSS from the satellite status callback (strength null:
+   C/N0 is not dBm). RID has no consumer Android call and stays
+   unpublished rather than faked. In a plain browser tab there is
+   still no shell — no web API can scan radios — so the feed reads
+   absent and the face paints SCAN — NO FEED: the honest state for a
+   surface with no radios of its own.
    ===================================================================== */
 var PLANES = ["wifi", "ble", "rid", "cell", "gnss"];
 var PLANE_NAMES = { wifi: "WIFI", ble: "BLE", rid: "RID", cell: "CELL", gnss: "GNSS" };
@@ -161,6 +193,8 @@ function hashStr(s) {
    each with its presentation spot (band, x, z) resolved at rebuild. */
 var plotted = [];
 var feedState = "nofeed";        /* "nofeed" | "nosignals" | "live" */
+var feedDenied = [];             /* planes the shell names as permission-denied */
+var feedOff = [];                /* planes the shell names as radio-off/absent */
 var feedStale = false;
 var staleClock = "";
 var feedTotal = 0;               /* entries in the feed (known planes) */
@@ -170,7 +204,9 @@ var feedFingerprint = null;
 function rebuild() {
   var f = window.__apexScanFeed;
   plotted = []; feedTotal = 0; feedNulls = 0; feedStale = false; staleClock = "";
-  if (!f || !f.on) { feedState = "nofeed"; updateHud(); return; }
+  feedDenied = (f && Array.isArray(f.denied)) ? f.denied.filter(function (p) { return PLANES.indexOf(p) >= 0; }) : [];
+  feedOff = (f && Array.isArray(f.off)) ? f.off.filter(function (p) { return PLANES.indexOf(p) >= 0; }) : [];
+  if (!f || !f.on) { feedState = "nofeed"; feedDenied = []; feedOff = []; updateHud(); return; }
   var entries = Array.isArray(f.entries) ? f.entries : [];
   var known = entries.filter(function (e) { return e && PLANES.indexOf(e.plane) >= 0; });
   feedTotal = known.length;
@@ -220,9 +256,23 @@ function rebuild() {
 }
 function fingerprint(f) {
   if (!f) return "absent";
-  var parts = [f.on ? "on" : "off", (f.entries || []).length];
+  var parts = [f.on ? "on" : "off", (f.entries || []).length,
+               (f.denied || []).join(","), (f.off || []).join(",")];
   (f.entries || []).forEach(function (e) { parts.push((e && e.id) + "@" + (e && e.lastSeen)); });
   return parts.join("|");
+}
+/* Legend rows naming the planes the shell cannot serve, and why. */
+function planeNoteRows(exclude) {
+  var rows = "";
+  feedDenied.forEach(function (p) {
+    if (exclude.indexOf(p) >= 0) return;
+    rows += '<div class="denied">' + PLANE_NAMES[p] + " — DENIED</div>";
+  });
+  feedOff.forEach(function (p) {
+    if (exclude.indexOf(p) >= 0) return;
+    rows += '<div class="off">' + PLANE_NAMES[p] + " — OFF</div>";
+  });
+  return rows;
 }
 function pad2(n) { return (n < 10 ? "0" : "") + n; }
 
@@ -395,10 +445,13 @@ function frame() {
   faces.forEach(function (f) { f.draw(); });
   var deg = ((theta * 180 / Math.PI) % 360 + 360) % 360;
   angleOut.textContent = deg.toFixed(0) + "°";
+  var planeNote = "";
+  feedDenied.forEach(function (p) { planeNote += " · " + PLANE_NAMES[p] + " DENIED"; });
+  feedOff.forEach(function (p) { planeNote += " · " + PLANE_NAMES[p] + " OFF"; });
   stateEl.textContent =
     feedState === "nofeed" ? "SCAN — NO FEED" :
-    feedState === "nosignals" ? "SCAN — NO SIGNALS" :
-    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "");
+    feedState === "nosignals" ? "SCAN — NO SIGNALS" + planeNote :
+    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "") + planeNote;
 }
 
 /* ---- HUD text -------------------------------------------------------- */
@@ -413,7 +466,7 @@ function updateHud() {
     return;
   }
   if (feedState === "nosignals") {
-    legendRows.innerHTML = "<div>NO SIGNALS</div>";
+    legendRows.innerHTML = "<div>NO SIGNALS</div>" + planeNoteRows([]);
     strongestLine.innerHTML = "STRONGEST: &mdash;";
     countLine.textContent = "SIGNALS: 0";
     return;
@@ -423,7 +476,7 @@ function updateHud() {
   });
   legendRows.innerHTML = present.map(function (p) {
     return '<div><span class="sw" style="background:' + PLANE_COLORS[p] + '"></span>' + PLANE_NAMES[p] + "</div>";
-  }).join("");
+  }).join("") + planeNoteRows(present);
   var measured = plotted.filter(function (s) { return s.strength !== null; })
                         .sort(function (a, b) { return b.strength - a.strength; });
   if (measured.length) {
