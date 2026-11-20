@@ -5,27 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APEX — P&W J58 · Motors Under Glass</title>
 <style>
-  /* P&W J58 MOTOR FACE v1 (Nov 9, 2026) — LATERAL view.
-     Family: Motors Under Glass (Compounding Pass #1 §B roster #4).
-     Determination: the J58's whole identity is its silhouette, so this
-     face is the lateral cut — the long translating spike, the intake
-     annulus, the long nacelle body, the bronze turbine section and the
-     ejector nozzle, drawn as its OWN machine (not a J79 reskin: the
-     J79 face looks down a bore; this one rides alongside the motor).
-     Backdrop is this motor's own: a dark titanium plate with panel
-     seams — high-altitude metal, not wood, not galaxy.
-     Motion (LIVE from first paint): the spool lines run their dash at geared
-     rates (a drawn convention for a spool turning inside a closed
-     nacelle — the lines' advance IS the spool read), exhaust breathes,
-     fine tremor. Dash offsets are clock-true at every instant.
+  /* P&W J58 MOTOR FACE v2 (Nov 13, 2026) — MOTOR LINE PILOT (JET).
+     The treatment, per the owner's design lead change (Nov 13, 03:19):
+     every motor face is a 3D wireframe mechanical model with the
+     machine's TRUE working flows drawn and moving. The Lamborghini
+     V12 fix is the reference implementation; this face is the jet
+     pilot whose solution templates the J79 and Raptor continuance.
+       · OPENS on the crankshaft-analog END view — direct-on into the
+         intake: spike centred, annulus rings, the compressor face
+         present as a working rotor, the stator ring honestly static,
+         and the spool's accessory GEARBOX present at the hub, gears
+         meshing at geared ratios.
+       · TIPS to the lateral WIREFRAME CUTAWAY as the working face:
+         nacelle in rings and longerons, the spool drawn as an actual
+         shaft with its 9 compressor discs and 2 turbine discs inside
+         the cutaway, turning.
+       · FLOW, the owner's named example made literal: intake
+         streamlines enter the annulus; the core gas path runs
+         nose → tail in colour order (cool → hot); a FUEL LINE flows
+         down the SIDE of the nacelle to the combustor ring; the
+         bleed-bypass duct runs the lower nacelle and ejects around
+         the core; DIRECTIONAL THRUST LINES stream aft from the
+         ejector nozzle, moving, breathing with the power cycle.
+       · The spike TRANSLATES fore/aft on a slow cycle, as the real
+         spike schedules with Mach.
+       · TOUCH flips end ↔ side. Touch is never ignition.
+     BEHAVIOUR (the Nov 13 law, as on the V12 reference): the engine
+     AUTO-STARTS when shown, runs for the host window's timeout
+     (host global → address → 30 s fallback, reported truthfully by
+     window.__governor), sleeps when unobserved; at rest the face
+     poses a still frame from absolute time. Every angle and dash
+     offset is a pure function of absolute time — clock-true at
+     every instant, live or posed.
      Spec character as DESIGN INPUT ONLY (public, historical): the
-     SR-71's turbojet with its translating spike intake. NO performance
-     figures appear on this face.
-     Governor history: this face was born under Battery V2 (REST/
-     OBSERVED, 12 s auto-exit); the face-line sweep removed that
-     governor Nov 10, 2026 - machinery runs from first paint, nothing
-     holds the screen on. Colour CALLED from the palette — solids,
-     never layered. */
+     SR-71's turbojet with its translating spike intake. NO
+     performance figures appear on this face. Colour CALLED from
+     the palette — solids, never layered. */
   :root{
     --void:#050607;        /* altitude depth */
     --plate:#0d0f10;       /* titanium plate */
@@ -39,6 +54,7 @@
     --digit:#ffb52e;
     --cream:#f5ead2;
     --hot:#ff7a1a; --hot2:#ff3d00;
+    --fuel:#ffd92e;        /* the side fuel line */
     --panel:#000000;
   }
   *{margin:0;padding:0;box-sizing:border-box}
@@ -59,6 +75,7 @@
   #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
     letter-spacing:.04em;font-variant-numeric:tabular-nums}
   #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #wxLine{font-size:2.2vmin;color:var(--steel);letter-spacing:.16em;margin-top:0.5vmin}
   #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
     color:var(--steel);letter-spacing:.14em;text-align:right}
   body.live #stateLamp{color:var(--laser)}
@@ -67,9 +84,9 @@
 <body>
 <div id="face">
   <div id="motorLbl" class="lbl">P&amp;W&nbsp;J58</div>
-  <div id="specLbl" class="lbl">SR-71 TURBOJET · SPIKE INTAKE</div>
-  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="J58 turbojet, lateral view"></svg></div>
-  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="specLbl" class="lbl">INTAKE FACE · COMPRESSOR + GEARBOX</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="J58 turbojet: intake end view tipping to a lateral wireframe cutaway with moving flow and thrust lines"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div><div id="wxLine">SKY — · —</div></div>
   <div id="stateLamp">REST</div>
 </div>
 
@@ -79,7 +96,8 @@
 var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
   steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
   ti:"#a8adb3", tiLo:"#6d7278", bronze:"#b0763a", laser:"#57e6ff",
-  hot:"#ff7a1a", hot2:"#ff3d00", seam:"#1c1f21", void:"#050607" };
+  hot:"#ff7a1a", hot2:"#ff3d00", fuel:"#ffd92e",
+  seam:"#1c1f21", void:"#050607" };
 var NS = "http://www.w3.org/2000/svg";
 function el(name, attrs, parent){
   var n = document.createElementNS(NS, name);
@@ -90,6 +108,35 @@ function el(name, attrs, parent){
 function polar(cx, cy, r, deg){
   var a = (deg-90) * Math.PI/180;
   return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+function clamp01(v){ return v<0 ? 0 : (v>1 ? 1 : v); }
+function easeIO(t){ t = clamp01(t); return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2, 2)/2; }
+/* A gear as line geometry: trapezoid teeth on a pitch circle. The
+   path is pure geometry from the teeth count — the assignment a
+   viewer reads (which gear, how many teeth, what ratio) is the
+   drawn truth, and rotation is applied per frame from absolute
+   time by the paint functions. */
+function gearPath(cx, cy, teeth, rPitch){
+  var mod = 2*rPitch/teeth, rOut = rPitch + mod*0.85, rRoot = rPitch - mod*0.85;
+  var step = 360/teeth, pts = [], i, a;
+  for(i=0; i<teeth; i++){
+    a = i*step;
+    [[a, rRoot], [a+step*0.30, rRoot], [a+step*0.42, rOut],
+     [a+step*0.58, rOut], [a+step*0.70, rRoot]].forEach(function(pr){
+      var p = polar(cx, cy, pr[1], pr[0]);
+      pts.push(p[0].toFixed(1)+","+p[1].toFixed(1));
+    });
+  }
+  return "M "+pts.join(" L ")+" Z";
+}
+function makeGear(parent, cx, cy, teeth, rPitch, colour, width){
+  var g = el("g", {}, parent);
+  el("path", {d:gearPath(cx, cy, teeth, rPitch), fill:"none",
+    stroke:colour, "stroke-width":width || 2, "stroke-linejoin":"round"}, g);
+  el("circle", {cx:cx, cy:cy, r:Math.max(3, rPitch*0.30), fill:"none",
+    stroke:colour, "stroke-width":1.4}, g);
+  el("circle", {cx:cx, cy:cy, r:2.2, fill:colour, stroke:"none"}, g);
+  return g;
 }
 
 var svg = document.getElementById("bore");
@@ -135,42 +182,109 @@ for(var h=1; h<=12; h++){
   ht.textContent = String(h);
 }
 
-/* ---- The motor (tremor group), lateral: spike → annulus → nacelle →
-   turbine → ejector → exhaust. -------------------------------------- */
-var motor = el("g", {}, svg);
-/* exhaust plume (drawn solids, breathes when OBSERVED) */
+/* =====================================================================
+   THE STAGE — two views of the same motor. END view (direct-on into
+   the intake) opens; the stage TURNS the machine side-on (flatten
+   around the vertical axis) and the lateral CUTAWAY settles in as
+   the working face. view.mix is the turn: 0 = end, 1 = side.
+   ===================================================================== */
+var stage = el("g", {}, svg);
+var viewEnd = el("g", {}, stage);
+var viewSide = el("g", {}, stage);
+var specEl = document.getElementById("specLbl");
+
+/* =====================================================================
+   SIDE VIEW — the lateral wireframe cutaway (the working face).
+   Spike → annulus → nacelle cutaway (rings, longerons, the spool as
+   shaft + disc stacks) → combustor → turbine → ejector → thrust.
+   ===================================================================== */
+var motor = el("g", {}, viewSide);
+/* exhaust plume (drawn solids, breathes with the power cycle) */
 var plume = el("g", {}, motor);
 el("polygon", {points:"352,"+(MY-13)+" 394,"+(MY-4)+" 394,"+(MY+4)+" 352,"+(MY+13),
   fill:PAL.hot2, stroke:"none", opacity:"0.55"}, plume);
 el("polygon", {points:"352,"+(MY-7)+" 384,"+(MY-2)+" 384,"+(MY+2)+" 352,"+(MY+7),
   fill:PAL.hot, stroke:"none", opacity:"0.8"}, plume);
-/* the spike: a long translating cone, point forward */
+/* THRUST LINES: directional, streaming aft from the nozzle, dash
+   advancing at exhaust speed; the group breathes (lengthens) with
+   the power cycle. Drawn under the nozzle, over the plume base. */
+var thrustG = el("g", {}, motor);
+var thrustLines = [];
+[-17, -9, 0, 9, 17].forEach(function(off){
+  thrustLines.push(el("line", {x1:356, y1:MY+off, x2:398, y2:MY+off,
+    stroke: off===0 ? PAL.hot : PAL.hot2, "stroke-width": off===0 ? 2.6 : 1.8,
+    "stroke-dasharray":"9 5", "stroke-linecap":"round"}, thrustG));
+});
+/* the spike: a long translating cone, point forward — its group
+   slides fore/aft on the Mach-schedule cycle in paintSide. */
+var spikeG = el("g", {}, motor);
 el("polygon", {points:"58,"+MY+" 148,"+(MY-13)+" 148,"+(MY+13),
-  fill:"none", stroke:PAL.steelHi, "stroke-width":2.4, "stroke-linejoin":"round"}, motor);
-el("line", {x1:66, y1:MY, x2:146, y2:MY, stroke:PAL.steelLo, "stroke-width":1.6}, motor);
+  fill:"none", stroke:PAL.steelHi, "stroke-width":2.4, "stroke-linejoin":"round"}, spikeG);
+el("line", {x1:66, y1:MY, x2:146, y2:MY, stroke:PAL.steelLo, "stroke-width":1.6}, spikeG);
 [104, 122, 136].forEach(function(x){
   var half = (x-58)/90*13;
-  el("line", {x1:x, y1:MY-half, x2:x, y2:MY+half, stroke:PAL.steel, "stroke-width":1.3}, motor);
+  el("line", {x1:x, y1:MY-half, x2:x, y2:MY+half, stroke:PAL.steel, "stroke-width":1.3}, spikeG);
 });
 /* intake annulus: the ring the spike sits in */
 el("ellipse", {cx:152, cy:MY, rx:7, ry:30, fill:PAL.void, stroke:PAL.steelHi, "stroke-width":2.6}, motor);
 el("ellipse", {cx:152, cy:MY, rx:3.4, ry:21, fill:"none", stroke:PAL.steelLo, "stroke-width":1.4}, motor);
-/* nacelle body: long titanium tube with panel rings */
+/* INTAKE STREAMLINES: air entering the annulus, dashes running
+   nose-ward into the intake — the flow starts OUTSIDE the machine. */
+var intakeLines = [];
+[-19, 0, 19].forEach(function(off){
+  intakeLines.push(el("path", {d:"M 6 "+(MY+off*1.5)+" L 96 "+(MY+off)+" L 148 "+(MY+off*0.8),
+    fill:"none", stroke:PAL.steel, "stroke-width":1.7,
+    "stroke-dasharray":"3 9", "stroke-linecap":"round", opacity:"0.85"}, motor));
+});
+/* nacelle: titanium tube in wireframe — skin lines + station rings */
 el("rect", {x:152, y:MY-30, width:150, height:60, fill:"none", stroke:PAL.ti, "stroke-width":2.6}, motor);
 [182, 214, 246, 278].forEach(function(x){
   el("line", {x1:x, y1:MY-30, x2:x, y2:MY+30, stroke:PAL.tiLo, "stroke-width":1.5}, motor);
 });
-el("line", {x1:152, y1:MY-30, x2:302, y2:MY-30, stroke:PAL.tiLo, "stroke-width":1.2}, motor);
-el("line", {x1:152, y1:MY+30, x2:302, y2:MY+30, stroke:PAL.tiLo, "stroke-width":1.2}, motor);
-/* spool lines: the turning read inside the closed nacelle */
-var spool1 = el("line", {x1:158, y1:MY-11, x2:298, y2:MY-11, stroke:PAL.laser,
-  "stroke-width":2.2, "stroke-dasharray":"10 7"}, motor);
-var spool2 = el("line", {x1:158, y1:MY+11, x2:298, y2:MY+11, stroke:PAL.steelHi,
-  "stroke-width":2.2, "stroke-dasharray":"10 7"}, motor);
-/* turbine section: bronze, hotter metal */
+el("line", {x1:152, y1:MY-22, x2:302, y2:MY-22, stroke:PAL.tiLo, "stroke-width":1.1}, motor);
+el("line", {x1:152, y1:MY+22, x2:302, y2:MY+22, stroke:PAL.tiLo, "stroke-width":1.1}, motor);
+/* THE CUTAWAY: the lower skin line drops away between the station
+   rings so the spool shows — a cut band drawn in laser ticks. */
+[166, 196, 226, 256, 286].forEach(function(x){
+  el("line", {x1:x, y1:MY+26, x2:x, y2:MY+33, stroke:PAL.laser, "stroke-width":1.6}, motor);
+});
+/* THE SPOOL, drawn as a mechanism: shaft the length of the core,
+   9 compressor discs (blade height shrinking as pressure rises —
+   the drawn truth of an axial compressor), the combustor ring,
+   2 turbine discs in bronze. Rotation reads three ways, all true
+   projections of one shaft angle: the shaft keyway dash advancing,
+   eccentric rim dots riding their circles at three stations, and
+   the disc chevrons phasing. */
+el("line", {x1:156, y1:MY, x2:330, y2:MY, stroke:PAL.steelHi, "stroke-width":2.6}, motor);
+var keyway = el("line", {x1:158, y1:MY, x2:328, y2:MY, stroke:PAL.laser,
+  "stroke-width":4.4, "stroke-dasharray":"2 14", opacity:"0.55"}, motor);
+var COMPX = [];
+for(var ci=0; ci<9; ci++){
+  var cxp = 168 + ci*9, halfH = 24 - ci*1.1;
+  COMPX.push(cxp);
+  el("line", {x1:cxp, y1:MY-halfH, x2:cxp, y2:MY+halfH, stroke:PAL.steel, "stroke-width":2}, motor);
+  el("line", {x1:cxp, y1:MY-halfH, x2:cxp+3.4, y2:MY-halfH+5, stroke:PAL.steelLo, "stroke-width":1.1}, motor);
+  el("line", {x1:cxp, y1:MY+halfH, x2:cxp+3.4, y2:MY+halfH-5, stroke:PAL.steelLo, "stroke-width":1.1}, motor);
+}
+/* combustor: annular ring with flame ticks, glow breathing */
+el("rect", {x:250, y:MY-21, width:16, height:42, fill:"none", stroke:PAL.hot, "stroke-width":2.4}, motor);
+var flameTicks = [];
+for(var fi=0; fi<5; fi++){
+  flameTicks.push(el("line", {x1:253+fi*2.6, y1:MY-14, x2:253+fi*2.6, y2:MY+14,
+    stroke:PAL.hot2, "stroke-width":1.3, opacity:"0.7"}, motor));
+}
+/* turbine section: bronze casing + its 2 discs */
 el("rect", {x:302, y:MY-27, width:30, height:54, fill:"none", stroke:PAL.bronze, "stroke-width":2.8}, motor);
-[311, 320].forEach(function(x){
-  el("line", {x1:x, y1:MY-27, x2:x, y2:MY+27, stroke:PAL.bronze, "stroke-width":1.4}, motor);
+[309, 321].forEach(function(x){
+  el("line", {x1:x, y1:MY-23, x2:x, y2:MY+23, stroke:PAL.bronze, "stroke-width":2.2}, motor);
+  el("line", {x1:x, y1:MY-23, x2:x+3, y2:MY-18, stroke:PAL.bronze, "stroke-width":1.1}, motor);
+  el("line", {x1:x, y1:MY+23, x2:x+3, y2:MY+18, stroke:PAL.bronze, "stroke-width":1.1}, motor);
+});
+/* eccentric rim dots: one per spool region, riding the shaft angle */
+var rimDots = [];
+[[180, 0], [252, 2.1], [315, 4.2]].forEach(function(cfg){
+  rimDots.push({ x:cfg[0], ph:cfg[1],
+    n: el("circle", {cx:cfg[0], cy:MY, r:2.6, fill:PAL.laser, stroke:"none"}, motor) });
 });
 /* ejector nozzle: petal trapezoids */
 el("polygon", {points:"332,"+(MY-27)+" 354,"+(MY-17)+" 354,"+(MY-9)+" 332,"+(MY-11),
@@ -179,119 +293,289 @@ el("polygon", {points:"332,"+(MY+11)+" 354,"+(MY+9)+" 354,"+(MY+17)+" 332,"+(MY+
   fill:"none", stroke:PAL.ti, "stroke-width":2.2, "stroke-linejoin":"round"}, motor);
 el("line", {x1:332, y1:MY-11, x2:354, y2:MY-9, stroke:PAL.tiLo, "stroke-width":1.4}, motor);
 el("line", {x1:332, y1:MY+11, x2:354, y2:MY+9, stroke:PAL.tiLo, "stroke-width":1.4}, motor);
-/* glass sheen over the nacelle: two called lines, solid tones */
-el("line", {x1:166, y1:MY-22, x2:296, y2:MY-22, stroke:PAL.steelHi, "stroke-width":1.8}, motor);
-el("line", {x1:186, y1:MY-17, x2:276, y2:MY-17, stroke:PAL.steelLo, "stroke-width":1.1}, motor);
+/* CORE GAS PATH: the flow through the machine in colour order —
+   laser through the compressor, hot at the combustor, hot2 out
+   the turbine. Dashes run nose → tail, always. */
+var coreSegs = [];
+[[156, 248, PAL.laser], [250, 266, PAL.hot], [268, 350, PAL.hot2]].forEach(function(sg){
+  coreSegs.push(el("line", {x1:sg[0], y1:MY+15, x2:sg[1], y2:MY+15,
+    stroke:sg[2], "stroke-width":2.2, "stroke-dasharray":"8 6",
+    "stroke-linecap":"round", opacity:"0.9"}, motor));
+});
+/* THE SIDE FUEL LINE: pump at the front of the nacelle, the line
+   running down the SIDE of the machine to the combustor ring —
+   dashes flowing aft along the skin, then dropping to the ring. */
+el("rect", {x:160, y:MY-44, width:12, height:9, fill:"none", stroke:PAL.fuel, "stroke-width":1.8}, motor);
+var fuelLine = el("path", {d:"M 172 "+(MY-40)+" L 254 "+(MY-40)+" L 258 "+(MY-23),
+  fill:"none", stroke:PAL.fuel, "stroke-width":2.2, "stroke-dasharray":"7 5",
+  "stroke-linecap":"round"}, motor);
+el("circle", {cx:258, cy:MY-21, r:3, fill:"none", stroke:PAL.fuel, "stroke-width":1.6}, motor);
+/* BLEED-BYPASS DUCT: the J58's party trick — compressor bleed air
+   ducted down the lower nacelle and ejected around the core,
+   augmenting thrust at speed. Dashes run aft. */
+var bypassLine = el("path", {d:"M 214 "+(MY+30)+" L 226 "+(MY+40)+" L 322 "+(MY+40)+" L 334 "+(MY+16),
+  fill:"none", stroke:PAL.steel, "stroke-width":1.9, "stroke-dasharray":"6 6",
+  "stroke-linecap":"round", opacity:"0.9"}, motor);
+/* station labels under the cutaway — the drawing names its parts */
+[["SPIKE", 96], ["9-STAGE COMPRESSOR", 202], ["TURBINE", 317]].forEach(function(lb){
+  var t = el("text", {x:lb[1], y:MY+58, "text-anchor":"middle", fill:PAL.steelLo,
+    "font-size":8.5, "letter-spacing":"0.14em",
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, motor);
+  t.textContent = lb[0];
+});
+var fuelLbl = el("text", {x:206, y:MY-50, "text-anchor":"middle", fill:PAL.fuel,
+  "font-size":8.5, "letter-spacing":"0.14em",
+  "font-family":"ui-monospace,Menlo,Consolas,monospace"}, motor);
+fuelLbl.textContent = "FUEL → COMBUSTOR";
 
-/* ---- Face motion hooks: spool dash advance is the spool read —
-   geared rates, always live. Exhaust breathes and the motor
-   trembles with it. ---------------------------------------------- */
-function spoolOff(nowMs, rate){ return -((nowMs/rate) % 17); }
-function paintSpool(nowMs, obs){
-  var r = obs ? 90 : 2600;
-  spool1.setAttribute("stroke-dashoffset", spoolOff(nowMs, r).toFixed(1));
-  spool2.setAttribute("stroke-dashoffset", spoolOff(nowMs, r*1.7).toFixed(1));
+/* =====================================================================
+   END VIEW — direct-on into the intake (the crankshaft-analog view
+   of a jet): spike centred in the annulus, the COMPRESSOR FACE as a
+   working rotor, the stator ring honestly still, and the spool's
+   ACCESSORY GEARBOX present at the hub — drive gear and two pinions
+   meshing at their geared ratios.
+   ===================================================================== */
+(function buildEnd(){
+  /* casing + annulus rings */
+  el("circle", {cx:CX, cy:CY, r:126, fill:"none", stroke:PAL.ti, "stroke-width":3}, viewEnd);
+  el("circle", {cx:CX, cy:CY, r:112, fill:"none", stroke:PAL.tiLo, "stroke-width":1.4}, viewEnd);
+  el("circle", {cx:CX, cy:CY, r:90, fill:PAL.void, stroke:PAL.steelHi, "stroke-width":2.4}, viewEnd);
+  /* stator ring: 24 ticks FIXED to the casing — they never rotate;
+     the rotor turns inside them. That stillness is the truth. */
+  for(var s=0; s<24; s++){
+    var sp1 = polar(CX, CY, 92, s*15), sp2 = polar(CX, CY, 103, s*15);
+    el("line", {x1:sp1[0], y1:sp1[1], x2:sp2[0], y2:sp2[1], stroke:PAL.steelLo, "stroke-width":2}, viewEnd);
+  }
+  /* the spike, head-on: concentric tip rings */
+  el("circle", {cx:CX, cy:CY, r:11, fill:"none", stroke:PAL.steelHi, "stroke-width":2.2}, viewEnd);
+  el("circle", {cx:CX, cy:CY, r:4, fill:PAL.steelHi, stroke:"none"}, viewEnd);
+})();
+/* the compressor rotor: 18 blades on a hub, ONE rotating group */
+var rotorG = el("g", {}, viewEnd);
+for(var rb=0; rb<18; rb++){
+  var ra = rb*20, rp1 = polar(CX, CY, 15, ra), rp2 = polar(CX, CY, 62, ra+16), rp3 = polar(CX, CY, 86, ra+7);
+  el("path", {d:"M "+rp1[0].toFixed(1)+" "+rp1[1].toFixed(1)+
+    " Q "+rp2[0].toFixed(1)+" "+rp2[1].toFixed(1)+" "+rp3[0].toFixed(1)+" "+rp3[1].toFixed(1),
+    fill:"none", stroke:PAL.steel, "stroke-width":2}, rotorG);
 }
-function extraStill(nowMs){ /* retained for the bench: poses the still frame on demand; the live driver never calls it */
-  motor.setAttribute("transform", "translate(0 0)");
-  plume.setAttribute("opacity", "0.5");
-  paintSpool(nowMs, false);
-}
-function extraFrame(el_ms){
-  var now = Date.now();
-  var tx = Math.sin(el_ms/43)*0.5;
+el("circle", {cx:CX, cy:CY, r:15, fill:PAL.void, stroke:PAL.steelHi, "stroke-width":2.2}, rotorG);
+/* THE GEARBOX: seated low on the hub face, as it sits on the real
+   accessory drive — a 17T drive gear turning at half spool speed,
+   two 11T pinions meshing either side, counter-rotating faster.
+   Ratios are the drawn teeth: 17:11. */
+var gbDrive = makeGear(viewEnd, CX, CY+52, 17, 17, PAL.brass, 1.8);
+var gbPinL = makeGear(viewEnd, CX-28, CY+52, 11, 11, PAL.brassHi, 1.5);
+var gbPinR = makeGear(viewEnd, CX+28, CY+52, 11, 11, PAL.brassHi, 1.5);
+var gbLbl = el("text", {x:CX, y:CY+88, "text-anchor":"middle", fill:PAL.brassLo,
+  "font-size":8.5, "letter-spacing":"0.14em",
+  "font-family":"ui-monospace,Menlo,Consolas,monospace"}, viewEnd);
+gbLbl.textContent = "ACCESSORY GEARBOX · 17:11";
+
+/* ---- Paint: every value a pure function of absolute time ----------
+   The spool turns one revolution per 1.1 s at the face's display
+   rate. All flow dashes advance aft/downstream; nothing on this
+   face ever flows backwards. */
+function spoolDeg(nowMs){ return ((nowMs/1100) % 1) * 360; }
+function paintSide(nowMs){
+  var th = spoolDeg(nowMs) * Math.PI/180;
+  /* spool rotation reads: keyway dash + rim dots riding their circles */
+  keyway.setAttribute("stroke-dashoffset", (-((nowMs/16) % 16)).toFixed(1));
+  rimDots.forEach(function(rd){
+    rd.n.setAttribute("cy", (MY + 7*Math.sin(th + rd.ph)).toFixed(1));
+  });
+  /* spike translation: a slow fore/aft schedule, ±3 units per 9 s */
+  var dx = 3*Math.sin(nowMs * 2*Math.PI/9000);
+  spikeG.setAttribute("transform", "translate("+dx.toFixed(2)+" 0)");
+  /* flow: intake in, core through, fuel down the side, bypass aft */
+  intakeLines.forEach(function(l){
+    l.setAttribute("stroke-dashoffset", (-((nowMs/22) % 12)).toFixed(1));
+  });
+  coreSegs.forEach(function(l){
+    l.setAttribute("stroke-dashoffset", (-((nowMs/13) % 14)).toFixed(1));
+  });
+  fuelLine.setAttribute("stroke-dashoffset", (-((nowMs/26) % 12)).toFixed(1));
+  bypassLine.setAttribute("stroke-dashoffset", (-((nowMs/24) % 12)).toFixed(1));
+  /* thrust: dashes stream aft fast; the fan breathes with power */
+  thrustLines.forEach(function(l){
+    l.setAttribute("stroke-dashoffset", (-((nowMs/8) % 14)).toFixed(1));
+  });
+  var br = 0.5 + 0.5*Math.sin(nowMs/300);
+  thrustG.setAttribute("transform",
+    "translate(356 0) scale("+(0.82 + 0.30*br).toFixed(3)+" 1) translate(-356 0)");
+  plume.setAttribute("opacity", (0.6 + 0.4*br).toFixed(2));
+  flameTicks.forEach(function(f, i){
+    f.setAttribute("opacity", (0.45 + 0.5*Math.abs(Math.sin(nowMs/170 + i))).toFixed(2));
+  });
+  /* idle tremor on the motor group */
+  var tx = Math.sin(nowMs/43)*0.5;
   motor.setAttribute("transform", "translate("+tx.toFixed(2)+" 0)");
-  plume.setAttribute("opacity", (0.65 + 0.35*Math.sin(el_ms/300)).toFixed(2));
-  paintSpool(now, true);
+}
+function paintEnd(nowMs){
+  var th = spoolDeg(nowMs);
+  rotorG.setAttribute("transform", "rotate("+th.toFixed(2)+" "+CX+" "+CY+")");
+  /* gearbox: drive at half spool, pinions counter-rotating at the
+     teeth ratio 17:11 against it. Mesh phase is a drawn constant. */
+  gbDrive.setAttribute("transform", "rotate("+(-th/2).toFixed(2)+" "+CX+" "+(CY+52)+")");
+  var pin = th/2 * 17/11;
+  gbPinL.setAttribute("transform", "rotate("+(pin+8).toFixed(2)+" "+(CX-28)+" "+(CY+52)+")");
+  gbPinR.setAttribute("transform", "rotate("+(pin+8).toFixed(2)+" "+(CX+28)+" "+(CY+52)+")");
 }
 
-/* ---- Spinners: none rotating in this plane — the lateral spool read
-   lives in the hooks above. ------------------------------------------ */
-var SPIN = [];
+/* ---- The turn between views (vertical-axis turn, as a machine
+   turning side-on inside its glass). ------------------------------- */
+var view = { mix:0, from:0, to:0, animStart:-1, animDur:2400 };
+function viewDest(){ return view.animStart >= 0 ? view.to : view.mix; }
+function applyMix(m){
+  view.mix = m;
+  var endP = easeIO(clamp01(m*2));            /* end turns away first */
+  var sideP = easeIO(clamp01((m-0.45)/0.55)); /* side settles in after */
+  var endSx = 1 - 0.82*endP, sideSx = 0.18 + 0.82*sideP;
+  viewEnd.setAttribute("transform",
+    "translate("+CX+" "+CY+") scale("+endSx.toFixed(3)+" 1) translate("+(-CX)+" "+(-CY)+")");
+  viewEnd.setAttribute("opacity", String(1 - clamp01((m-0.1)/0.45)));
+  viewSide.setAttribute("transform",
+    "translate("+CX+" "+CY+") scale("+sideSx.toFixed(3)+" 1) translate("+(-CX)+" "+(-CY)+")");
+  viewSide.setAttribute("opacity", String(clamp01((m-0.3)/0.5)));
+  specEl.textContent = m < 0.5 ? "INTAKE FACE · COMPRESSOR + GEARBOX"
+                               : "SPIKE INTAKE · FLOW CUTAWAY";
+}
+function turnTo(to, dur){
+  view.from = view.mix; view.to = to;
+  view.animDur = dur || 2200; view.animStart = Date.now();
+}
 
-/* ---- Time read ------------------------------------------------------- */
+/* ---- Time read (digital fitting, as on every sibling face) --------- */
 var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
-var lampEl = document.getElementById("stateLamp");
 var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 var lastMinute = -1;
 function paintTime(now){
   var m = now.getMinutes();
-  if(m === lastMinute && now.getSeconds() !== 0 && lastMinute !== -1 && paintedOnce) return;
-  lastMinute = m; paintedOnce = true;
+  if(m === lastMinute) return;
+  lastMinute = m;
   var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
   clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
   dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
     " · "+(hh<12?"AM":"PM");
 }
-var paintedOnce = false;
 
-/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
-   This face previously ran the BATTERY V2 GOVERNOR: a two-state
-   REST/OBSERVED runtime. It booted into REST and ran its machinery
-   only while an observation signal (container hook, focus, touch,
-   ?face=observed) kept it awake, auto-exiting to REST 12 s after
-   the last signal. In any plain viewer it sat frozen behind a live
-   clock - the Betta V2 defect class, banned house-wide. The
-   governor is REMOVED on the flagship repair pattern: the driver
-   below is kicked at load and runs unconditionally while the face
-   is open; every angle is a pure function of absolute time, so a
-   returning face resumes exactly on cadence. The only pause left
-   is document.hidden (the platform stops rAF itself when the
-   screen sleeps). window.__faceRest is pinned false and
-   window.__governor reports state "live" - the bench handles stay
-   readable and now tell the truth. window.ApexFace keeps the old
-   container contract as NO-OP compatibility: its calls only note
-   the signal; state() always returns "live". Battery care,
-   honestly scoped: no auto-exit, no still-painting; while the
-   face is lit, it lives. */
-var bootMs = Date.now();
-var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+/* =====================================================================
+   RUN-WINDOW GOVERNOR (the Nov 13 behaviour law, ported from the
+   V12 reference): AUTO-START on show; the run is bound to the host
+   window's timeout — host global, then address, then the 30 s
+   fallback, with the resolved value and source reported on
+   window.__governor; hidden faces sleep at once; TOUCH TURNS THE
+   VIEW ONLY — it never starts, extends, or restarts the run.
+   ===================================================================== */
+function resolveTimeoutMs(){
+  if(typeof window.__faceTimeoutMs === "number" && window.__faceTimeoutMs > 0)
+    return { ms:Math.floor(window.__faceTimeoutMs), source:"host-global-ms" };
+  if(typeof window.__faceTimeoutSec === "number" && window.__faceTimeoutSec > 0)
+    return { ms:Math.floor(window.__faceTimeoutSec*1000), source:"host-global-sec" };
+  var q = location.search || "", mt = /[?&]timeoutMs=(\d+)/.exec(q), ts = /[?&]timeout=(\d+)/.exec(q);
+  if(mt) return { ms:parseInt(mt[1], 10), source:"address-timeoutMs" };
+  if(ts) return { ms:parseInt(ts[1], 10)*1000, source:"address-timeout" };
+  return { ms:30000, source:"fallback-30s" };
+}
+var RESOLVED = resolveTimeoutMs();
+var TIMEOUT_MS = RESOLVED.ms;
+var lampEl = document.getElementById("stateLamp");
+var eng = { mode:"rest", runStart:0, enters:0, rests:0, lastSignal:"boot" };
+var gov = { state:"rest", enters:0, rests:0, lastSignal:"boot",
+            timeoutMs:TIMEOUT_MS, timeoutSource:RESOLVED.source };
 window.__governor = gov;
-window.__faceRest = false;
-function liveAngles(nowMs){
-  var t = nowMs/1000;
-  return SPIN.map(function(c){ return ((t % c.obsP)/c.obsP)*360; });
+window.__faceRest = true;
+function syncGov(){
+  gov.state = eng.mode; gov.enters = eng.enters; gov.rests = eng.rests;
+  gov.lastSignal = eng.lastSignal;
+  window.__faceRest = (eng.mode !== "live");
 }
-function liveFrame(){
+var rafId = 0;
+function paintStill(){
+  paintSide(Date.now());
+  paintEnd(Date.now());
+}
+function startRun(sig){
+  eng.mode = "live"; eng.enters++; eng.lastSignal = sig;
+  eng.runStart = Date.now();
+  lampEl.textContent = "LIVE";
+  document.body.classList.add("live");
+  /* every run opens on the intake end view and turns to the cutaway */
+  view.animStart = -1; applyMix(0);
+  turnTo(1, 2400);
+  syncGov();
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(frame);
+}
+function sleep(sig){
+  eng.lastSignal = sig;
+  if(eng.mode !== "rest"){ eng.mode = "rest"; eng.rests++; }
+  lampEl.textContent = "AT REST";
+  document.body.classList.remove("live");
+  cancelAnimationFrame(rafId); rafId = 0;
+  if(view.animStart >= 0){ view.mix = view.to; view.animStart = -1; applyMix(view.mix); }
+  paintStill();
+  syncGov();
+}
+function frame(){
+  if(eng.mode !== "live") return;
   var now = Date.now();
-  applyAngles(liveAngles(now)); extraFrame(now - bootMs);
-  requestAnimationFrame(liveFrame);
+  if(now - eng.runStart >= TIMEOUT_MS){ sleep("window-timeout"); return; }
+  if(view.animStart >= 0){
+    var p = (now - view.animStart) / view.animDur;
+    if(p >= 1){ view.mix = view.to; view.animStart = -1; applyMix(view.mix); }
+    else applyMix(view.from + (view.to - view.from) * easeIO(p));
+  }
+  paintSide(now);
+  paintEnd(now);
+  rafId = requestAnimationFrame(frame);
 }
-function setLamp(){ lampEl.textContent = "LIVE"; }
-function note(sig){ gov.lastSignal = sig; }
-window.ApexFace = {
-  observe: function(){ note("container-observe(noop)"); },
-  rest:    function(){ note("container-rest(noop)"); },
-  toggle:  function(){ note("toggle(noop)"); },
-  state:   function(){ return "live"; }
-};
-window.addEventListener("apex-face-observe", function(){ note("event-observe(noop)"); });
-window.addEventListener("apex-face-rest", function(){ note("event-rest(noop)"); });
-["pointerdown","touchstart","keydown"].forEach(function(ev){
-  window.addEventListener(ev, function(){ note(ev); }, true);
-});
-window.addEventListener("focus", function(){ note("focus"); });
+/* Touch = play: turn the view. Never ignition, never a window reset. */
+function cycleView(){
+  var to = viewDest() === 1 ? 0 : 1;
+  if(eng.mode === "live"){ turnTo(to, 1800); eng.lastSignal = "touch-view"; }
+  else {
+    view.animStart = -1; applyMix(to);
+    paintStill(); eng.lastSignal = "touch-view-rest";
+  }
+  syncGov();
+}
+document.getElementById("face").addEventListener("pointerdown", function(){ cycleView(); });
 document.addEventListener("visibilitychange", function(){
-  if(!document.hidden) paintTime(new Date());
+  if(document.hidden) sleep("hidden");
+  else { paintTime(new Date()); startRun("visible"); }
 });
+window.ApexFace = {
+  observe: function(){ startRun("container-observe"); },
+  rest:    function(){ sleep("container-rest"); },
+  toggle:  function(){ cycleView(); },
+  state:   function(){ return eng.mode; }
+};
+window.addEventListener("apex-face-observe", function(){ startRun("event-observe"); });
+window.addEventListener("apex-face-rest", function(){ sleep("event-rest"); });
+/* Bench handles, in the face-line style: they report, they do not lie. */
+window.__j58 = {
+  state: function(){ return eng.mode; },
+  view: function(){ return view.animStart >= 0 ? "turning" :
+    (view.mix === 1 ? "side" : (view.mix === 0 ? "end" : "mid")); },
+  timeoutMs: function(){ return TIMEOUT_MS; },
+  timeoutSource: function(){ return RESOLVED.source; },
+  spoolDeg: function(){ return Math.round(spoolDeg(Date.now())); },
+  cycleView: cycleView,
+  start: function(){ startRun("bench"); },
+  sleep: function(){ sleep("bench"); }
+};
 
-/* ---- Boot: paint the clock, then the live loop runs from first
-   paint. No wake-lock of any kind - the system sleep governs
-   this face, never a governor inside it. ----------------------- */
+/* ---- Boot: paint the fittings, pose the still, then IGNITE on
+   show — no touch, no signal, the run opens by itself. ------------ */
 paintTime(new Date());
-setLamp();
-document.body.classList.add("live");
-requestAnimationFrame(liveFrame);
+applyMix(0);
+paintStill();
+startRun("boot");
 setInterval(function(){
   var now = new Date();
-  if(now.getMinutes() !== lastMinute) paintTime(now);
+  paintTime(now);
 }, 1000);
-function applyAngles(angles){
-  SPIN.forEach(function(c, i){
-    c.g.setAttribute("transform", "rotate("+angles[i].toFixed(2)+" "+c.cx+" "+c.cy+")");
-  });
-}
 
 </script>
 <script>
@@ -407,6 +691,40 @@ function applyAngles(angles){
   }
   requestAnimationFrame(tick);
 })();
+</script>
+<script>
+  /* ---- WEATHER FITTING: the sibling faces' pattern, lifted from
+     apex-weather — one small Open-Meteo JSON fetch on load for the
+     house coordinates (Johannesburg, MI), refresh every 15 minutes,
+     painted as one plain-text line in the read panel. A failed fetch
+     keeps the last paint; the line never blocks the face. --------- */
+  var WX_URL = 'https://api.open-meteo.com/v1/forecast?latitude=44.98096&longitude=-84.49608'
+    + '&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m'
+    + '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDetroit&forecast_days=1';
+  var WX_CODES = {0:'CLEAR',1:'MOSTLY CLEAR',2:'PARTLY CLOUDY',3:'OVERCAST',45:'FOG',48:'FOG',
+    51:'DRIZZLE',53:'DRIZZLE',55:'DRIZZLE',56:'FREEZING DRIZZLE',57:'FREEZING DRIZZLE',
+    61:'RAIN',63:'RAIN',65:'HEAVY RAIN',66:'FREEZING RAIN',67:'FREEZING RAIN',
+    71:'SNOW',73:'SNOW',75:'HEAVY SNOW',77:'SNOW GRAINS',80:'SHOWERS',81:'SHOWERS',82:'VIOLENT SHOWERS',
+    85:'SNOW SHOWERS',86:'SNOW SHOWERS',95:'THUNDERSTORM',96:'T-STORM + HAIL',99:'T-STORM + HAIL'};
+  var WX_DIRS = ['N','NE','E','SE','S','SW','W','NW'];
+  function paintWx() {
+    var x = new XMLHttpRequest();
+    x.open('GET', WX_URL, true);
+    x.onreadystatechange = function() {
+      if (x.readyState !== 4 || x.status !== 200) return;
+      try {
+        var j = JSON.parse(x.responseText), c = j.current;
+        var dir = WX_DIRS[Math.round(c.wind_direction_10m / 45) % 8];
+        document.getElementById('wxLine').textContent =
+          Math.round(c.temperature_2m) + '° ' + (WX_CODES[c.weather_code] || '—')
+          + ' · WIND ' + dir + ' ' + Math.round(c.wind_speed_10m)
+          + ' · FEELS ' + Math.round(c.apparent_temperature) + '°';
+      } catch (e) { /* keep last paint */ }
+    };
+    x.send();
+  }
+  paintWx();
+  setInterval(paintWx, 900000);
 </script>
 </body>
 </html>
