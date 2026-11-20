@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dark Sky Event — the Event Build | Apex Air Solutions</title>
+<meta name="description" content="The third pre-built build: a space-themed dark sky event site — template, layout builder, and the event network plan. The UAP dark sky event is Cast Net's proving ground.">
+<style>
+  :root{
+    --bg:#05070d; --panel:rgba(16,22,34,.82); --panel2:rgba(9,13,22,.88);
+    --line:rgba(120,200,220,.28); --aqua:#25c7dc; --aqua2:#a5f2fa; --deep:#0e7c94;
+    --text:#eef7f9; --dim:#a9bcc2; --warn:#ffb347; --good:#5eeaa0; --gold:#ffd166;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  body{margin:0; font-family:Georgia,'Times New Roman',serif; color:var(--text);
+    background:
+      radial-gradient(120% 55% at 85% -10%, rgba(30,40,90,.45), transparent 60%),
+      radial-gradient(100% 50% at 0% 110%, rgba(37,199,220,.10), transparent 55%),
+      var(--bg);
+    min-height:100vh; padding:18px 14px 44px;}
+  .wrap{max-width:720px; margin:0 auto}
+  header{text-align:center; padding:14px 0 2px}
+  .kicker{color:var(--gold); font-size:12px; letter-spacing:.34em; margin:0}
+  h1{font-size:30px; letter-spacing:.06em; margin:6px 0 4px; font-weight:600}
+  h1 .sky{color:var(--aqua)}
+  .sub{color:var(--dim); font-size:14.5px; line-height:1.55; margin:0 auto; max-width:560px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:16px; margin:16px 0; box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  .card h2{margin:0 0 8px; font-size:15px; letter-spacing:.18em; color:var(--aqua2)}
+  .card p{margin:0 0 10px; font-size:15px; line-height:1.6}
+  .card p:last-child{margin-bottom:0}
+  .tag{display:inline-block; font-size:10.5px; letter-spacing:.14em; padding:2px 8px;
+    border-radius:999px; border:1px solid var(--line); color:var(--aqua2); vertical-align:2px}
+  .tag.run{color:var(--good); border-color:rgba(94,234,160,.5)}
+  .tag.new{color:var(--gold); border-color:rgba(255,209,102,.5)}
+  .tag.plan{color:var(--warn); border-color:rgba(255,179,71,.5)}
+  .shelf{display:grid; grid-template-columns:1fr; gap:10px}
+  @media (min-width:640px){ .shelf{grid-template-columns:1fr 1fr 1fr} }
+  .pre{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:12px 13px}
+  .pre h3{margin:0 0 2px; font-size:15.5px; font-weight:600}
+  .pre .no{color:var(--gold); font-size:11px; letter-spacing:.22em; margin:0 0 4px}
+  .pre p{font-size:13.5px; line-height:1.55; color:var(--dim); margin:0 0 8px}
+  .pre p:last-child{margin-bottom:0}
+  .pre .state{font-size:12px; letter-spacing:.1em}
+  figure.plan{margin:0}
+  figure.plan svg{width:100%; height:auto; display:block; border-radius:12px; border:1px solid var(--line)}
+  figcaption{color:var(--dim); font-size:13px; line-height:1.55; margin-top:8px}
+  .bar{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:10px 0}
+  .bar .lab{font-size:11px; letter-spacing:.16em; color:var(--dim); margin-right:2px}
+  button.pill, a.pill{font-family:inherit; font-size:12.5px; letter-spacing:.04em;
+    color:var(--aqua2); background:rgba(14,124,148,.16); border:1px solid var(--line);
+    border-radius:999px; padding:5px 12px; cursor:pointer; text-decoration:none; line-height:1.5}
+  button.pill:hover, a.pill:hover{border-color:var(--aqua)}
+  button.pill.on{background:var(--aqua); color:#04222b; border-color:var(--aqua); font-weight:700}
+  button.pill.gold{color:var(--gold); border-color:rgba(255,209,102,.55); background:rgba(255,209,102,.08)}
+  button.pill:disabled{opacity:.45; cursor:default}
+  input.txt, select.txt{font-family:inherit; font-size:13.5px; color:var(--text);
+    background:rgba(5,8,14,.8); border:1px solid var(--line); border-radius:999px; padding:5px 12px}
+  input.txt{flex:1 1 180px; min-width:140px}
+  select.txt{border-radius:10px}
+  .stage{position:relative; width:100%; aspect-ratio:4/3; border:1px solid var(--line);
+    border-radius:12px; overflow:hidden; background:#060a12; touch-action:none}
+  .stage .base{position:absolute; inset:0; width:100%; height:100%}
+  .stage iframe.base{border:0}
+  .stage .base svg{width:100%; height:100%; display:block}
+  .stage.locked iframe.base{pointer-events:none}
+  .stage .veil{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    color:var(--dim); font-size:14px; letter-spacing:.08em; text-align:center; padding:20px}
+  .stage.nobase .veil{display:flex}
+  .stage .locktag{position:absolute; top:8px; left:8px; display:none; z-index:5;
+    font-size:10.5px; letter-spacing:.16em; color:#04222b; background:var(--gold);
+    border-radius:999px; padding:2px 9px; font-weight:700}
+  .stage.locked .locktag{display:block}
+  .stage svg.chain{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:3}
+  .pin{position:absolute; z-index:4; width:38px; height:46px; margin:-40px 0 0 -19px;
+    background:none; border:0; padding:0; cursor:grab; touch-action:none; text-align:center}
+  .pin .dot{width:30px; height:30px; margin:0 auto; border-radius:50%;
+    background:rgba(6,14,20,.92); border:1.5px solid var(--aqua);
+    display:flex; align-items:center; justify-content:center; pointer-events:none}
+  .pin .dot svg{width:17px; height:17px; fill:var(--aqua2)}
+  .pin.mesh .dot{border-color:var(--gold)}
+  .pin.mesh .dot svg{fill:var(--gold)}
+  .pin .cap{display:block; margin-top:1px; font-size:8.5px; letter-spacing:.06em;
+    color:var(--text); text-shadow:0 1px 3px #000, 0 0 6px #000; pointer-events:none;
+    white-space:nowrap; transform:translateX(calc(50% - 19px)); width:max-content; max-width:92px;
+    overflow:hidden; text-overflow:ellipsis}
+  .pin.sel .dot{box-shadow:0 0 0 2px var(--gold), 0 0 14px rgba(255,209,102,.55)}
+  .palette{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 2px}
+  .chip{font-family:inherit; font-size:12px; color:var(--text); background:var(--panel2);
+    border:1px solid var(--line); border-radius:999px; padding:4px 10px 4px 7px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:5px; line-height:1.4}
+  .chip svg{width:14px; height:14px; fill:var(--aqua2)}
+  .chip.meshchip svg{fill:var(--gold)}
+  .chip.on{border-color:var(--gold); color:var(--gold)}
+  .readout{font-size:13.5px; color:var(--dim); line-height:1.6; margin:8px 0 0}
+  .readout b{color:var(--text); font-weight:600}
+  .steps{margin:4px 0 0; padding:0; list-style:none}
+  .steps li{margin:0 0 12px; font-size:14.5px; line-height:1.6}
+  .steps li:last-child{margin-bottom:2px}
+  .steps .n{color:var(--gold); letter-spacing:.14em; font-size:11.5px; display:block; margin-bottom:1px}
+  .honest{border-color:rgba(255,179,71,.45)}
+  .honest h2{color:var(--warn)}
+  footer{text-align:center; color:var(--dim); font-size:13px; line-height:1.7; padding:8px 0 0}
+  a{color:var(--aqua2)}
+  .small{font-size:12.5px; color:var(--dim); line-height:1.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="kicker">APEX AIR SOLUTIONS · THE EVENT BUILD</p>
+  <h1>DARK SKY <span class="sky">EVENT</span></h1>
+  <p class="sub">The UAP dark sky event, stood up as a build: a space-themed event site, a layout
+  builder for any ground you can get, and the event network plan that runs on Cast Net.
+  The dark sky event is Cast Net&rsquo;s proving ground — a crowd in a field, every node on the
+  mesh, the whole thing holding together when the towers drop out.</p>
+</header>
+
+<section class="card">
+  <h2>THE PRE-BUILT BUILDS</h2>
+  <p>Three event builds, ready to stand up. The first two are patterns this house has already
+  run on its own ground. The third is the full build — the one a crew takes anywhere.</p>
+  <div class="shelf">
+    <div class="pre">
+      <p class="no">PRE-BUILT 01</p>
+      <h3>Hilltop Watch</h3>
+      <p>One node on home ground: the stream, the desk catalogs, the ledger. The pattern of the
+      first dark sky watches over Johannesburg.</p>
+      <p class="state"><span class="tag run">RUN · PROVEN IN THE FIELD</span></p>
+    </div>
+    <div class="pre">
+      <p class="no">PRE-BUILT 02</p>
+      <h3>Triangle Watch</h3>
+      <p>Three seats of observation on one sky: an eye outside, an eye inside on the big
+      screen, and the desk&rsquo;s catalogs grading by track. The pattern of November 19.</p>
+      <p class="state"><span class="tag run">RUN · PROVEN IN THE FIELD</span></p>
+    </div>
+    <div class="pre">
+      <p class="no">PRE-BUILT 03</p>
+      <h3>Dark Sky Event Site</h3>
+      <p>The whole field: open sky in the middle, forest at the edges, a pavilion, water where
+      the ground has it, and a mesh under all of it. This page is its template and its builder.</p>
+      <p class="state"><span class="tag new">NEW · THIS BUILD</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>THE TEMPLATE — ONE FIELD, ANY GROUND</h2>
+  <figure class="plan">
+  <svg viewBox="0 0 640 480" role="img" aria-label="Drawn plan of the dark sky event site template">
+    <defs>
+      <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#04060f"/><stop offset="1" stop-color="#0d1830"/>
+      </linearGradient>
+      <linearGradient id="lakeG" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0a2e4a"/><stop offset="1" stop-color="#12557e"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="640" height="480" fill="#0a1410"/>
+    <rect x="0" y="0" width="640" height="118" fill="url(#skyG)"/>
+    <g fill="#dfeeff">
+      <circle cx="40" cy="22" r="1.6"/><circle cx="110" cy="48" r="1.2"/><circle cx="180" cy="18" r="1.8"/>
+      <circle cx="250" cy="40" r="1.1"/><circle cx="320" cy="14" r="1.5"/><circle cx="395" cy="44" r="1.2"/>
+      <circle cx="470" cy="20" r="1.7"/><circle cx="540" cy="50" r="1.1"/><circle cx="600" cy="26" r="1.6"/>
+      <circle cx="70" cy="74" r="1.1"/><circle cx="290" cy="70" r="1.3"/><circle cx="505" cy="82" r="1.2"/>
+    </g>
+    <path d="M566 18 a17 17 0 1 0 12 29 a13.5 13.5 0 1 1 -12 -29z" fill="#f4ecd2"/>
+    <rect x="86" y="96" width="554" height="384" fill="#10241a"/>
+    <path d="M0 96 L96 96 L78 210 L92 330 L70 480 L0 480 Z" fill="url(#lakeG)"/>
+    <path d="M96 96 L78 210 L92 330 L70 480" stroke="#7fd4ea" stroke-width="2" fill="none" opacity=".65"/>
+    <text x="30" y="292" fill="#a5f2fa" font-size="12" letter-spacing="2" transform="rotate(-90 30 292)" text-anchor="middle">THE WATER</text>
+    <g fill="#173d27" stroke="#0a1f13" stroke-width="1">
+      <path d="M104 108 l11 -22 l11 22 z"/><path d="M140 104 l11 -22 l11 22 z"/><path d="M176 108 l11 -22 l11 22 z"/>
+      <path d="M212 104 l11 -22 l11 22 z"/><path d="M248 108 l11 -22 l11 22 z"/><path d="M284 104 l11 -22 l11 22 z"/>
+      <path d="M320 108 l11 -22 l11 22 z"/><path d="M356 104 l11 -22 l11 22 z"/><path d="M392 108 l11 -22 l11 22 z"/>
+      <path d="M428 104 l11 -22 l11 22 z"/><path d="M464 108 l11 -22 l11 22 z"/><path d="M500 104 l11 -22 l11 22 z"/>
+      <path d="M536 108 l11 -22 l11 22 z"/><path d="M572 104 l11 -22 l11 22 z"/><path d="M604 108 l11 -22 l11 22 z"/>
+      <path d="M610 150 l11 -22 l11 22 z"/><path d="M610 200 l11 -22 l11 22 z"/><path d="M610 250 l11 -22 l11 22 z"/>
+      <path d="M610 300 l11 -22 l11 22 z"/><path d="M610 350 l11 -22 l11 22 z"/><path d="M610 400 l11 -22 l11 22 z"/>
+      <path d="M120 452 l11 -22 l11 22 z"/><path d="M470 452 l11 -22 l11 22 z"/><path d="M520 452 l11 -22 l11 22 z"/>
+      <path d="M570 452 l11 -22 l11 22 z"/>
+    </g>
+    <text x="368" y="86" fill="#8fd0a8" font-size="11" letter-spacing="3" text-anchor="middle">FOREST BORDER</text>
+    <ellipse cx="330" cy="262" rx="168" ry="104" fill="#14301f"/>
+    <ellipse cx="330" cy="262" rx="168" ry="104" fill="none" stroke="#2c5c3d" stroke-width="1.5" stroke-dasharray="5 6"/>
+    <circle cx="330" cy="262" r="34" fill="none" stroke="#25c7dc" stroke-width="1.4" opacity=".8"/>
+    <circle cx="330" cy="262" r="3.4" fill="#a5f2fa"/>
+    <text x="330" y="240" fill="#eef7f9" font-size="13" letter-spacing="2.5" text-anchor="middle">VIEWING FIELD</text>
+    <text x="330" y="290" fill="#a9bcc2" font-size="10.5" letter-spacing="1.5" text-anchor="middle">OPEN SKY OVERHEAD</text>
+    <g>
+      <path d="M112 236 L168 218 L196 236 Z" fill="#274b63"/>
+      <path d="M118 236 L118 262 M190 236 L190 262" stroke="#c8a06a" stroke-width="4"/>
+      <rect x="112" y="262" width="84" height="4" fill="#c8a06a"/>
+      <circle cx="128" cy="252" r="4" fill="#ffd166"/><circle cx="182" cy="252" r="4" fill="#ff7a7a"/>
+      <text x="154" y="282" fill="#eef7f9" font-size="11.5" letter-spacing="1.5" text-anchor="middle">PAVILION</text>
+      <text x="154" y="296" fill="#a9bcc2" font-size="9" letter-spacing="1" text-anchor="middle">POWER · FIRST AID</text>
+    </g>
+    <g>
+      <rect x="292" y="128" width="76" height="14" rx="3" fill="#274b63"/>
+      <rect x="300" y="142" width="60" height="5" fill="#1a3247"/>
+      <text x="330" y="122" fill="#eef7f9" font-size="11" letter-spacing="1.5" text-anchor="middle">STAGE</text>
+    </g>
+    <g fill="#315f7d">
+      <path d="M486 148 l13 -18 l13 18 z"/><path d="M522 138 l13 -18 l13 18 z"/><path d="M516 172 l13 -18 l13 18 z"/>
+      <path d="M478 182 l13 -18 l13 18 z"/><path d="M552 160 l13 -18 l13 18 z"/>
+    </g>
+    <text x="524" y="204" fill="#eef7f9" font-size="11" letter-spacing="1.5" text-anchor="middle">CAMP ROWS</text>
+    <g>
+      <rect x="548" y="356" width="17" height="22" rx="2" fill="#3d5a46"/>
+      <rect x="570" y="356" width="17" height="22" rx="2" fill="#3d5a46"/>
+      <text x="567" y="394" fill="#eef7f9" font-size="10.5" letter-spacing="1" text-anchor="middle">OUTHOUSES</text>
+    </g>
+    <g fill="#46617a">
+      <rect x="196" y="428" width="26" height="12" rx="3"/><rect x="232" y="428" width="26" height="12" rx="3"/>
+      <rect x="268" y="428" width="26" height="12" rx="3"/><rect x="304" y="428" width="26" height="12" rx="3"/>
+      <rect x="340" y="428" width="26" height="12" rx="3"/><rect x="376" y="428" width="26" height="12" rx="3"/>
+    </g>
+    <text x="299" y="458" fill="#eef7f9" font-size="11" letter-spacing="1.5" text-anchor="middle">PARKING</text>
+    <path d="M330 480 L330 448" stroke="#ffd166" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <text x="342" y="470" fill="#ffd166" font-size="10" letter-spacing="2" text-anchor="start">GATE</text>
+    <g stroke="#ffd166" stroke-width="1.6" stroke-dasharray="6 5" opacity=".9">
+      <path d="M154 252 L330 262 L524 168 L299 434 L154 252" fill="none"/>
+    </g>
+    <g fill="#ffd166">
+      <circle cx="154" cy="252" r="5"/><circle cx="330" cy="262" r="5"/>
+      <circle cx="524" cy="168" r="5"/><circle cx="299" cy="434" r="5"/>
+    </g>
+    <text x="632" y="330" fill="#ffd166" font-size="10.5" letter-spacing="1.5" text-anchor="end">MESH NODES · THE DAISY CHAIN</text>
+  </svg>
+  <figcaption>The template, drawn once so it can run anywhere: open sky in the middle, forest at
+  the edges, the pavilion by the water, camp where the ground is high, and the mesh chained
+  through all of it. The type specimen is the west end of Lewis Lake by Lewiston — pavilion,
+  shore and all — but the same plan stands up on a buddy&rsquo;s property down the street.
+  Nothing here is a picture of one place; it is the shape every place gets fitted to.</figcaption>
+  </figure>
+</section>
+
+<section class="card">
+  <h2>THE LAYOUT BUILDER</h2>
+  <p>Pull the map of your ground, frame it at working magnification — zoom 17 class — and
+  snapshot it. Then drop your icons on the snapshot and lace the site up: where the icons sit
+  is the event plan, and where the mesh nodes sit is the network. The layout saves on this
+  device and re-opens as you left it.</p>
+
+  <div class="bar">
+    <span class="lab">YOUR GROUND</span>
+    <input class="txt" id="q" type="text" autocomplete="off"
+      placeholder="Place or coordinates — e.g. Lewis Lake, Lewiston, MI">
+    <select class="txt" id="z" aria-label="Map zoom">
+      <option value="16">Zoom 16</option>
+      <option value="17" selected>Zoom 17</option>
+      <option value="18">Zoom 18</option>
+    </select>
+    <button class="pill" id="pullMap" type="button">Pull the map</button>
+  </div>
+  <div class="bar">
+    <span class="lab">BASE</span>
+    <button class="pill on" id="baseMapBtn" type="button">Map view</button>
+    <button class="pill" id="baseTplBtn" type="button">Template plan</button>
+    <button class="pill gold" id="snapBtn" type="button" disabled>Snapshot this view</button>
+    <button class="pill" id="reframeBtn" type="button" hidden>Re-frame</button>
+  </div>
+
+  <div class="stage nobase" id="stage">
+    <span class="locktag">SNAPSHOT LOCKED</span>
+    <div class="veil" id="veil">Pull a map of your ground above — or switch the base to the
+    template plan — and your field appears here, ready for icons.</div>
+    <svg class="chain" id="chainSvg" viewBox="0 0 100 75" preserveAspectRatio="none" aria-hidden="true"></svg>
+  </div>
+
+  <div class="bar" style="margin-top:12px">
+    <span class="lab">ICON SET</span>
+    <button class="pill on" id="setEventBtn" type="button">Event set</button>
+    <button class="pill" id="setSkyBtn" type="button">Sky watch set</button>
+    <span class="lab" style="margin-left:6px">TAP AN ICON, THEN TAP THE FIELD — OR DRAG A PLACED ICON TO MOVE IT</span>
+  </div>
+  <div class="palette" id="palette"></div>
+  <div class="bar">
+    <button class="pill" id="removeBtn" type="button" disabled>Remove selected</button>
+    <button class="pill" id="clearBtn" type="button">Clear all icons</button>
+    <input class="txt" id="eventName" type="text" autocomplete="off" placeholder="Event name — e.g. Lewis Lake Dark Sky, first night">
+  </div>
+  <div class="bar">
+    <button class="pill gold" id="saveBtn" type="button">Save layout</button>
+    <button class="pill" id="freshBtn" type="button">Start fresh</button>
+    <button class="pill" id="copyBtn" type="button">Copy plan as text</button>
+  </div>
+  <p class="readout" id="readout">No icons placed yet.</p>
+  <p class="small">The snapshot locks the framed map view and its coordinates on this device;
+  icons ride on top of it and save with it. If the map cannot load — no signal at the site,
+  say — the template plan base still takes the full layout offline. Positions are percentages
+  of the frame, so a saved layout re-opens on any screen size.</p>
+
+  <template id="tplBase">
+    <svg viewBox="0 0 640 480" preserveAspectRatio="none" aria-hidden="true">
+      <rect x="0" y="0" width="640" height="480" fill="#0a1410"/>
+      <rect x="0" y="0" width="640" height="118" fill="#0d1830"/>
+      <g fill="#dfeeff"><circle cx="60" cy="26" r="1.6"/><circle cx="200" cy="18" r="1.8"/><circle cx="330" cy="42" r="1.2"/><circle cx="470" cy="20" r="1.7"/><circle cx="600" cy="30" r="1.5"/></g>
+      <rect x="86" y="96" width="554" height="384" fill="#10241a"/>
+      <path d="M0 96 L96 96 L78 210 L92 330 L70 480 L0 480 Z" fill="#12557e"/>
+      <g fill="#173d27">
+        <path d="M104 108 l11 -22 l11 22 z"/><path d="M176 108 l11 -22 l11 22 z"/><path d="M248 108 l11 -22 l11 22 z"/>
+        <path d="M320 108 l11 -22 l11 22 z"/><path d="M392 108 l11 -22 l11 22 z"/><path d="M464 108 l11 -22 l11 22 z"/>
+        <path d="M536 108 l11 -22 l11 22 z"/><path d="M604 108 l11 -22 l11 22 z"/>
+        <path d="M610 190 l11 -22 l11 22 z"/><path d="M610 280 l11 -22 l11 22 z"/><path d="M610 370 l11 -22 l11 22 z"/>
+      </g>
+      <ellipse cx="330" cy="262" rx="168" ry="104" fill="#14301f"/>
+      <ellipse cx="330" cy="262" rx="168" ry="104" fill="none" stroke="#2c5c3d" stroke-width="1.5" stroke-dasharray="5 6"/>
+      <circle cx="330" cy="262" r="34" fill="none" stroke="#25c7dc" stroke-width="1.4" opacity=".8"/>
+    </svg>
+  </template>
+</section>
+
+<section class="card">
+  <h2>THE EVENT NETWORK — THE SUMMATION</h2>
+  <p>Everybody at the event on one little network, and the network holds when the internet
+  doesn&rsquo;t. This is the plan the layout above feeds: the mesh-node icons in your plan are
+  the chain on the night.</p>
+  <ol class="steps">
+    <li><span class="n">ONE · THE ROUTER COMES TO THE FIELD</span>
+      The event runs on a personal network — the house router, carried to the site. Local
+      first, by design: the field talks to itself before it talks to the world.
+      <span class="tag plan">THE PLAN</span></li>
+    <li><span class="n">TWO · THE QR IS THE DOOR</span>
+      One QR code at the gate signs a phone into the event network and hands it the
+      communication suite and the I Saw A UAP app. No account toll, no store run, no
+      identity file — the scan is the sign-in.
+      <span class="tag plan">THE PLAN · WATCHDOG §F</span></li>
+    <li><span class="n">THREE · CAST NET IS THE WORKING SURFACE</span>
+      The Cast Net application runs the mesh: build rights by licence, local discovery
+      first — the app looks for the container on the device before it ever calls the web.
+      <span class="tag">FACE LIVE · /faces/cast-net.html</span></li>
+    <li><span class="n">FOUR · WHEN THE TOWERS DROP, THE CHAIN HOLDS</span>
+      Lose the internet and the communications daisy-chain — node to node, the QR event
+      holding together towerless. Tower-down is the design case, not the disaster.
+      <span class="tag plan">THE PLAN · DESIGN CASE</span></li>
+    <li><span class="n">FIVE · THE SPORTSCASTER OVER THE TOP</span>
+      The Centroid node calls the sky for the whole field — continuous play-by-play that
+      speaks only what it has graded: drones, satellites, aircraft, the sound dome, and
+      the radio floor, revolving through the quiet stretches so the eyes stay up.
+      <span class="tag plan">THE PLAN · WATCHDOG §F</span></li>
+  </ol>
+  <p class="readout" id="netReadout">Your plan&rsquo;s chain: no mesh nodes placed yet — drop
+  mesh node icons on the layout and the daisy chain draws itself.</p>
+  <p class="small">What is tagged THE PLAN is presented as the plan. It is the design the
+  Watchdog platform is being built to — it is not claimed as a live service on this page.
+  What is live on this page is the builder itself: the template, the map snapshot, the
+  icons, and the saved layout.</p>
+</section>
+
+<section class="card honest">
+  <h2>THE BUILDER&rsquo;S SHAPE — TRY IT, THEN KEEP IT</h2>
+  <p>The owner&rsquo;s shape for this tool: a <b>free builder trial — seven days</b> to lay
+  out your field and run your event — then about <b>$10 to keep it</b>, if it earns its
+  place. Nothing is charged on this page, nothing is gated in this cut, and no trial clock
+  is running here: the clock and the till belong to the licensed launch. What you build
+  above saves on your device either way.</p>
+</section>
+
+<footer>
+  Apex Air Solutions · the Dark Sky Event build — Cast Net&rsquo;s proving ground<br>
+  <a href="/isawauap.html">I Saw A UAP — the evidence page</a> ·
+  <a href="/faces/cast-net.html">Cast Net — the working surface</a> ·
+  <a href="/build-house.html">The Build House</a>
+</footer>
+</div>
+<script src="/dark-sky-event.js" defer></script>
+</body>
+</html>
