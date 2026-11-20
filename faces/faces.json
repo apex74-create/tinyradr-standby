@@ -252,66 +252,6 @@
     },
     {
       "access": "public-standalone",
-      "key": "isawauap-live-wallpaper",
-      "note": "The isawauap.com live wallpaper scene, landed as a face-line entry. (Its isawauap.com home is a separate owner/Lovable step.)",
-      "path": "/faces/isawauap-live-wallpaper.html",
-      "sha256": "93a36672908a8a78575c3763b9fab6e8396806a71ffdb5ee958b5ea500dab6a3",
-      "source": "isawauap-live-wallpaper-2026-11-09.html",
-      "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
-      "version": "v1"
-    },
-    {
-      "access": "public-standalone",
-      "key": "isawauap-v2-1-glass",
-      "note": "UAP vault glass build V2.1, landed from the staged Nov 9 line.",
-      "path": "/faces/isawauap-v2-1-glass.html",
-      "sha256": "8c26d018e7418bf9a893073ab7c1f4d239b57b692418ada67cff233decd30c73",
-      "source": "isawauap-v2-1-glass-2026-11-09.html",
-      "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
-      "version": "v2.1"
-    },
-    {
-      "access": "public-standalone",
-      "key": "isawauap-v2-2-milkyway",
-      "note": "UAP vault milkyway build V2.2, landed from the staged Nov 9 line.",
-      "path": "/faces/isawauap-v2-2-milkyway.html",
-      "sha256": "2243c9119cfa12a34e8e9dcee71c0b78c37f14b802bde7a2395ab371d04322df",
-      "source": "isawauap-v2-2-milkyway-2026-11-09.html",
-      "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
-      "version": "v2.2"
-    },
-    {
-      "access": "public-standalone",
-      "key": "isawauap-v2-3-tree-evidence",
-      "note": "UAP tree-evidence build V2.3 (evidence assets embedded in the single file), landed from the staged Nov 9 line.",
-      "path": "/faces/isawauap-v2-3-tree-evidence.html",
-      "sha256": "ec1559c7c5d0288715364cf9e8a35c9cdd5a5d1b86070e1a83179f36356b11b1",
-      "source": "isawauap-v2-3-tree-evidence-2026-11-09.html",
-      "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
-      "version": "v2.3"
-    },
-    {
-      "access": "public-standalone",
-      "key": "isawauap-v2-4-spacing-evidencefix",
-      "note": "UAP evidence build V2.4 (spacing fix), landed from the staged Nov 9 line.",
-      "path": "/faces/isawauap-v2-4-spacing-evidencefix.html",
-      "sha256": "9b4b4558af9da77e2360e5c43019a6a0f17260d890c20082d2eb0c5835bb7974",
-      "source": "isawauap-v2-4-spacing-evidencefix-2026-11-09.html",
-      "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
-      "version": "v2.4"
-    },
-    {
-      "access": "public-standalone",
-      "key": "isawauap-v2-vault-machine-glass",
-      "note": "UAP vault machine glass build, landed from the staged Nov 9 line.",
-      "path": "/faces/isawauap-v2-vault-machine-glass.html",
-      "sha256": "8b480a0bd59c6db197cdbb8a3bc33c949e1b7308f1d398f4673c8c59f749988f",
-      "source": "isawauap-v2-vault-machine-glass-2026-11-09.html",
-      "title": "I Saw A UAP — Photo &amp; Film Examination Station | Apex Air Solutions",
-      "version": "v2"
-    },
-    {
-      "access": "public-standalone",
       "key": "uap-hero-face",
       "note": "UAP hero face V1 — the isawauap live-drawn sky scene as a watch face. Built Nov 11, never landed until this branch.",
       "path": "/faces/uap-hero-face.html",
