@@ -193,18 +193,23 @@
     4. the burst layer (obliteration sparks)
     5. TONE/LIGHT LAST: the hovering digits
 
-  BATTERY V2 LAW (the house contract, as the newest faces carry it):
-    STATIC AT REST — one time-true still pass, no animation loops
-    run at rest; spectacle ONLY WHEN OBSERVED, through the ApexFace
-    hook and its signal family exactly as Merry's Garden carries
-    them (observe / rest / toggle, DOM events, visibility, focus,
-    pointer/touch/key); 12-SECOND AUTO-EXIT from spectacle back to
-    rest; NOTHING holds the screen on — no wake-lock of any kind,
-    the system sleep governs this face.
+  BATTERY V2 LAW (the house contract, as amended by the OWNER'S
+    RULE of Nov 20, 2026): the face BOOTS OBSERVED — the fish swim
+    on load with no touch required, and keep swimming while the
+    face is shown, through the bright phase and the dim phase
+    alike; there is NO timed auto-exit and no idle freeze in this
+    face's own code. Rest comes only when the page is hidden (the
+    system has taken the screen — dim long past, display off) or
+    when the container explicitly rests the face through the
+    ApexFace hook (observe / rest / toggle, DOM events, visibility,
+    focus, pointer/touch/key — the same hook and signal family as
+    Merry's Garden carries). NOTHING holds the screen on — no
+    wake-lock of any kind, the system sleep governs this face.
     Mechanism note: V2's own driver ran its rAF openly; the V2
     CONTAINER's observed-hook pattern (Merry's Garden, Nov 9) is
     the house's current statement of the law and is what this face
-    mirrors — same hook, same signals, same 12 s exit.
+    mirrors — same hook, same signals; the 12 s exit it originally
+    mirrored was retired by the owner's Nov 20, 2026 rule above.
 
   NO fake instruments. Live device time and date only. Zero data
   calls. ONE FILE, ZERO EXTERNAL REFERENCES. FIT: measure-and-jam
@@ -1269,9 +1274,13 @@ window.__updateTerm=updateTerm;
 updateTerm();
 
 /* ================= BATTERY V2 GOVERNOR — the house contract =========
-   Mirrors Merry's Garden (Nov 9) exactly in mechanism: REST still /
-   OBSERVED spectacle, the ApexFace hook, the same signal family,
-   12 s auto-exit, no wake-lock of any kind. */
+   Mirrors Merry's Garden (Nov 9) in mechanism: the ApexFace hook and
+   the same signal family. AMENDED by the OWNER'S RULE (Nov 20, 2026):
+   the face boots OBSERVED — the fish swim on load, no touch required,
+   and keep swimming while the face is shown (bright phase and dim
+   phase alike); there is NO timed auto-exit. Rest comes only when
+   the page is hidden (system has taken the screen) or when the
+   container explicitly rests the face. No wake-lock of any kind. */
 var REST="rest", OBSERVED="observed";
 var state=REST, raf=0, exitTimer=0, obsStart=0, lastMs=-1;
 var gov={state:"rest", enters:0, rests:0, lastSignal:"boot"};
@@ -1337,8 +1346,11 @@ function observe(sig){
     raf=requestAnimationFrame(obsFrame);
   }
   gov.lastSignal=sig||"signal";
-  if(exitTimer)clearTimeout(exitTimer);
-  exitTimer=setTimeout(function(){ rest("auto-exit"); },12000);   /* 12 s auto-exit */
+  /* OWNER RULE (Nov 20, 2026): no timed auto-exit — the 12 s exit
+     that used to be armed here is retired. The fish swim while the
+     face is shown, bright phase and dim phase alike; rest comes
+     only from hidden (screen taken) or an explicit container rest. */
+  if(exitTimer){ clearTimeout(exitTimer); exitTimer=0; }
 }
 function rest(sig){
   if(state===REST){ gov.lastSignal=sig||gov.lastSignal; stillPass(); return; }
@@ -1361,20 +1373,23 @@ window.__pinFight=/[?&]fight=1/.test(window.location.search);
 window.addEventListener("apex-face-observe",function(){ observe("event-observe"); });
 window.addEventListener("apex-face-rest",function(){ rest("event-rest"); });
 window.addEventListener("focus",function(){ if(!document.hidden)observe("focus"); });
-window.addEventListener("blur",function(){ rest("blur"); });
+/* blur does NOT rest this face (owner rule, Nov 20, 2026): a face
+   that is visible but unfocused keeps swimming. */
 window.addEventListener("pointerdown",function(){ observe("pointer"); },true);
 window.addEventListener("touchstart",function(){ observe("touch"); },true);
 window.addEventListener("keydown",function(){ observe("key"); },true);
 document.addEventListener("visibilitychange",function(){
   if(document.hidden){ rest("hidden"); }
-  else if(document.hasFocus&&document.hasFocus()){ observe("visible"); }
-  else { stillPass(); }
+  else { observe("visible"); }
 });
 
-/* ---- Boot: REST still pass. The clock's own 200 ms interval (part
-   1) is the only timer that runs at rest. No wake-lock. ---- */
+/* ---- Boot: OBSERVED — the fish swim on load, no touch required
+   (owner rule, Nov 20, 2026). One still pass first so the first
+   painted frame is posed true, then the loop starts. The clock's
+   own 200 ms interval (part 1) runs regardless. No wake-lock:
+   the system sleep governs the screen, and hidden = rest. ---- */
 stillPass(); refreshState(0);
-if(/[?&]face=observed/.test(location.search))observe("boot-param");
+observe("boot");
 })();
 </script>
 </body>

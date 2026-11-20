@@ -781,7 +781,7 @@
       "apkSha256": "a0deb53ada9ea3e688a3662f46d5aa11a724cc7997fd7054073a7a0c82a0beb6",
       "apkSizeBytes": 37329,
       "facePath": "/faces/betta-hyperdetail-freefloat.html",
-      "faceSha256": "f27cf1df49f6a140bb02d3bdbf55215f6536644c74e6493513da09904266eab1",
+      "faceSha256": "5b70ae45ae734f6fa1fd947bb74402fbb59d28bd3aec02be73098c669694d620",
       "priceUsd": 9.99,
       "functions": [
         "clock"
