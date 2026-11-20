@@ -213,6 +213,34 @@
   diagnosis + A/B mapping proof, 1 ground-clear + gear-thin,
   1 final composition + fixtures, 1 vignette nudge + re-verify).
   Per-phase figures are the receipt; the total is the headline.
+
+  IN-FIELD ADJUSTMENT (Nov 20, 2026, 00:13 EST — the owner's live
+  read of this face installed on the tablet, worked at the desk as
+  a customer in-field adjustment; the layer order and the hero
+  plate are untouched, both verified check-plus the same night):
+  (1) THE EYE — the black football mask over the machine (was a
+  hard-edged flat ellipse, 262,232 rx238 ry118, painted over the
+  traces, labels and chips): shrunk ~13% (rx206 ry102),
+  recentred toward the gear hub (240,250 — the main gear sits
+  left of the frame's centre and the tunneling follows the
+  gears, not the square), its fill now a radial gradient fading
+  to nothing at the rim so no hard edge hangs on the gear radii,
+  and sunk in the paint order to directly over the machine,
+  under the circuit traces, the labels and the chips.
+  (2)+(3) THE BLUE CADENCE RING TURNS, MESHED — at its daily
+  period it read static. It now turns RIGHT at the true
+  internal-mesh period against the gold half-hour arc-ring it
+  runs tooth-and-tooth with: 180 s x 44/60 = 132 s, so both
+  tooth trains pass a tooth every 3.0 s and can never drift
+  through each other; a +5.8 deg phase seats blue teeth into
+  gold gaps on the line of centres (bench-measured worst offset
+  at a tooth pass 0.36 deg, about a pixel at the ring radius).
+  (4) THE DAILY HUB BACKSPINS — the centre gold DAILY gear now
+  turns LEFT at its daily period, backspun against the blue
+  ring on its own shaft, at its own timing, as designed.
+  Angles still derive from absolute time and the phase is a
+  constant, so the mesh cannot drift; the face self-updates on
+  reload — no manual update step anywhere in the chain.
 -->
 <style>
   /* DSEG7 Classic (Bold) — classic Casio segment forms, SIL OFL 1.1.
@@ -280,6 +308,12 @@
         <rect width="14" height="14" fill="#0c0d0a"/>
         <rect width="7" height="14" fill="rgba(240,201,63,.75)"/>
       </pattern>
+      <radialGradient id="eyeShade">
+        <stop offset="0%" stop-color="rgb(2,3,5)" stop-opacity=".42"/>
+        <stop offset="55%" stop-color="rgb(2,3,5)" stop-opacity=".38"/>
+        <stop offset="82%" stop-color="rgb(2,3,5)" stop-opacity=".18"/>
+        <stop offset="100%" stop-color="rgb(2,3,5)" stop-opacity="0"/>
+      </radialGradient>
       <path id="halfArc" d="M 128,113 A 196,196 0 0 1 384,113" fill="none"/>
     </defs>
 
@@ -298,6 +332,8 @@
       <rect x="34" y="34" width="444" height="444" fill="none"/>
       <rect x="34" y="34" width="444" height="444" fill="url(#grid)"/>
       <g id="machine"></g>
+      <!-- the EYE — black football mask, sunk over the machine (in-field adj. Nov 20) -->
+      <ellipse cx="240" cy="250" rx="206" ry="102" fill="url(#eyeShade)"/>
 
       <!-- green circuit traces, right field -->
       <g stroke="rgba(63,185,80,.5)" stroke-width="1.6" fill="none">
@@ -345,7 +381,6 @@
 
       <!-- hazard bar, lower right -->
       <rect x="352" y="430" width="126" height="15" fill="url(#hazard)" opacity=".85"/>
-      <ellipse cx="262" cy="232" rx="238" ry="118" fill="rgba(2,3,5,0.42)"/>
       <rect x="34" y="34" width="444" height="444" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="10"/>
     </g>
     <rect x="34" y="34" width="444" height="444" rx="22" fill="none" stroke="rgba(255,181,46,.4)" stroke-width="1.5"/>
@@ -422,8 +457,9 @@ function rgba(c,a){ var v=hx(c); return "rgba("+v[0]+","+v[1]+","+v[2]+","+a+")"
 
 /* ================= THE MACHINE — gears from a spec =================
    Each spec: [cx, cy, rOut, rRoot, teeth, paletteKey, fillAlpha,
-   strokeAlpha, periodSec (display, ×10), dir, fine?]
-   periodSec 0 = static. Rings add an inner radius (annulus). */
+   strokeAlpha, periodSec (display, ×10), dir, fine?, phaseDeg?]
+   periodSec 0 = static. Rings add an inner radius (annulus).
+   phaseDeg is a constant rotation offset (mesh seating). */
 var NS = "http://www.w3.org/2000/svg";
 function gearPts(cx,cy,rOut,rRoot,teeth){
   var pts=[], N=teeth*4;
@@ -444,9 +480,9 @@ function el(name, attrs, parent){
   return e;
 }
 var machine = document.getElementById("machine");
-var ROT = [];   /* {g, period, dir, cx, cy, fine} — angles from absolute time */
-function addRot(g, period, dir, cx, cy, fine){
-  if(period>0) ROT.push({g:g, period:period, dir:dir, cx:cx, cy:cy, fine:!!fine});
+var ROT = [];   /* {g, period, dir, cx, cy, fine, phase} — angles from absolute time */
+function addRot(g, period, dir, cx, cy, fine, phase){
+  if(period>0) ROT.push({g:g, period:period, dir:dir, cx:cx, cy:cy, fine:!!fine, phase:phase||0});
 }
 function gear(spec, ringInner){
   var cx=spec[0], cy=spec[1], key=spec[5], col=CARD.palette[key];
@@ -459,11 +495,15 @@ function gear(spec, ringInner){
     "px "+CARD.light.gearShadowBlur+"px rgba(0,0,0,"+CARD.light.gearShadowOpacity+"))";
   el("circle",{cx:cx, cy:cy, r:Math.max(3,spec[3]*0.16), fill:rgba(col,Math.min(1,(spec[6]+0.25)*0.6)),
     stroke:rgba(col,spec[7]), "stroke-width":1},g);
-  addRot(g, spec[8], spec[9], cx, cy, spec[10]);
+  addRot(g, spec[8], spec[9], cx, cy, spec[10], spec[11]);
   if(spec[10]) g.setAttribute("class","fine");
   return g;
 }
 var M = CARD.motion.displayPeriodsSec;
+/* the blue cadence ring's mesh period: internal mesh against the
+   60-tooth gold arc-ring at M.half — 180 x 44/60 = 132 s, tooth-
+   pass 3.0 s on both trains (in-field adj. Nov 20, 2026) */
+var BLUE_MESH_PERIOD = M.half*44/60;
 /* copper/rust masses (the deep machinery) */
 gear([430,118, 64,55, 18,"copper",.40,.55, M.half,-1]);
 gear([118,118, 58,49, 16,"rust",  .42,.55, M.volley, 1]);
@@ -474,12 +514,12 @@ gear([84, 262, 44,36, 14,"rust",  .40,.55, M.half, -1]);
 /* the great HALF-HOUR arc-ring (gold, toothed annulus across the top) */
 gear([256,288,178,167, 60,"brass",.30,.65, M.half, 1], 152);
 /* the great translucent BLUE cadence ring + its train */
-gear([205,272,124,114, 44,"blueDk",.34,.75, M.daily, 1], 96);
+gear([205,272,124,114, 44,"blueDk",.34,.75, BLUE_MESH_PERIOD, 1, false, 5.8], 96);
 gear([205,272, 62,53, 20,"blue",  .30,.65, M.volley,-1]);
 /* the pulse ring — the fast life around the hub */
 gear([205,272, 72,67, 36,"brass",.20,.55, M.pulse,-1], 63);
-/* the DAILY hub gear */
-gear([205,272, 44,36, 12,"brassHi",.55,.85, M.daily, 1]);
+/* the DAILY hub gear — backspun LEFT, real slow, against the ring on its shaft */
+gear([205,272, 44,36, 12,"brassHi",.55,.85, M.daily,-1]);
 /* dark-hole pinions meshing in the blue ring */
 [[112,302,1],[298,206,-1],[240,370,1]].forEach(function(s){
   var g=gear([s[0],s[1],19,15,9,"brass",.85,.9, M.pulse, s[2]]);
@@ -600,7 +640,7 @@ function frame(){
     for(var i=0;i<ROT.length;i++){
       var r=ROT[i];
       if(FIT.thin && r.fine) continue;      /* thinned motion at small glass */
-      var a = ((now % r.period)/r.period)*360*r.dir;
+      var a = ((now % r.period)/r.period)*360*r.dir + r.phase;
       r.g.setAttribute("transform","rotate("+a.toFixed(2)+" "+r.cx+" "+r.cy+")");
     }
     window.__rot0 = ROT.length ? ROT[3].g.getAttribute("transform") : null;
