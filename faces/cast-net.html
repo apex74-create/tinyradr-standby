@@ -34,16 +34,17 @@
      is found on is the BO-2b wrist app's surface; that app is
      NOT BUILT, and this face says so on the panel itself.
 
-   * THE CALL — RUNG A (this build): the panel's CAST NET button
-     OPENS THE CAST NET PRODUCT SURFACE — https://castnetmesh.com
-     — the live web presence of the product (the paper's BO-2a
-     scope: the button "opens what exists — the Cast Net product
-     surface/web presence — labelled as such"). The COMMS-door
-     pattern: a surface element that opens the teammate rather
-     than re-implementing it. NO native launch is wired: the
-     Cast Net wrist app (BO-2b) does not exist as a build, and
-     nothing here fakes or implies it. window.__callCast is the
-     bench handle { url, rung: "A", appBuilt: false }.
+   * THE CALL — RUNG B (owner order, Nov 20, 2026): NATIVE FIRST,
+     WEB SECOND. The panel's button hands off to the Cast Net app
+     in its native container first — shell bridge, then the app
+     intent — where the licence is checked and the mesh is built
+     and discovered natively. The web surface
+     (https://castnetmesh.com) opens ONLY when no native container
+     answers. (Rung A, the BO-2a build, opened the web surface
+     only; the owner struck that order.) The BO-2b spinnable 3D
+     floor remains the app's own surface, not the face's.
+     window.__callCast is the bench handle { rung: "B",
+     nativeFirst, intent, fallbackUrl, appPackage }.
 
    * TWO READOUTS — THE OWNER'S OPTIONS (the paper's BO-2a
      scope: "both readout variants (Casio / analog-smooth) as
@@ -137,7 +138,12 @@
   #clockChip{position:absolute;left:50%;transform:translateX(-50%);top:12.5%;z-index:4;background:#020a06;border:1px solid rgba(57,255,142,.55);padding:6px 14px 7px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.65);}
   #clock{font-family:"ApexDigital","Courier New",monospace;font-size:64px;line-height:1;color:#000;-webkit-text-stroke:2.6px #39ff8e;paint-order:stroke fill;letter-spacing:2px;white-space:nowrap;text-shadow:0 0 9px rgba(57,255,142,.40);}
   #secLine{margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:4px;color:#7dffb0;}
-  #gpsLine{position:absolute;left:50%;transform:translateX(-50%);bottom:26.5%;z-index:4;background:rgba(2,10,6,.82);border:1px solid rgba(57,255,142,.28);padding:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:2px;color:#9fe8c0;white-space:nowrap;}
+  #gpsLine{position:absolute;left:50%;transform:translateX(-50%);bottom:26.5%;z-index:4;background:rgba(2,10,6,.82);border:1px solid rgba(57,255,142,.28);border-radius:8px;padding:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:2px;color:#9fe8c0;white-space:nowrap;text-align:center;max-width:82%;}
+  /* The plain-words line (owner, Nov 20, 2026): NO FIX must say
+     what a fix IS and what its absence means, on the face itself —
+     no mystery readouts. Rides inside the GPS chip as a second,
+     smaller line; hidden the moment a real fix lands. */
+  #gpsWhy{margin-top:2px;font-size:8px;letter-spacing:1px;color:#7dffb0;white-space:normal;line-height:1.35;}
   #fault{position:absolute;left:4%;top:5%;width:92%;z-index:8;display:none;background:#ff4d4d;color:#f2fff7;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:13px;text-align:center;padding:6px 0;letter-spacing:1px;}
   /* BOTTOM NO-FLY ZONE (house law, Nov 11 2026; fix Nov 18 2026): the
      bottom row - this button, its READOUT mirror, and the mesh panel -
@@ -146,11 +152,14 @@
      own design offset; the native shell also pads the WebView by the
      same window inset (faces-library module MainActivity), so the row
      clears the bar in the APK and in the browser alike. */
-  #frameBtn{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  /* BUTTONS — APEX FLAVOUR (owner field report, Nov 20, 2026):
+     small, round-ended pills, tucked to the corners — never big
+     blocky boxes. The bottom no-fly clearance above still holds. */
+  #frameBtn{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:10;background:rgba(10,12,14,.85);color:#39ff8e;border:1px solid rgba(31,157,67,.8);border-radius:999px;font-family:"Courier New",monospace;font-weight:bold;font-size:11px;letter-spacing:1.5px;padding:4px 11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #frameBtn:active{color:#baffd9;}
   /* THE READOUT SWITCH — bottom-left, the frame button's mirror.
      A mode control, not a shape control: SHAPE stays baked. */
-  #readoutBtn{position:absolute;left:10px;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  #readoutBtn{position:absolute;left:10px;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);z-index:10;background:rgba(10,12,14,.85);color:#39ff8e;border:1px solid rgba(31,157,67,.8);border-radius:999px;font-family:"Courier New",monospace;font-weight:bold;font-size:11px;letter-spacing:1.5px;padding:4px 11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #readoutBtn:active{color:#baffd9;}
   /* THE ANALOG-SMOOTH READOUT — hands swept on the real clock,
      mounted on the centre post pin (Face Law 1), riding the same
@@ -162,11 +171,17 @@
      a sensor: every state word is NO STATE while the native
      bucket is empty (see the contract in the header). Its one
      live element is THE CALL button (Rung A, below). */
-  #meshPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(6.2% + env(safe-area-inset-bottom, 0px));z-index:4;background:rgba(2,10,6,.88);border:1px solid rgba(57,255,142,.40);padding:6px 12px 7px;text-align:center;}
-  #meshHead{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:3px;color:#2bd97c;white-space:nowrap;}
-  #meshLegs{display:flex;gap:14px;justify-content:center;margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:1.5px;color:#9fe8c0;white-space:nowrap;}
+  /* Panel compaction (owner field report, Nov 20, 2026): the panel
+     rides slimmer and a touch more transparent so the plate reads
+     through its edges, and its tuck pill collapses the legs + note
+     to a slim head-and-button bar — nothing it holds buries the
+     face. The CALL button always stays. */
+  #meshPanel{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(6.2% + env(safe-area-inset-bottom, 0px));z-index:4;background:rgba(2,10,6,.84);border:1px solid rgba(57,255,142,.40);border-radius:10px;padding:5px 12px 6px;text-align:center;}
+  #meshHead{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;letter-spacing:2.5px;color:#2bd97c;white-space:nowrap;}
+  #meshLegs{display:flex;gap:12px;justify-content:center;margin-top:2px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:1.2px;color:#9fe8c0;white-space:nowrap;}
   #meshLegs b{color:#baffd9;font-weight:700;}
-  #meshNote{margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;letter-spacing:2px;color:#ffb52e;white-space:nowrap;}
+  #meshNote{margin-top:2px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:8px;letter-spacing:1.6px;color:#ffb52e;white-space:nowrap;}
+  #meshTuck{position:absolute;top:1px;right:2px;width:21px;height:21px;border-radius:50%;border:1px solid rgba(57,255,142,.45);background:rgba(10,12,14,.7);color:#7dffb0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
   /* NOTE (bench finding, BO-2a): the mesh panel carries NO
      box-shadow. A soft black shadow over the plate quantised,
      at its fully-opaque core against this plate's dark
@@ -176,12 +191,12 @@
      keep their shadows (their colour over this plate never
      lands on the case colour — measured), the panel drops its
      own: a labelled instrument panel needs no shadow to read. */
-  /* THE CALL — RUNG A (BO-2a): the CAST NET button in the mesh
-     panel OPENS the Cast Net product surface
-     (https://castnetmesh.com), the live web presence — what
-     exists today, labelled as such. No native launch is wired:
-     the wrist app (BO-2b) is not built; nothing fakes it. */
-  #callCast{margin-top:6px;background:#0a0c0e;color:#67e8f9;border:1.5px solid rgba(103,232,249,.75);font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  /* THE CALL — RUNG B (owner order, Nov 20, 2026): NATIVE FIRST,
+     WEB SECOND. The button asks the device for the Cast Net app
+     in its native container first (shell bridge, then the app
+     intent); the web surface opens ONLY when no native container
+     answers. See the script block at window.__callCastGo. */
+  #callCast{margin-top:5px;background:rgba(10,12,14,.85);color:#67e8f9;border:1px solid rgba(103,232,249,.75);border-radius:999px;font-family:"Courier New",monospace;font-weight:bold;font-size:11px;letter-spacing:1.5px;padding:4px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #callCast:active{color:#baffd9;border-color:#baffd9;}
   @font-face { font-family:"ApexDigital"; src:url(data:font/woff2;base64,d09GMgABAAAAABQMAA4AAAAAWgAAABOxAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP0ZGVE0cGhwGYACCcggEEQgKuRilZguBEgABNgIkA4E2BCAF72YHgTIbw04jA8HGAQh5fv0iKknrCv5bAodjyObBNMtgGNKl1aJERCtDEAN6YJfqaNsT9d3q/ezF8seFeWpDMBEOphkj8Vx4ILvPN9jdgzn3T3TsTlVcJlVyVUq1cmlUUmceoGNfb+aHbkfQUiT4imzjgZ4dRtEBVtAB/4u1tYhIgubaqO6JkBmaWRSNGrWSyJ547Z+ufeb/zn2856WLLGzUibfAjA94uTAoXABTbnBklWIQ0AqZrNP9DzA+sPL+t6mWWcuk8/SF5FvZZBCxLkSYljJ+L5tN/+Osy0nbw4zhtXJqPXkp9z/GiOCNbbGSSZZI8f9/7fvU1W9C8IIWSwVtVuSQUTEirt+pc/bt/8+cX/MBa1UqwG+IO3Ch7qPq7gECGUlEamyMSRShzfIRDtjFZhVbpcJsu3dXJKpOCCGY4DUeYzK+yIp636sRm4opotWDMdHkFSnbjxAgAA/+L7wCcLv5Q4Gntz9XAABegmgggQAC6EQ0+pwUt7g3nmD/+pOI73qCBMktAfNTFT4+PeeNiziu2qnEH4zNgmY9VE2jOFNLjRrGsErF9L3UeoAfPwrEM8qMmbbDqcwQJ5tLrWmz00/efXh5uroYC446keY0kbhC5JlnQiXZn4GVxrHMJ/qx4AIBeZhQ5qb+pBclWVE13TAtG4As2Z1+EEZxkmZ5UVZ103b94Kyrb2hs4uh/uNnRm8bH7QAig4VRy4c/jCgBnGPA/UYXDZgRLL25YJMs1u8razQnUtim4rQsBO9GamyRI005nDrz7A19dLrtR3DsafK2YU+Fg6Cs3bkcOhTCj/AXWQuIOQDVkUQky4G568ubJPDkVu5+/ppuO9n/ufS0vPUQxfLYGuzx6gs/Kj8Plt31aFaZjze91TCfT1aZUfSEAuMZHETvUNLSI9TFAopMi2Gm5WiPkBBmu4yaEadtjDFkePHSfBanDY6B+sMpAxiWZ38IzwmBBkavASSJ84Ve8l56AOXfc09i9St+9wnGi3GPNxz+jM7kTpLpA0s5kYSB2VPbWkorvIustG1Nc98XtzxHOz6MDwec45POVHGKl0Qs9ykbnFdpVtnI855xQ3xreFSppzpT3HmnJ7GH19racPXr2tU/Jak88RmAtG8qfkaa/dMnf9JM65E7/PJrYkU4fhOW3k/rz9aLaHK8SI5iMmykoyaO5M/+/xMXGlpoGh1PwlONnDfEwd9fzI2u6Dp5tSu65INAxtU6eiyG4eBaJ9Krsk0Vd4lX5GtfHSe8jDzSuBQMJcCTOGbLZYpC1qUdC69F/DHcrq1HBjVRbdkuruoTpx9xtP/wRWfWKPvt8RE4tNEP/speTxxXSJPKvM9bJNK4XZL1POdrwmH2dH4rw852Og5JAi0e38xex36POnFGNgPp1zZfpWlUcYB8NOFDCR5+ujaxm7088780npG+OkjlWeOBY5Xv/LPsq9vrkxIZS44+0ukAOeMfAcvn3pd43PP3HoFBr59eS6zh1s86ghd/QoqK/zwKwOa34t3Ch3xWxT+i3m2Fni1zjvw8nBm4kVuCvIG54Upan9aH+Mbi5xMYVkE8QGwA3EJ1L1/wJP9fAPMH0L3rR8Lh5PBKtzQO4fzixV6Y3/nD2R9+ngAtDAebvjR++BoGAISFFNJtrT2hUvD2tpS0X6ViwmSpBYQzpcUrvCpt/tGvdJcQl5VeQuPZ0jtHooqlj4jB/ZMH8ho8QoJIugO7CJVChBul5OZbqUz4X2pJYX9pCQvXS1tC+FS6a4gJpRcT95XetR70vdJHweD4YAcKGzxgjjMVxMpICzUm6BNRPW/HSsCBl/XQC5bk9Tcvtgg6VTuGZnpZNrh15EiX87Dup1FTnVpCshIofn3rJT9Je7+zCX7u8JO9cMovLFvC0/oYZz8fu9FFH5m7H2atXZ0ol1AUztqzV1fQo8BSynMK9/n16k8/e19F0WNBq/h92lsvvqmbegtvUFfXrDI+jhMXKmcqp46XKwoal7/Fe9pd3cnk5BtOLqqz6mcAt1/cdKC42jdTFCtEKI8l6Fjt3KXiF3Hc9rg+vyyTM4ZvcU20M5tJ8+3PvHVnl/qlJizyfrl2bSBYqfiAbfb3eBy7vdtF5P+n9Tb9ur4ehMviGdLD4oZqu/vAzorngn42znZFaPh4RWGxwUR4W/DNaMYpoTxv7YlrBhag5FliuX7JvCK6Sj+diP1rBZ09O5qzYv37B7L5dzUANiWWNe+Tr7FOdmAJgom7wn7skGmp6ShpD4p4lEA2v/uCFoacoMDyF1BhojoqTmgJhInyQKWO89p/ipybBOwArhYfMn67VqAYsvYsL7AaAUEu1WJu7i13D5TdAnEa5ST+ZINM1ZQX1JW8+cjCiy+w+O+rFosgwzN/PJs/c2Fu07x7jN60tee5QZVu9RLig5OGGFli0vP/67Erop8c/Fh5du/bgy/Pw/kJ2mLZFWfoM1uXLZoJ2ZWwBsYZb1aZF40asjyS/E3QamnaIrCyvSabQSxhGRNr14IKCUItOOV1qEPHn2HTfxGnt0WDZjoaDBCWKUaG2v3oytJOAenSCvHYmVqORa2RC6kdqbrzJ1sjT97coJGHceLv4xGdBSko2J4Xri3tsNWU0wKWhFPYpJjVZgdxEMvaY6h7mkzj9MiaKv90pHrBFltMNGAuCNA65LRZ0j8VWh7sVHnNSZ5RtgQVQqMFw6lViKRFOuzgSGYbE82o68xRy0eaiEfrDo47pirSbBZeY5T3HtMaGDJrnspySlgQL04KL5LmCa6ia0wZGvFqYJI4MRwXgaAZhlsn0EFhTYDcIkjpvuIhuMCoywJL1rSWOjBDiIqma7WxDFaYOT0qFpB0Yjucq7ThRXVsLStEwsteJS23BUnLA8oyZMeQxY3P+OOQI5eGqRhtQK9OtqEF4VgQMdNMogiDtpmDql8Pb4qyyYAsJKp5h1vEmf5n5APOBMWGUrUh6WbrNPQV/XxA22LOQVCtOVIVGMB7SjydOSOm0CgdC7XqdyjzXzMqJXppIWAaf0Q9efbi3dy7jXcLc2vgd59lv/OhHbzjyKG6rqJWMu74GyUqaVjJQ+hLW/BWF+86RMyokn8o0VxpE9vRGKp3VWjasMjCRSWX5YclsA4h+pLZSDhkxhjMV3Low4AsJbZrgyLOdn/3yf3kgKbCah+rwZxhJxlokBU7cMk3BlynYIrcVY7IAwq2yCL2Chv1bzk6gvsg3OAHquqrTrT+8YAXyY5uVIEF5+vw+BB0V363wPwhq+lY9DvASEGvYZUZM8SU5YSxASayWuOIumxMVHSlUYcB23BepiJtlAXMUY+aZjxM3R6ooTZESYVqZ0EsNkyMOGtzWXCVoRXmKAT8KwzNAaJ/+p4nddIzBNZ7/rQvmC1mod1Wamc1kTKKoWHb1kfWMb45I04vzR/OCsCB8DXJLASNzgZMCyyeiDOQtC648/gSFqgbe9OVb+/W1o2hQX9XCYVWPTUM/cF0ZuSpxNLRCm4jAZkDS/iWjeMmRFBEITdADONx8qezRm7IrIkO2H4b2s2lj4LwQKHjvc7EQIvzNULqXF/CFVNOX/f3MGPoXrcYPLW0vUSSt7GwNSV9PACrQOcWV0rRSe8gDENjhAPG/NNQtwA4UUJzxCs1vzqLtFqsxnztmy/LHtdGK0kakJlGPYDWI4VyDJugUh2b320wPpHMuoq51U6VpWekVGDs1X38ZfYZ2zFTS6yHQKUYKAYV6veevJkgzS7hL8Qli5cDeufz+vp5Cob9WejcgD7UqfNAlsu1FduJGlnzDf8ve7yi17i3yp0vtht01kc6Is2LEQVc2MAsrdTzyTLzgVtHsgjNlmO0ZoxKktY6MZAj4tBoM2FrzJHr34UbMxyWC/k29PTmHbbuM4YOHgsWa1JDo7ObOccVM+sRRV1uX1/9MPC7DGGJJuLTBg2qLy5NmibxVD0boWt9aW6e7jBpiVobHN/2wJOGHQtDiQVE3LMlidB73ohH3ltUuRCVAq7RTcBRU4ZwOpichi+46TQ6t03SUmIdEs/Qice63WX0bS4xvy26rTlpxf4WBAjFNw27iJv5iBomE/A1Vqs39qteV3rzJqB6M9q7r0OGJj21nB1OO9j/wlbpSRcosEledgD4hhnnHZalqbgtiNwqOl4Q/Rx3kenjEh4K6NLzzphuaGqAqAanjV7NVuqi82R7M3uzYtFMKBiqMdnDZm+H9W2bO4vbXyc7vPBJiccDuT3Nwzbd3H330u/n7Jh58ZogYKNBQKzpHvMBUlboYtOeJ+2hsf36OMBtHptzP3tVRWEFRCyxDFQD/nmyXSVQ+OkayQfK/+LRKItWhMMc1CElTTv16bqfKwZtkAzVZFTiiVuoGKZRF2yqq42WbX5ui3rFAotMiKejQEqriYyVbRoXOn0O9WU7FX+uj4SyirirYvEoOipgBaEBP601JE1JT2CJxthACtWK1/w0JkgFCHpqNSFI0aKdfxQVjMccalUqrZcpKSMhBArIuFNuRtvE888NKlPQagaFtdJSB0PFuwXDpUWxKeSB2YxTxnNhxFZYC8TD6UGAEEOwVxS8DVyJtscSGP3cpGPJ7ZwOK5yNQ7iJ/mAZABpKMQxaQCGCVAUpSA2pC4+YJRFWXyNyfKHqi1UuCqgDl9iuIBnbpCUy7AogI/VANLAD30ar2poHq0+KiJTApRXBUGVH15U3YpKcgsyGgqIssizVKKVQ8dbUWEeEIc+CwKXnGgUggWEZhBw7bAGpldLZ8NeZmYC2P9C+u103HfC1k6uCO99FObBrvsgEhhmx3SoLWuibNtZ16sqBl7/b4X05fufuAWCPFQm2UPODhIMg1lmeejRb8JNK3645Vzj13gWD9ubznlXpHCr5IDfoKeHN/zWkSfz/a/5e3n+3/rLoAxydTFOFbBwbWYe3QoafJ9g6E6d4fM62JUrC/EL+ODBmpmUfGOrzA+oNoCKNF+c5cSf6UEyJE+HDZkbNPo7BZuLcroJftyeU3u3eW+wBLbgRfrDcCzaAiUEA0LDj0TN8hbm045liTD+Kp1v3AWfG6divKB0U7WUU7aJjk3xgcoBPIuBZlX+0L5iBVy1evlCxEGZKjoASJQY7C8QACj4pgZcVYn9QJ5550JUAl0IOiPlgnldueoJQo1zU29o0ofLDykeIqAqB9fFYakOMzkGxoba9JjjiGL7iiAX9naFggRqBVdN0F1geVhFLEG+B8EQTxLEfIYXp369TAygMB1wAJlnmdQfiEbDVcYFzxbckExOEUZOQC08GHKK5sudsX+aowHYWtKJDbEjQ+1nAWH5KrlsDuMV8efhdtpZ/p7oIa6VizsAbNNp0crof3tqn6Uq1zALlpIC7nBG/Mr44XxXtBDMIe4tUhVypqRX7pUINVDcC8Lssu6xIYXHZO9wHYrGAejhrQFa4Hmzap2UkwItA4vyjiHFVYZ56dKzOKszEqWI8DiVqADZfRHT+EWoVw0ePZjZJRwPld+9jgAU7B+JgVWF297HsVIARupkCF1H1Yi+3rIS82GVuDKK5ILP3sdxMy0vMiGGuVFm4LSQ6IMAp1VBEFEkrFLdDgTu4M3SdM55ODJccQIsmmEhCaUzxeMKkXacG6MbUhb/7JWYB+Kb7vFLOJwexBJs0mbC91hJ7iQOzae7r0xYsADDcpgeTCKlxroTUvPudyyTLP1ker0fDZeCaIUJ+KNYdjulqx8xC+A8DjxoXgbt4nTLyaoATEneiTF+aWGacy/isgMKbis404BPu3SALTt0H1VRurupglzHvBsBpAOmcRaCoQmZWb6ww24SwI7v7AvZRhcTzJIPt44LsOak/qFSn7QFIFw+MWwUQ0ooFRFh8iF4F4JlWQrZ9VsdUI5rHrgs+Oc8q+ne9h1WKjomtxaA/AWBRSPRUxxqfGmRVmJFqvGWlx0rSmeHM3RfvGS75tksNcIZzLp2eW4KqDOV6DbjaICSZZ4O0wIW9FkaQBRAJCnWURsVUKpeYRktiDopTTz4ejyrMCrbWWQVDaJB6qjn3nzcMLMVfMh2NQ3WXkbC84THRxVFxiC3EXSqxPf2clFoWpSAdNYlm3JWQ/wcMOnR02Dq4ekqHg5ecIUi6TMvBoQAApRERLaeHAVXFelFEMZnzROqyLFuDpio6aABL6c+7gF0mnluo2aYHS156tWyiKRYunlvCJthJAicER5CubdY23GtY4as7YaOT4lNCDR72XcXsxMeJdNWEXYN9kSpSz0/4VwG6Dvy6DC63+0Nlc7SjEj7UmQEFmiSeminr4Vt8A5JucUVlMBgRbAdj/pMnOw/wZeSSe57S01PgKY8Kl2kPeEEv/7VS6aevyrP8wGF5WbnJ3wepQ40q6r2tr5zF34DZrUgI6xdT389XzsjTMMNPdpWn8tWIApmKosbBB6oGsGaSVENQNGxBk6w39IxBXJWneFWZqIrxFDMu6usSPN1dMlJDQVQPlD9KqfTAFhUUDwJXVWRvEMdab90Xc9Pi5YVTOzFJNwjLzFivp6QfIB0R9TQ5MNTzt6sx15G2IENotht6Wd7rlt1jrfBx4At/dVt8yqB7UyAKgVMPGT1NdF4w8ZhbfJUBfqqxRd578H609HGNYnFy5SmTr8BPlX5BjVUIoypOAAmA/+l1Zk8LOvJBovnxFyhIsBChwoSLEClKtCTJUqRKky5DpizZjByuGNDOF1OoSLESpcqUq1Cp7uum42Ytm9u069Cp683Kr6VXn34DBg0ZNmLUmHETJu0GAAA=) format("woff2"); font-weight:700; }
 </style>
@@ -207,12 +222,13 @@
       <line id="handS" x1="60" y1="68" x2="60" y2="10" stroke="#ffb52e" stroke-width="1.6" stroke-linecap="round"/>
       <circle cx="60" cy="60" r="4.5" fill="#020a06" stroke="#39ff8e" stroke-width="2"/>
     </svg></div>
-    <div id="gpsLine">GPS — NO FIX</div>
+    <div id="gpsLine"><span id="gpsMain">GPS — NO FIX</span><div id="gpsWhy">NO FIX = NO SATELLITE LOCK YET — THE WATCH CAN'T PLACE YOU. CLOCK + MESH STILL WORK.</div></div>
     <div id="meshPanel">
+      <button id="meshTuck" type="button" aria-label="Tuck the mesh panel to a slim bar">–</button>
       <div id="meshHead">CAST NET MESH — THE MODEL</div>
       <div id="meshLegs"><span><b>SEE</b> · <span id="legSee">NO STATE</span></span><span><b>TALK</b> · <span id="legTalk">NO STATE</span></span><span><b>LOCATE</b> · <span id="legLocate">NO STATE</span></span></div>
-      <div id="meshNote">3D FLOOR APP — NOT BUILT (BO-2B)</div>
-      <button id="callCast" type="button" aria-label="Open the Cast Net product surface — castnetmesh.com">CAST NET ↗ WEB</button>
+      <div id="meshNote">APP FIRST — THE WEB OPENS ONLY IF NO APP ANSWERS</div>
+      <button id="callCast" type="button" aria-label="Open Cast Net — the app on this device first; the web page only if no app answers">OPEN CAST NET</button>
     </div>
     <button id="readoutBtn" type="button" aria-label="Toggle readout — digital or hands">READOUT · DIGITAL</button>
   </div>
@@ -272,28 +288,87 @@ function applyBackdrop(){
 }
 
 /* ================================================================
-   THE CALL — RUNG A (BO-2a). The mesh panel's CAST NET button
-   OPENS THE CAST NET PRODUCT SURFACE — https://castnetmesh.com
-   — the product's live web presence, what exists today (the
-   paper's BO-2a scope, verbatim in substance: the button "opens
-   what exists — the Cast Net product surface/web presence —
-   labelled as such"). The COMMS-door pattern: a surface element
-   that opens the teammate rather than re-implementing it. NO
-   native launch is wired: the Cast Net wrist app (BO-2b — the
-   spinnable 3D floor mesh, partner-finding) does NOT exist as a
-   build, and nothing in this face fakes or implies it; the
-   panel carries the not-built note on its face.
-   Bench handle: window.__callCast { url, rung, appBuilt };
-   window.__callCastGo() is the exact function the tap fires.
+   THE CALL — RUNG B (owner order, Nov 20, 2026, 01:02 EST):
+   NATIVE FIRST, WEB SECOND. Rung A opened the web surface and
+   only the web surface; the owner struck that order — on his
+   devices the Cast Net app is INSTALLED, and the button's first
+   act is to hand off to the native container, where the licence
+   lives and the mesh is built and discovered (a venue's local
+   feed/mesh is found by the app's own native discovery, never
+   by a web page). The web surface is the FALLBACK, fired only
+   when no native container answers:
+     1. a shell bridge, if the native container injected one
+        (window.ApexNative.openCastNet) — the container performs
+        its licence check and opens its mesh surface;
+     2. the Android app intent for the house app
+        (app.lovable.apexsignal, the build castnetmesh.com
+        installs) with the web URL as its declared fallback;
+     3. after a short beat, if this page is still in front (the
+        app did not take the hand-off), the web surface opens.
+   Nothing here claims a native answer that did not happen: the
+   button reports what it is doing while it does it, and step 3
+   is the honest residue when no app is on the device.
+   Bench handle: window.__callCast { rung, nativeFirst, intent,
+   fallbackUrl, appPackage }; window.__callCastGo() is the exact
+   function the tap fires.
    ================================================================ */
 var CAST_URL = "https://castnetmesh.com";
-window.__callCast = { url: CAST_URL, rung: "A", appBuilt: false };
-window.__callCastGo = function(){
-  window.open(CAST_URL, "_blank");
-};
+var CAST_APP_PACKAGE = "app.lovable.apexsignal";
+var CAST_APP_INTENT = "intent://castnetmesh.com/#Intent;scheme=https;package=" +
+  CAST_APP_PACKAGE + ";S.browser_fallback_url=" +
+  encodeURIComponent(CAST_URL) + ";end";
+window.__callCast = { rung: "B", nativeFirst: true,
+  intent: CAST_APP_INTENT, fallbackUrl: CAST_URL,
+  appPackage: CAST_APP_PACKAGE };
 var callCastEl = document.getElementById("callCast");
+window.__callCastGo = function(){
+  var answered = false;
+  var onVis = function(){ if (document.hidden) answered = true; };
+  document.addEventListener("visibilitychange", onVis);
+  var settle = function(){
+    document.removeEventListener("visibilitychange", onVis);
+  };
+  /* 1 — the native container's own bridge, when a shell offers one. */
+  var bridge = window.ApexNative || window.AndroidBridge || null;
+  if (bridge && typeof bridge.openCastNet === "function"){
+    try { bridge.openCastNet(); answered = true; settle(); return; }
+    catch (e) { /* the bridge declined — fall through to the intent */ }
+  }
+  /* 2 — the installed app, by intent. */
+  if (callCastEl) callCastEl.textContent = "OPENING THE APP…";
+  try { window.location.href = CAST_APP_INTENT; } catch (e) {}
+  /* 3 — web fallback: only if the app did not take us away. */
+  setTimeout(function(){
+    settle();
+    if (!answered && !document.hidden){
+      if (callCastEl) callCastEl.textContent = "NO APP — OPENING WEB…";
+      window.open(CAST_URL, "_blank");
+      setTimeout(function(){
+        if (callCastEl) callCastEl.textContent = "OPEN CAST NET";
+      }, 1200);
+    } else if (callCastEl) {
+      callCastEl.textContent = "OPEN CAST NET";
+    }
+  }, 1600);
+};
 if (callCastEl) callCastEl.addEventListener("click", function(ev){
   ev.stopPropagation(); window.__callCastGo();
+});
+
+/* THE PANEL TUCK — the mesh panel's pill collapses its legs and
+   note to a slim head-and-button bar, so the plate underneath is
+   never buried (owner field report, Nov 20, 2026). The CALL
+   button stays in both states. */
+var meshTuckEl = document.getElementById("meshTuck");
+var meshTucked = false;
+if (meshTuckEl) meshTuckEl.addEventListener("click", function(ev){
+  ev.stopPropagation();
+  meshTucked = !meshTucked;
+  document.getElementById("meshLegs").style.display = meshTucked ? "none" : "";
+  document.getElementById("meshNote").style.display = meshTucked ? "none" : "";
+  meshTuckEl.textContent = meshTucked ? "+" : "–";
+  meshTuckEl.setAttribute("aria-label",
+    meshTucked ? "Untuck the mesh panel" : "Tuck the mesh panel to a slim bar");
 });
 
 /* ================================================================
@@ -409,6 +484,14 @@ function sizeStage(){
   var moved = (nVW !== VW || nVH !== VH);
   VW = nVW; VH = nVH;
   stage.style.width = VW + "px"; stage.style.height = VH + "px";
+  /* CENTRED IN THE VIEWPORT (owner field report, Nov 20, 2026):
+     the square stage seats in the middle of the window, letterboxed
+     — black strips left/right in landscape, black bands top/bottom
+     in portrait — never hugged to the left or pushed to the top.
+     The page behind the stage is the void colour, so the bands
+     read as the letterbox they are. */
+  stage.style.left = Math.round((window.innerWidth - VW) / 2) + "px";
+  stage.style.top = Math.round((window.innerHeight - VH) / 2) + "px";
   document.documentElement.style.height = VH + "px";
   document.body.style.height = VH + "px";
   /* the stage is positioned, so html/body collapse to their
@@ -435,7 +518,12 @@ function sizeStage(){
 function layoutHud(){
   var m = Math.min(VW, VH);
   var clock = document.getElementById("clock");
-  clock.style.fontSize = Math.round(m * 0.125) + "px";
+  /* Clock readout +12% (owner, Nov 20, 2026: 0.125 -> 0.140 of the
+     stage). Checked against the patrol: drone 0's loop already
+     transits behind the opaque chip; the widened chip takes ~7px
+     more per side at full size and the craft still flank it on
+     both ends. */
+  clock.style.fontSize = Math.round(m * 0.140) + "px";
   clock.style.webkitTextStrokeWidth = Math.max(1.6, m * 0.005) + "px";
   var brand = document.getElementById("brandWord");
   brand.style.fontSize = Math.round(m * 0.041) + "px";
@@ -454,8 +542,14 @@ function layoutHud(){
                                        transform in applyFrame
                                        depends on this */
   var gps = document.getElementById("gpsLine");
-  gps.style.bottom = Math.round(VH * 0.265) + "px";
+  /* 0.265 -> 0.295 (Nov 20, 2026): the chip now carries the
+     plain-words second line, and at small stage heights the
+     taller chip met the mesh panel's top edge. The raise seats
+     the chip clear of the panel in both orientations. */
+  gps.style.bottom = Math.round(VH * 0.295) + "px";
   gps.style.fontSize = Math.max(10, Math.round(m * 0.023)) + "px";
+  var gpsWhy = document.getElementById("gpsWhy");
+  if (gpsWhy) gpsWhy.style.fontSize = Math.max(8, Math.round(m * 0.0165)) + "px";
 }
 var resizeTimer = 0;
 window.addEventListener("resize", function(){
@@ -569,6 +663,18 @@ function drawPulse(now, nowMs){
   var W = innerW(), H = innerH();
   var x0 = W * 0.06, x1 = W * 0.94;
   var yBase = H * 0.775, amp = H * 0.052;
+  /* NAMED (owner, Nov 20, 2026): the ribbon is the face's
+     multi-purpose signal trace — gate state and pulse-class
+     (heart-rate class) signals ride it when the app feeds them.
+     Its name and purpose sit under its left end — above the
+     trace they collided with the GPS chip — in the trace's own
+     hand. The trace itself stays what it has always been: one
+     pulse per second on the real clock. */
+  ctx.fillStyle = PAL.trail; ctx.globalAlpha = 0.6;
+  ctx.font = "600 " + Math.max(7, H * 0.016) + "px ui-monospace, Menlo, Consolas, monospace";
+  ctx.fillText("PULSE RIBBON", x0, yBase + amp + 13);
+  ctx.fillText("GATE · BODY SIGNALS", x0, yBase + amp + 22);
+  ctx.globalAlpha = 1;
   var secFrac = (now.getSeconds() % 60) / 60 +
                 (now.getMilliseconds() / 1000) / 60;
   var phase = secFrac * 6.2832;                 /* one pulse / second */
@@ -787,6 +893,13 @@ function drawGlyphs(){
       ctx.moveTo(gx, gy - s); ctx.lineTo(gx + s, gy + s*0.8); ctx.lineTo(gx - s, gy + s*0.8);
       ctx.closePath(); ctx.stroke();
       ctx.beginPath(); ctx.arc(gx, gy + s*0.25, s*0.30, 0, 6.2832); ctx.stroke();
+      /* NAMED, NOT A MYSTERY (owner, Nov 20, 2026): the triangle
+         over the horizon is THE EYE — the SEE mark of the mesh
+         model, first leg on the panel below. It carries its name
+         in the same dim glyph hand so it reads as what it is. */
+      ctx.fillStyle = PAL.glyph;
+      ctx.font = "600 " + Math.max(7, W * 0.019) + "px ui-monospace, Menlo, Consolas, monospace";
+      ctx.fillText("THE EYE · SEE", gx + s + 5, gy + s * 0.35);
     } else if (marks[i] === "arcs"){               /* signal arcs */
       for (var a = 1; a <= 3; a++){
         ctx.beginPath(); ctx.arc(gx - s*0.7, gy + s*0.7, a * s * 0.42, -1.25, -0.32); ctx.stroke();
@@ -810,6 +923,8 @@ var clockEl = document.getElementById("clock");
 var secEl = document.getElementById("secLine");
 var dateEl = document.getElementById("dateBox");
 var gpsEl = document.getElementById("gpsLine");
+var gpsMainEl = document.getElementById("gpsMain");
+var gpsWhyEl = document.getElementById("gpsWhy");
 var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 function fmt2(n){ return (n < 10 ? "0" : "") + n; }
@@ -834,7 +949,7 @@ function drawClock(now){
 var gpsState = { mode: "none" };
 if (navigator.geolocation){
   gpsState.mode = "seeking";
-  gpsEl.textContent = "GPS — SEEKING";
+  gpsMainEl.textContent = "GPS — SEEKING";
   try {
     navigator.geolocation.watchPosition(function(p){
       gpsState = { mode: "fix",
@@ -853,7 +968,11 @@ function drawGps(){
   } else if (gpsState.mode === "seeking"){ txt = "GPS — SEEKING"; }
   else if (gpsState.mode === "denied"){ txt = "GPS — NO FIX"; }
   else { txt = "GPS — NO FIX"; }
-  if (gpsEl.textContent !== txt) gpsEl.textContent = txt;
+  if (gpsMainEl.textContent !== txt) gpsMainEl.textContent = txt;
+  /* The plain-words line rides exactly as long as there is no
+     fix to report; a real fix retires it. */
+  var whyDisplay = gpsState.mode === "fix" ? "none" : "";
+  if (gpsWhyEl.style.display !== whyDisplay) gpsWhyEl.style.display = whyDisplay;
 }
 
 /* ================================================================

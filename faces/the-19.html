@@ -177,9 +177,15 @@
   #clockChip{position:absolute;left:50%;transform:translateX(-50%);top:12.5%;z-index:4;background:#020a06;border:1px solid rgba(57,255,142,.55);padding:6px 14px 7px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.65);}
   #clock{font-family:"ApexDigital","Courier New",monospace;font-size:64px;line-height:1;color:#000;-webkit-text-stroke:2.6px #39ff8e;paint-order:stroke fill;letter-spacing:2px;white-space:nowrap;text-shadow:0 0 9px rgba(57,255,142,.40);}
   #secLine{margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:4px;color:#7dffb0;}
-  #gpsLine{position:absolute;left:50%;transform:translateX(-50%);bottom:15.5%;z-index:4;background:rgba(2,10,6,.82);border:1px solid rgba(57,255,142,.28);padding:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:2px;color:#9fe8c0;white-space:nowrap;}
+  #gpsLine{position:absolute;left:50%;transform:translateX(-50%);bottom:15.5%;z-index:4;background:rgba(2,10,6,.82);border:1px solid rgba(57,255,142,.28);border-radius:8px;padding:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:2px;color:#9fe8c0;white-space:nowrap;text-align:center;max-width:82%;}
+  /* The plain-words line (owner, Nov 20, 2026 — same line as the
+     Cast Net face): NO FIX says what a fix IS and what its absence
+     means, on the face itself. Hidden the moment a real fix lands. */
+  #gpsWhy{margin-top:2px;font-size:8px;letter-spacing:1px;color:#7dffb0;white-space:normal;line-height:1.35;}
   #fault{position:absolute;left:4%;top:5%;width:92%;z-index:8;display:none;background:#ff4d4d;color:#f2fff7;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:13px;text-align:center;padding:6px 0;letter-spacing:1px;}
-  #frameBtn{position:absolute;right:10px;bottom:10px;z-index:10;background:#0a0c0e;color:#39ff8e;border:1.5px solid #1f9d43;font-family:"Courier New",monospace;font-weight:bold;font-size:13px;letter-spacing:2px;padding:6px 10px;cursor:pointer;}
+  /* BUTTONS — APEX FLAVOUR (owner field report, Nov 20, 2026):
+     small, round-ended pills, tucked to the corners. */
+  #frameBtn{position:absolute;right:10px;bottom:10px;z-index:10;background:rgba(10,12,14,.85);color:#39ff8e;border:1px solid rgba(31,157,67,.8);border-radius:999px;font-family:"Courier New",monospace;font-weight:bold;font-size:11px;letter-spacing:1.5px;padding:4px 11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #frameBtn:active{color:#baffd9;}
   /* THE CALL — the tap target on the plate's 19 dial. Geometry
      (fractions of the STAGE, i.e. of the object-fit:cover view of
@@ -210,7 +216,7 @@
       <div id="dateBox">—</div>
     </div>
     <div id="clockChip"><div id="clock">00:00</div><div id="secLine">SEC 00 · 000 MS</div></div>
-    <div id="gpsLine">GPS — NO FIX</div>
+    <div id="gpsLine"><span id="gpsMain">GPS — NO FIX</span><div id="gpsWhy">NO FIX = NO SATELLITE LOCK YET — THE WATCH CAN'T PLACE YOU. CLOCK + MESH STILL WORK.</div></div>
     <button id="call19" type="button" aria-label="Open Encrypted CB — channel 19"><span id="call19Ring"></span></button>
   </div>
   <svg id="trimSvg" viewBox="0 0 512 512" preserveAspectRatio="none" aria-hidden="true"></svg>
@@ -379,6 +385,12 @@ function sizeStage(){
   var moved = (nVW !== VW || nVH !== VH);
   VW = nVW; VH = nVH;
   stage.style.width = VW + "px"; stage.style.height = VH + "px";
+  /* CENTRED IN THE VIEWPORT (owner field report, Nov 20, 2026):
+     the square stage seats in the middle of the window, letterboxed
+     — black strips left/right in landscape, black bands top/bottom
+     in portrait — never hugged to the left or pushed to the top. */
+  stage.style.left = Math.round((window.innerWidth - VW) / 2) + "px";
+  stage.style.top = Math.round((window.innerHeight - VH) / 2) + "px";
   document.documentElement.style.height = VH + "px";
   document.body.style.height = VH + "px";
   /* the stage is positioned, so html/body collapse to their
@@ -414,6 +426,8 @@ function layoutHud(){
   var gps = document.getElementById("gpsLine");
   gps.style.bottom = Math.round(VH * 0.155) + "px";
   gps.style.fontSize = Math.max(10, Math.round(m * 0.023)) + "px";
+  var gpsWhy = document.getElementById("gpsWhy");
+  if (gpsWhy) gpsWhy.style.fontSize = Math.max(8, Math.round(m * 0.0165)) + "px";
 }
 var resizeTimer = 0;
 window.addEventListener("resize", function(){
@@ -820,6 +834,8 @@ var clockEl = document.getElementById("clock");
 var secEl = document.getElementById("secLine");
 var dateEl = document.getElementById("dateBox");
 var gpsEl = document.getElementById("gpsLine");
+var gpsMainEl = document.getElementById("gpsMain");
+var gpsWhyEl = document.getElementById("gpsWhy");
 var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 function fmt2(n){ return (n < 10 ? "0" : "") + n; }
@@ -844,7 +860,7 @@ function drawClock(now){
 var gpsState = { mode: "none" };
 if (navigator.geolocation){
   gpsState.mode = "seeking";
-  gpsEl.textContent = "GPS — SEEKING";
+  gpsMainEl.textContent = "GPS — SEEKING";
   try {
     navigator.geolocation.watchPosition(function(p){
       gpsState = { mode: "fix",
@@ -863,7 +879,11 @@ function drawGps(){
   } else if (gpsState.mode === "seeking"){ txt = "GPS — SEEKING"; }
   else if (gpsState.mode === "denied"){ txt = "GPS — NO FIX"; }
   else { txt = "GPS — NO FIX"; }
-  if (gpsEl.textContent !== txt) gpsEl.textContent = txt;
+  if (gpsMainEl.textContent !== txt) gpsMainEl.textContent = txt;
+  /* The plain-words line rides exactly as long as there is no
+     fix to report; a real fix retires it. */
+  var whyDisplay = gpsState.mode === "fix" ? "none" : "";
+  if (gpsWhyEl.style.display !== whyDisplay) gpsWhyEl.style.display = whyDisplay;
 }
 
 /* ================================================================

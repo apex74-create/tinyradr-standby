@@ -341,7 +341,7 @@
       "apkSha256": "45de792de634d8c6866652b4c5f0a2e0411180e3c2bcd23be7574b3fd2dbfc3e",
       "apkSizeBytes": 3303337,
       "facePath": "/faces/cast-net.html",
-      "faceSha256": "0e272392d6eb5c1f47bb68a228f178b994925cb312f7cb12721719870673331b",
+      "faceSha256": "943d50290d35790a39cc79e5dbb22c463aefa0324556a64edafcfd9fa599654b",
       "priceUsd": 9.99,
       "functions": [
         "clock"
@@ -392,7 +392,7 @@
       "apkSha256": "13e161a79da79a55e30e76fc6ff1bfbf57104bcb95ef06022c2ae3aa28fc7a7f",
       "apkSizeBytes": 3038953,
       "facePath": "/faces/the-19.html",
-      "faceSha256": "eda07d3f3e26947b2021585882c37e3dfee3e47ee14bf914908ddb0e32a70bd3",
+      "faceSha256": "454b71160bd03268de79064c449be0609c9084429e520531d237add8f1cdbb28",
       "priceUsd": 9.99,
       "functions": [
         "clock"
