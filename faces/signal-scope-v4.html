@@ -29,6 +29,29 @@
     border:1px solid rgba(57,255,106,.55); border-radius:6px; background:rgba(2,20,10,.72);
     text-shadow:0 0 8px rgba(57,255,106,.5); cursor:pointer; user-select:none; -webkit-user-select:none; }
   #invbtn.on { color:#0b2e16; background:#39ff6a; text-shadow:none; box-shadow:0 0 18px rgba(57,255,106,.55); }
+  #cenbtn { position:absolute; text-align:center; color:#39ff6a; font-weight:700; letter-spacing:.22em;
+    border:1px solid rgba(57,255,106,.55); border-radius:6px; background:rgba(2,20,10,.72);
+    text-shadow:0 0 8px rgba(57,255,106,.5); cursor:pointer; user-select:none; -webkit-user-select:none; }
+  #cenbtn.on { color:#0b2e16; background:#39ff6a; text-shadow:none; box-shadow:0 0 18px rgba(57,255,106,.55); }
+  /* EMITTER CENSUS panel — DOM text over the glass, face palette. */
+  #census { position:absolute; display:none; overflow-y:auto; overflow-x:hidden; z-index:5;
+    background:#021009; border:1px solid rgba(57,255,106,.45); border-radius:8px;
+    padding:8px 10px; color:#b6ffd0; -webkit-overflow-scrolling:touch; }
+  #census .cen-h { color:#39ff6a; font-weight:700; letter-spacing:.22em; text-align:center; }
+  #census .cen-sub { color:#8fd9a4; text-align:center; margin-top:2px; }
+  #census .cen-sim { color:#ffc95c; font-weight:700; }
+  #census .cen-tot { text-align:center; margin-top:6px; color:#eaffef; font-weight:700; line-height:1.5; }
+  #census .cen-tot .dim { color:#8fd9a4; font-weight:400; }
+  #census .cen-rule { text-align:center; color:#ffc95c; margin-top:4px; letter-spacing:.06em; }
+  #census .cen-sec { color:#3f6b4d; letter-spacing:.12em; margin-top:9px; border-top:1px solid rgba(57,255,106,.25); padding-top:5px; }
+  #census .cen-row { display:flex; justify-content:space-between; gap:6px; margin-top:2px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  #census .cen-nm { color:#b6ffd0; overflow:hidden; text-overflow:ellipsis; }
+  #census .cen-tag { color:#3f6b4d; }
+  #census .cen-why { color:#ffc95c; }
+  #census .cen-pipe { color:#eaffef; font-weight:700; }
+  #census .cen-rs { color:#eaffef; font-weight:700; }
+  #census .cen-more { color:#3f6b4d; margin-top:2px; }
+  #census .cen-none { color:#ffc95c; margin-top:8px; text-align:center; line-height:1.5; }
   #foxmark { position:absolute; pointer-events:none; opacity:.85; }
   .strip { position:absolute; left:0; text-align:center; color:#3f6b4d; width:100%; padding:0 12px; box-sizing:border-box; }
 </style></head>
@@ -48,7 +71,9 @@
   <div id="bios"></div>
   <div id="mode">SCOPE STANDBY</div>
   <div id="invbtn">INVESTIGATE</div>
+  <div id="cenbtn">CENSUS</div>
   <div id="foxmark"></div>
+  <div id="census"></div>
   <div class="strip">APEX SIGNAL WATCH · FOX HUNT EDITION · SCOPE SHOWS SIGNAL PRESENCE ONLY · NO POSITION FIX · TINYRADAR.COM</div>
   <div class="strip" id="strip2">READINGS SHOWN ONLY WHEN SENSORS ANSWER · PINS ARE GENERALIZED ASSUMPTIONS — PRESENCE + STRENGTH, NEVER SURVEYED POSITION</div>
 </div>
@@ -114,6 +139,14 @@
   //     default. If a bridge payload declares sim:true (a container in
   //     demo mode), the face flies a SIM flag on the mode line for as
   //     long as simulated values are on screen.
+  //   * EMITTER CENSUS (Nov 13, 2026, owner's reiteration order): a
+  //     CENSUS mode beside the hunt — session totals by radio, every
+  //     emitter heard ordered by strength, a NOTABLE section, and a
+  //     date-stamped FIRST-APPEARANCE LOG fed by a persistent
+  //     seen-store. The census eats the same bridge snapshots as the
+  //     scope; radios the bridge never reports read NO MEASURE, and
+  //     the panel prints the standing rule on its face: RSSI IS
+  //     SIGNAL STRENGTH, NOT DISTANCE. See the CENSUS block below.
   //   * FOX HUNT layer: sampled-by-default battery governor (periodic
   //     snapshots, the dial replays the sampled picture with its age
   //     honest); a wearer-toggled INVESTIGATE button runs the promiscuous
@@ -387,6 +420,30 @@
     // uncontested by text AND by the dial's own rim; the
     // indication stays legible — a beat-source label buried in
     // stacked words is not indicated (owner, Nov 15).
+    // CONTROL ROW (census merge, Nov 19, 2026): CENSUS joins
+    // INVESTIGATE in the measured stack's button row — the row the
+    // stack above reserved. The single centered button splits into
+    // two half buttons side by side on the same row metrics
+    // (stackTop / invH / gap), so the stack's reservations stay
+    // exact and the row keeps its clear margin over the strips.
+    var cenb = document.getElementById('cenbtn');
+    var btnW2 = Math.floor(M * 0.44);
+    inv.style.width = btnW2 + 'px';
+    inv.style.left = Math.floor(W / 2 - btnW2 - gap) + 'px';
+    cenb.style.width = btnW2 + 'px'; cenb.style.height = invH + 'px';
+    cenb.style.lineHeight = invH + 'px';
+    cenb.style.left = Math.floor(W / 2 + gap) + 'px';
+    cenb.style.top = stackTop + 'px';
+    cenb.style.fontSize = Math.max(10, Math.floor(M * 0.030)) + 'px';
+    // CENSUS panel: the central glass — from just under the brand
+    // line down to the stack's button row, never into the strips
+    // or the no-fly band beneath them.
+    var cpan = document.getElementById('census');
+    cpan.style.left = Math.floor(W * 0.035) + 'px';
+    cpan.style.width = Math.floor(W * 0.93) + 'px';
+    cpan.style.top = Math.floor(H * 0.045) + 'px';
+    cpan.style.height = Math.max(80, Math.floor(stackTop - gap - H * 0.045)) + 'px';
+    cpan.style.fontSize = Math.max(10, Math.floor(M * 0.030)) + 'px';
     built = true;
     buildFall();
   }
@@ -534,6 +591,7 @@
     for (var k in RF.pins) {
       if (!seen[k] && now - RF.pins[k].lastSeen > PIN_DROP_MS) delete RF.pins[k];
     }
+    censusIngest(snap);
     renderBios();
     renderMode();
   }
@@ -644,6 +702,7 @@
   function drawScope(now) {
     if (!built) return;
     if (document.hidden) { RUN.scope = false; return; } // LOKMAT STANDARD: the loop STOPS in the dark; it does not re-queue
+    if (CENSUS.on) { requestAnimationFrame(drawScope); return; } // census owns the glass — loop stays alive, draws nothing
     drawFox(now);
     var d = R * 2, c = R; // canvas-local center
     ctx.clearRect(0, 0, d, d);
@@ -779,6 +838,7 @@
   function drawPulse(now) {
     if (!built || !PW) { RUN.pulse = false; return; }
     if (document.hidden) { RUN.pulse = false; return; } // stops in the dark (LOKMAT STANDARD)
+    if (CENSUS.on) { requestAnimationFrame(drawPulse); return; } // census owns the glass
     pctx.clearRect(0, 0, PW, PH);
     var base = PH * 0.60, amp = PH * 0.46, span = PW * 2.4;
     var src = BEAT.src, beat = 0;
@@ -952,6 +1012,7 @@
   function drawFreq(now) {
     if (!built || !FW) { RUN.freq = false; return; }
     if (document.hidden) { RUN.freq = false; return; } // stops in the dark (LOKMAT STANDARD)
+    if (CENSUS.on) { requestAnimationFrame(drawFreq); return; } // census owns the glass
     fctx.clearRect(0, 0, FW, FH);
     var base = FH * 0.88, top = FH * 0.16;
     fctx.lineWidth = 1;
@@ -1049,6 +1110,13 @@
   //     stack ('5G', '4G', ...) — the only honest way it can appear.
   //   ApexWifi    { at, aps:[{ssid,bssid,bandGhz,channel,rssi}],
   //                 connectedBssid, sim }
+  //     A wifi snapshot may ALSO carry the census extension fields
+  //     bt / cell / session below; readers ignore what is absent.
+  //   ApexCensus  { at, bt:[{name,addr,rssi}], cell:[{name,rssi}],
+  //                 session:{distMi,durMin}, sim }
+  //     The census picture's other radios + session meta. Any radio
+  //     a payload never supplies reads NO MEASURE in the census —
+  //     never zero, which would claim "none heard".
   //   ApexBeat    { pulseMs, phaseMs, at, sim }
   //   ApexPing    { rttMs, at, sim } — the connected AP's ping RTT,
   //     one payload per answered ping (the ROUTER HEARTBEAT source,
@@ -1260,6 +1328,242 @@
   }
   function readPing() { if (window.ApexPing) applyPing(window.ApexPing); }
   window.ApexPingPush = function (p) { window.ApexPing = p; applyPing(p); };
+
+  // ================================================================
+  // EMITTER CENSUS — the Wardrive picture, in the watch (owner's
+  // reiteration order, Nov 13, 2026: on a Friday night he had to
+  // open Wardrive Go because his own face did not give him the
+  // census of his subdivision). A CENSUS, not a hunt: session
+  // totals by radio, every emitter heard ordered by strength, a
+  // NOTABLE section, and a FIRST-APPEARANCE LOG — emitters heard
+  // this session for the first time ever, date-stamped. That log
+  // is the design's proof of purpose: the day fiber was installed
+  // at the neighbor's house, a new gateway SSID (DasherJay) would
+  // have stood in it with the date beside it.
+  // DATA: the same container-bridge snapshots the scope eats
+  // (ApexWifi), optionally extended with bt[] / cell[] / session{}
+  // (see BRIDGE CONTRACTS), or a standalone ApexCensus payload.
+  // A radio the bridge never reports reads NO MEASURE in the
+  // totals — never zero, which would claim "none heard". The
+  // census keeps the LAST snapshot and prints its age; past the
+  // freshness bound it is labelled STALE, never dressed as live.
+  // FIRST-APPEARANCE MEMORY lives in localStorage (the seen-store)
+  // and is written by every snapshot whether or not the census is
+  // open; where storage is unavailable the census still renders,
+  // with first-appearance scoped to what this page has heard.
+  // NOTABLE rules (printed on the panel): UNNAMED emitters · names
+  // carrying watch words · names with a repeated word · FIRST SEEN
+  // this session as a DUAL-BAND gateway (the same SSID heard on
+  // both bands = new infrastructure, the DasherJay shape) · FIRST
+  // SEEN this session at near strength. Ordering: suspicious names
+  // first, then new infrastructure and nameless Wi-Fi, then the
+  // rest of the new-and-near — a merely-new strong neighbour never
+  // buries an odd name or a new gateway down the list. And the
+  // standing rule, printed on the panel: RSSI IS SIGNAL STRENGTH,
+  // NOT DISTANCE — no emitter in this view is ever ranged.
+  // ================================================================
+  var CENSUS = { on: false, bt: null, cell: null, session: null, at: 0, sig: '' };
+  var CENSUS_SEEN_KEY = 'apex.census.seen.v1';
+  var CENSUS_WATCH = /cam|drone|spy|track|record|hidden|listen/i;
+  var seenStore = null;
+  function seenLoad() {
+    if (seenStore) return seenStore;
+    seenStore = {};
+    try {
+      var raw = window.localStorage.getItem(CENSUS_SEEN_KEY);
+      if (raw) { var p = JSON.parse(raw); if (p && typeof p === 'object') seenStore = p; }
+    } catch (e) { /* storage unavailable — session-scoped memory only */ }
+    return seenStore;
+  }
+  function seenSave() {
+    try { window.localStorage.setItem(CENSUS_SEEN_KEY, JSON.stringify(seenStore)); } catch (e) { /* held in memory */ }
+  }
+  function dayStr(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function emitKey(radio, e) {
+    return radio + '|' + (e.bssid || e.addr || e.name || e.ssid || '');
+  }
+  function seenStamp(radio, e, at) {
+    var store = seenLoad(), key = emitKey(radio, e);
+    if (!key || key === radio + '|') return;
+    if (!store[key]) { store[key] = dayStr(at || Date.now()); seenSave(); }
+  }
+  function censusIngest(snap) {
+    if (!snap) return;
+    var at = (typeof snap.at === 'number') ? snap.at : Date.now();
+    var aps = snap.aps || [];
+    for (var i = 0; i < aps.length; i++) seenStamp('wifi', aps[i], at);
+    if (snap.bt || snap.cell || snap.session) {
+      if (snap.bt) { CENSUS.bt = snap.bt; for (var j = 0; j < snap.bt.length; j++) seenStamp('bt', snap.bt[j], at); }
+      if (snap.cell) { CENSUS.cell = snap.cell; for (var k = 0; k < snap.cell.length; k++) seenStamp('cell', snap.cell[k], at); }
+      if (snap.session) CENSUS.session = snap.session;
+      CENSUS.at = at;
+    }
+    CENSUS.sig = '';
+  }
+  window.ApexCensusPush = function (c) {
+    if (!c) return;
+    if (typeof c.at !== 'number') c.at = Date.now();
+    if (c.sim) SIM.on = true;
+    censusIngest({ at: c.at, bt: c.bt, cell: c.cell, session: c.session });
+    if (CENSUS.on) renderCensus();
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function oddName(name) {
+    var toks = name.toLowerCase().split(/[^a-z0-9]+/), seen = {};
+    for (var i = 0; i < toks.length; i++) {
+      if (toks[i].length < 3) continue;
+      if (seen[toks[i]]) return true;
+      seen[toks[i]] = 1;
+    }
+    return false;
+  }
+  function censusData() {
+    var store = seenLoad();
+    var snapAt = Math.max(RF.snapAt || 0, CENSUS.at || 0);
+    var snapDay = snapAt ? dayStr(snapAt) : '';
+    function mk(radio, e) {
+      var name = radio === 'wifi' ? (e.ssid || '') : (e.name || '');
+      var tag = 'CELL';
+      if (radio === 'wifi') {
+        tag = 'WIFI ' + (e.bandGhz >= 5.5 ? '6G' : (e.bandGhz >= 4.5 ? '5G' : (e.bandGhz > 0 ? '2.4G' : '--'))) + (e.channel ? ' CH' + e.channel : '');
+      } else if (radio === 'bt') tag = 'BT';
+      var first = store[emitKey(radio, e)] || '';
+      var isNew = !!snapDay && first === snapDay;
+      var reasons = [];
+      if (!name) reasons.push('UNNAMED');
+      else {
+        if (CENSUS_WATCH.test(name)) reasons.push('WATCH WORD');
+        if (oddName(name)) reasons.push('ODD NAME');
+      }
+      var rssi = num(e.rssi);
+      if (isNew && rssi !== null && rssi >= -85) reasons.push('FIRST SEEN · NEAR');
+      return {
+        name: name, radio: radio, tag: tag, rssi: rssi, isNew: isNew, first: first,
+        reasons: reasons, conn: radio === 'wifi' && !!e.bssid && e.bssid === RF.connBssid
+      };
+    }
+    var rows = [], i;
+    var aps = RF.aps || [];
+    for (i = 0; i < aps.length; i++) rows.push(mk('wifi', aps[i]));
+    // Dual-band pass: a NEW wifi SSID heard in two band classes is
+    // new infrastructure (a gateway), not single-radio chatter.
+    var bandOf = {};
+    for (i = 0; i < rows.length; i++) {
+      var rw = rows[i];
+      if (rw.radio !== 'wifi' || !rw.name) continue;
+      var bc = rw.tag.indexOf('5G') >= 0 || rw.tag.indexOf('6G') >= 0 ? 'hi' : 'lo';
+      (bandOf[rw.name] = bandOf[rw.name] || {})[bc] = 1;
+    }
+    for (i = 0; i < rows.length; i++) {
+      var rd = rows[i];
+      if (rd.radio === 'wifi' && rd.isNew && rd.name && bandOf[rd.name] && bandOf[rd.name].hi && bandOf[rd.name].lo) {
+        rd.reasons.unshift('FIRST SEEN · DUAL-BAND'); // class-defining reason leads the row
+      }
+    }
+    if (CENSUS.bt) for (i = 0; i < CENSUS.bt.length; i++) rows.push(mk('bt', CENSUS.bt[i]));
+    if (CENSUS.cell) for (i = 0; i < CENSUS.cell.length; i++) rows.push(mk('cell', CENSUS.cell[i]));
+    rows.sort(function (a, b) { return (b.rssi === null ? -999 : b.rssi) - (a.rssi === null ? -999 : a.rssi); });
+    var wifiNew = 0, btNew = 0, cellNew = 0;
+    for (i = 0; i < rows.length; i++) {
+      if (!rows[i].isNew) continue;
+      if (rows[i].radio === 'wifi') wifiNew++; else if (rows[i].radio === 'bt') btNew++; else cellNew++;
+    }
+    // NOTABLE ordering, three classes (rows arrive RSSI-sorted; the
+    // partition is stable, so strength rules inside each class):
+    //   A — the name itself is the anomaly (WATCH WORD · ODD NAME)
+    //   B — new infrastructure (FIRST SEEN · DUAL-BAND) and
+    //       nameless Wi-Fi
+    //   C — nameless BT/cell and the merely new-and-near
+    function notClass(r) {
+      if (r.reasons.indexOf('WATCH WORD') >= 0 || r.reasons.indexOf('ODD NAME') >= 0) return 0;
+      if (r.reasons.indexOf('FIRST SEEN · DUAL-BAND') >= 0) return 1;
+      if (r.reasons.indexOf('UNNAMED') >= 0 && r.radio === 'wifi') return 1;
+      return 2;
+    }
+    var nA = [], nB = [], nC = [];
+    for (i = 0; i < rows.length; i++) {
+      if (!rows[i].reasons.length) continue;
+      var nc = notClass(rows[i]);
+      if (nc === 0) nA.push(rows[i]); else if (nc === 1) nB.push(rows[i]); else nC.push(rows[i]);
+    }
+    return {
+      snapAt: snapAt, snapDay: snapDay, rows: rows,
+      notable: nA.concat(nB, nC),
+      firstLog: rows.filter(function (r) { return r.isNew; }),
+      wifiTotal: aps.length, wifiNew: wifiNew,
+      btTotal: CENSUS.bt ? CENSUS.bt.length : null, btNew: btNew,
+      cellTotal: CENSUS.cell ? CENSUS.cell.length : null, cellNew: cellNew,
+      session: CENSUS.session
+    };
+  }
+  function cenRow(r, withWhy) {
+    var nm = r.name ? esc(r.name) : '(UNNAMED)';
+    var why = (withWhy && r.reasons.length) ? ' <span class="cen-why">' + esc(r.reasons.join(' · ')) + '</span>' : '';
+    var pipe = r.conn ? ' <span class="cen-pipe">PIPE</span>' : '';
+    var nw = (!withWhy && r.isNew) ? ' <span class="cen-why">NEW</span>' : '';
+    return '<div class="cen-row"><span class="cen-nm">' + nm + ' <span class="cen-tag">' + r.tag + '</span>' + why + nw + pipe +
+      '</span><span class="cen-rs">' + (r.rssi === null ? 'NO MEASURE' : r.rssi + ' DB') + '</span></div>';
+  }
+  function renderCensus() {
+    var el = document.getElementById('census');
+    var d = censusData();
+    if (!d.snapAt) {
+      el.innerHTML = '<div class="cen-h">EMITTER CENSUS</div>' +
+        '<div class="cen-none">NO MEASURE — NO SCAN SNAPSHOT HAS ARRIVED.<br>' +
+        'WHEN THE CONTAINER BRIDGE DELIVERS A SCAN, THE CENSUS FILLS FROM IT.<br>NOTHING HERE IS SIMULATED.</div>' +
+        '<div class="cen-rule">RSSI IS SIGNAL STRENGTH, NOT DISTANCE</div>';
+      return;
+    }
+    var ageS = Math.floor((Date.now() - d.snapAt) / 1000);
+    var ageTxt = ageS < 60 ? ageS + 'S OLD' : Math.floor(ageS / 60) + 'M OLD';
+    var stale = (Date.now() - d.snapAt) > SNAP_FRESH_MS;
+    var when = new Date(d.snapAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+    var html = '<div class="cen-h">EMITTER CENSUS</div>';
+    html += '<div class="cen-sub">' + when + ' · SNAPSHOT ' + ageTxt + (stale ? ' · <span class="cen-sim">STALE</span>' : '') +
+      (SIM.on ? '<br><span class="cen-sim">SIM — DECLARED DEMO DATA, NOT A LIVE SCAN</span>' : '<br>LIVE SCAN SNAPSHOT') + '</div>';
+    var ses = d.session || {};
+    var sesTxt = (typeof ses.distMi === 'number' || typeof ses.durMin === 'number')
+      ? '<span class="dim">SESSION</span> ' + (typeof ses.distMi === 'number' ? ses.distMi.toFixed(1) + ' MI' : '—') + (typeof ses.durMin === 'number' ? ' · ' + Math.round(ses.durMin) + ' MIN' : '')
+      : '<span class="dim">SESSION</span> NO MEASURE';
+    html += '<div class="cen-tot">WIFI NEW ' + d.wifiNew + ' · TOTAL ' + d.wifiTotal + '<br>' +
+      'BT ' + (d.btTotal === null ? 'NO MEASURE' : d.btTotal + (d.btNew ? ' (' + d.btNew + ' NEW)' : '')) +
+      ' · CELL ' + (d.cellTotal === null ? 'NO MEASURE' : d.cellTotal + (d.cellNew ? ' (' + d.cellNew + ' NEW)' : '')) + '<br>' + sesTxt + '</div>';
+    html += '<div class="cen-rule">RSSI IS SIGNAL STRENGTH, NOT DISTANCE</div>';
+    html += '<div class="cen-sec">NOTABLE (' + d.notable.length + ') — UNNAMED · WATCH WORDS · ODD NAMES · FIRST SEEN · DUAL-BAND NEW</div>';
+    if (!d.notable.length) html += '<div class="cen-more">NONE THIS SESSION</div>';
+    for (var i = 0; i < Math.min(16, d.notable.length); i++) html += cenRow(d.notable[i], true);
+    if (d.notable.length > 16) html += '<div class="cen-more">+ ' + (d.notable.length - 16) + ' MORE NOTABLE</div>';
+    html += '<div class="cen-sec">STRONGEST EMITTERS (' + d.rows.length + ')</div>';
+    for (var j = 0; j < Math.min(40, d.rows.length); j++) html += cenRow(d.rows[j], false);
+    if (d.rows.length > 40) html += '<div class="cen-more">+ ' + (d.rows.length - 40) + ' MORE, WEAKER</div>';
+    html += '<div class="cen-sec">FIRST APPEARANCE LOG — ' + d.snapDay + ' (' + d.firstLog.length + ' NEW)</div>';
+    if (!d.firstLog.length) html += '<div class="cen-more">NO FIRST APPEARANCES THIS SESSION — EVERY EMITTER WAS IN THE SEEN-STORE</div>';
+    for (var k = 0; k < Math.min(12, d.firstLog.length); k++) html += cenRow(d.firstLog[k], false);
+    if (d.firstLog.length > 12) html += '<div class="cen-more">+ ' + (d.firstLog.length - 12) + ' MORE FIRST SEEN ' + d.snapDay + '</div>';
+    el.innerHTML = html;
+  }
+  function censusTick() {
+    if (!CENSUS.on) return;
+    var snapAt = Math.max(RF.snapAt || 0, CENSUS.at || 0);
+    var sig = snapAt + '|' + Math.floor((Date.now() - snapAt) / 5000) + '|' + SIM.on;
+    if (sig !== CENSUS.sig) { CENSUS.sig = sig; renderCensus(); }
+  }
+  function setCensus(on) {
+    CENSUS.on = on;
+    document.getElementById('census').style.display = on ? 'block' : 'none';
+    var b = document.getElementById('cenbtn');
+    b.className = on ? 'on' : '';
+    b.textContent = on ? 'SCOPE' : 'CENSUS';
+    var vis = on ? 'hidden' : 'visible';
+    cv.style.visibility = vis; pv.style.visibility = vis; fv.style.visibility = vis; fxv.style.visibility = vis;
+    if (on) { CENSUS.sig = ''; renderCensus(); }
+  }
+  document.getElementById('cenbtn').addEventListener('click', function () { setCensus(!CENSUS.on); });
   // ---- FACTORY BEAT ingest (bridge relay, or the house state the
   // network serves at factory-beat.json next to the face).
   function applyBeat(b) {
@@ -1516,7 +1820,20 @@
       return out;
     },
     select: function (bssid) { HUNT.bssid = bssid || null; renderBios(); },
-    investigate: function (on) { setInvest(!!on); }
+    investigate: function (on) { setInvest(!!on); },
+    census: function (on) { setCensus(!!on); },
+    censusState: function () {
+      var d = censusData();
+      return {
+        on: CENSUS.on,
+        wifiNew: d.wifiNew, wifiTotal: d.wifiTotal,
+        bt: d.btTotal, cell: d.cellTotal,
+        notable: d.notable.map(function (r) { return { name: r.name, tag: r.tag, rssi: r.rssi, reasons: r.reasons }; }),
+        firstLogCount: d.firstLog.length,
+        snapDay: d.snapDay,
+        panel: document.getElementById('census').textContent.replace(/\s+/g, ' ').trim()
+      };
+    }
   };
   // ================================================================
   // TABLE SERVICE (V6) — ONE 1 s service timer runs the house, at
@@ -1575,6 +1892,7 @@
   if (window.visualViewport) window.visualViewport.addEventListener('resize', layout);
   service();
   setInterval(service, 1000);
+  setInterval(function () { if (!document.hidden) censusTick(); }, 500); // census merge: the panel's freshness tick rides its own beat
   fetchWX(); setInterval(fetchWX, 900000);
   if (navigator.getBattery) {
     navigator.getBattery().then(function (b) {
