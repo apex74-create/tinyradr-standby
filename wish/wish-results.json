@@ -1,1 +1,96 @@
-{"checkedTwice": true, "date": "2026-11-18", "games": {"daily3": "015", "daily4": "7127", "fantasy5": [3, 13, 26, 29, 32], "fantasy5DoublePlay": [5, 6, 7, 14, 27], "megaMillions": {"bonus": 21, "whites": [3, 10, 19, 28, 33]}}, "grades": {"date": "2026-11-18", "fantasy5DoublePlay": "No win on the Double Play.", "games": {"daily3": {"doublePlay": {"note": "Michigan Daily 3 has no Double Play drawing", "status": "no-drawing"}, "main": {"anyOrder": false, "drawn": "015", "positionMatches": 0, "prize": "NO MEASURE", "result": "NO WIN", "status": "graded", "straight": false}}, "daily4": {"doublePlay": {"note": "Michigan Daily 4 has no Double Play drawing", "status": "no-drawing"}, "main": {"anyOrder": false, "drawn": "7127", "positionMatches": 1, "prize": "NO MEASURE", "result": "NO WIN", "status": "graded", "straight": false}}, "fantasy5": {"doublePlay": {"drawn": [5, 6, 7, 14, 27], "matchCount": 1, "matched": [14], "prize": 0.0, "result": "NO WIN", "status": "graded"}, "main": {"drawn": [3, 13, 26, 29, 32], "matchCount": 0, "matched": [], "prize": 0.0, "result": "NO WIN", "status": "graded"}}, "megaMillions": {"doublePlay": {"note": "Michigan Mega Millions has no Double Play drawing", "status": "no-drawing"}, "main": {"bonusHit": false, "drawn": {"bonus": 21, "whites": [3, 10, 19, 28, 33]}, "matchCount": 1, "matched": [19], "prize": 0.0, "result": "NO WIN", "status": "graded"}}}, "totals": {"prizeTotal": 0.0}}, "postedAt": "2026-11-18T20:50:32-05:00"}
+{
+ "checkedTwice": true,
+ "date": "2026-11-19",
+ "games": {
+  "daily3": "834",
+  "daily4": "1539",
+  "fantasy5": [
+   3,
+   22,
+   28,
+   33,
+   39
+  ],
+  "fantasy5DoublePlay": [
+   5,
+   24,
+   27,
+   34,
+   38
+  ]
+ },
+ "grades": {
+  "date": "2026-11-19",
+  "fantasy5DoublePlay": "No win on the Double Play.",
+  "games": {
+   "daily3": {
+    "doublePlay": {
+     "note": "Michigan Daily 3 has no Double Play drawing",
+     "status": "no-drawing"
+    },
+    "main": {
+     "anyOrder": false,
+     "drawn": "834",
+     "positionMatches": 0,
+     "prize": "NO MEASURE",
+     "result": "NO WIN",
+     "status": "graded",
+     "straight": false
+    }
+   },
+   "daily4": {
+    "doublePlay": {
+     "note": "Michigan Daily 4 has no Double Play drawing",
+     "status": "no-drawing"
+    },
+    "main": {
+     "anyOrder": false,
+     "drawn": "1539",
+     "positionMatches": 0,
+     "prize": "NO MEASURE",
+     "result": "NO WIN",
+     "status": "graded",
+     "straight": false
+    }
+   },
+   "fantasy5": {
+    "doublePlay": {
+     "drawn": [
+      5,
+      24,
+      27,
+      34,
+      38
+     ],
+     "matchCount": 1,
+     "matched": [
+      27
+     ],
+     "prize": 0.0,
+     "result": "NO WIN",
+     "status": "graded"
+    },
+    "main": {
+     "drawn": [
+      3,
+      22,
+      28,
+      33,
+      39
+     ],
+     "matchCount": 1,
+     "matched": [
+      33
+     ],
+     "prize": 0.0,
+     "result": "NO WIN",
+     "status": "graded"
+    }
+   }
+  },
+  "totals": {
+   "prizeTotal": 0.0
+  }
+ },
+ "postedAt": "2026-11-19T20:49:15-05:00"
+}
