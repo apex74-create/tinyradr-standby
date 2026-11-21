@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — SpaceX Launch Watch · Phase Two</title>
+<style>
+  /* SPACEX LAUNCH WATCH — PHASE TWO (owner design, Nov 20, 2026).
+     Shows WHICH SpaceX vehicle/mission is on the tower, a live feed
+     bubble that mounts only inside the launch window, a God's-eye
+     3D tower the wearer can spin, and the flight-data panels — plus
+     the house law: a compass dial and the time, digital and analog.
+
+     DATA SOURCE (the one that answers): the Space Launch Schedule
+     public feed — spacelaunchschedule.com/wp-json/launches/v1/
+     next-launches (RSS, CORS-open, no key). It carries, per launch:
+     provider + vehicle, status text, the window (open–close, with
+     its own timezone), and the site. It does NOT carry the pad
+     complex, a target orbit, an apogee, or a flight-event timeline
+     — those read NO MEASURE on this face rather than wearing
+     invented numbers (the fabrication ban holds on every figure).
+     Sources tried and found dead at build time (Nov 20, 2026):
+     Launch Library 2 (HTTP 429 from this network), the SpaceX-API
+     REST host (origin down), its GraphQL mirror (upstream dead),
+     rocketlaunch.live (key now required).
+
+     THE FEED BUBBLE is a real sandboxed component (Slide-Out
+     Standard): an iframe in its own sandbox carrying NASASpace-
+     flight's YouTube live channel (channel UCSUu1lih2RifWkKtDOJdsBA
+     — the crew that streams SpaceX launches and runs 24/7 pad
+     cameras). It MOUNTS only from 30 min before the window opens
+     until 30 min after it closes; outside the window the bubble is
+     an honest plate — NO LIVE FEED + the next window — and no
+     player is loaded at all. Nothing is dressed as live that is
+     not.
+
+     THE TOWER is a schematic render (labelled on the face), drawn
+     in plain canvas 2D long form — no framework, no imports (the
+     Vanilla Doctrine). Angles are pure functions of absolute time;
+     the face runs from first paint (the Nov 10 governor law). */
+  :root{
+    --void:#05060a; --plate:#0b0d12;
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --laser:#57e6ff; --digit:#ffb52e; --cream:#f5ead2; --panel:#000000;
+    --bad:#ff6a5e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #titleLbl{top:1.6vmin;font-size:3.6vmin;color:var(--brass-hi)}
+  #subLbl{top:5.8vmin;font-size:2.0vmin;color:var(--steel)}
+  .panel{position:absolute;background:var(--panel);
+    border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:1.2vmin 1.8vmin;overflow:hidden}
+  .pHead{font-size:1.9vmin;letter-spacing:.18em;color:var(--brass-hi);
+    font-weight:700;margin-bottom:0.7vmin}
+  .row{display:flex;justify-content:space-between;align-items:baseline;
+    gap:1.2vmin;margin-top:0.45vmin}
+  .k{font-size:1.85vmin;color:var(--steel);letter-spacing:.1em;white-space:nowrap}
+  .v{font-size:2.05vmin;color:var(--cream);font-weight:700;text-align:right;
+    letter-spacing:.03em}
+  .v.no{color:var(--steel-lo);font-weight:400;font-size:1.8vmin}
+  .v.hot{color:var(--laser)}
+  /* tower, left */
+  #towerWrap{position:absolute;left:1.2vmin;top:11vmin;width:45vmin;height:47vmin}
+  #tower{width:100%;height:41vmin;display:block;touch-action:none;cursor:grab}
+  #towerCap{text-align:center;font-size:1.8vmin;color:var(--steel);
+    letter-spacing:.14em;margin-top:0.4vmin}
+  /* on the tower, right */
+  #towerPanel{left:48.3vmin;top:11vmin;width:50.5vmin;height:47vmin}
+  #mMission{font-size:3.3vmin;color:var(--cream);font-weight:800;
+    line-height:1.16;letter-spacing:.02em;min-height:7.6vmin}
+  #mCount{font-size:6.6vmin;font-weight:800;color:var(--digit);line-height:1.05;
+    letter-spacing:.02em;font-variant-numeric:tabular-nums;margin-top:0.8vmin}
+  #mCountLab{font-size:1.8vmin;color:var(--steel);letter-spacing:.16em}
+  #mWindow{font-size:1.85vmin;color:var(--steel-hi);margin-top:0.5vmin;
+    letter-spacing:.05em}
+  /* feed bubble, bottom left */
+  #feedPanel{left:1.2vmin;top:59.5vmin;width:45vmin;height:23.5vmin}
+  #bubble{position:relative;width:100%;height:17.6vmin;background:#000;
+    border:1px solid var(--steel-lo);border-radius:1vmin;overflow:hidden}
+  #bubble iframe{width:100%;height:100%;border:0;display:block}
+  #bubblePlate{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:0.7vmin;text-align:center;
+    padding:0 2vmin}
+  #bubbleBig{font-size:2.9vmin;font-weight:800;color:var(--steel-hi);
+    letter-spacing:.14em}
+  #bubbleSub{font-size:1.8vmin;color:var(--steel);letter-spacing:.08em;line-height:1.35}
+  /* flight data, bottom right */
+  #flightPanel{left:48.3vmin;top:59.5vmin;width:50.5vmin;height:23.5vmin}
+  /* bottom row */
+  #compassWrap{position:absolute;left:1.2vmin;top:83.2vmin;width:14vmin;height:14vmin}
+  #compass{width:14vmin;height:14vmin;display:block}
+  #hdgLbl{position:absolute;left:-3vmin;top:14.2vmin;width:20vmin;text-align:center;
+    font-size:1.4vmin;color:var(--steel);letter-spacing:.08em;white-space:nowrap}
+  #readPanel{position:absolute;left:50%;bottom:1.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.6vmin 3.2vmin 1vmin;text-align:center}
+  #clock{font-size:9.2vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.3vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.4vmin}
+  #lampWrap{position:absolute;right:1.6vmin;bottom:1.6vmin;text-align:right}
+  #stateLamp{font-size:2.0vmin;color:var(--laser);letter-spacing:.13em;font-weight:700}
+  #srcLine{text-align:center;font-size:1.5vmin;color:var(--steel-lo);
+    letter-spacing:.08em;margin-top:0.3vmin}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="titleLbl" class="lbl">SPACEX LAUNCH WATCH</div>
+  <div id="subLbl" class="lbl">PHASE TWO · WHO IS ON THE TOWER</div>
+
+  <div id="towerWrap">
+    <canvas id="tower" width="450" height="410"></canvas>
+    <div id="towerCap">GOD'S EYE · TOWER — SCHEMATIC · DRAG TO SPIN</div>
+    <div id="srcLine">DATA · SPACE LAUNCH SCHEDULE FEED</div>
+  </div>
+
+  <div id="towerPanel" class="panel">
+    <div class="pHead">ON THE TOWER</div>
+    <div id="mMission">READING THE BOARD…</div>
+    <div class="row"><span class="k">VEHICLE</span><span class="v" id="mVehicle">—</span></div>
+    <div class="row"><span class="k">SITE</span><span class="v" id="mSite">—</span></div>
+    <div class="row"><span class="k">PAD</span><span class="v no" id="mPad">NO MEASURE</span></div>
+    <div class="row"><span class="k">STATUS</span><span class="v hot" id="mStatus">—</span></div>
+    <div id="mCount">T−--:--:--</div>
+    <div id="mCountLab">TO WINDOW OPEN</div>
+    <div id="mWindow">WINDOW —</div>
+  </div>
+
+  <div id="feedPanel" class="panel">
+    <div class="pHead">LIVE FEED BUBBLE</div>
+    <div id="bubble">
+      <div id="bubblePlate">
+        <div id="bubbleBig">NO LIVE FEED</div>
+        <div id="bubbleSub">THE PLAYER MOUNTS IN THE WINDOW</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="flightPanel" class="panel">
+    <div class="pHead">FLIGHT DATA</div>
+    <div class="row"><span class="k">TRAJECTORY</span><span class="v no" id="fTraj">NO MEASURE</span></div>
+    <div class="row"><span class="k">APOGEE</span><span class="v no" id="fApogee">NO MEASURE</span></div>
+    <div class="row"><span class="k">LIFTOFF</span><span class="v" id="eLiftoff">—</span></div>
+    <div class="row"><span class="k">MAX-Q</span><span class="v no">NO MEASURE</span></div>
+    <div class="row"><span class="k">STAGE SEP</span><span class="v no">NO MEASURE</span></div>
+    <div class="row"><span class="k">WINDOW T+</span><span class="v hot" id="fTplus">—</span></div>
+  </div>
+
+  <div id="compassWrap">
+    <svg id="compass" viewBox="0 0 120 120" aria-label="Compass dial with analog clock"></svg>
+    <div id="hdgLbl">HDG NO MEASURE</div>
+  </div>
+
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+
+  <div id="lampWrap">
+    <div id="stateLamp">READING</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= DATA LAYER =================
+   Source: the Space Launch Schedule public feed (RSS). Per item,
+   the description carries: "<provider> <vehicle>", a status line,
+   the window "Fri, November 20, 8:20 PM - 10:32 PM PST", and the
+   site. Parsed defensively; anything absent stays NO MEASURE. */
+var FEED_URL = "https://www.spacelaunchschedule.com/wp-json/launches/v1/next-launches";
+var NSF_CHANNEL = "UCSUu1lih2RifWkKtDOJdsBA"; /* NASASpaceflight, YouTube */
+var MONTHS = {JANUARY:0,FEBRUARY:1,MARCH:2,APRIL:3,MAY:4,JUNE:5,JULY:6,
+  AUGUST:7,SEPTEMBER:8,OCTOBER:9,NOVEMBER:10,DECEMBER:11};
+var TZOFF = {PST:-8,PDT:-7,MST:-7,MDT:-6,CST:-6,CDT:-5,EST:-5,EDT:-4,
+  UTC:0,GMT:0,AKST:-9,AKDT:-8,HST:-10};
+
+function parseWindow(winStr, year){
+  /* "Fri, November 20, 8:20 PM - 10:32 PM PST" -> {open, close} UTC ms */
+  var s = winStr.replace(/^[^,]+,\s*/, "");
+  var m = s.match(/([A-Za-z]+)\s+(\d{1,2}),\s*(\d{1,2}):(\d{2})\s*(AM|PM)(?:\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM))?\s*([A-Za-z]{2,4}|[+-]\d{2})?/);
+  if(!m) return null;
+  var mon = MONTHS[m[1].toUpperCase()];
+  if(mon === undefined) return null;
+  var tz = m[9] || "";
+  var off = TZOFF[tz];
+  if(off === undefined) off = /^[+-]\d{2}$/.test(tz) ? parseInt(tz, 10) : 0;
+  function utc(day, h, mm, ap){
+    var hh = h % 12; if(ap === "PM") hh += 12;
+    return Date.UTC(year, mon, day, hh - off, mm);
+  }
+  var day = parseInt(m[2], 10);
+  var open = utc(day, parseInt(m[3], 10), parseInt(m[4], 10), m[5]);
+  var close = m[6] ? utc(day, parseInt(m[6], 10), parseInt(m[7], 10), m[8]) : open + 30*60000;
+  if(close < open) close += 24*3600000;
+  return { open: open, close: close };
+}
+
+function stripText(html){
+  /* Decode entities and drop tags WITHOUT parsing into the live
+     DOM — the feed descriptions carry <img> tags, and innerHTML
+     on a live element would fire off-site image loads from the
+     wrist. A textarea decodes without fetching anything. */
+  var ta = document.createElement("textarea");
+  ta.innerHTML = html || "";
+  return ta.value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function parseFeed(xmlText){
+  var doc = new DOMParser().parseFromString(xmlText, "text/xml");
+  if(doc.querySelector("parsererror")) throw new Error("feed parse");
+  var lbd = doc.querySelector("lastBuildDate");
+  var year = lbd ? new Date(lbd.textContent).getUTCFullYear() : new Date().getUTCFullYear();
+  var now = Date.now();
+  var items = doc.querySelectorAll("item");
+  var spacex = [], any = [];
+  items.forEach(function(it){
+    var title = (it.querySelector("title") || {}).textContent || "";
+    var desc = stripText((it.querySelector("description") || {}).textContent || "");
+    var iR = desc.indexOf("\u{1F680}"), iC = desc.indexOf("\u{1F4C5}"), iE = desc.indexOf("\u{1F30E}");
+    if(iC < 0) return; /* not a launch item (article etc.) */
+    var head = desc.slice(0, iR > 0 ? iR : iC).trim();
+    var status = iR > 0 ? desc.slice(iR + 2, iC).trim() : "";
+    var winStr = desc.slice(iC + 2, iE > 0 ? iE : undefined).trim();
+    var loc = iE > 0 ? desc.slice(iE + 2).trim() : "";
+    var win = parseWindow(winStr, year);
+    if(!win) return;
+    if(win.open < now - 24*3600000){ win = parseWindow(winStr, year + 1); if(!win) return; }
+    var rec = { mission: title.trim(), head: head, status: status,
+      site: loc, open: win.open, close: win.close };
+    any.push(rec);
+    if(/^SpaceX\b/.test(head)){
+      rec.vehicle = head.replace(/^SpaceX\s*/, "");
+      spacex.push(rec);
+    }
+  });
+  function pick(list){
+    var inWin = list.filter(function(r){ return r.open <= now && now <= r.close; });
+    if(inWin.length) return inWin[0];
+    var fut = list.filter(function(r){ return r.close >= now; });
+    fut.sort(function(a, b){ return a.open - b.open; });
+    return fut.length ? fut[0] : null;
+  }
+  return { current: pick(spacex), nextAny: pick(any) };
+}
+
+/* ================= FACE STATE ================= */
+var $ = function(id){ return document.getElementById(id); };
+var cur = null;          /* the SpaceX launch on the tower */
+var nextAny = null;      /* soonest launch of any provider, if pad empty */
+var feedOk = false, lastOkAt = 0;
+var bubbleMode = "plate"; /* plate | live */
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+function fmtClock(ms){
+  var d = new Date(ms);
+  var p = function(n){ return (n < 10 ? "0" : "") + n; };
+  return p(d.getHours()) + ":" + p(d.getMinutes());
+}
+function fmtDay(ms){
+  var d = new Date(ms);
+  return DAYS[d.getDay()] + " " + MONS[d.getMonth()] + " " + d.getDate();
+}
+function fmtDur(ms){
+  if(ms < 0) ms = 0;
+  var s = Math.floor(ms / 1000);
+  var p = function(n){ return (n < 10 ? "0" : "") + n; };
+  var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  return p(h) + ":" + p(m) + ":" + p(s % 60);
+}
+
+function setLamp(txt, color){ var l = $("stateLamp"); l.textContent = txt; l.style.color = color; }
+
+function renderData(){
+  if(!feedOk && !cur){
+    $("mMission").textContent = "NO FEED";
+    $("mVehicle").textContent = "—";
+    $("mSite").textContent = "—";
+    $("mStatus").textContent = "SOURCE UNREACHABLE";
+    $("mCount").textContent = "T−--:--:--";
+    $("mWindow").textContent = "WINDOW —";
+    $("eLiftoff").textContent = "—";
+    setLamp("NO FEED", "#ff6a5e");
+    return;
+  }
+  if(!cur){
+    $("mMission").textContent = "PAD EMPTY";
+    $("mVehicle").textContent = "NO SPACEX LAUNCH CARRIED";
+    $("mSite").textContent = "—";
+    $("mStatus").textContent = "—";
+    $("mCount").textContent = "T−--:--:--";
+    $("mCountLab").textContent = "TO WINDOW OPEN";
+    if(nextAny){
+      $("mWindow").textContent = "NEXT ON THE BOARD · " + nextAny.mission +
+        " · " + fmtDay(nextAny.open) + " " + fmtClock(nextAny.open);
+      $("eLiftoff").textContent = "—";
+    } else {
+      $("mWindow").textContent = "WINDOW —";
+    }
+    setLamp(feedOk ? "LIVE DATA" : "STALE", feedOk ? "#57e6ff" : "#ffb52e");
+    return;
+  }
+  $("mMission").textContent = cur.mission.toUpperCase();
+  $("mVehicle").textContent = cur.vehicle || "—";
+  $("mSite").textContent = cur.site || "—";
+  $("mStatus").textContent = (cur.status || "—").toUpperCase();
+  $("mWindow").textContent = "WINDOW " + fmtDay(cur.open) + " · " +
+    fmtClock(cur.open) + " – " + fmtClock(cur.close) + " LOCAL";
+  $("eLiftoff").textContent = "AT WINDOW OPEN · " + fmtClock(cur.open);
+  setLamp(feedOk ? "LIVE DATA" : "STALE · LAST READ " + fmtClock(lastOkAt),
+    feedOk ? "#57e6ff" : "#ffb52e");
+}
+
+function setBubble(mode, line){
+  var plate = $("bubblePlate"), bubble = $("bubble");
+  if(mode === "live"){
+    if(bubbleMode !== "live"){
+      var old = bubble.querySelector("iframe");
+      if(old) old.remove();
+      var f = document.createElement("iframe");
+      f.src = "https://www.youtube-nocookie.com/embed/live_stream?channel=" +
+        NSF_CHANNEL + "&rel=0";
+      f.setAttribute("sandbox", "allow-scripts allow-same-origin allow-presentation");
+      f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+      f.setAttribute("allowfullscreen", "");
+      f.title = "Live launch coverage — NASASpaceflight (YouTube)";
+      bubble.insertBefore(f, plate);
+    }
+    plate.style.display = "none";
+    bubbleMode = "live";
+  } else {
+    var fr = bubble.querySelector("iframe");
+    if(fr) fr.remove();
+    plate.style.display = "flex";
+    $("bubbleBig").textContent = "NO LIVE FEED";
+    $("bubbleSub").textContent = line || "THE PLAYER MOUNTS IN THE WINDOW";
+    bubbleMode = "plate";
+  }
+}
+
+function tick(){
+  var now = Date.now();
+  if(cur){
+    if(now < cur.open){
+      $("mCount").textContent = "T−" + fmtDur(cur.open - now);
+      $("mCountLab").textContent = "TO WINDOW OPEN";
+      $("fTplus").textContent = "—";
+    } else if(now <= cur.close){
+      $("mCount").textContent = "T−00:00:00";
+      $("mCountLab").textContent = "IN WINDOW · CLOSES " + fmtClock(cur.close);
+      $("fTplus").textContent = fmtDur(now - cur.open);
+    } else {
+      $("mCount").textContent = "T−--:--:--";
+      $("mCountLab").textContent = "WINDOW CLOSED · READING THE BOARD";
+      $("fTplus").textContent = "—";
+    }
+    var inZone = now >= cur.open - 30*60000 && now <= cur.close + 30*60000;
+    if(inZone){
+      setBubble("live");
+      setLamp("IN WINDOW · LIVE", "#ffb52e");
+    } else if(now < cur.open){
+      setBubble("plate", "WINDOW OPENS " + fmtDay(cur.open) + " · " + fmtClock(cur.open) +
+        " — COVERAGE: NASASPACEFLIGHT LIVE");
+    } else {
+      setBubble("plate", "WINDOW CLOSED — AWAITING THE NEXT BOARD");
+    }
+  } else {
+    setBubble("plate", feedOk ? "NO SPACEX WINDOW CARRIED" : "SOURCE UNREACHABLE");
+  }
+}
+
+function fetchData(){
+  fetch(FEED_URL, { cache: "no-store" })
+    .then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.text(); })
+    .then(function(txt){
+      var parsed = parseFeed(txt);
+      cur = parsed.current; nextAny = parsed.nextAny;
+      feedOk = true; lastOkAt = Date.now();
+      renderData(); tick();
+    })
+    .catch(function(){
+      feedOk = false;
+      renderData(); tick();
+    });
+}
+fetchData();
+setInterval(fetchData, 300000);
+setInterval(tick, 1000);
+
+/* ================= GOD'S-EYE TOWER =================
+   A schematic launch mount + service tower + vehicle, drawn as a
+   small software-3D scene on canvas 2D. Primitives are built once
+   in world space; every frame they are rotated by the azimuth
+   (absolute time + the wearer's drag), projected from a God's-eye
+   elevation, depth-sorted, and painted. Plain long-form JS. */
+var cvs = $("tower"), ctx = cvs.getContext("2d");
+var CW = cvs.width, CH = cvs.height, CCX = CW/2, CCY = CH/2 + 26, SCALE = 11.5;
+var ELEV = 0.86; /* radians above horizon — the God's eye */
+var prims = [];
+function quad(p1, p2, p3, p4, fill, stroke){
+  prims.push({ t: "q", p: [p1, p2, p3, p4], fill: fill, stroke: stroke || null });
+}
+function beam(a, b, w, color){ prims.push({ t: "l", p: [a, b], w: w, color: color }); }
+function dot(p, r, color, blink){ prims.push({ t: "d", p: [p], r: r, color: color, blink: !!blink }); }
+
+(function buildScene(){
+  var STEEL = "#9fb4c0", STEELLO = "#5d7180", BRASS = "#c9a227",
+      WHITE = "#e8edf0", DARK = "#232a31", GROUND = "#11151c";
+  /* ground apron disc */
+  var ring = [];
+  for(var i = 0; i < 28; i++){
+    var a = i / 28 * Math.PI * 2;
+    ring.push([Math.cos(a) * 15.5, Math.sin(a) * 15.5, 0]);
+  }
+  for(var j = 0; j < 28; j++){
+    var q = [ring[j], ring[(j + 1) % 28], [0, 0, 0.01], [0, 0, 0.01]];
+    /* fan triangles as degenerate quads */
+    quad(q[0], q[1], q[2], q[3], GROUND, null);
+  }
+  /* pad deck */
+  quad([-8,-8,0],[8,-8,0],[8,8,0],[-8,8,0], "#171c24", STEELLO);
+  quad([-8,-8,2],[8,-8,2],[8,8,2],[-8,8,2], "#1d232d", STEELLO);
+  /* ---- the vehicle (Falcon form): white stack on the mount ---- */
+  var VX = 4.2, VY = 0.5, R = 1.55, SEG = 10;
+  function cylShade(a){
+    var c = 0.55 + 0.45 * Math.cos(a - 0.8);
+    var v = Math.round(232 * c);
+    return "rgb(" + v + "," + Math.round(v * 0.99) + "," + Math.round(v * 0.96) + ")";
+  }
+  for(var s = 0; s < SEG; s++){
+    var a0 = s / SEG * Math.PI * 2, a1 = (s + 1) / SEG * Math.PI * 2, am = (a0 + a1) / 2;
+    var x0 = VX + Math.cos(a0) * R, y0 = VY + Math.sin(a0) * R;
+    var x1 = VX + Math.cos(a1) * R, y1 = VY + Math.sin(a1) * R;
+    quad([x0,y0,2],[x1,y1,2],[x1,y1,9],[x0,y0,9], DARK, null);            /* engine skirt */
+    quad([x0,y0,9],[x1,y1,9],[x1,y1,11.5],[x0,y0,11.5], "#0c0e11", null); /* interstage band */
+    quad([x0,y0,11.5],[x1,y1,11.5],[x1,y1,27],[x0,y0,27], cylShade(am), null); /* body */
+    var rT = R * 0.25;
+    var xt0 = VX + Math.cos(a0) * rT, yt0 = VY + Math.sin(a0) * rT;
+    var xt1 = VX + Math.cos(a1) * rT, yt1 = VY + Math.sin(a1) * rT;
+    quad([x0,y0,27],[x1,y1,27],[xt1,yt1,30.5],[xt0,yt0,30.5], cylShade(am), null); /* fairing cone */
+  }
+  dot([VX, VY, 30.6], 1.6, BRASS, false);
+  /* landing-leg hints at the base */
+  for(var lg = 0; lg < 3; lg++){
+    var la = lg / 3 * Math.PI * 2 + 0.5;
+    beam([VX + Math.cos(la) * 1.2, VY + Math.sin(la) * 1.2, 6],
+         [VX + Math.cos(la) * 3.4, VY + Math.sin(la) * 3.4, 2.1], 2.2, STEELLO);
+  }
+  /* ---- the service tower: lattice mast + arms + lightning rod ---- */
+  var TX = -4.6, TY = -2.2, HW = 1.5, TOP = 30;
+  var corners = [[TX-HW,TY-HW],[TX+HW,TY-HW],[TX+HW,TY+HW],[TX-HW,TY+HW]];
+  corners.forEach(function(c){ beam([c[0], c[1], 2], [c[0], c[1], TOP], 2.6, STEEL); });
+  for(var z = 2; z <= TOP; z += 4){
+    for(var e = 0; e < 4; e++){
+      var c0 = corners[e], c1 = corners[(e + 1) % 4];
+      beam([c0[0], c0[1], z], [c1[0], c1[1], z], 1.1, STEELLO);
+      if(z + 4 <= TOP) beam([c0[0], c0[1], z], [c1[0], c1[1], z + 4], 0.8, STEELLO);
+    }
+  }
+  /* umbilical arms reaching to the vehicle */
+  [10, 17.5, 24].forEach(function(az2){
+    beam([TX + HW, TY, az2], [VX - R - 0.4, VY, az2], 2.0, BRASS);
+  });
+  /* crane arm across the top */
+  beam([TX, TY, TOP], [VX + 1, VY, TOP - 1], 2.4, STEEL);
+  /* lightning mast */
+  beam([TX, TY, TOP], [TX, TY, 38], 1.6, STEEL);
+  dot([TX, TY, 38.2], 2.4, "#ff6a5e", true);
+})();
+
+var azSpin = 0.6, azDrag = 0, dragging = false, lastX = 0, lastFrame = 0;
+cvs.addEventListener("pointerdown", function(e){
+  dragging = true; lastX = e.clientX;
+  cvs.setPointerCapture(e.pointerId);
+});
+cvs.addEventListener("pointermove", function(e){
+  if(!dragging) return;
+  var dx = e.clientX - lastX; lastX = e.clientX;
+  azDrag += dx * 0.008;
+});
+function endDrag(){
+  if(dragging){ azSpin += azDrag; azDrag = 0; }
+  dragging = false;
+}
+cvs.addEventListener("pointerup", endDrag);
+cvs.addEventListener("pointercancel", endDrag);
+
+function project(p, az){
+  var ca = Math.cos(az), sa = Math.sin(az);
+  var xr = p[0] * ca - p[1] * sa;
+  var yr = p[0] * sa + p[1] * ca;
+  var ce = Math.cos(ELEV), se = Math.sin(ELEV);
+  return {
+    x: CCX + xr * SCALE,
+    y: CCY + (yr * ce - p[2] * se) * SCALE,
+    d: yr * se + p[2] * ce
+  };
+}
+function drawTower(now){
+  if(!dragging && lastFrame) azSpin += (now - lastFrame) * 0.000045;
+  lastFrame = now;
+  var az = azSpin + azDrag;
+  ctx.clearRect(0, 0, CW, CH);
+  var items = prims.map(function(pr){
+    var pts = pr.p.map(function(p){ return project(p, az); });
+    var d = 0; pts.forEach(function(q){ d += q.d; }); d /= pts.length;
+    return { pr: pr, pts: pts, d: d };
+  });
+  items.sort(function(a, b){ return a.d - b.d; });
+  items.forEach(function(it){
+    var pr = it.pr, pts = it.pts;
+    if(pr.t === "q"){
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for(var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+      ctx.fillStyle = pr.fill; ctx.fill();
+      if(pr.stroke){ ctx.strokeStyle = pr.stroke; ctx.lineWidth = 1; ctx.stroke(); }
+    } else if(pr.t === "l"){
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[1].x, pts[1].y);
+      ctx.strokeStyle = pr.color; ctx.lineWidth = pr.w; ctx.lineCap = "round"; ctx.stroke();
+    } else if(pr.t === "d"){
+      if(pr.blink && Math.floor(now / 900) % 2 === 0) return;
+      ctx.beginPath();
+      ctx.arc(pts[0].x, pts[0].y, pr.r, 0, Math.PI * 2);
+      ctx.fillStyle = pr.color; ctx.fill();
+    }
+  });
+  requestAnimationFrame(drawTower);
+}
+requestAnimationFrame(drawTower);
+
+/* ================= COMPASS + ANALOG CLOCK ================= */
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+}
+var cmp = $("compass"), CC = 60;
+el("circle", {cx:CC, cy:CC, r:57, fill:"#000", stroke:"#c9a227", "stroke-width":2}, cmp);
+var ring = el("g", {}, cmp);
+for(var t = 0; t < 24; t++){
+  var ang = t * 15, big = ang % 90 === 0;
+  var p0 = polar(CC, CC, big ? 48 : 51.5, ang), p1 = polar(CC, CC, 55, ang);
+  el("line", {x1:p0[0], y1:p0[1], x2:p1[0], y2:p1[1],
+    stroke: big ? "#e8c85a" : "#5d7180", "stroke-width": big ? 2 : 1}, ring);
+}
+[["N",0],["E",90],["S",180],["W",270]].forEach(function(cd){
+  var pp = polar(CC, CC, 41, cd[1]);
+  var tx = el("text", {x:pp[0], y:pp[1] + 3.4, "text-anchor":"middle",
+    fill: cd[0] === "N" ? "#ff6a5e" : "#f5ead2", "font-size":10, "font-weight":700,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, ring);
+  tx.textContent = cd[0];
+});
+/* needle: fixed to the screen (heading-up); the ring turns under it */
+var ndl = el("g", {}, cmp);
+el("polygon", {points: CC+",14 "+(CC+4.4)+","+CC+" "+(CC-4.4)+","+CC, fill:"#ff6a5e"}, ndl);
+el("polygon", {points: CC+",106 "+(CC+4.4)+","+CC+" "+(CC-4.4)+","+CC, fill:"#5d7180"}, ndl);
+/* analog hands at the center */
+el("circle", {cx:CC, cy:CC, r:16.5, fill:"#0b0d12", stroke:"#9fb4c0", "stroke-width":1.2}, cmp);
+var hH = el("line", {stroke:"#f5ead2", "stroke-width":2.6, "stroke-linecap":"round"}, cmp);
+var hM = el("line", {stroke:"#f5ead2", "stroke-width":1.7, "stroke-linecap":"round"}, cmp);
+var hS = el("line", {stroke:"#57e6ff", "stroke-width":0.9, "stroke-linecap":"round"}, cmp);
+el("circle", {cx:CC, cy:CC, r:1.8, fill:"#c9a227"}, cmp);
+var heading = null;
+if(window.DeviceOrientationEvent){
+  window.addEventListener("deviceorientation", function(e){
+    if(e.alpha === null || e.alpha === undefined) return;
+    heading = (360 - e.alpha) % 360;
+    ring.setAttribute("transform", "rotate(" + (-heading).toFixed(1) + " " + CC + " " + CC + ")");
+    $("hdgLbl").textContent = "HDG " + ("00" + Math.round(heading)).slice(-3) + "°";
+  });
+}
+function paintHands(now){
+  var s = now.getSeconds() + now.getMilliseconds() / 1000;
+  var m = now.getMinutes() + s / 60;
+  var h = (now.getHours() % 12) + m / 60;
+  function hand(ln, deg, r){
+    var pp = polar(CC, CC, r, deg);
+    ln.setAttribute("x1", CC); ln.setAttribute("y1", CC);
+    ln.setAttribute("x2", pp[0].toFixed(1)); ln.setAttribute("y2", pp[1].toFixed(1));
+  }
+  hand(hH, h * 30, 8.5); hand(hM, m * 6, 12.5); hand(hS, s * 6, 14);
+}
+
+/* ================= DIGITAL CLOCK ================= */
+var clockEl = $("clock"), dateEl = $("dateLine"), lastSec = -1;
+function paintTime(now){
+  if(now.getSeconds() === lastSec) return;
+  lastSec = now.getSeconds();
+  var p = function(n){ return (n < 10 ? "0" : "") + n; };
+  clockEl.textContent = p(now.getHours()) + ":" + p(now.getMinutes());
+  dateEl.textContent = DAYS[now.getDay()] + " · " + MONS[now.getMonth()] + " " +
+    now.getDate() + " · LOCAL";
+  paintHands(now);
+}
+paintTime(new Date());
+setInterval(function(){ paintTime(new Date()); }, 250);
+
+window.__governor = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__faceRest = false;
+</script>
+</body>
+</html>

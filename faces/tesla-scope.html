@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>APEX — Signal Watch · TESLA SCOPE</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#010502; }
+  body { font-family:ui-monospace,Menlo,Consolas,monospace; overflow:hidden; }
+  #stage { position:absolute; left:0; top:0; overflow:hidden; background:radial-gradient(circle at center, #03140a 0%, #020403 70%, #010502 100%); }
+  .vignette { position:absolute; left:0; top:0; background:radial-gradient(ellipse at center, rgba(0,0,0,.05) 45%, rgba(0,0,0,.75) 100%); pointer-events:none; }
+  #brand { position:absolute; text-align:center; color:#39ff6a; font-weight:700; letter-spacing:.35em; text-shadow:0 0 12px rgba(57,255,106,.55); }
+  #batt { position:absolute; text-align:right; color:#b6ffd0; font-weight:700; font-variant-numeric:tabular-nums; text-shadow:0 0 8px rgba(57,255,106,.5); }
+  #clock { position:absolute; text-align:center; color:#eaffef; font-weight:800; line-height:1; text-shadow:0 0 10px rgba(57,255,106,.9), 0 0 42px rgba(57,255,106,.45); font-variant-numeric:tabular-nums; }
+  #date { position:absolute; text-align:center; color:#8fd9a4; font-variant-numeric:tabular-nums; }
+  #vstate { position:absolute; text-align:center; color:#8fd9a4; font-variant-numeric:tabular-nums; text-shadow:0 0 6px rgba(57,255,106,.3); }
+  #gauge { position:absolute; display:block; }
+  #center { position:absolute; text-align:center; pointer-events:none; }
+  #center .big { color:#eaffef; font-weight:800; line-height:1.05; text-shadow:0 0 10px rgba(57,255,106,.8); font-variant-numeric:tabular-nums; }
+  #center .sub { color:#b6ffd0; font-weight:700; letter-spacing:.14em; margin-top:.35em; line-height:1.3; }
+  #center .sub2 { color:#8fd9a4; margin-top:.3em; font-variant-numeric:tabular-nums; line-height:1.3; }
+  #center .amber { color:#ffc95c; }
+  .col { position:absolute; color:#8fd9a4; font-variant-numeric:tabular-nums; text-shadow:0 0 6px rgba(57,255,106,.35); white-space:nowrap; }
+  .col .bl { color:#3f6b4d; letter-spacing:.10em; }
+  .col .bv { color:#b6ffd0; font-weight:700; }
+  .col .bnone { color:#ffc95c; font-weight:400; }
+  .col .bhead { color:#39ff6a; font-weight:700; letter-spacing:.22em; }
+  #analog, #compass { position:absolute; display:block; }
+  .diallab { position:absolute; text-align:center; color:#3f6b4d; letter-spacing:.14em; white-space:nowrap; }
+  #mode { position:absolute; text-align:center; color:#ffc95c; font-weight:700; letter-spacing:.18em; text-shadow:0 0 8px rgba(255,201,92,.35); white-space:nowrap; }
+  #pairbtn { position:absolute; text-align:center; color:#39ff6a; font-weight:700; letter-spacing:.22em;
+    border:1px solid rgba(57,255,106,.55); border-radius:6px; background:rgba(2,20,10,.72);
+    text-shadow:0 0 8px rgba(57,255,106,.5); cursor:pointer; user-select:none; -webkit-user-select:none; }
+  #pairbtn.on { color:#0b2e16; background:#39ff6a; text-shadow:none; box-shadow:0 0 18px rgba(57,255,106,.55); }
+  /* PAIRING panel — DOM text over the glass, face palette (the census
+     panel's shape). Carries the documented Fleet API OAuth flow as
+     inert text + an authorize-URL template with placeholders. */
+  #pair { position:absolute; display:none; overflow-y:auto; overflow-x:hidden; z-index:5;
+    background:#021009; border:1px solid rgba(57,255,106,.45); border-radius:8px;
+    padding:8px 10px; color:#b6ffd0; -webkit-overflow-scrolling:touch; line-height:1.5; }
+  #pair .p-h { color:#39ff6a; font-weight:700; letter-spacing:.22em; text-align:center; }
+  #pair .p-sub { color:#8fd9a4; text-align:center; margin-top:2px; }
+  #pair .p-sec { color:#39ff6a; font-weight:700; letter-spacing:.12em; margin-top:9px; border-top:1px solid rgba(57,255,106,.25); padding-top:5px; }
+  #pair .p-row { margin-top:3px; }
+  #pair .p-dim { color:#3f6b4d; }
+  #pair .p-amber { color:#ffc95c; font-weight:700; }
+  #pair .p-url { color:#eaffef; word-break:break-all; margin-top:3px; }
+  #pair .p-note { color:#8fd9a4; margin-top:6px; }
+  .strip { position:absolute; left:0; text-align:center; color:#3f6b4d; width:100%; padding:0 12px; box-sizing:border-box; }
+</style></head>
+<body>
+<div id="stage">
+  <canvas id="gauge"></canvas>
+  <div class="vignette"></div>
+  <div id="brand">TESLA SCOPE</div>
+  <div id="batt"></div>
+  <div id="clock">--:--</div>
+  <div id="date">—</div>
+  <div id="vstate">NO VEHICLE</div>
+  <canvas id="analog"></canvas>
+  <canvas id="compass"></canvas>
+  <div class="diallab" id="analoglab">LOCAL</div>
+  <div class="diallab" id="compasslab">HDG NO MEASURE</div>
+  <div id="center"><div class="big">NO CAR</div><div class="sub">PAIRED</div><div class="sub2">—</div></div>
+  <div class="col" id="colL"></div>
+  <div class="col" id="colR"></div>
+  <div id="mode">TESLA SCOPE · NO CAR PAIRED</div>
+  <div id="pairbtn">PAIR TESLA</div>
+  <div id="pair"></div>
+  <div class="strip">APEX TESLA SCOPE · READS ONLY WHAT TESLA'S FLEET API REPORTS · UNPAIRED SHOWS NO CAR DATA</div>
+  <div class="strip" id="strip2">PAIRING RUNS ON TESLA'S OWN AUTHORIZE PAGE (OAUTH) · THIS FACE NEVER SEES A TESLA PASSWORD · NO COMMANDS — READ ONLY</div>
+</div>
+<script>
+// ================================================================
+// TESLA SCOPE — a Tesla companion panel in the Scope pipe.
+// Owner's design, Nov 20, 2026: "a fucking Tesla app that talks to
+// the car — lets us know what the battery is doing and whatever
+// little updates it can catch — that's going to go in a scope
+// pipe too. Tesla compliant device outlines."
+//
+// TESLA COMPLIANCE (built strictly to Tesla's published rules —
+// developer.tesla.com/docs/fleet-api, read Nov 20, 2026):
+//   * Access is the official TESLA FLEET API only. No scraping, no
+//     unofficial endpoints, no credential tricks.
+//   * Auth is Tesla's OAuth authorization_code flow for third
+//     parties: the owner authorizes on Tesla's own page
+//     (https://auth.tesla.com/oauth2/v3/authorize), the code is
+//     exchanged server-side at
+//     https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/token
+//     with audience = the regional Fleet API base URL
+//     (NA: https://fleet-api.prd.na.vn.cloud.tesla.com).
+//     Scopes requested: openid offline_access vehicle_device_data.
+//     vehicle_location is deliberately NOT requested — this face
+//     shows no position.
+//   * Before any of that, the house app must be registered at
+//     developer.tesla.com and the partner account registered via
+//     POST /api/1/partner_accounts (partner token), with the app's
+//     EC public key (secp256r1) hosted at
+//     https://<domain>/.well-known/appspecific/com.tesla.3p.public-key.pem
+//   * NO TOKEN EVER LIVES IN THIS FACE. The face is a display in
+//     the Scope pipe: an authorized house pipe (built later, after
+//     the owner registers the app and authorizes a real car — both
+//     flesh acts) fetches from the Fleet API and hands this face
+//     the response JSON through TeslaScopeIngest() below.
+//
+// PAIRING STATE TONIGHT: no app is registered, no car is paired.
+// The face therefore stands at its true state — TESLA SCOPE ·
+// NO CAR PAIRED — every car readout reads NO MEASURE, the battery
+// gauge is parked empty, and the PAIR panel carries the
+// documented flow as inert text with placeholder client_id /
+// redirect_uri. Nothing here is a demo number dressed as live.
+//
+// THE WIRE (what the authorized pipe hands in):
+//   TeslaScopeIngest.vehicleList(resp) — the JSON of
+//     GET /api/1/vehicles  ({response:[{vin, display_name, state}]})
+//   TeslaScopeIngest.vehicleData(resp) — the JSON of
+//     GET /api/1/vehicles/{vin}/vehicle_data  (or vehicle_data_cached)
+//     ({response:{charge_state:{...}, climate_state:{...},
+//                 vehicle_state:{...}, ...}})
+// Every readout below names the response field it binds. A field
+// the response does not carry reads NO MEASURE. Block timestamps
+// older than STALE_MS fly the STALE flag on the mode line — the
+// values stay (they are the car's last report, labeled as such).
+//
+// HOUSE DISCIPLINE inherited from Signal Scope:
+//   * MOTION IS A CLAIM: nothing animates without a source. The
+//     gauge arc moves only when a charge level has been ingested;
+//     unpaired, it holds still, parked.
+//   * TABLE SERVICE: one 1 s service timer updates clock, dials
+//     and staleness; all drawing stops while the page is hidden.
+//   * The bottom stack (strips, button, mode row) is MEASURED
+//     bottom-up from laid-out DOM heights, like V6/V7 — wrapped
+//     words can never stack onto the button or the dial.
+//   * Compass: the dial furniture always draws; the needle binds
+//     ONLY to a real heading source (deviceorientation). No
+//     source answers -> HDG NO MEASURE, needle parked. No azimuth
+//     is ever invented.
+// ================================================================
+(function () {
+  var stage = document.getElementById('stage');
+  var gv = document.getElementById('gauge'); var gtx = gv.getContext('2d');
+  var av = document.getElementById('analog'); var atx = av.getContext('2d');
+  var cv = document.getElementById('compass'); var ctx = cv.getContext('2d');
+  var GREEN = '#39ff6a', BRIGHT = '#b6ffd0', DIM = '#3f6b4d', AMBER = '#ffc95c', RED = '#ff7a5c';
+  var STALE_MS = 10 * 60 * 1000; // a block older than this flies STALE
+  var W = 0, H = 0, CX = 0, CY = 0, R = 0, built = false;
+  var headingDeg = null; // real heading source only (deviceorientation)
+
+  // ---- ingested state: null until an authorized pipe answers ----
+  var CAR = { paired: false, name: '', vin: '', vstate: '', charge: null, climate: null, vstateBlk: null, dataAt: 0 };
+
+  function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+  function num(v) { return (typeof v === 'number' && isFinite(v)) ? v : null; }
+  function str(v) { return (typeof v === 'string' && v) ? v : null; }
+
+  function measure() {
+    var vv = window.visualViewport;
+    W = Math.floor(vv ? vv.width : window.innerWidth);
+    H = Math.floor(vv ? vv.height : window.innerHeight);
+    if (!W || !H) { W = document.documentElement.clientWidth || 300; H = document.documentElement.clientHeight || 400; }
+  }
+
+  function layout() {
+    if (!document.getElementById('stage')) return; // document replaced under us — stand down
+    measure();
+    stage.style.width = W + 'px'; stage.style.height = H + 'px';
+    var vg = document.querySelector('.vignette'); vg.style.width = W + 'px'; vg.style.height = H + 'px';
+    var M = Math.min(W, H);
+    // ---- THE BOTTOM STACK, MEASURED (V6/V7 discipline) ----
+    var stripFont = Math.max(9, Math.min(13, Math.floor(H * 0.020)));
+    var strip1 = document.querySelector('.strip');
+    var strip2 = document.getElementById('strip2');
+    strip1.style.fontSize = stripFont + 'px'; strip1.style.lineHeight = '1.35';
+    strip2.style.fontSize = stripFont + 'px'; strip2.style.lineHeight = '1.35';
+    var gap = Math.max(4, Math.floor(H * 0.008));
+    var botM = Math.floor(H * 0.012);
+    var s1h = strip1.offsetHeight, s2h = strip2.offsetHeight;
+    strip1.style.bottom = botM + 'px';
+    strip2.style.bottom = (botM + s1h + gap) + 'px';
+    var btn = document.getElementById('pairbtn');
+    var btnW = Math.floor(M * 0.46), btnH = Math.max(30, Math.floor(M * 0.058));
+    var stackTop = H - (botM + s1h + gap + s2h + gap + btnH);
+    btn.style.width = btnW + 'px'; btn.style.height = btnH + 'px';
+    btn.style.lineHeight = btnH + 'px';
+    btn.style.left = Math.floor(W / 2 - btnW / 2) + 'px';
+    btn.style.top = stackTop + 'px';
+    btn.style.fontSize = Math.max(10, Math.floor(M * 0.030)) + 'px';
+    var mode = document.getElementById('mode');
+    var modeFont = Math.max(10, Math.floor(M * 0.030));
+    var modeH = Math.ceil(modeFont * 1.3);
+    var modeTop = stackTop - gap - modeH;
+    mode.style.left = '0px'; mode.style.width = W + 'px';
+    mode.style.top = modeTop + 'px'; mode.style.height = modeH + 'px';
+    mode.style.fontSize = modeFont + 'px'; mode.style.lineHeight = '1.3';
+    // ---- the stage above the stack ----
+    var availH = modeTop - Math.floor(H * 0.012);
+    var D = Math.floor(Math.min(W * 0.94, availH * 0.98));
+    R = Math.floor(D / 2);
+    CX = Math.floor(W / 2); CY = Math.floor(availH / 2) + Math.floor(H * 0.006);
+    gv.width = D; gv.height = D;
+    gv.style.width = D + 'px'; gv.style.height = D + 'px';
+    gv.style.left = (CX - R) + 'px'; gv.style.top = (CY - R) + 'px';
+    var brand = document.getElementById('brand');
+    brand.style.left = '0px'; brand.style.width = W + 'px';
+    brand.style.top = Math.floor(CY - R + D * 0.055) + 'px';
+    brand.style.fontSize = Math.max(11, Math.floor(D * 0.038)) + 'px';
+    brand.style.lineHeight = '1';
+    var batt = document.getElementById('batt');
+    batt.style.width = Math.floor(D * 0.30) + 'px';
+    batt.style.left = Math.floor(CX + R - D * 0.34) + 'px';
+    batt.style.top = Math.floor(CY - R + D * 0.095) + 'px';
+    batt.style.fontSize = Math.max(11, Math.floor(D * 0.042)) + 'px';
+    var clock = document.getElementById('clock');
+    clock.style.left = '0px'; clock.style.width = W + 'px';
+    clock.style.top = Math.floor(CY - D * 0.35) + 'px';
+    clock.style.fontSize = Math.floor(D * 0.135) + 'px';
+    var date = document.getElementById('date');
+    date.style.left = '0px'; date.style.width = W + 'px';
+    date.style.top = Math.floor(CY - D * 0.205) + 'px';
+    date.style.fontSize = Math.max(11, Math.floor(D * 0.040)) + 'px';
+    var vs = document.getElementById('vstate');
+    vs.style.left = '0px'; vs.style.width = W + 'px';
+    vs.style.top = Math.floor(CY - D * 0.155) + 'px';
+    vs.style.fontSize = Math.max(10, Math.floor(D * 0.034)) + 'px';
+    // center readout: the gauge's lower-center DEAD ZONE — the one
+    // sector the needle never sweeps (0% and 100% end at the lower
+    // corners). It starts below the readout columns' span, so the
+    // big charge text never shares a band with a column row.
+    var cen = document.getElementById('center');
+    cen.style.left = Math.floor(CX - D * 0.23) + 'px'; cen.style.width = Math.floor(D * 0.46) + 'px';
+    cen.style.top = Math.floor(CY + D * 0.215) + 'px';
+    cen.querySelector('.big').style.fontSize = Math.floor(D * 0.115) + 'px';
+    cen.querySelector('.sub').style.fontSize = Math.max(10, Math.floor(D * 0.034)) + 'px';
+    cen.querySelector('.sub2').style.fontSize = Math.max(10, Math.floor(D * 0.032)) + 'px';
+    // readout columns: anchored to the GAUGE's edges (not the
+    // stage's — at height-bound sizes the gauge is narrower than
+    // the stage), starting just under the clock block and ending
+    // above the center readout's band. nowrap + the font floor are
+    // sized so the longest row fits the column at every size.
+    var colTop = Math.floor(CY - D * 0.120);
+    var colL = document.getElementById('colL');
+    colL.style.left = Math.floor(CX - R + D * 0.035) + 'px'; colL.style.top = colTop + 'px';
+    colL.style.width = Math.floor(D * 0.40) + 'px';
+    colL.style.fontSize = Math.max(9, Math.floor(D * 0.024)) + 'px'; colL.style.lineHeight = '1.15';
+    var colR = document.getElementById('colR');
+    colR.style.left = Math.floor(CX + R - D * 0.435) + 'px'; colR.style.top = colTop + 'px';
+    colR.style.width = Math.floor(D * 0.40) + 'px'; colR.style.textAlign = 'left';
+    colR.style.fontSize = Math.max(9, Math.floor(D * 0.024)) + 'px'; colR.style.lineHeight = '1.15';
+    // the two small dials: analog LOCAL (left) + compass HDG (right),
+    // seated in the gauge's lower crescent corners, flanking the
+    // center readout (their inner edges clear its box)
+    var ds = Math.floor(D * 0.15);
+    var dialY = Math.floor(CY + D * 0.30);
+    av.width = ds; av.height = ds; av.style.width = ds + 'px'; av.style.height = ds + 'px';
+    av.style.left = Math.floor(CX - D * 0.315 - ds / 2) + 'px'; av.style.top = dialY + 'px';
+    cv.width = ds; cv.height = ds; cv.style.width = ds + 'px'; cv.style.height = ds + 'px';
+    cv.style.left = Math.floor(CX + D * 0.315 - ds / 2) + 'px'; cv.style.top = dialY + 'px';
+    var labF = Math.max(8, Math.floor(D * 0.022)) + 'px';
+    var al = document.getElementById('analoglab');
+    al.style.left = Math.floor(CX - D * 0.315 - D * 0.12) + 'px'; al.style.width = Math.floor(D * 0.24) + 'px';
+    al.style.top = (dialY + ds + 2) + 'px'; al.style.fontSize = labF;
+    var cl = document.getElementById('compasslab');
+    cl.style.left = Math.floor(CX + D * 0.315 - D * 0.12) + 'px'; cl.style.width = Math.floor(D * 0.24) + 'px';
+    cl.style.top = (dialY + ds + 2) + 'px'; cl.style.fontSize = labF;
+    // PAIR panel: the central glass, under the brand, above the stack
+    var pp = document.getElementById('pair');
+    pp.style.left = Math.floor(W * 0.035) + 'px';
+    pp.style.width = Math.floor(W * 0.93) + 'px';
+    pp.style.top = Math.floor(H * 0.045) + 'px';
+    pp.style.height = Math.max(80, Math.floor(stackTop - gap - H * 0.045)) + 'px';
+    pp.style.fontSize = Math.max(10, Math.floor(M * 0.030)) + 'px';
+    built = true;
+    renderAll();
+  }
+
+  // ================================================================
+  // THE BATTERY GAUGE — the Scope dial, repurposed: bezel, degree
+  // ticks, and a 270-degree charge arc (0% at lower-left, 100% at
+  // lower-right). The arc is a CLAIM: it fills only from an
+  // ingested charge_state.battery_level. Unpaired, the track draws
+  // dashed and empty and the needle parks at zero — the gauge
+  // holds still at its honest state.
+  // ================================================================
+  var A0 = Math.PI * 0.75, A1 = Math.PI * 2.25; // 270 deg of sweep
+  function drawGauge() {
+    if (!built) return;
+    var d = R * 2, c = R;
+    gtx.clearRect(0, 0, d, d);
+    gtx.beginPath(); gtx.arc(c, c, R - 1, 0, Math.PI * 2);
+    gtx.fillStyle = 'rgba(2,20,10,.82)'; gtx.fill();
+    // range rings, Scope furniture
+    gtx.lineWidth = Math.max(1, Math.floor(R * 0.006));
+    for (var i = 1; i <= 5; i++) {
+      gtx.beginPath(); gtx.arc(c, c, (R - 4) * i / 5, 0, Math.PI * 2);
+      gtx.strokeStyle = i === 5 ? GREEN : 'rgba(57,255,106,.28)'; gtx.stroke();
+    }
+    // rim ticks: long each 10% of charge, short each 2%
+    for (var m = 0; m <= 50; m++) {
+      var t = A0 + (A1 - A0) * m / 50, lng = (m % 5 === 0);
+      gtx.beginPath();
+      gtx.moveTo(c + Math.cos(t) * (R - 4), c + Math.sin(t) * (R - 4));
+      gtx.lineTo(c + Math.cos(t) * (R - 4 - (lng ? R * 0.05 : R * 0.024)), c + Math.sin(t) * (R - 4 - (lng ? R * 0.05 : R * 0.024)));
+      gtx.strokeStyle = lng ? GREEN : 'rgba(57,255,106,.28)'; gtx.lineWidth = Math.max(1, Math.floor(R * 0.006)); gtx.stroke();
+    }
+    // percent labels: the arc's two ends only (0 / 100), seated in
+    // the clear lower corners — mid-arc labels would sit under the
+    // readout columns' glyphs (canvas ink counts, V7 lesson)
+    gtx.fillStyle = DIM;
+    gtx.font = '700 ' + Math.max(9, Math.floor(R * 0.07)) + 'px ui-monospace,Menlo,Consolas,monospace';
+    gtx.textAlign = 'center'; gtx.textBaseline = 'middle';
+    var pl = [[0, '0'], [4, '100']];
+    for (var k = 0; k < pl.length; k++) {
+      var ta = A0 + (A1 - A0) * pl[k][0] / 4;
+      gtx.fillText(pl[k][1], c + Math.cos(ta) * R * 0.72, c + Math.sin(ta) * R * 0.72);
+    }
+    // the charge track + fill
+    var lvl = (CAR.charge && num(CAR.charge.battery_level) !== null) ? num(CAR.charge.battery_level) : null;
+    gtx.beginPath(); gtx.arc(c, c, R * 0.90, A0, A1);
+    gtx.strokeStyle = 'rgba(57,255,106,.22)'; gtx.lineWidth = Math.max(2, Math.floor(R * 0.030));
+    gtx.setLineDash(lvl === null ? [4, 6] : []); gtx.stroke(); gtx.setLineDash([]);
+    if (lvl !== null) {
+      var frac = clamp(lvl, 0, 100) / 100;
+      gtx.beginPath(); gtx.arc(c, c, R * 0.90, A0, A0 + (A1 - A0) * frac);
+      gtx.strokeStyle = lvl <= 20 ? RED : GREEN;
+      gtx.lineWidth = Math.max(2, Math.floor(R * 0.030));
+      gtx.shadowColor = 'rgba(57,255,106,.6)'; gtx.shadowBlur = R * 0.03; gtx.stroke(); gtx.shadowBlur = 0;
+      // the limit marker: charge_limit_soc drawn as a tick across the track
+      var lim = num(CAR.charge.charge_limit_soc);
+      if (lim !== null) {
+        var la = A0 + (A1 - A0) * clamp(lim, 0, 100) / 100;
+        gtx.beginPath();
+        gtx.moveTo(c + Math.cos(la) * R * 0.845, c + Math.sin(la) * R * 0.845);
+        gtx.lineTo(c + Math.cos(la) * R * 0.955, c + Math.sin(la) * R * 0.955);
+        gtx.strokeStyle = AMBER; gtx.lineWidth = Math.max(2, Math.floor(R * 0.012)); gtx.stroke();
+      }
+      // needle at the level
+      var na = A0 + (A1 - A0) * frac;
+      gtx.beginPath(); gtx.moveTo(c, c);
+      gtx.lineTo(c + Math.cos(na) * R * 0.66, c + Math.sin(na) * R * 0.66);
+      gtx.strokeStyle = BRIGHT; gtx.lineWidth = Math.max(2, Math.floor(R * 0.012)); gtx.stroke();
+    }
+    // outer bezel
+    gtx.beginPath(); gtx.arc(c, c, R - 2, 0, Math.PI * 2);
+    gtx.strokeStyle = GREEN; gtx.lineWidth = Math.max(2, Math.floor(R * 0.014)); gtx.stroke();
+    // hub
+    gtx.beginPath(); gtx.arc(c, c, Math.max(3, R * 0.022), 0, Math.PI * 2);
+    gtx.fillStyle = BRIGHT; gtx.fill();
+  }
+
+  // ================================================================
+  // THE TWO SMALL DIALS — analog LOCAL time + the compass.
+  // The compass needle binds ONLY to deviceorientation headings.
+  // ================================================================
+  function drawAnalog(now) {
+    var s = av.width; if (!s) return;
+    var c = s / 2, r = c - 2;
+    atx.clearRect(0, 0, s, s);
+    atx.beginPath(); atx.arc(c, c, r, 0, Math.PI * 2);
+    atx.fillStyle = 'rgba(2,20,10,.85)'; atx.fill();
+    atx.strokeStyle = GREEN; atx.lineWidth = Math.max(1, s * 0.012); atx.stroke();
+    for (var m = 0; m < 12; m++) {
+      var t = m * Math.PI / 6;
+      atx.beginPath();
+      atx.moveTo(c + Math.cos(t) * r * 0.88, c + Math.sin(t) * r * 0.88);
+      atx.lineTo(c + Math.cos(t) * r * 0.97, c + Math.sin(t) * r * 0.97);
+      atx.strokeStyle = 'rgba(57,255,106,.6)'; atx.lineWidth = Math.max(1, s * 0.008); atx.stroke();
+    }
+    var dt = new Date(now);
+    var hh = dt.getHours() % 12 + dt.getMinutes() / 60, mm = dt.getMinutes() + dt.getSeconds() / 60, ss = dt.getSeconds();
+    function hand(ang, len, wdt, col) {
+      atx.beginPath(); atx.moveTo(c, c);
+      atx.lineTo(c + Math.cos(ang - Math.PI / 2) * len, c + Math.sin(ang - Math.PI / 2) * len);
+      atx.strokeStyle = col; atx.lineWidth = wdt; atx.stroke();
+    }
+    hand(hh / 12 * Math.PI * 2, r * 0.52, Math.max(2, s * 0.03), BRIGHT);
+    hand(mm / 60 * Math.PI * 2, r * 0.76, Math.max(1.5, s * 0.02), GREEN);
+    hand(ss / 60 * Math.PI * 2, r * 0.84, Math.max(1, s * 0.008), AMBER);
+    atx.beginPath(); atx.arc(c, c, Math.max(2, s * 0.035), 0, Math.PI * 2); atx.fillStyle = BRIGHT; atx.fill();
+  }
+  function drawCompass() {
+    var s = cv.width; if (!s) return;
+    var c = s / 2, r = c - 2;
+    ctx.clearRect(0, 0, s, s);
+    ctx.beginPath(); ctx.arc(c, c, r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(2,20,10,.85)'; ctx.fill();
+    ctx.strokeStyle = GREEN; ctx.lineWidth = Math.max(1, s * 0.012); ctx.stroke();
+    var rot = (headingDeg === null) ? 0 : -headingDeg * Math.PI / 180;
+    var cards = ['N', 'E', 'S', 'W'];
+    ctx.font = '700 ' + Math.max(8, Math.floor(s * 0.16)) + 'px ui-monospace,Menlo,Consolas,monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (var k = 0; k < 4; k++) {
+      var t = k * Math.PI / 2 + rot;
+      ctx.fillStyle = k === 0 ? AMBER : 'rgba(182,255,208,.8)';
+      ctx.fillText(cards[k], c + Math.sin(t) * r * 0.70, c - Math.cos(t) * r * 0.70);
+    }
+    for (var m = 0; m < 12; m++) {
+      var tt = m * Math.PI / 6 + rot;
+      ctx.beginPath();
+      ctx.moveTo(c + Math.sin(tt) * r * 0.90, c - Math.cos(tt) * r * 0.90);
+      ctx.lineTo(c + Math.sin(tt) * r * 0.97, c - Math.cos(tt) * r * 0.97);
+      ctx.strokeStyle = 'rgba(57,255,106,.5)'; ctx.lineWidth = Math.max(1, s * 0.008); ctx.stroke();
+    }
+    // needle: fixed to the glass (the card rotates under it, marine
+    // style). Parked + dim with no heading source — never invented.
+    ctx.beginPath();
+    ctx.moveTo(c, c - r * 0.52); ctx.lineTo(c + r * 0.10, c); ctx.lineTo(c - r * 0.10, c); ctx.closePath();
+    ctx.fillStyle = headingDeg === null ? 'rgba(255,201,92,.45)' : AMBER; ctx.fill();
+    ctx.beginPath(); ctx.arc(c, c, Math.max(2, s * 0.035), 0, Math.PI * 2); ctx.fillStyle = BRIGHT; ctx.fill();
+    document.getElementById('compasslab').textContent =
+      headingDeg === null ? 'HDG NO MEASURE' : 'HDG ' + ('00' + Math.round(headingDeg)).slice(-3) + '°';
+  }
+
+  // ================================================================
+  // READOUTS — every row binds a named Fleet API response field.
+  // A field the ingested response does not carry reads NO MEASURE.
+  // ================================================================
+  function row(label, value, none) {
+    return '<div><span class="bl">' + label + '</span> ' +
+      (none ? '<span class="bnone">NO MEASURE</span>' : '<span class="bv">' + value + '</span>') + '</div>';
+  }
+  function fmtMi(v) { var n = num(v); return n === null ? null : (Math.round(n * 10) / 10) + ' MI'; }
+  function fmtPct(v) { var n = num(v); return n === null ? null : Math.round(n) + '%'; }
+  function fmtToFull(cs) {
+    var mins = num(cs.minutes_to_full_charge);
+    if (mins !== null) { if (mins <= 0) return 'FULL'; var h = Math.floor(mins / 60), m2 = Math.round(mins % 60); return h > 0 ? (h + 'H ' + ('0' + m2).slice(-2) + 'M') : (m2 + ' MIN'); }
+    var hrs = num(cs.time_to_full_charge);
+    if (hrs !== null) { if (hrs <= 0) return 'FULL'; var th = Math.floor(hrs), tm = Math.round((hrs - th) * 60); return th > 0 ? (th + 'H ' + ('0' + tm).slice(-2) + 'M') : (tm + ' MIN'); }
+    return null;
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function renderCols() {
+    var cs = CAR.charge, cl = CAR.climate, vs = CAR.vstateBlk;
+    var L = '<div class="bhead">BATTERY</div>';
+    if (!cs) {
+      L += row('LEVEL', null, true) + row('USABLE', null, true) + row('STATE', null, true) +
+           row('RANGE EST', null, true) + row('LIMIT', null, true) + row('TO FULL', null, true) +
+           row('RATE', null, true) + row('POWER', null, true);
+    } else {
+      var st = str(cs.charging_state);
+      L += row('LEVEL', fmtPct(cs.battery_level), num(cs.battery_level) === null);
+      L += row('USABLE', fmtPct(cs.usable_battery_level), num(cs.usable_battery_level) === null);
+      L += row('STATE', st ? esc(st.toUpperCase()) : null, !st);
+      L += row('RANGE EST', fmtMi(cs.est_battery_range), num(cs.est_battery_range) === null);
+      L += row('LIMIT', fmtPct(cs.charge_limit_soc), num(cs.charge_limit_soc) === null);
+      var tf = fmtToFull(cs);
+      L += row('TO FULL', tf, tf === null);
+      var rt = num(cs.charge_rate);
+      L += row('RATE', rt === null ? null : (Math.round(rt * 10) / 10) + ' MPH', rt === null);
+      var pw = num(cs.charger_power);
+      L += row('POWER', pw === null ? null : pw + ' KW', pw === null);
+    }
+    document.getElementById('colL').innerHTML = L;
+    var Rr = '<div class="bhead">CAR</div>';
+    if (!vs && !cl) {
+      Rr += row('NAME', null, true) + row('LOCK', null, true) + row('ODO', null, true) +
+            row('SW', null, true) + row('UPDATE', null, true) + row('CLIMATE', null, true) +
+            row('CABIN', null, true) + row('OUTSIDE', null, true);
+    } else {
+      var nm = vs ? (str(vs.vehicle_name) || (CAR.name ? CAR.name : null)) : (CAR.name || null);
+      Rr += row('NAME', nm ? esc(nm.toUpperCase().slice(0, 14)) : null, !nm);
+      var lk = vs ? vs.locked : null;
+      Rr += row('LOCK', (lk === true || lk === false) ? (lk ? 'LOCKED' : 'UNLOCKED') : null, !(lk === true || lk === false));
+      var od = vs ? num(vs.odometer) : null;
+      Rr += row('ODO', od === null ? null : Math.floor(od).toLocaleString('en-US') + ' MI', od === null);
+      var sw = vs ? str(vs.car_version) : null;
+      Rr += row('SW', sw ? esc(sw.split(' ')[0]) : null, !sw);
+      var su = vs ? vs.software_update : null;
+      var sust = (su && typeof su === 'object') ? str(su.status) : null;
+      Rr += row('UPDATE', sust ? esc(sust.replace(/_/g, ' ').toUpperCase()) : (sw ? 'CURRENT' : null), !(sust || sw));
+      var con = cl ? cl.is_climate_on : null;
+      Rr += row('CLIMATE', (con === true || con === false) ? (con ? 'ON' : 'OFF') : null, !(con === true || con === false));
+      var it = cl ? num(cl.inside_temp) : null;
+      Rr += row('CABIN', it === null ? null : (Math.round(it * 10) / 10) + '°C', it === null);
+      var ot = cl ? num(cl.outside_temp) : null;
+      Rr += row('OUTSIDE', ot === null ? null : (Math.round(ot * 10) / 10) + '°C', ot === null);
+    }
+    document.getElementById('colR').innerHTML = Rr;
+  }
+  function renderCenter() {
+    var cen = document.getElementById('center');
+    var big = cen.querySelector('.big'), sub = cen.querySelector('.sub'), sub2 = cen.querySelector('.sub2');
+    var lvl = CAR.charge ? num(CAR.charge.battery_level) : null;
+    if (!CAR.paired) {
+      big.textContent = 'NO CAR'; big.className = 'big';
+      sub.innerHTML = '<span class="amber">PAIRED</span>'; sub.className = 'sub';
+      sub2.textContent = 'STANDING BY';
+    } else if (lvl !== null) {
+      big.textContent = Math.round(lvl) + '%'; big.className = 'big';
+      var st = str(CAR.charge.charging_state);
+      sub.textContent = st ? st.toUpperCase() : 'CHARGE STATE —';
+      sub.className = 'sub';
+      var re = fmtMi(CAR.charge.est_battery_range);
+      sub2.textContent = re ? ('EST RANGE ' + re) : 'EST RANGE NO MEASURE';
+    } else {
+      big.textContent = 'PAIRED'; big.className = 'big';
+      sub.textContent = CAR.name ? CAR.name.toUpperCase().slice(0, 18) : 'VEHICLE';
+      sub.className = 'sub';
+      sub2.textContent = 'CHARGE STATE NO MEASURE';
+    }
+  }
+  function renderMode() {
+    var mode = document.getElementById('mode');
+    var vs = document.getElementById('vstate');
+    if (!CAR.paired) {
+      mode.textContent = 'TESLA SCOPE · NO CAR PAIRED';
+      mode.style.color = AMBER;
+      vs.textContent = 'NO VEHICLE';
+      return;
+    }
+    vs.textContent = CAR.vstate ? CAR.vstate.toUpperCase() : 'VEHICLE';
+    var stale = CAR.dataAt && (Date.now() - CAR.dataAt > STALE_MS);
+    mode.textContent = 'TESLA SCOPE · ' + (CAR.name ? CAR.name.toUpperCase().slice(0, 16) : 'VEHICLE') + (stale ? ' · STALE' : ' · LAST REPORT');
+    mode.style.color = stale ? AMBER : GREEN;
+  }
+  function renderClock() {
+    var dt = new Date();
+    var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    var mons = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    var hh = dt.getHours(), mm = ('0' + dt.getMinutes()).slice(-2), ss = ('0' + dt.getSeconds()).slice(-2);
+    document.getElementById('clock').textContent = hh + ':' + mm + ':' + ss;
+    document.getElementById('date').textContent = days[dt.getDay()] + ', ' + mons[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+  }
+  function renderAll() { drawGauge(); drawAnalog(Date.now()); drawCompass(); renderCols(); renderCenter(); renderMode(); renderClock(); }
+
+  // ================================================================
+  // THE PAIR PANEL — the documented Fleet API flow, INERT.
+  // No client_id exists (the house app is not registered) and none
+  // is invented: the authorize URL is a template with placeholders.
+  // ================================================================
+  var PAIR = { on: false };
+  function pairHTML() {
+    return '<div class="p-h">PAIR A TESLA</div>' +
+      '<div class="p-sub">TESLA FLEET API · OFFICIAL OAUTH FLOW</div>' +
+      '<div class="p-row p-amber" style="text-align:center;margin-top:6px">PAIRING INERT — NO HOUSE APP REGISTERED</div>' +
+      '<div class="p-sec">1 · REGISTER THE APP (OWNER, ONCE)</div>' +
+      '<div class="p-row">Create the application at <span class="p-url">developer.tesla.com</span> — Tesla issues a client_id and client_secret. Then register the partner account: <span class="p-url">POST /api/1/partner_accounts</span> with a partner token, the app domain matching the app\'s allowed origins, and the app\'s EC public key (secp256r1) hosted at <span class="p-url">https://&lt;domain&gt;/.well-known/appspecific/com.tesla.3p.public-key.pem</span></div>' +
+      '<div class="p-sec">2 · THE OWNER AUTHORIZES (TESLA\'S PAGE)</div>' +
+      '<div class="p-row">The owner signs in and grants scopes on Tesla\'s own authorize page — this face never sees the password:</div>' +
+      '<div class="p-url">https://auth.tesla.com/oauth2/v3/authorize?response_type=code&amp;client_id=&lt;CLIENT_ID&gt;&amp;redirect_uri=&lt;REDIRECT_URI&gt;&amp;scope=openid offline_access vehicle_device_data&amp;state=&lt;RANDOM&gt;</div>' +
+      '<div class="p-sec">3 · CODE EXCHANGE (SERVER SIDE)</div>' +
+      '<div class="p-row">The returned code is exchanged at <span class="p-url">POST https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/token</span> (grant_type=authorization_code, audience = the regional Fleet API base URL). The token lives in the house pipe — <span class="p-amber">never in this face</span>. Refresh tokens are single-use and expire after 3 months.</div>' +
+      '<div class="p-sec">4 · THE PIPE READS</div>' +
+      '<div class="p-row"><span class="p-url">GET /api/1/vehicles</span> then <span class="p-url">GET /api/1/vehicles/{vin}/vehicle_data</span> — the charge_state, climate_state and vehicle_state blocks fill this face. Tesla advises against regular polling of vehicle_data (it makes a live call to the car); the cached read and Fleet Telemetry are the efficient lanes. This face issues <span class="p-amber">no commands</span> — wake_up and every command endpoint are out of scope; the virtual-key pairing step is a command-side requirement and is not part of this read-only build.</div>' +
+      '<div class="p-note">Scopes requested: openid · offline_access · vehicle_device_data. vehicle_location is deliberately NOT requested — this face shows no position.</div>';
+  }
+  function togglePair() {
+    PAIR.on = !PAIR.on;
+    var pp = document.getElementById('pair');
+    var btn = document.getElementById('pairbtn');
+    if (PAIR.on) { pp.innerHTML = pairHTML(); pp.style.display = 'block'; pp.scrollTop = 0; btn.classList.add('on'); btn.textContent = 'CLOSE'; }
+    else { pp.style.display = 'none'; btn.classList.remove('on'); btn.textContent = 'PAIR TESLA'; }
+  }
+
+  // ================================================================
+  // INGEST — the wire the authorized house pipe hands in.
+  // ================================================================
+  window.TeslaScopeIngest = {
+    vehicleList: function (resp) {
+      try {
+        var list = resp && resp.response;
+        if (!list || !list.length) return;
+        var v = list[0];
+        CAR.paired = true;
+        CAR.name = str(v.display_name) || '';
+        CAR.vin = str(v.vin) || '';
+        CAR.vstate = str(v.state) || '';
+        renderCenter(); renderMode();
+      } catch (e) { /* a malformed payload changes nothing */ }
+    },
+    vehicleData: function (resp) {
+      try {
+        var r = resp && resp.response;
+        if (!r) return;
+        CAR.paired = true;
+        if (str(r.display_name)) CAR.name = str(r.display_name);
+        CAR.charge = (r.charge_state && typeof r.charge_state === 'object') ? r.charge_state : null;
+        CAR.climate = (r.climate_state && typeof r.climate_state === 'object') ? r.climate_state : null;
+        CAR.vstateBlk = (r.vehicle_state && typeof r.vehicle_state === 'object') ? r.vehicle_state : null;
+        var ts = 0;
+        [CAR.charge, CAR.climate, CAR.vstateBlk].forEach(function (b) { if (b && num(b.timestamp)) ts = Math.max(ts, num(b.timestamp)); });
+        CAR.dataAt = ts || Date.now();
+        renderAll();
+      } catch (e) { /* a malformed payload changes nothing */ }
+    },
+    unpaired: function () {
+      CAR = { paired: false, name: '', vin: '', vstate: '', charge: null, climate: null, vstateBlk: null, dataAt: 0 };
+      renderAll();
+    }
+  };
+
+  // heading source: real deviceorientation only
+  window.addEventListener('deviceorientationabsolute', function (e) {
+    if (e && typeof e.alpha === 'number') { headingDeg = (360 - e.alpha) % 360; }
+  }, true);
+  window.addEventListener('deviceorientation', function (e) {
+    if (!e) return;
+    if (typeof e.webkitCompassHeading === 'number') headingDeg = e.webkitCompassHeading;
+    else if (e.absolute && typeof e.alpha === 'number') headingDeg = (360 - e.alpha) % 360;
+  }, true);
+
+  // device battery for the BATT tile (the watch's own, not the car's)
+  if (navigator.getBattery) {
+    navigator.getBattery().then(function (b) {
+      var upd = function () { document.getElementById('batt').textContent = 'BATT ' + Math.round(b.level * 100) + '%'; };
+      upd(); b.addEventListener('levelchange', upd);
+    }).catch(function () { document.getElementById('batt').textContent = ''; });
+  }
+
+  document.getElementById('pairbtn').addEventListener('click', togglePair);
+  window.addEventListener('resize', layout);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', layout);
+
+  // TABLE SERVICE — one 1 s timer; everything stops in the dark.
+  // If the face's document is ever replaced under it (a host
+  // swapping DOM), the service finds no stage and stands down
+  // instead of drawing into a document that is no longer its own.
+  var svc = setInterval(function () {
+    if (!document.getElementById('stage')) { clearInterval(svc); return; }
+    if (document.hidden || !built) return;
+    renderClock(); drawAnalog(Date.now()); drawCompass(); drawGauge(); renderMode();
+  }, 1000);
+
+  layout();
+})();
+</script>
+</body></html>

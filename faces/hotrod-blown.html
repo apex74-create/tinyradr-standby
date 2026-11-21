@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Hot Rod Line · Blown Drag</title>
+<style>
+  /* HOT ROD LINE — BLOWN DRAG (Nov 20, 2026, owner's new
+     family). The art is an ORIGINAL Apex monster in the 1960s
+     hot-rod t-shirt graphic STYLE — eyes on stalks, one huge hand
+     on the shifter, riding a super-blown drag motor — drawn by
+     the house generation station. The monster is our own
+     creation; it is not the Rat Fink character or any existing
+     character (same no-lift discipline as the patches). Bold
+     graphic is this family's bar, labelled graphic, never
+     photorealistic.
+     Family fittings (owner's rule for the new families): a COMPASS
+     DIAL on the face and the TIME in two formats — ANALOG hands and
+     the DIGITAL read panel. A face that doesn't tell time is not a
+     face. The compass needle sweeps with the seconds (a plain
+     viewer has no magnetometer; the dial is drawn, the sweep is
+     time-true — stated here, not faked). Angles and hands are pure
+     functions of the clock; the face runs from first paint. */
+  :root{
+    --void:#05060a; --plate:#0b0d12;
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --laser:#57e6ff; --digit:#ffb52e; --cream:#f5ead2; --panel:#000000;
+    --acc:#c1440e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #artWrap{position:absolute;left:50%;top:40.5%;transform:translate(-50%,-50%);
+    width:62vmin;height:62vmin}
+  #artWrap img{width:100%;height:100%;object-fit:cover;border-radius:3vmin;
+    border:2px solid var(--acc);display:block}
+  
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:1.9vmin;color:var(--steel)}
+  #compassWrap{position:absolute;left:3vmin;bottom:3vmin;width:24vmin;height:24vmin}
+  #analogWrap{position:absolute;right:3vmin;bottom:3vmin;width:24vmin;height:24vmin}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:10.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.4vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  svg{width:100%;height:100%;display:block}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">HOT ROD LINE · BLOWN DRAG</div>
+  <div id="specLbl" class="lbl">APEX MONSTERS · SHIFTER IN HAND · ORIGINAL GRAPHIC</div>
+  <div id="artWrap"><img src="hotrod-blown.jpg" alt="Hot rod line: original Apex monster on a super-blown drag engine, 1960s t-shirt graphic style"></div>
+  
+  <div id="compassWrap"><svg id="compass" viewBox="0 0 200 200" aria-label="Compass dial"></svg></div>
+  <div id="analogWrap"><svg id="analog" viewBox="0 0 200 200" aria-label="Analog clock"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+</div>
+<script>
+"use strict";
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+var CREAM = "#f5ead2", BRASS = "#c9a227", STEEL = "#9fb4c0", LASER = "#57e6ff";
+/* ---- the compass dial ---- */
+var comp = document.getElementById("compass");
+el("circle", {cx:100, cy:100, r:96, fill:"#000", stroke:BRASS, "stroke-width":3}, comp);
+el("circle", {cx:100, cy:100, r:84, fill:"none", stroke:STEEL, "stroke-width":1}, comp);
+for(var t=0; t<24; t++){
+  var deg = t*15, card = deg % 90 === 0;
+  var p1 = polar(100, 100, card ? 70 : 76, deg), p2 = polar(100, 100, 84, deg);
+  el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1], stroke:card ? BRASS : STEEL, "stroke-width":card ? 3 : 1.4}, comp);
+}
+[["N",0],["E",90],["S",180],["W",270]].forEach(function(c){
+  var p = polar(100, 100, 58, c[1]);
+  var tx = el("text", {x:p[0], y:p[1]+6, "text-anchor":"middle", fill:c[0]==="N" ? LASER : CREAM,
+    "font-size":19, "font-weight":800, "font-family":"ui-monospace,Menlo,Consolas,monospace"}, comp);
+  tx.textContent = c[0];
+});
+el("polygon", {points:"100,14 94,26 106,26", fill:LASER, stroke:"none"}, comp);
+var needle = el("g", {}, comp);
+el("polygon", {points:"100,38 106,100 100,112 94,100", fill:LASER, stroke:"none", opacity:"0.9"}, needle);
+el("polygon", {points:"100,162 106,100 100,112 94,100", fill:STEEL, stroke:"none", opacity:"0.55"}, needle);
+el("circle", {cx:100, cy:100, r:6, fill:BRASS, stroke:"none"}, comp);
+var capT = el("text", {x:100, y:140, "text-anchor":"middle", fill:STEEL,
+  "font-size":10, "letter-spacing":"0.2em", "font-family":"ui-monospace,Menlo,Consolas,monospace"}, comp);
+capT.textContent = "COMPASS";
+/* ---- the analog clock ---- */
+var ana = document.getElementById("analog");
+el("circle", {cx:100, cy:100, r:96, fill:"#000", stroke:BRASS, "stroke-width":3}, ana);
+for(var h=0; h<12; h++){
+  var hp = polar(100, 100, 80, h*30), hp2 = polar(100, 100, 90, h*30);
+  el("line", {x1:hp[0], y1:hp[1], x2:hp2[0], y2:hp2[1], stroke:CREAM, "stroke-width":h%3===0?4:2}, ana);
+}
+var hourH = el("line", {x1:100, y1:100, x2:100, y2:52, stroke:CREAM, "stroke-width":7, "stroke-linecap":"round"}, ana);
+var minH = el("line", {x1:100, y1:100, x2:100, y2:30, stroke:CREAM, "stroke-width":4.5, "stroke-linecap":"round"}, ana);
+var secH = el("line", {x1:100, y1:112, x2:100, y2:24, stroke:LASER, "stroke-width":2, "stroke-linecap":"round"}, ana);
+el("circle", {cx:100, cy:100, r:5.5, fill:BRASS, stroke:"none"}, ana);
+function hand(elm, deg){ elm.setAttribute("transform", "rotate("+deg.toFixed(2)+" 100 100)"); }
+/* ---- the digital read (family pattern) ---- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paint(now){
+  var ms = now.getMilliseconds();
+  var sec = now.getSeconds() + ms/1000;
+  hand(secH, sec*6);
+  hand(minH, (now.getMinutes() + sec/60)*6);
+  hand(hourH, ((now.getHours()%12) + now.getMinutes()/60)*30);
+  needle.setAttribute("transform", "rotate("+(sec*6).toFixed(2)+" 100 100)");
+  var m = now.getMinutes();
+  if(m !== lastMinute){
+    lastMinute = m;
+    var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+    clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+    dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+      " · "+(hh<12?"AM":"PM");
+  }
+}
+function tick(){ paint(new Date()); requestAnimationFrame(tick); }
+paint(new Date());
+requestAnimationFrame(tick);
+window.__governor = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__faceRest = false;
+</script>
+</body>
+</html>
