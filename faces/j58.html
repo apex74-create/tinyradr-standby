@@ -6,6 +6,12 @@
 <title>APEX — P&W J58 · Motors Under Glass</title>
 <style>
   /* P&W J58 MOTOR FACE v2 (Nov 13, 2026) — MOTOR LINE PILOT (JET).
+     v3 (face-graphics refinement, Nov 20, 2026): the jet tranche —
+     MORE INTAKE PIPES (two auxiliary intake ducts arcing into the
+     annulus, a second bleed pipe) and the compressor flow IN
+     DIMENSION (the core gas path now runs on both walls of the
+     core), plus the random INGEST ROUTINE on the cutaway. The v2
+     treatment below stands as written.
      The treatment, per the owner's design lead change (Nov 13, 03:19):
      every motor face is a 3D wireframe mechanical model with the
      machine's TRUE working flows drawn and moving. The Lamborghini
@@ -329,6 +335,101 @@ var fuelLbl = el("text", {x:206, y:MY-50, "text-anchor":"middle", fill:PAL.fuel,
 fuelLbl.textContent = "FUEL → COMBUSTOR";
 
 /* =====================================================================
+   MORE INTAKE PIPES + THE FLOW IN DIMENSION (jet tranche,
+   face-graphics refinement, Nov 20, 2026 — the owner's ask: "more
+   intake pipes and compressor flow, in dimension"). The cutaway
+   gains: TWO AUXILIARY INTAKE DUCTS arcing down into the annulus
+   from above (the ingestion made visible — air arrives through
+   pipes, not from nowhere), a SECOND BLEED PIPE paralleling the
+   bypass duct, and the UPPER CORE FLOW LINE — the gas path drawn
+   on BOTH walls of the core (the line at MY+15 had a twin owed at
+   MY-15), so the flow reads as a volume through the machine, not
+   a stripe under it. All dashes run downstream, as ever.
+   ===================================================================== */
+var ductLines = [];
+[[26, -64, 128, -34], [88, -70, 146, -30]].forEach(function(d){
+  ductLines.push(el("path", {d:"M "+d[0]+" "+(MY+d[1])+" Q "+((d[0]+d[2])/2)+" "+(MY+d[1]-16)+" "+d[2]+" "+(MY+d[3]),
+    fill:"none", stroke:PAL.steel, "stroke-width":3, "stroke-dasharray":"4 7",
+    "stroke-linecap":"round", opacity:"0.9"}, motor));
+  el("ellipse", {cx:d[0], cy:MY+d[1], rx:7, ry:3.2, fill:"none", stroke:PAL.steelHi, "stroke-width":1.6}, motor);
+});
+var bypassLine2 = el("path", {d:"M 222 "+(MY+33)+" L 234 "+(MY+47)+" L 318 "+(MY+47)+" L 330 "+(MY+20),
+  fill:"none", stroke:PAL.steelLo, "stroke-width":1.6, "stroke-dasharray":"6 6",
+  "stroke-linecap":"round", opacity:"0.75"}, motor);
+var coreSegsTop = [];
+[[156, 248, PAL.laser], [250, 266, PAL.hot], [268, 350, PAL.hot2]].forEach(function(sg){
+  coreSegsTop.push(el("line", {x1:sg[0], y1:MY-15, x2:sg[1], y2:MY-15,
+    stroke:sg[2], "stroke-width":2.2, "stroke-dasharray":"8 6",
+    "stroke-linecap":"round", opacity:"0.9"}, motor));
+});
+var ductLbl = el("text", {x:58, y:MY-106, "text-anchor":"middle", fill:PAL.steelLo,
+  "font-size":8.5, "letter-spacing":"0.14em",
+  "font-family":"ui-monospace,Menlo,Consolas,monospace"}, motor);
+ductLbl.textContent = "AUX INTAKE DUCTS";
+/* =====================================================================
+   THE INGEST ROUTINE (owner's live edit, Nov 20, 2026, 21:54 EST):
+   on a random cycle an object from the pool — UAP orb, triangle
+   craft, saucer, bird — flies the intake streamlines in, is
+   swallowed by the annulus, breaks to particles down the core, and
+   is expelled through the ejector. Random object, random wait
+   (6–15 s). Runs on the cutaway only.
+   ===================================================================== */
+var ingestG = el("g", {opacity:"0"}, motor);
+var ingestParts = [];
+for(var ip=0; ip<12; ip++){
+  ingestParts.push(el("circle", {r:1.9, cy:MY, fill:PAL.laser, stroke:"none", opacity:"0"}, ingestG));
+}
+var ingestObj = el("g", {}, ingestG);
+function drawIngestShape(kind){
+  while(ingestObj.firstChild) ingestObj.removeChild(ingestObj.firstChild);
+  if(kind === "saucer"){
+    el("ellipse", {cx:0, cy:0, rx:11, ry:3.6, fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+    el("path", {d:"M -5 0 A 5 4 0 0 1 5 0", fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+  } else if(kind === "triangle"){
+    el("polygon", {points:"0,-8 8,6 -8,6", fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+  } else if(kind === "bird"){
+    el("path", {d:"M -11 1 Q -5 -6 0 0 Q 5 -6 11 1", fill:"none", stroke:PAL.steelHi, "stroke-width":1.8}, ingestObj);
+  } else {
+    el("circle", {cx:0, cy:0, r:5.5, fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+    el("circle", {cx:0, cy:0, r:1.8, fill:PAL.laser, stroke:"none"}, ingestObj);
+  }
+}
+var INGEST_KINDS = ["orb", "triangle", "saucer", "bird"];
+var ingest = { phase:"wait", until: Date.now() + 4000 + Math.random()*6000, t0:0, kind:"orb" };
+function ingestFrame(nowMs){
+  if(view.mix < 0.5){ ingestG.setAttribute("opacity", "0"); return; }
+  if(ingest.phase === "wait"){
+    ingestG.setAttribute("opacity", "0");
+    if(nowMs >= ingest.until){
+      ingest.phase = "in"; ingest.t0 = nowMs;
+      ingest.kind = INGEST_KINDS[Math.floor(Math.random()*INGEST_KINDS.length)];
+      drawIngestShape(ingest.kind);
+    }
+    return;
+  }
+  var dt = nowMs - ingest.t0;
+  ingestG.setAttribute("opacity", "1");
+  if(ingest.phase === "in"){
+    var k = Math.min(1, dt/1100);
+    var x = -16 + (152+16)*k;
+    ingestObj.setAttribute("transform", "translate("+x.toFixed(1)+" "+MY+") scale("+(1.1-0.5*k).toFixed(2)+")");
+    ingestObj.setAttribute("opacity", String(1 - Math.max(0, k-0.8)*5));
+    if(k >= 1){ ingest.phase = "through"; ingest.t0 = nowMs; }
+  } else if(ingest.phase === "through"){
+    var k2 = Math.min(1, dt/1500);
+    ingestObj.setAttribute("opacity", "0");
+    ingestParts.forEach(function(c, i){
+      var px = 154 + (392-154) * Math.max(0, Math.min(1, k2*1.15 - i*0.012));
+      c.setAttribute("cx", px.toFixed(1));
+      c.setAttribute("cy", (MY + Math.sin(k2*20 + i*2.4) * (3 + 9*k2) * (i%2 ? 1 : -1)).toFixed(1));
+      c.setAttribute("fill", k2 > 0.6 ? PAL.hot : PAL.laser);
+      c.setAttribute("opacity", String(0.95 - Math.max(0, k2-0.85)*5));
+    });
+    if(k2 >= 1){ ingest.phase = "wait"; ingest.until = nowMs + 6000 + Math.random()*9000; }
+  }
+}
+
+/* =====================================================================
    END VIEW — direct-on into the intake (the crankshaft-analog view
    of a jet): spike centred in the annulus, the COMPRESSOR FACE as a
    working rotor, the stator ring honestly still, and the spool's
@@ -395,6 +496,16 @@ function paintSide(nowMs){
   });
   fuelLine.setAttribute("stroke-dashoffset", (-((nowMs/26) % 12)).toFixed(1));
   bypassLine.setAttribute("stroke-dashoffset", (-((nowMs/24) % 12)).toFixed(1));
+  /* the refinement additions ride the same flow: ducts in, second
+     bleed aft, upper core line downstream, and the ingest routine */
+  ductLines.forEach(function(l){
+    l.setAttribute("stroke-dashoffset", (-((nowMs/22) % 11)).toFixed(1));
+  });
+  bypassLine2.setAttribute("stroke-dashoffset", (-((nowMs/24) % 12)).toFixed(1));
+  coreSegsTop.forEach(function(l){
+    l.setAttribute("stroke-dashoffset", (-((nowMs/13) % 14)).toFixed(1));
+  });
+  ingestFrame(nowMs);
   /* thrust: dashes stream aft fast; the fan breathes with power */
   thrustLines.forEach(function(l){
     l.setAttribute("stroke-dashoffset", (-((nowMs/8) % 14)).toFixed(1));

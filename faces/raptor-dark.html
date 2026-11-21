@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Raptor · DARK EDITION · Motors Under Glass</title>
+<style>
+  /* RAPTOR MOTOR FACE v1 (Nov 9, 2026) — DIRECT-ON view into the bell.
+     v2 (face-graphics refinement, Nov 20, 2026): the face now opens on
+     THE EXPLODED VIEW — the motor laid out along a diagonal axis at a
+     one-third turn, sections pulled apart on witness lines, exhaust to
+     a vanishing point — because the owner's verdict on the direct-on
+     bell was that it reads as nothing special. The direct-on view
+     below is kept whole as the touch-flip second view, and the
+     exploded view carries the family's flow line plus the random
+     INGEST ROUTINE (orb / triangle / saucer / bird, random cycle).
+     DARK EDITION (Nov 20, 2026): this file is the dark-edition seat
+     of the Raptor — deep-space plate, dimmed galaxy, the same
+     machine, both views, flow and ingest routine, carried whole.
+     Family: Motors Under Glass (Compounding Pass #1 §B roster #2).
+     Determination: look DOWN the great expansion bell — concentric bell
+     rings, throat, injector plate with its element pattern drawn as
+     concentric rings of elements, turbopump ports on the rim. Backdrop is
+     the Raptor's OWN sky per roster discipline: the spinning galaxy (the
+     J79's wood is NOT borrowed). The galaxy's rotation is the backdrop's
+     own mechanism; the bell gimbal-sways a degree either way when
+     LIVE; the throat shimmers. Spec character as DESIGN INPUT ONLY
+     (public, historical): methalox, full-flow staged combustion. The
+     brief's rating-vs-target spread is unresolved — NO performance
+     figures appear on this face.
+     Governor history: this face was born under Battery V2 (REST/
+     OBSERVED, 12 s auto-exit); the face-line sweep removed that
+     governor Nov 10, 2026 - machinery runs from first paint, nothing
+     holds the screen on. Colour is CALLED from the
+     palette block below — solid numbers, never layered, no translucent
+     dark over the plate. */
+  :root{
+    --void:#030409;        /* deep space */
+    --plate:#020208;       /* deep-space plate — dark edition */
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --laser:#57e6ff;       /* laser-line cyan */
+    --nebula:#5a4cb0;      /* galaxy arms, dimmed — dark edition */
+    --digit:#ffb52e;       /* time digits, solid amber */
+    --cream:#f5ead2;       /* lettering */
+    --hot:#ff7a1a;         /* throat heat */
+    --hot2:#ff3d00;
+    --panel:#000000;       /* solid read panel */
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none;cursor:pointer}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  #boreWrap svg{position:absolute;inset:0}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--steel);letter-spacing:.14em;text-align:right}
+  body.live #stateLamp{color:var(--laser)}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">RAPTOR&nbsp;·&nbsp;DARK</div>
+  <div id="specLbl" class="lbl">FULL-FLOW STAGED COMBUSTION</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="Raptor expansion bell, direct-on, against its galaxy"></svg><svg id="side" viewBox="0 0 400 400" aria-label="Raptor engine, exploded one-third-turn view"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stateLamp">REST</div>
+</div>
+
+<script>
+"use strict";
+/* Palette in code — the same called colours as the CSS block. */
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  laser:"#57e6ff", nebula:"#8a7cff", hot:"#ff7a1a", hot2:"#ff3d00",
+  void:"#030409" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+
+var svg = document.getElementById("bore");
+var CX = 200, CY = 200;
+
+/* ---- The Raptor's own sky: a three-arm spiral galaxy + star field.
+   The galaxy group is a SPIN entry — its slow turn is the backdrop's
+   own mechanism, time-true at REST, stately when OBSERVED. ---------- */
+var galaxy = el("g", {}, svg);
+(function(){
+  var cols = [PAL.nebula, PAL.laser, PAL.steelHi];
+  for(var arm=0; arm<3; arm++){
+    for(var i=0; i<42; i++){
+      var r = 14 + i*4.1, a = arm*120 + i*5.4;
+      var p = polar(CX, CY, r, a);
+      var jitter = Math.sin(i*12.9898 + arm*78.233) * 5;
+      var q = polar(CX, CY, r, a + jitter/r*8);
+      el("circle", {cx:q[0].toFixed(1), cy:q[1].toFixed(1),
+        r:(2.6 - i*0.045).toFixed(2), fill:cols[(i+arm)%3], stroke:"none"}, galaxy);
+    }
+  }
+  el("circle", {cx:CX, cy:CY, r:9, fill:PAL.steelHi, stroke:"none"}, galaxy);
+  for(var sIdx=0; sIdx<46; sIdx++){
+    var sx = 8 + ((Math.sin(sIdx*39.7)*0.5+0.5)*384);
+    var sy = 8 + ((Math.cos(sIdx*27.3)*0.5+0.5)*384);
+    el("circle", {cx:sx.toFixed(1), cy:sy.toFixed(1),
+      r:(sIdx%5===0?1.5:0.9), fill:PAL.steel, stroke:"none"}, galaxy);
+  }
+})();
+
+/* ---- Bezel: brass ring, degree ticks, cardinal points, hour numerals
+   (the mariner treatment rides every face in this series). ---------- */
+el("circle", {cx:CX, cy:CY, r:196, fill:"none", stroke:PAL.brassLo, "stroke-width":7}, svg);
+var hdgRing = el("circle", {cx:CX, cy:CY, r:188, fill:"none", stroke:PAL.brass, "stroke-width":2.5}, svg);
+for(var d=0; d<360; d+=6){
+  var big = (d % 30 === 0), p1 = polar(CX, CY, big?176:181, d), p2 = polar(CX, CY, 186, d);
+  el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1],
+    stroke: big?PAL.brassHi:PAL.brassLo, "stroke-width": big?2.4:1.2}, svg);
+}
+var hdgNorth = null;
+["N","E","S","W"].forEach(function(card, i){
+  var p = polar(CX, CY, 165, i*90);
+  var t = el("text", {x:p[0], y:p[1]+5, "text-anchor":"middle",
+    fill:PAL.brassHi, "font-size":15, "font-weight":800,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = card;
+  if(card === "N") hdgNorth = t;
+});
+/* ---- Heading witness (Face Law 2): a needle inside the dial that
+   points at the stack's live heading, or sweeps in SEARCHING. The
+   cardinals above stay where the bezel's geometry puts them - the
+   witness, not the paint, carries the truth. Stack = the firewalled
+   script at the end of this file. ------------------------------- */
+var hdgNeedle = el("line", {x1:CX, y1:CY-138, x2:CX, y2:CY-118,
+  stroke:"#ff3d00", "stroke-width":3.4, "stroke-linecap":"round"}, svg);
+window.__hdgTargets = { needle:hdgNeedle, ring:hdgRing, north:hdgNorth,
+  cx:CX, cy:CY, green:PAL.brassHi, yellow:"#ffb52e", red:"#ff3d00" };
+for(var h=1; h<=12; h++){
+  var hp = polar(CX, CY, 147, h*30);
+  var ht = el("text", {x:hp[0], y:hp[1]+4.5, "text-anchor":"middle",
+    fill:"#f5ead2", "font-size":12.5, "font-weight":700,
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  ht.textContent = String(h);
+}
+
+/* ---- The bell assembly (gimbal group): bell rings, throat, injector
+   plate. Turbopump ports ride the rim at ten and two. ---------------- */
+var bell = el("g", {}, svg);
+el("circle", {cx:CX, cy:CY, r:136, fill:PAL.void, stroke:PAL.steelLo, "stroke-width":5}, bell);
+[128, 112, 94, 76].forEach(function(r, i){
+  el("circle", {cx:CX, cy:CY, r:r, fill:"none",
+    stroke: i%2 ? PAL.steelLo : PAL.steel, "stroke-width": i===0?2.2:1.3}, bell);
+});
+[-38, 38].forEach(function(deg){
+  var pp = polar(CX, CY, 136, deg);
+  el("circle", {cx:pp[0], cy:pp[1], r:9, fill:PAL.void, stroke:PAL.brass, "stroke-width":2}, bell);
+  el("circle", {cx:pp[0], cy:pp[1], r:3.4, fill:PAL.brassLo, stroke:"none"}, bell);
+});
+var throat = el("circle", {cx:CX, cy:CY, r:60, fill:"none", stroke:PAL.hot, "stroke-width":3}, bell);
+el("circle", {cx:CX, cy:CY, r:56, fill:PAL.void, stroke:PAL.steel, "stroke-width":1.4}, bell);
+/* injector elements: concentric rings of elements, as drawn */
+[[13,6],[24,12],[35,18],[46,24]].forEach(function(ring, ri){
+  for(var e=0; e<ring[1]; e++){
+    var ep = polar(CX, CY, ring[0], e*(360/ring[1]) + ri*7);
+    el("circle", {cx:ep[0].toFixed(1), cy:ep[1].toFixed(1), r:2.1,
+      fill: (e+ri)%2 ? PAL.laser : PAL.steelHi, stroke:"none"}, bell);
+  }
+});
+el("circle", {cx:CX, cy:CY, r:6.5, fill:PAL.void, stroke:PAL.brassHi, "stroke-width":2}, bell);
+el("circle", {cx:CX, cy:CY, r:2.4, fill:PAL.brass, stroke:"none"}, bell);
+/* glass sheen: two called arcs, solid tones (the family's glass) */
+el("path", {d:"M 96 128 A 128 128 0 0 1 196 74", fill:"none", stroke:PAL.steelHi, "stroke-width":2}, svg);
+el("path", {d:"M 84 152 A 138 138 0 0 1 150 82", fill:"none", stroke:PAL.steelLo, "stroke-width":1.2}, svg);
+
+/* =====================================================================
+   THE EXPLODED VIEW (v2, face-graphics refinement, Nov 20, 2026).
+   The owner's verdict on v1's direct-on bell: "looks stupid, don't
+   look like nothing special" — head-on, the engine reads as a cone
+   of rings. The face now OPENS on this view: the whole motor laid
+   along a diagonal axis at a one-third turn (section faces drawn as
+   foreshortened ellipses, rx = 0.34 x ry), the assembly EXPLODED —
+   injector, chamber sections, throat and bell segments pulled apart
+   along the axis with dashed witness lines across the gaps — and
+   the exhaust running to a vanishing point past the frame's edge.
+   Touch flips back to the direct-on end view; touch again returns.
+   Flow dots ride the axis through the machine (cyan in, amber out),
+   and the INGEST ROUTINE (below) runs on this view.
+   ===================================================================== */
+var sideSvg = document.getElementById("side");
+var AX = { x:70, y:96, dx:0.86, dy:0.51, L:300 };
+function axP(s, off){
+  return [AX.x + AX.dx*s - AX.dy*(off||0), AX.y + AX.dy*s + AX.dx*(off||0)];
+}
+function axPt(s, off){ var p = axP(s, off); return p[0].toFixed(1)+","+p[1].toFixed(1); }
+var sideG = el("g", {}, sideSvg);
+/* vanishing-point construction: the axis, dashed past the exit */
+(function(){
+  var a = axP(-16, 0), b = axP(348, 0);
+  el("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], stroke:PAL.steelLo,
+    "stroke-width":1, "stroke-dasharray":"3 6", opacity:"0.7"}, sideG);
+  [-1, 1].forEach(function(sgn){
+    var e1 = axP(292, 46*sgn), vp = axP(356, 58*sgn);
+    el("line", {x1:e1[0], y1:e1[1], x2:vp[0], y2:vp[1], stroke:PAL.steelLo,
+      "stroke-width":0.8, "stroke-dasharray":"2 5", opacity:"0.55"}, sideG);
+  });
+})();
+function sectionRibbon(s0, w0, s1, w1, fill, strokeW){
+  var pts = axPt(s0, w0)+" "+axPt(s1, w1)+" "+axPt(s1, -w1)+" "+axPt(s0, -w0);
+  return el("polygon", {points:pts, fill:fill, stroke:PAL.steelHi,
+    "stroke-width":strokeW||1.1, "stroke-linejoin":"round"}, sideG);
+}
+function sectionFace(s, w, fill){
+  var c = axP(s, 0);
+  return el("ellipse", {cx:c[0].toFixed(1), cy:c[1].toFixed(1), rx:(w*0.34).toFixed(1), ry:w,
+    transform:"rotate(30.7 "+c[0].toFixed(1)+" "+c[1].toFixed(1)+")",
+    fill:fill, stroke:PAL.steelHi, "stroke-width":1.1}, sideG);
+}
+function gapWitness(s0, s1, w){
+  [-1, 1].forEach(function(sgn){
+    var a = axP(s0, w*sgn), b = axP(s1, w*sgn);
+    el("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], stroke:PAL.brass,
+      "stroke-width":0.9, "stroke-dasharray":"4 3", opacity:"0.8"}, sideG);
+  });
+}
+function sideLabel(text, s, off, anchor){
+  var p = axP(s, off);
+  var t = el("text", {x:p[0].toFixed(1), y:p[1].toFixed(1), "text-anchor":anchor||"middle",
+    fill:"#f5ead2", "font-size":10.5, "font-weight":700, "letter-spacing":"0.14em",
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, sideG);
+  t.textContent = text;
+  return t;
+}
+/* -- the machine, section by section along the axis -- */
+sectionFace(0, 44, PAL.void);                                   /* injector plate */
+(function(){ /* injector elements on the plate face — laid in the
+   plate's own rotated frame (squashed along the axis, full across
+   it) so the pattern stays on the plate's ellipse */
+  var c = axP(0, 0);
+  [[0,0],[15,6],[27,12],[37,18]].forEach(function(ring, ri){
+    for(var i=0; i<ring[1]; i++){
+      var a = (i*(360/Math.max(1,ring[1])) + ri*9) * Math.PI/180;
+      var u = Math.cos(a)*ring[0]*0.34, v = Math.sin(a)*ring[0];
+      var ex = c[0] + AX.dx*u - AX.dy*v, ey = c[1] + AX.dy*u + AX.dx*v;
+      el("circle", {cx:ex.toFixed(1), cy:ey.toFixed(1), r:2,
+        fill:(i+ri)%2 ? PAL.laser : PAL.steelHi, stroke:"none"}, sideG);
+    }
+  });
+  el("circle", {cx:c[0], cy:c[1], r:3.2, fill:PAL.brass, stroke:"none"}, sideG);
+})();
+sectionRibbon(6, 40, 44, 31, "#10151d");                        /* injector housing */
+(function(){ /* turbopump block, high side, with its feed pipes */
+  var c = axP(64, -64);
+  el("rect", {x:(c[0]-34).toFixed(1), y:(c[1]-17).toFixed(1), width:68, height:34, rx:6,
+    fill:"#10151d", stroke:PAL.steelHi, "stroke-width":1.1}, sideG);
+  [-17, 17].forEach(function(off){
+    el("circle", {cx:(c[0]+off).toFixed(1), cy:c[1].toFixed(1), r:11,
+      fill:PAL.void, stroke:PAL.brass, "stroke-width":1.6}, sideG);
+    el("circle", {cx:(c[0]+off).toFixed(1), cy:c[1].toFixed(1), r:3,
+      fill:PAL.brassLo, stroke:"none"}, sideG);
+  });
+  var p1 = axP(52, -48), p2 = axP(74, -30);
+  el("path", {d:"M "+p1[0].toFixed(1)+" "+p1[1].toFixed(1)+" L "+axPt(66, -33)+" L "+axPt(80, -31),
+    fill:"none", stroke:PAL.brass, "stroke-width":1.6}, sideG);
+  el("path", {d:"M "+p2[0].toFixed(1)+" "+p2[1].toFixed(1)+" L "+axPt(88, -30),
+    fill:"none", stroke:PAL.brassLo, "stroke-width":1.4}, sideG);
+})();
+sectionRibbon(46, 31, 118, 34, "#151a23");                      /* chamber, section 1 */
+gapWitness(118, 134, 34);
+sectionFace(134, 34, "#0b0e14");
+sectionRibbon(134, 34, 176, 26, "#10151d");                     /* chamber, section 2 */
+sectionRibbon(176, 26, 190, 15, "#151a23");                     /* throat run-in */
+sectionFace(190, 15, "#1a0f08");
+sectionRibbon(190, 15, 204, 14, "#231208");                     /* the throat */
+gapWitness(204, 218, 15);
+sectionRibbon(218, 16, 250, 30, "#10151d");                     /* bell, segment 1 */
+gapWitness(250, 260, 31);
+sectionRibbon(260, 32, 292, 46, "#151a23");                     /* bell, segment 2 */
+sectionFace(292, 46, PAL.void);                                 /* the exit */
+/* exhaust plume: a hot wedge past the exit, breathing in extraFrame */
+var plume = (function(){
+  var pts = axPt(292, 38)+" "+axPt(344, 54)+" "+axPt(344, -54)+" "+axPt(292, -38);
+  return el("polygon", {points:pts, fill:PAL.hot, opacity:"0.16", stroke:"none"}, sideG);
+})();
+sideLabel("INJECTOR", 30, 74);
+sideLabel("TURBOPUMPS", 124, -104);
+sideLabel("CHAMBER — EXPLODED", 126, 58);
+sideLabel("THROAT", 197, -54);
+sideLabel("EXPANSION BELL", 246, 88);
+/* flow dots: ridden by extraFrame as pure functions of elapsed time */
+var flowDots = [];
+for(var fd=0; fd<10; fd++){
+  flowDots.push(el("circle", {r:2.2, fill:PAL.laser, stroke:"none"}, sideG));
+}
+/* =====================================================================
+   THE INGEST ROUTINE (owner's live edit, Nov 20, 2026, 21:54 EST):
+   on a RANDOM cycle an object from the pool — UAP orb, triangle
+   craft, saucer, bird — crosses to the intake, is drawn in, breaks
+   to particles through the machine, and is expelled out the bell.
+   Random object, random wait (6–15 s): a living detail, never a
+   loop the eye can memorize. Runs on the exploded view only.
+   ===================================================================== */
+var ingestG = el("g", {opacity:"0"}, sideSvg);
+var ingestParts = [];
+for(var ip=0; ip<12; ip++){
+  ingestParts.push(el("circle", {r:1.9, fill:PAL.laser, stroke:"none", opacity:"0"}, ingestG));
+}
+var ingestObj = el("g", {}, ingestG);
+function drawIngestShape(kind){
+  while(ingestObj.firstChild) ingestObj.removeChild(ingestObj.firstChild);
+  if(kind === "saucer"){
+    el("ellipse", {cx:0, cy:0, rx:11, ry:3.6, fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+    el("path", {d:"M -5 0 A 5 4 0 0 1 5 0", fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+  } else if(kind === "triangle"){
+    el("polygon", {points:"0,-8 8,6 -8,6", fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+  } else if(kind === "bird"){
+    el("path", {d:"M -11 1 Q -5 -6 0 0 Q 5 -6 11 1", fill:"none", stroke:PAL.steelHi, "stroke-width":1.8}, ingestObj);
+  } else { /* orb */
+    el("circle", {cx:0, cy:0, r:5.5, fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+    el("circle", {cx:0, cy:0, r:1.8, fill:PAL.laser, stroke:"none"}, ingestObj);
+  }
+}
+var INGEST_KINDS = ["orb", "triangle", "saucer", "bird"];
+var ingest = { phase:"wait", until: 5000 + Math.random()*8000, t0:0, kind:"orb" };
+function ingestFrame(el_ms){
+  var now = el_ms;
+  if(ingest.phase === "wait"){
+    ingestG.setAttribute("opacity", "0");
+    if(now >= ingest.until){
+      ingest.phase = "in"; ingest.t0 = now;
+      ingest.kind = INGEST_KINDS[Math.floor(Math.random()*INGEST_KINDS.length)];
+      drawIngestShape(ingest.kind);
+    }
+    return;
+  }
+  var dt = now - ingest.t0;
+  ingestG.setAttribute("opacity", "1");
+  if(ingest.phase === "in"){                        /* approach + swallow: 1s */
+    var k = Math.min(1, dt/1000);
+    var p = axP(-46 + 52*k, Math.sin(k*9)*3);
+    ingestObj.setAttribute("transform", "translate("+p[0].toFixed(1)+" "+p[1].toFixed(1)+") scale("+(1.15-0.55*k).toFixed(2)+")");
+    ingestObj.setAttribute("opacity", String(1 - Math.max(0, k-0.75)*4));
+    if(k >= 1){ ingest.phase = "through"; ingest.t0 = now; }
+  } else if(ingest.phase === "through"){           /* particleized: 1.6s */
+    var k2 = Math.min(1, dt/1600);
+    ingestObj.setAttribute("opacity", "0");
+    ingestParts.forEach(function(c, i){
+      var s = 6 + (292-6) * Math.max(0, Math.min(1, k2*1.15 - i*0.012));
+      var off = Math.sin(k2*22 + i*2.4) * (4 + 10*k2) * (i%2 ? 1 : -1);
+      var pp = axP(s, off);
+      c.setAttribute("cx", pp[0].toFixed(1)); c.setAttribute("cy", pp[1].toFixed(1));
+      c.setAttribute("fill", k2 > 0.62 ? PAL.hot : PAL.laser);
+      c.setAttribute("opacity", String(0.95 - Math.max(0, k2-0.85)*5));
+    });
+    if(k2 >= 1){ ingest.phase = "wait"; ingest.until = now + 6000 + Math.random()*9000; }
+  }
+}
+function sideFrame(el_ms){
+  flowDots.forEach(function(c, i){
+    var s = ((el_ms*0.045 + i*31) % 330) - 14;
+    var p = axP(s, Math.sin(el_ms/300 + i*1.7)*3);
+    c.setAttribute("cx", p[0].toFixed(1)); c.setAttribute("cy", p[1].toFixed(1));
+    c.setAttribute("fill", s > 190 ? PAL.hot : PAL.laser);
+    c.setAttribute("opacity", s < 0 || s > 300 ? "0" : "0.9");
+  });
+  plume.setAttribute("opacity", (0.13 + 0.05*Math.sin(el_ms/170)).toFixed(2));
+  ingestFrame(el_ms);
+}
+/* view state: the face OPENS on the exploded view; touch flips */
+var viewSide = true;
+var specEl = document.getElementById("specLbl");
+function applyView(){
+  sideSvg.style.display = viewSide ? "block" : "none";
+  svg.style.display = viewSide ? "none" : "block";
+  specEl.textContent = viewSide ? "EXPLODED · ONE-THIRD TURN — TOUCH FOR END VIEW"
+                                : "FULL-FLOW STAGED COMBUSTION — TOUCH FOR EXPLODED VIEW";
+}
+applyView();
+window.addEventListener("click", function(){ viewSide = !viewSide; applyView(); });
+window.__sideFrame = sideFrame;
+
+/* ---- Face motion hooks: the bell gimbal-sways ±1.2° and the throat
+   breathes when OBSERVED; both are functions of absolute time, so the
+   REST still pass is time-true. ------------------------------------- */
+function swayDeg(nowMs){ return Math.sin(nowMs/1400) * 1.2; }
+function extraStill(nowMs){ /* retained for the bench: poses the still frame on demand; the live driver never calls it */
+  bell.setAttribute("transform", "rotate("+swayDeg(nowMs).toFixed(2)+" "+CX+" "+CY+")");
+  throat.setAttribute("opacity", "0.85");
+}
+function extraFrame(el_ms){
+  var now = Date.now();
+  bell.setAttribute("transform", "rotate("+swayDeg(now).toFixed(2)+" "+CX+" "+CY+")");
+  throat.setAttribute("opacity", (0.7 + 0.3*Math.sin(el_ms/260)).toFixed(2));
+  if(window.__sideFrame && typeof viewSide !== "undefined" && viewSide) window.__sideFrame(el_ms);
+}
+
+/* ---- Spinners: entries turn around their own centres. REST periods
+   are display gearing from absolute time (angles snap time-true on
+   wake); OBSERVED periods are the same ratios, faster. -------------- */
+var SPIN = [
+  { g:galaxy, cx:CX, cy:CY, restP:7200, obsP:240 }  /* the galaxy's own turn */
+];
+
+/* ---- Time read ------------------------------------------------------- */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var lampEl = document.getElementById("stateLamp");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute && now.getSeconds() !== 0 && lastMinute !== -1 && paintedOnce) return;
+  lastMinute = m; paintedOnce = true;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+var paintedOnce = false;
+
+/* ---- GOVERNOR REMOVED - FACE-LINE SWEEP REPAIR (Nov 10, 2026) -------
+   This face previously ran the BATTERY V2 GOVERNOR: a two-state
+   REST/OBSERVED runtime. It booted into REST and ran its machinery
+   only while an observation signal (container hook, focus, touch,
+   ?face=observed) kept it awake, auto-exiting to REST 12 s after
+   the last signal. In any plain viewer it sat frozen behind a live
+   clock - the Betta V2 defect class, banned house-wide. The
+   governor is REMOVED on the flagship repair pattern: the driver
+   below is kicked at load and runs unconditionally while the face
+   is open; every angle is a pure function of absolute time, so a
+   returning face resumes exactly on cadence. The only pause left
+   is document.hidden (the platform stops rAF itself when the
+   screen sleeps). window.__faceRest is pinned false and
+   window.__governor reports state "live" - the bench handles stay
+   readable and now tell the truth. window.ApexFace keeps the old
+   container contract as NO-OP compatibility: its calls only note
+   the signal; state() always returns "live". Battery care,
+   honestly scoped: no auto-exit, no still-painting; while the
+   face is lit, it lives. */
+var bootMs = Date.now();
+var gov = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__governor = gov;
+window.__faceRest = false;
+function liveAngles(nowMs){
+  var t = nowMs/1000;
+  return SPIN.map(function(c){ return ((t % c.obsP)/c.obsP)*360; });
+}
+function liveFrame(){
+  var now = Date.now();
+  applyAngles(liveAngles(now)); extraFrame(now - bootMs);
+  requestAnimationFrame(liveFrame);
+}
+function setLamp(){ lampEl.textContent = "LIVE"; }
+function note(sig){ gov.lastSignal = sig; }
+window.ApexFace = {
+  observe: function(){ note("container-observe(noop)"); },
+  rest:    function(){ note("container-rest(noop)"); },
+  toggle:  function(){ note("toggle(noop)"); },
+  state:   function(){ return "live"; }
+};
+window.addEventListener("apex-face-observe", function(){ note("event-observe(noop)"); });
+window.addEventListener("apex-face-rest", function(){ note("event-rest(noop)"); });
+["pointerdown","touchstart","keydown"].forEach(function(ev){
+  window.addEventListener(ev, function(){ note(ev); }, true);
+});
+window.addEventListener("focus", function(){ note("focus"); });
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) paintTime(new Date());
+});
+
+/* ---- Boot: paint the clock, then the live loop runs from first
+   paint. No wake-lock of any kind - the system sleep governs
+   this face, never a governor inside it. ----------------------- */
+paintTime(new Date());
+setLamp();
+document.body.classList.add("live");
+requestAnimationFrame(liveFrame);
+setInterval(function(){
+  var now = new Date();
+  if(now.getMinutes() !== lastMinute) paintTime(now);
+}, 1000);
+function applyAngles(angles){
+  SPIN.forEach(function(c, i){
+    c.g.setAttribute("transform", "rotate("+angles[i].toFixed(2)+" "+c.cx+" "+c.cy+")");
+  });
+}
+
+</script>
+<script>
+/* =====================================================================
+   FACE LAW 2 - THE BEZEL IS WIRED (face-line sweep, Nov 10, 2026)
+   ---------------------------------------------------------------------
+   This bezel's cardinals were paint: N sat at the top because it was
+   drawn there. Under Face Law 2 (as amended, Nov 10, 2026) a compass
+   bezel must always show a LIVE heading state with an honest
+   confidence colour in the face's own palette - or honestly show
+   that it has nothing. The stack, in order:
+     (a) deviceorientation / deviceorientationabsolute - the
+         magnetometer answer, when the hardware answers;
+     (b) GPS course-over-ground while moving, fused with the
+         inertial carry;
+     (c) inertial carry from the last good anchor;
+     (d) no anchor: SEARCHING - the witness sweeps slowly and
+         asserts NO north. A fabricated heading is a firing offence
+         under the fabrication ban; this stack would rather sweep.
+   An accelerometer alone never originates north (deviceorientation
+   is only read when it carries an absolute/compass heading).
+   Confidence, in this face's called colours: brassHi (green-class)
+   = live anchor agreeing with the inertial read; #ffb52e
+   (yellow-class) = real but weak/intermittent anchor, or a recent
+   inertial carry; #ff3d00 (red-class) = stale, disagreeing, or no
+   anchor - searching. The stack is FIREWALLED: it lives in its own
+   script and touches only its own three elements (witness, ring,
+   the N glyph). Its failure changes nothing else on the face, and
+   nothing else on the face can stop it. Bench: window.__heading.
+   ===================================================================== */
+(function(){
+  "use strict";
+  var T = window.__hdgTargets;
+  if(!T || !T.needle || !T.ring || !T.north) return;   /* bezel absent: nothing to govern */
+  var hdg = { state:"searching", heading:null, source:"none",
+              confidence:"red", lastAnchorMs:0, disagreements:0 };
+  window.__heading = hdg;
+  var CXp = T.cx, CYp = T.cy;
+  function paint(now){
+    var col = hdg.confidence === "green" ? T.green :
+              hdg.confidence === "yellow" ? T.yellow : T.red;
+    T.ring.setAttribute("stroke", col);
+    T.north.setAttribute("fill", col);
+    T.needle.setAttribute("stroke", col);
+    var ang;
+    if(hdg.state === "live" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else if(hdg.state === "carry" && typeof hdg.heading === "number"){
+      ang = hdg.heading;
+    } else {
+      hdg.state = "searching"; hdg.heading = null;
+      ang = ((now/1000) * 6) % 360;          /* one slow sweep per minute */
+    }
+    T.needle.setAttribute("transform", "rotate(" + ang.toFixed(2) + " " + CXp + " " + CYp + ")");
+  }
+  function anchor(deg, src, now){
+    if(typeof deg !== "number" || !isFinite(deg)) return;
+    deg = ((deg % 360) + 360) % 360;
+    if(typeof hdg.heading === "number" && hdg.state === "live"){
+      var d = Math.abs(deg - hdg.heading); if(d > 180) d = 360 - d;
+      if(d > 25){ hdg.disagreements++; } else { hdg.disagreements = 0; }
+    }
+    hdg.heading = deg; hdg.source = src; hdg.lastAnchorMs = now;
+    hdg.state = "live";
+    hdg.confidence = hdg.disagreements >= 3 ? "yellow" : "green";
+  }
+  function onOrient(e){
+    var deg = null;
+    if(typeof e.webkitCompassHeading === "number") deg = e.webkitCompassHeading;
+    else if(e.absolute && typeof e.alpha === "number") deg = 360 - e.alpha;
+    if(deg !== null) anchor(deg, "magnetometer", Date.now());
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientationabsolute", onOrient, true);
+    window.addEventListener("deviceorientation", onOrient, true);
+    if(typeof DeviceOrientationEvent.requestPermission === "function"){
+      /* iOS gate: permission is asked on the first press of the glass,
+         inside this stack only; a refusal leaves the stack searching. */
+      window.addEventListener("pointerdown", function ask(){
+        window.removeEventListener("pointerdown", ask, true);
+        try { DeviceOrientationEvent.requestPermission().catch(function(){}); } catch(e){}
+      }, true);
+    }
+  }
+  var lastFix = null;
+  function onGeo(pos){
+    var c = pos.coords, now = Date.now();
+    if(lastFix && typeof c.speed === "number" && c.speed >= 0.5){
+      var dt = (now - lastFix.t)/1000;
+      if(dt > 0){
+        var dy = (c.latitude - lastFix.lat) * 111320;
+        var dx = (c.longitude - lastFix.lon) * 111320 * Math.cos(c.latitude * Math.PI/180);
+        if(Math.sqrt(dx*dx + dy*dy) >= 2){
+          anchor((Math.atan2(dx, dy) * 180/Math.PI + 360) % 360, "gps-course", now);
+        }
+      }
+    }
+    lastFix = { lat:c.latitude, lon:c.longitude, t:now };
+  }
+  if(navigator.geolocation && navigator.geolocation.watchPosition){
+    try { navigator.geolocation.watchPosition(onGeo, function(){}, { enableHighAccuracy:true, maximumAge:2000 }); } catch(e){}
+  }
+  function tick(){
+    var now = Date.now();
+    if(hdg.state === "live" && now - hdg.lastAnchorMs > 5000){
+      hdg.state = "carry"; hdg.confidence = "yellow";   /* inertial carry: last anchored heading, honestly ageing */
+    }
+    if(hdg.state === "carry" && now - hdg.lastAnchorMs > 30000){
+      hdg.state = "searching"; hdg.confidence = "red"; hdg.heading = null; hdg.source = "none";
+    }
+    paint(now);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

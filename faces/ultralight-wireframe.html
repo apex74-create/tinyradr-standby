@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Ultralight Wireframe Helicopter · The Propeller Wing · TENTATIVE</title>
+<style>
+  /* APEX ULTRALIGHT — WIREFRAME HELICOPTER FACE v1 (face-graphics
+     refinement, Nov 20, 2026) — THE PROPELLER WING, TENTATIVE seat.
+     The owner marked this one "maybe": it is built as part of the
+     wing and flagged TENTATIVE in the refinement report for his
+     end-grade. The whole aircraft is wireframe line geometry — open
+     truss frame, mast, engine block with its drive gear, skids —
+     and both rotors turn like clockwork: the main rotor geared off
+     the mast gear, the tail rotor geared up 5x at the boom's end,
+     every angle a pure function of absolute time. The face runs
+     from first paint (the Nov 10 governor law). No compass bezel is
+     drawn, so no heading is asserted. Colour CALLED from the
+     palette — solids, never layered. */
+  :root{
+    --void:#050708; --plate:#0a0e11;
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --laser:#57e6ff; --digit:#ffb52e; --cream:#f5ead2; --panel:#000000;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--laser);letter-spacing:.14em;text-align:right}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">APEX ULTRALIGHT</div>
+  <div id="specLbl" class="lbl">THE PROPELLER WING · WIREFRAME HELICOPTER · TENTATIVE</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="Wireframe ultralight helicopter, rotors turning"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stateLamp">LIVE</div>
+</div>
+
+<script>
+"use strict";
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  laser:"#57e6ff", void:"#050708" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+function gearPath(cx, cy, teeth, rPitch){
+  var mod = 2*rPitch/teeth, rOut = rPitch + mod*0.85, rRoot = rPitch - mod*0.85;
+  var step = 360/teeth, pts = [], i, a;
+  for(i=0; i<teeth; i++){
+    a = i*step;
+    [[a, rRoot], [a+step*0.30, rRoot], [a+step*0.42, rOut],
+     [a+step*0.58, rOut], [a+step*0.70, rRoot]].forEach(function(pr){
+      var p = polar(cx, cy, pr[1], pr[0]);
+      pts.push(p[0].toFixed(1)+","+p[1].toFixed(1));
+    });
+  }
+  return "M"+pts.join(" L")+" Z";
+}
+var svg = document.getElementById("bore");
+var MAST = { x:168, y:118 };          /* the mast head */
+var frame = el("g", {}, svg);
+function line(x1, y1, x2, y2, col, w){
+  return el("line", {x1:x1, y1:y1, x2:x2, y2:y2, stroke:col, "stroke-width":w, "stroke-linecap":"round"}, frame);
+}
+/* tail boom + fin */
+line(196, 168, 348, 138, PAL.steel, 2.2);
+line(196, 188, 348, 146, PAL.steelLo, 1.6);
+line(348, 138, 348, 108, PAL.steel, 2.2);
+line(348, 138, 366, 152, PAL.steel, 2.2);
+/* the open truss cabin: seat, frame triangles, engine block */
+line(120, 130, 196, 168, PAL.steel, 2.2);
+line(120, 130, 128, 208, PAL.steel, 2.2);
+line(128, 208, 196, 188, PAL.steel, 2.2);
+line(120, 130, 196, 188, PAL.steelLo, 1.4);
+line(96, 176, 128, 172, PAL.brass, 2.4);            /* the seat */
+line(96, 176, 94, 158, PAL.brass, 2.4);
+el("rect", {x:158, y:158, width:34, height:26, rx:3, fill:"none", stroke:PAL.steelHi, "stroke-width":2}, frame);
+/* mast + drive gear at its base */
+line(MAST.x, MAST.y, 164, 158, PAL.steelHi, 2.6);
+var mastGear = el("g", {}, svg);
+el("path", {d:gearPath(164, 168, 14, 15), fill:"none", stroke:PAL.brass, "stroke-width":1.8}, mastGear);
+el("circle", {cx:164, cy:168, r:4, fill:PAL.brass, stroke:"none"}, mastGear);
+/* skids */
+line(108, 208, 104, 232, PAL.steel, 2.2);
+line(188, 196, 192, 232, PAL.steel, 2.2);
+line(78, 240, 226, 240, PAL.steelHi, 2.6);
+line(78, 240, 70, 232, PAL.steelHi, 2.2);
+line(226, 240, 234, 232, PAL.steelHi, 2.2);
+/* ground line */
+line(30, 252, 370, 252, PAL.steelLo, 1.2);
+/* main rotor: a two-blade bar on the mast head + its disc trace */
+el("ellipse", {cx:MAST.x, cy:MAST.y, rx:150, ry:10, fill:"none",
+  stroke:PAL.steelLo, "stroke-width":1, "stroke-dasharray":"2 7", opacity:"0.8"}, svg);
+var rotor = el("g", {}, svg);
+el("line", {x1:MAST.x-148, y1:MAST.y, x2:MAST.x+148, y2:MAST.y, stroke:PAL.steelHi, "stroke-width":3, "stroke-linecap":"round"}, rotor);
+el("line", {x1:MAST.x-148, y1:MAST.y, x2:MAST.x-128, y2:MAST.y-5, stroke:PAL.brassHi, "stroke-width":3, "stroke-linecap":"round"}, rotor);
+el("line", {x1:MAST.x+148, y1:MAST.y, x2:MAST.x+128, y2:MAST.y-5, stroke:PAL.brassHi, "stroke-width":3, "stroke-linecap":"round"}, rotor);
+el("circle", {cx:MAST.x, cy:MAST.y, r:6, fill:PAL.void, stroke:PAL.brassHi, "stroke-width":2.2}, rotor);
+/* tail rotor at the boom's end, geared up 5x */
+var tail = el("g", {}, svg);
+el("line", {x1:348, y1:116, x2:348, y2:160, stroke:PAL.steelHi, "stroke-width":2.4, "stroke-linecap":"round"}, tail);
+el("circle", {cx:348, cy:138, r:3.6, fill:PAL.brass, stroke:"none"}, tail);
+[["MAIN ROTOR", MAST.x, 84], ["TAIL ROTOR · 5X", 330, 182], ["OPEN TRUSS FRAME", 150, 282]].forEach(function(lb){
+  var t = el("text", {x:lb[1], y:lb[2], "text-anchor":"middle", fill:"#f5ead2",
+    "font-size":10, "font-weight":700, "letter-spacing":"0.16em",
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = lb[0];
+});
+function frame2(){
+  var now = Date.now();
+  /* the main rotor reads as a turning bar: its squash is the turn —
+     scaleY on the rotor group around the mast head gives the
+     blade-passage beat; the mast gear turns with it, the tail
+     rotor spins true at 5x */
+  var ph = (now/900) % 1;
+  var sq = Math.abs(Math.cos(ph * Math.PI));
+  rotor.setAttribute("transform", "translate("+MAST.x+" "+MAST.y+") scale(1 "+(0.12+0.88*sq).toFixed(3)+") translate("+(-MAST.x)+" "+(-MAST.y)+")");
+  mastGear.setAttribute("transform", "rotate("+(((now/2400)%1)*360).toFixed(2)+" 164 168)");
+  tail.setAttribute("transform", "rotate("+(((now/480)%1)*360).toFixed(2)+" 348 138)");
+  requestAnimationFrame(frame2);
+}
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute) return;
+  lastMinute = m;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+paintTime(new Date());
+setInterval(function(){ paintTime(new Date()); }, 1000);
+window.__governor = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__faceRest = false;
+requestAnimationFrame(frame2);
+</script>
+</body>
+</html>

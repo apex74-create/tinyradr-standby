@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Propeller &amp; Gears · The Propeller Wing</title>
+<style>
+  /* PROPELLER & GEARS FACE v1 (face-graphics refinement, Nov 20, 2026)
+     — first seat of THE PROPELLER WING (owner's live edit, 21:54 EST:
+     "propeller devices spun up — propellers turning on screen LIKE
+     CLOCK GEARS, with clock gears turning behind them"). The
+     composition is literal: a three-blade propeller on the hub of a
+     great brass gear, the gear train meshing behind it at true teeth
+     ratios (36 drives 20, 20 drives 12 — each mesh counter-rotates),
+     and the smallest gear carries the clock's own hands, so the
+     train tells the time it is geared to. Every angle is a pure
+     function of absolute time; the face runs from first paint (the
+     Nov 10 governor law). No compass bezel is drawn, so no heading
+     is asserted. House-drawn line geometry only; colour CALLED from
+     the palette — solids, never layered. */
+  :root{
+    --void:#070605; --plate:#100e0c;
+    --brass:#c9a227; --brass-hi:#e8c85a; --brass-lo:#8a6d1c;
+    --steel:#9fb4c0; --steel-hi:#d7e6ee; --steel-lo:#5d7180;
+    --laser:#57e6ff; --digit:#ffb52e; --cream:#f5ead2; --panel:#000000;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
+  body{font-family:ui-monospace,Menlo,Consolas,monospace;
+    -webkit-user-select:none;user-select:none}
+  #face{position:absolute;inset:0;background:var(--plate)}
+  #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+    width:92vmin;height:92vmin}
+  svg{width:100%;height:100%;display:block}
+  .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
+    letter-spacing:.22em;font-weight:700}
+  #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
+  #specLbl{top:6.4vmin;font-size:2.0vmin;color:var(--steel)}
+  #readPanel{position:absolute;left:50%;bottom:3.2vmin;transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
+    padding:0.8vmin 3.4vmin 1.2vmin;text-align:center}
+  #clock{font-size:11.5vmin;font-weight:800;color:var(--digit);line-height:1;
+    letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  #dateLine{font-size:2.6vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.6vmin}
+  #stateLamp{position:absolute;right:3vmin;bottom:3.4vmin;font-size:2.0vmin;
+    color:var(--laser);letter-spacing:.14em;text-align:right}
+</style>
+</head>
+<body>
+<div id="face">
+  <div id="motorLbl" class="lbl">PROPELLER &amp; GEARS</div>
+  <div id="specLbl" class="lbl">THE PROPELLER WING · GEAR TRAIN 36 : 20 : 12</div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="A propeller on a great gear, meshing clock gears behind it"></svg></div>
+  <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
+  <div id="stateLamp">LIVE</div>
+</div>
+
+<script>
+"use strict";
+var PAL = { brass:"#c9a227", brassHi:"#e8c85a", brassLo:"#8a6d1c",
+  steel:"#9fb4c0", steelHi:"#d7e6ee", steelLo:"#5d7180",
+  laser:"#57e6ff", void:"#070605" };
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, parent){
+  var n = document.createElementNS(NS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function polar(cx, cy, r, deg){
+  var a = (deg-90) * Math.PI/180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+/* a gear as line geometry: trapezoid teeth on a pitch circle */
+function gearPath(cx, cy, teeth, rPitch){
+  var mod = 2*rPitch/teeth, rOut = rPitch + mod*0.85, rRoot = rPitch - mod*0.85;
+  var step = 360/teeth, pts = [], i, a;
+  for(i=0; i<teeth; i++){
+    a = i*step;
+    [[a, rRoot], [a+step*0.30, rRoot], [a+step*0.42, rOut],
+     [a+step*0.58, rOut], [a+step*0.70, rRoot]].forEach(function(pr){
+      var p = polar(cx, cy, pr[1], pr[0]);
+      pts.push(p[0].toFixed(1)+","+p[1].toFixed(1));
+    });
+  }
+  return "M"+pts.join(" L")+" Z";
+}
+function makeGear(parent, cx, cy, teeth, rPitch, col, w){
+  var g = el("g", {}, parent);
+  el("path", {d:gearPath(cx, cy, teeth, rPitch), fill:"none", stroke:col, "stroke-width":w}, g);
+  el("circle", {cx:cx, cy:cy, r:rPitch*0.62, fill:"none", stroke:col, "stroke-width":w*0.7}, g);
+  for(var s=0; s<5; s++){
+    var p1 = polar(cx, cy, rPitch*0.16, s*72), p2 = polar(cx, cy, rPitch*0.60, s*72);
+    el("line", {x1:p1[0], y1:p1[1], x2:p2[0], y2:p2[1], stroke:col, "stroke-width":w*0.8}, g);
+  }
+  el("circle", {cx:cx, cy:cy, r:rPitch*0.15, fill:"none", stroke:col, "stroke-width":w*0.8}, g);
+  return g;
+}
+var svg = document.getElementById("bore");
+/* the train: great gear (36T) carries the propeller; 20T and 12T mesh
+   behind it; the 12T carries the clock hands */
+var G1 = { x:168, y:204, teeth:36, r:100 };
+var G2 = { x:309, y:133, teeth:20, r:52 };
+var G3 = { x:344, y:207, teeth:12, r:30 };
+var g1 = makeGear(svg, G1.x, G1.y, G1.teeth, G1.r, PAL.brass, 2.2);
+var g2 = makeGear(svg, G2.x, G2.y, G2.teeth, G2.r, PAL.steel, 1.8);
+var g3 = makeGear(svg, G3.x, G3.y, G3.teeth, G3.r, PAL.brassHi, 1.5);
+/* clock hands on the smallest gear */
+var hourHand = el("line", {x1:G3.x, y1:G3.y, x2:G3.x, y2:G3.y-13,
+  stroke:"#f5ead2", "stroke-width":2.6, "stroke-linecap":"round"}, svg);
+var minHand = el("line", {x1:G3.x, y1:G3.y, x2:G3.x, y2:G3.y-19,
+  stroke:PAL.laser, "stroke-width":1.8, "stroke-linecap":"round"}, svg);
+/* the propeller: three blades on the great gear's hub, plus the
+   turning disc its speed draws */
+var prop = el("g", {}, svg);
+el("circle", {cx:G1.x, cy:G1.y, r:88, fill:"none", stroke:PAL.steelLo,
+  "stroke-width":1, "stroke-dasharray":"2 7", opacity:"0.8"}, prop);
+for(var b=0; b<3; b++){
+  var bg = el("g", {transform:"rotate("+(b*120)+" "+G1.x+" "+G1.y+")"}, prop);
+  el("path", {d:"M "+G1.x+" "+(G1.y-14)+" C "+(G1.x+13)+" "+(G1.y-38)+", "+(G1.x+11)+" "+(G1.y-66)+", "+G1.x+" "+(G1.y-88)
+    +" C "+(G1.x-7)+" "+(G1.y-64)+", "+(G1.x-6)+" "+(G1.y-36)+", "+G1.x+" "+(G1.y-14)+" Z",
+    fill:"rgba(159,180,192,0.20)", stroke:PAL.steelHi, "stroke-width":1.8, "stroke-linejoin":"round"}, bg);
+}
+el("circle", {cx:G1.x, cy:G1.y, r:15, fill:PAL.void, stroke:PAL.brassHi, "stroke-width":2.4}, prop);
+el("path", {d:"M "+(G1.x-6)+" "+G1.y+" A 6 9 0 0 1 "+(G1.x+6)+" "+G1.y+" Z",
+  fill:PAL.brass, stroke:"none"}, prop);
+[["GEAR 36T", G1.x, G1.y+128], ["20T", G2.x, G2.y-66], ["12T · THE CLOCK", G3.x-6, G3.y+52]].forEach(function(lb){
+  var t = el("text", {x:lb[1], y:lb[2], "text-anchor":"middle", fill:"#f5ead2",
+    "font-size":10, "font-weight":700, "letter-spacing":"0.16em",
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, svg);
+  t.textContent = lb[0];
+});
+/* motion: the great gear turns one revolution per 36 s; each mesh
+   counter-rotates at its teeth ratio; the propeller spins geared
+   UP off the hub shaft at 6x, opposite the great gear */
+function frame(){
+  var now = Date.now();
+  var a1 = ((now/36000) % 1) * 360;
+  var a2 = -a1 * (G1.teeth/G2.teeth);
+  var a3 = -a2 * (G2.teeth/G3.teeth);
+  g1.setAttribute("transform", "rotate("+a1.toFixed(2)+" "+G1.x+" "+G1.y+")");
+  g2.setAttribute("transform", "rotate("+a2.toFixed(2)+" "+G2.x+" "+G2.y+")");
+  g3.setAttribute("transform", "rotate("+a3.toFixed(2)+" "+G3.x+" "+G3.y+")");
+  prop.setAttribute("transform", "rotate("+(-a1*6).toFixed(2)+" "+G1.x+" "+G1.y+")");
+  var d = new Date(now);
+  var sA = ((d.getSeconds()+d.getMilliseconds()/1000)/60)*360;
+  var mA = (((d.getMinutes())+d.getSeconds()/60)/60)*360;
+  var hA = ((((d.getHours()%12)+d.getMinutes()/60)/12)*360);
+  hourHand.setAttribute("transform", "rotate("+hA.toFixed(2)+" "+G3.x+" "+G3.y+")");
+  minHand.setAttribute("transform", "rotate("+mA.toFixed(2)+" "+G3.x+" "+G3.y+")");
+  requestAnimationFrame(frame);
+}
+/* time read */
+var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
+var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+var lastMinute = -1;
+function paintTime(now){
+  var m = now.getMinutes();
+  if(m === lastMinute) return;
+  lastMinute = m;
+  var hh = now.getHours(), h12 = hh % 12; if(h12 === 0) h12 = 12;
+  clockEl.textContent = (h12<10?"0":"")+h12+":"+(m<10?"0":"")+m;
+  dateEl.textContent = DAYS[now.getDay()]+" · "+MONS[now.getMonth()]+" "+now.getDate()+
+    " · "+(hh<12?"AM":"PM");
+}
+paintTime(new Date());
+setInterval(function(){ paintTime(new Date()); }, 1000);
+window.__governor = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
+window.__faceRest = false;
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

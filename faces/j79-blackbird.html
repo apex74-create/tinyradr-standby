@@ -6,6 +6,12 @@
 <title>APEX — GE J79 · Motors Under Glass</title>
 <style>
   /* J79 MOTOR FACE v1 (Nov 9, 2026) — DIRECT-ON view.
+     v2 (face-graphics refinement, Nov 20, 2026): the face gains the
+     family's second view — an exploded one-third-turn cutaway with
+     its intake pipes, stage counts drawn, flow through the machine
+     and the random ingest routine — tipping in at six seconds or on
+     touch, exactly as the J58 benchmate has always done. The
+     direct-on view below is unchanged.
      Determination (Compounding Pass #1 §C, direct-on cut): look INTO the
      intake — concentric spool stacks receding down the bore, brass compass
      bezel, dark wood plate, big time as the primary read.
@@ -43,6 +49,7 @@
   #boreWrap{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
     width:92vmin;height:92vmin}
   svg{width:100%;height:100%;display:block}
+  #boreWrap svg{position:absolute;inset:0}
   .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
     letter-spacing:.22em;font-weight:700}
   #motorLbl{top:2.2vmin;font-size:3.4vmin;color:var(--brass-hi)}
@@ -62,7 +69,7 @@
 <div id="face">
   <div id="motorLbl" class="lbl">GE&nbsp;J79</div>
   <div id="specLbl" class="lbl">SINGLE-SPOOL TURBOJET</div>
-  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="J79 intake, direct-on"></svg></div>
+  <div id="boreWrap"><svg id="bore" viewBox="0 0 400 400" aria-label="J79 intake, direct-on"></svg><svg id="side" viewBox="0 0 400 400" aria-label="J79 turbojet, exploded one-third-turn cutaway"></svg></div>
   <div id="readPanel"><div id="clock">--:--</div><div id="dateLine">—</div></div>
   <div id="stateLamp">REST</div>
 </div>
@@ -160,6 +167,196 @@ var spinnerMark = el("line", {x1:CX, y1:CY-13, x2:CX, y2:CY-5, stroke:PAL.brassH
 el("path", {d:"M 96 128 A 128 128 0 0 1 196 74", fill:"none", stroke:PAL.steelHi, "stroke-width":2}, svg);
 el("path", {d:"M 84 152 A 138 138 0 0 1 150 82", fill:"none", stroke:PAL.steelLo, "stroke-width":1.2}, svg);
 
+/* =====================================================================
+   THE CUTAWAY (v2, face-graphics refinement, Nov 20, 2026). This face
+   shipped as v1 DIRECT-ON only, while its benchmate the J58 carried
+   the family's two-view treatment. It carries it now: the motor laid
+   along a diagonal axis at a one-third turn (section faces as
+   foreshortened ellipses), EXPLODED — compressor, combustor, turbine
+   and nozzle pulled apart on dashed witness lines — with its intake
+   pipes drawn in (two auxiliary intake ducts arcing into the lip, a
+   bleed pipe under the compressor) and the flow riding the axis
+   through every stage. The 17 compressor stages and 3 turbine stages
+   are drawn as their counts. The face opens on the end view and tips
+   to the cutaway at six seconds (the J58 pattern); touch flips.
+   The INGEST ROUTINE runs on this view (orb / triangle / saucer /
+   bird, random object on a random 6–15 s cycle, particleized
+   through the stages and expelled at the nozzle).
+   ===================================================================== */
+var sideSvg = document.getElementById("side");
+var AX = { x:62, y:118, dx:0.88, dy:0.47, L:296 };
+function axP(s, off){
+  return [AX.x + AX.dx*s - AX.dy*(off||0), AX.y + AX.dy*s + AX.dx*(off||0)];
+}
+function axPt(s, off){ var p = axP(s, off); return p[0].toFixed(1)+","+p[1].toFixed(1); }
+var sideG = el("g", {}, sideSvg);
+(function(){
+  var a = axP(-14, 0), b = axP(340, 0);
+  el("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], stroke:PAL.steelLo,
+    "stroke-width":1, "stroke-dasharray":"3 6", opacity:"0.7"}, sideG);
+})();
+function sectionRibbon(s0, w0, s1, w1, fill){
+  var pts = axPt(s0, w0)+" "+axPt(s1, w1)+" "+axPt(s1, -w1)+" "+axPt(s0, -w0);
+  return el("polygon", {points:pts, fill:fill, stroke:PAL.steelHi,
+    "stroke-width":1.1, "stroke-linejoin":"round"}, sideG);
+}
+function sectionFace(s, w, fill){
+  var c = axP(s, 0);
+  return el("ellipse", {cx:c[0].toFixed(1), cy:c[1].toFixed(1), rx:(w*0.34).toFixed(1), ry:w,
+    transform:"rotate(28.1 "+c[0].toFixed(1)+" "+c[1].toFixed(1)+")",
+    fill:fill, stroke:PAL.steelHi, "stroke-width":1.1}, sideG);
+}
+function stageDisc(s, w, col){
+  var c = axP(s, 0);
+  el("ellipse", {cx:c[0].toFixed(1), cy:c[1].toFixed(1), rx:(w*0.30).toFixed(1), ry:w,
+    transform:"rotate(28.1 "+c[0].toFixed(1)+" "+c[1].toFixed(1)+")",
+    fill:"none", stroke:col, "stroke-width":1.6}, sideG);
+}
+function gapWitness(s0, s1, w){
+  [-1, 1].forEach(function(sgn){
+    var a = axP(s0, w*sgn), b = axP(s1, w*sgn);
+    el("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], stroke:PAL.brass,
+      "stroke-width":0.9, "stroke-dasharray":"4 3", opacity:"0.8"}, sideG);
+  });
+}
+function sideLabel(text, s, off, anchor){
+  var p = axP(s, off);
+  var t = el("text", {x:p[0].toFixed(1), y:p[1].toFixed(1), "text-anchor":anchor||"middle",
+    fill:"#f5ead2", "font-size":10.5, "font-weight":700, "letter-spacing":"0.14em",
+    "font-family":"ui-monospace,Menlo,Consolas,monospace"}, sideG);
+  t.textContent = text;
+  return t;
+}
+/* intake pipes: two auxiliary ducts arcing into the lip from above,
+   one bleed pipe leaving the compressor's underside */
+(function(){
+  var lip = axP(6, -30), d1 = axP(-30, -86), d2 = axP(26, -88);
+  el("path", {d:"M "+d1[0].toFixed(1)+" "+d1[1].toFixed(1)+" Q "+axPt(-24, -44)+" "+lip[0].toFixed(1)+" "+lip[1].toFixed(1),
+    fill:"none", stroke:PAL.steel, "stroke-width":3, "stroke-linecap":"round"}, sideG);
+  var lip2 = axP(16, -32);
+  el("path", {d:"M "+d2[0].toFixed(1)+" "+d2[1].toFixed(1)+" Q "+axPt(30, -50)+" "+lip2[0].toFixed(1)+" "+lip2[1].toFixed(1),
+    fill:"none", stroke:PAL.steel, "stroke-width":3, "stroke-linecap":"round"}, sideG);
+  var b0 = axP(96, 30), b1 = axP(128, 62);
+  el("path", {d:"M "+b0[0].toFixed(1)+" "+b0[1].toFixed(1)+" Q "+axPt(116, 56)+" "+b1[0].toFixed(1)+" "+b1[1].toFixed(1),
+    fill:"none", stroke:PAL.brassLo, "stroke-width":2.4, "stroke-linecap":"round"}, sideG);
+})();
+sectionFace(0, 40, PAL.void);                                   /* intake lip */
+sectionRibbon(4, 37, 18, 35, "#10151d");
+for(var cs=0; cs<17; cs++){                                     /* 17 compressor stages */
+  stageDisc(24 + cs*7.4, 34 - cs*0.35, cs%2 ? PAL.steel : PAL.steelHi);
+}
+sectionRibbon(18, 35, 150, 29, "rgba(16,21,29,0.35)");
+gapWitness(152, 166, 29);
+sectionFace(166, 29, "#170d06");
+sectionRibbon(166, 29, 200, 27, "#1c1108");                     /* combustor */
+el("ellipse", (function(){ var c = axP(183, 0); return {cx:c[0].toFixed(1), cy:c[1].toFixed(1),
+  rx:(28*0.30).toFixed(1), ry:28, transform:"rotate(28.1 "+c[0].toFixed(1)+" "+c[1].toFixed(1)+")",
+  fill:"none", stroke:PAL.hot, "stroke-width":2}; })(), sideG);
+gapWitness(200, 212, 27);
+for(var ts=0; ts<3; ts++){                                      /* 3 turbine stages */
+  stageDisc(214 + ts*11, 26 - ts*1.5, PAL.hot);
+}
+sectionRibbon(212, 26, 248, 22, "#151a23");
+gapWitness(248, 260, 23);
+sectionRibbon(260, 24, 292, 38, "#10151d");                     /* nozzle */
+sectionFace(292, 38, PAL.void);
+var plume = (function(){
+  var pts = axPt(292, 32)+" "+axPt(340, 46)+" "+axPt(340, -46)+" "+axPt(292, -32);
+  return el("polygon", {points:pts, fill:PAL.hot, opacity:"0.15", stroke:"none"}, sideG);
+})();
+sideLabel("INTAKE + PIPES", 2, 92, "start");
+sideLabel("17-STAGE COMPRESSOR", 84, 74);
+sideLabel("COMBUSTOR", 183, -48);
+sideLabel("3-STAGE TURBINE", 230, 52);
+sideLabel("NOZZLE", 282, -58);
+var flowDots = [];
+for(var fd=0; fd<10; fd++){
+  flowDots.push(el("circle", {r:2.1, fill:PAL.laser, stroke:"none"}, sideG));
+}
+/* ---- the ingest routine: same house pattern as the Raptor's ---- */
+var ingestG = el("g", {opacity:"0"}, sideSvg);
+var ingestParts = [];
+for(var ip=0; ip<12; ip++){
+  ingestParts.push(el("circle", {r:1.9, fill:PAL.laser, stroke:"none", opacity:"0"}, ingestG));
+}
+var ingestObj = el("g", {}, ingestG);
+function drawIngestShape(kind){
+  while(ingestObj.firstChild) ingestObj.removeChild(ingestObj.firstChild);
+  if(kind === "saucer"){
+    el("ellipse", {cx:0, cy:0, rx:11, ry:3.6, fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+    el("path", {d:"M -5 0 A 5 4 0 0 1 5 0", fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+  } else if(kind === "triangle"){
+    el("polygon", {points:"0,-8 8,6 -8,6", fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+  } else if(kind === "bird"){
+    el("path", {d:"M -11 1 Q -5 -6 0 0 Q 5 -6 11 1", fill:"none", stroke:PAL.steelHi, "stroke-width":1.8}, ingestObj);
+  } else {
+    el("circle", {cx:0, cy:0, r:5.5, fill:"none", stroke:PAL.laser, "stroke-width":1.6}, ingestObj);
+    el("circle", {cx:0, cy:0, r:1.8, fill:PAL.laser, stroke:"none"}, ingestObj);
+  }
+}
+var INGEST_KINDS = ["orb", "triangle", "saucer", "bird"];
+var ingest = { phase:"wait", until: 6000 + Math.random()*8000, t0:0, kind:"orb" };
+function ingestFrame(el_ms){
+  if(ingest.phase === "wait"){
+    ingestG.setAttribute("opacity", "0");
+    if(el_ms >= ingest.until){
+      ingest.phase = "in"; ingest.t0 = el_ms;
+      ingest.kind = INGEST_KINDS[Math.floor(Math.random()*INGEST_KINDS.length)];
+      drawIngestShape(ingest.kind);
+    }
+    return;
+  }
+  var dt = el_ms - ingest.t0;
+  ingestG.setAttribute("opacity", "1");
+  if(ingest.phase === "in"){
+    var k = Math.min(1, dt/1000);
+    var p = axP(-44 + 50*k, Math.sin(k*9)*3);
+    ingestObj.setAttribute("transform", "translate("+p[0].toFixed(1)+" "+p[1].toFixed(1)+") scale("+(1.15-0.55*k).toFixed(2)+")");
+    ingestObj.setAttribute("opacity", String(1 - Math.max(0, k-0.75)*4));
+    if(k >= 1){ ingest.phase = "through"; ingest.t0 = el_ms; }
+  } else if(ingest.phase === "through"){
+    var k2 = Math.min(1, dt/1600);
+    ingestObj.setAttribute("opacity", "0");
+    ingestParts.forEach(function(c, i){
+      var s = 4 + (292-4) * Math.max(0, Math.min(1, k2*1.15 - i*0.012));
+      var off = Math.sin(k2*22 + i*2.4) * (4 + 10*k2) * (i%2 ? 1 : -1);
+      var pp = axP(s, off);
+      c.setAttribute("cx", pp[0].toFixed(1)); c.setAttribute("cy", pp[1].toFixed(1));
+      c.setAttribute("fill", k2 > 0.62 ? PAL.hot : PAL.laser);
+      c.setAttribute("opacity", String(0.95 - Math.max(0, k2-0.85)*5));
+    });
+    if(k2 >= 1){ ingest.phase = "wait"; ingest.until = el_ms + 6000 + Math.random()*9000; }
+  }
+}
+function sideFrame(el_ms){
+  flowDots.forEach(function(c, i){
+    var s = ((el_ms*0.045 + i*31) % 326) - 12;
+    var p = axP(s, Math.sin(el_ms/300 + i*1.7)*3);
+    c.setAttribute("cx", p[0].toFixed(1)); c.setAttribute("cy", p[1].toFixed(1));
+    c.setAttribute("fill", s > 200 ? PAL.hot : PAL.laser);
+    c.setAttribute("opacity", s < 0 || s > 296 ? "0" : "0.9");
+  });
+  plume.setAttribute("opacity", (0.12 + 0.05*Math.sin(el_ms/170)).toFixed(2));
+  ingestFrame(el_ms);
+}
+/* view state: opens on the end view, tips to the cutaway at 6 s;
+   touch flips either way and cancels the auto-tip */
+var viewSide = false;
+var specEl = document.getElementById("specLbl");
+function applyView(){
+  sideSvg.style.display = viewSide ? "block" : "none";
+  svg.style.display = viewSide ? "none" : "block";
+  specEl.textContent = viewSide ? "EXPLODED CUTAWAY · ONE-THIRD TURN — TOUCH FOR END VIEW"
+                                : "SINGLE-SPOOL TURBOJET — TOUCH FOR CUTAWAY";
+}
+applyView();
+var tipTimer = setTimeout(function(){ viewSide = true; applyView(); }, 6000);
+window.addEventListener("click", function(){
+  if(tipTimer){ clearTimeout(tipTimer); tipTimer = null; }
+  viewSide = !viewSide; applyView();
+});
+window.__sideFrame = sideFrame;
+
 /* ---- Time read ------------------------------------------------------- */
 var clockEl = document.getElementById("clock"), dateEl = document.getElementById("dateLine");
 var lampEl = document.getElementById("stateLamp");
@@ -207,6 +404,7 @@ function liveAngles(nowMs){
 function liveFrame(){
   var now = Date.now();
   applyAngles(liveAngles(now));
+  if(window.__sideFrame && typeof viewSide !== "undefined" && viewSide) window.__sideFrame(now - bootMs);
   requestAnimationFrame(liveFrame);
 }
 function setLamp(){ lampEl.textContent = "LIVE"; }

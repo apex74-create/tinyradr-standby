@@ -76,10 +76,16 @@
 
   FITTINGS: live clock (viewer-local + UTC), simple weather for the
   viewer's location (Open-Meteo current conditions; WEATHER — NO
-  MEASURE on failure), the comms doors as quiet background chips
-  (CB · GUARD · CAST NET — drawn labels, no handlers). BOTTOM NO-FLY
-  ZONE: no actionable element anywhere on this face; the chips and all
-  controls sit clear of the bottom band. Nothing on this face is a button.
+  MEASURE on failure), the comms doors as real door links (CB ·
+  GUARD · CAST NET). DOORS REPAIR (face-graphics refinement, Nov 20,
+  2026): the doors shipped as inert <span> chips flex-pinned to the
+  bottom of the face — they read as buttons, sat in the bottom band,
+  and presses did nothing (the owner's dead-row defect). They are
+  now anchors with real destinations (Encrypted CB, the Guard page,
+  Cast Net Mesh), seated in the flow directly under the feed lines —
+  out of the bottom band entirely. The BOTTOM NO-FLY ZONE law holds:
+  nothing actionable sits in the band where Android's three-button
+  navigation lands.
 
   BENCH SURFACE: window.__iss = the feed state; window.__arch = the
   viewer + orbit + pass state (viewer, gate, pass, now, hemi).
@@ -115,9 +121,11 @@
   #state .archline{color:var(--amber)}
   #state .nofeed{color:#ff5d5d}
   #wxloc{flex:0 0 auto;padding:4px 12px 0 12px;font-size:11px;color:var(--dim);line-height:1.5}
-  #doors{flex:1 1 auto;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:0 12px 30px 12px}
+  #doors{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px 0 12px}
   .chip{border:1px solid var(--line);border-radius:9px;padding:4px 10px;font-size:10.5px;
-    letter-spacing:2px;color:var(--dim);background:rgba(10,40,22,.25)}
+    letter-spacing:2px;color:var(--dim);background:rgba(10,40,22,.25);
+    text-decoration:none;cursor:pointer}
+  .chip:active,.chip:hover{color:var(--ink);border-color:var(--cyan)}
   #dimveil{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .6s}
 </style>
 </head>
@@ -144,7 +152,7 @@
     <div id="r-loc">LOCATION — NO MEASURE</div>
     <div id="r-src">FEED — WHERETHEISS.AT · ISS (NORAD 25544)</div>
   </div>
-  <div id="doors"><span class="chip">CB · CH 19</span><span class="chip">GUARD</span><span class="chip">CAST NET</span></div>
+  <div id="doors"><a class="chip" href="https://encryptedcb.com" target="_top">CB · CH 19</a><a class="chip" href="/guard" target="_top">GUARD</a><a class="chip" href="https://castnetmesh.com" target="_top">CAST NET</a></div>
 </div>
 <div id="dimveil"></div>
 <script>

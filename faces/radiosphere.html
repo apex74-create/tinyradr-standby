@@ -27,8 +27,19 @@
      at handset width — title into legend, HOW TO READ IT into FIELD
      READOUT. Every panel now carries a hard width share of the
      viewport and wraps inside it; the pairs can never meet. Graded
-     at the worst handset, not the widest. */
-  #titlebox { top: 14px; left: 14px; max-width: 55vw; }
+     at the worst handset, not the widest.
+     REBUILT AGAIN (face-graphics refinement, Nov 20, 2026): the owner
+     still found overlapping divs on the face at 19:15. The Nov 18
+     shares were max-widths — a panel could still size to its content
+     and wander — and the state banner's row was never reserved: it
+     sat at bottom:14 under panels whose bottoms were at 54, so a
+     wrapped two-line banner climbed into both bottom panels. Now
+     every panel carries a HARD width (width, not max-width) computed
+     off the viewport minus the margins, the bottom panels ride at
+     bottom:96px, and the banner owns the bottom row alone. Pairwise
+     separation is verified by bounding box at 360x640, 320x568,
+     400x400 and 844x390 in the refinement bench. */
+  #titlebox { top: 14px; left: 14px; width: calc(57vw - 20px); }
   #titlebox h1 {
     margin: 0; font-size: 20px; letter-spacing: 4px; font-weight: 700;
     color: #eafff2; text-shadow: 0 0 12px rgba(64, 255, 150, 0.55);
@@ -40,7 +51,7 @@
     color: #eafff2; font-variant-numeric: tabular-nums;
     text-shadow: 0 0 10px rgba(64, 255, 150, 0.65);
   }
-  #legend { top: 14px; right: 14px; font-size: 11px; line-height: 1.75; max-width: 37vw; }
+  #legend { top: 14px; right: 14px; font-size: 11px; line-height: 1.75; width: calc(39vw - 20px); }
   #legend .denied { color: #e08a8a; }
   #legend .off { color: #8a94a6; }
   #legend .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; margin-bottom: 2px; }
@@ -48,28 +59,28 @@
     display: inline-block; width: 10px; height: 10px; margin-right: 7px;
     border: 1px solid rgba(255,255,255,0.35); vertical-align: -1px;
   }
-  #keybox { left: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; max-width: 45vw; }
+  #keybox { left: 14px; bottom: 96px; font-size: 11.5px; line-height: 1.9; width: calc(47vw - 20px); }
   #keybox .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; }
   #keybox b { color: #eafff2; }
-  #statbox { right: 14px; bottom: 54px; font-size: 11.5px; line-height: 1.9; text-align: right; max-width: 45vw; }
+  #statbox { right: 14px; bottom: 96px; font-size: 11.5px; line-height: 1.9; text-align: right; width: calc(47vw - 20px); }
   #statbox .head { color: #ffcf5c; letter-spacing: 2px; font-size: 10px; }
   #statbox b { color: #eafff2; }
   #state {
     position: absolute; z-index: 6; left: 50%; bottom: 14px; transform: translateX(-50%);
-    pointer-events: none; white-space: normal; text-align: center; max-width: 94vw;
+    pointer-events: none; white-space: normal; text-align: center; width: max-content; max-width: 94vw;
     color: #ffcf5c; border: 1px solid rgba(255, 207, 92, 0.65);
     background: rgba(20, 14, 2, 0.78);
     padding: 6px 16px; font-size: 13px; letter-spacing: 3px;
     text-shadow: 0 0 8px rgba(255, 207, 92, 0.45);
   }
   @media (max-width: 620px) {
-    #titlebox { max-width: 57vw; padding: 8px 10px; }
+    #titlebox { width: calc(58vw - 16px); padding: 8px 10px; }
     #titlebox h1 { font-size: 14px; letter-spacing: 2px; }
     #titlebox p { font-size: 9px; letter-spacing: 1px; }
     #clock { font-size: 20px; }
-    #legend { max-width: 36vw; padding: 8px 10px; font-size: 9.5px; line-height: 1.6; }
-    #keybox { max-width: 46vw; padding: 8px 10px; font-size: 10px; line-height: 1.65; }
-    #statbox { max-width: 46vw; padding: 8px 10px; font-size: 10px; line-height: 1.65; }
+    #legend { width: calc(38vw - 16px); padding: 8px 10px; font-size: 9.5px; line-height: 1.6; }
+    #keybox { width: calc(47vw - 16px); padding: 8px 10px; font-size: 10px; line-height: 1.65; }
+    #statbox { width: calc(47vw - 16px); padding: 8px 10px; font-size: 10px; line-height: 1.65; }
     #state { font-size: 11px; letter-spacing: 2px; }
   }
 </style>
