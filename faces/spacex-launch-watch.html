@@ -254,6 +254,54 @@ var cur = null;          /* the SpaceX launch on the tower */
 var nextAny = null;      /* soonest launch of any provider, if pad empty */
 var feedOk = false, lastOkAt = 0;
 var bubbleMode = "plate"; /* plate | live */
+
+/* ================= FEED RESILIENCE =================
+   The Nov 20, 23:31 EST sweep caught this face DEGRADED inside a
+   live window: stuck on the boot placeholder, fields blank, one
+   feed request attempted and never settled. Root cause: the old
+   fetch carried no timeout and no retry — a stalled read never
+   resolved, renderData never ran, and the only recovery was a
+   flat 5-minute interval whose own read could stall the same way.
+   The fix, three parts: (1) every read times out (12 s) instead
+   of hanging; (2) a failed read retries on a backoff ladder
+   (5 s, 15 s, 30 s, 60 s, then every 120 s) instead of waiting
+   out the refresh interval; (3) the last good board is HELD —
+   in memory and, where the container allows, in localStorage —
+   and stays on the glass under an honest STALE · LAST READ
+   stamp rather than blanking. A board that was never read still
+   says NO FEED, and says it is retrying. */
+var FEED_TIMEOUT_MS = 12000;
+var REFRESH_MS = 300000;
+var RETRY_STEPS = [5000, 15000, 30000, 60000, 120000];
+var STORE_KEY = "apex-spacex-board-v1";
+var lastGood = null;     /* { cur, nextAny, at } — the held board */
+var retryStep = 0;
+var refreshTimer = null;
+var fetchInFlight = false;
+window.__boardState = { feedOk: false, lastOkAt: 0, retries: 0, held: false };
+
+function saveBoard(){
+  if(!lastGood) return;
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(lastGood));
+  } catch(e){ /* container without storage: the in-memory hold still stands */ }
+}
+function loadBoard(){
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return null;
+    var b = JSON.parse(raw);
+    if(!b || typeof b.at !== "number") return null;
+    return b;
+  } catch(e){ return null; }
+}
+function applyBoard(parsed, at){
+  cur = parsed.current; nextAny = parsed.nextAny;
+  lastOkAt = at;
+  lastGood = { cur: cur, nextAny: nextAny, at: at };
+  window.__boardState.held = true;
+  window.__boardState.lastOkAt = at;
+}
 var DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 var MONS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
@@ -273,6 +321,13 @@ function fmtDur(ms){
   var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
   return p(h) + ":" + p(m) + ":" + p(s % 60);
 }
+function fmtStamp(ms){
+  /* LAST READ stamp: time today, day + time once it is older. */
+  var d = new Date(ms), n = new Date();
+  var sameDay = d.getFullYear() === n.getFullYear() &&
+    d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+  return (sameDay ? "" : fmtDay(ms) + " ") + fmtClock(ms);
+}
 
 function setLamp(txt, color){ var l = $("stateLamp"); l.textContent = txt; l.style.color = color; }
 
@@ -281,11 +336,11 @@ function renderData(){
     $("mMission").textContent = "NO FEED";
     $("mVehicle").textContent = "—";
     $("mSite").textContent = "—";
-    $("mStatus").textContent = "SOURCE UNREACHABLE";
+    $("mStatus").textContent = "SOURCE UNREACHABLE · RETRYING";
     $("mCount").textContent = "T−--:--:--";
     $("mWindow").textContent = "WINDOW —";
     $("eLiftoff").textContent = "—";
-    setLamp("NO FEED", "#ff6a5e");
+    setLamp("NO FEED · RETRYING", "#ff6a5e");
     return;
   }
   if(!cur){
@@ -302,7 +357,7 @@ function renderData(){
     } else {
       $("mWindow").textContent = "WINDOW —";
     }
-    setLamp(feedOk ? "LIVE DATA" : "STALE", feedOk ? "#57e6ff" : "#ffb52e");
+    setLamp(feedOk ? "LIVE DATA" : "STALE · LAST READ " + fmtStamp(lastOkAt), feedOk ? "#57e6ff" : "#ffb52e");
     return;
   }
   $("mMission").textContent = cur.mission.toUpperCase();
@@ -312,7 +367,7 @@ function renderData(){
   $("mWindow").textContent = "WINDOW " + fmtDay(cur.open) + " · " +
     fmtClock(cur.open) + " – " + fmtClock(cur.close) + " LOCAL";
   $("eLiftoff").textContent = "AT WINDOW OPEN · " + fmtClock(cur.open);
-  setLamp(feedOk ? "LIVE DATA" : "STALE · LAST READ " + fmtClock(lastOkAt),
+  setLamp(feedOk ? "LIVE DATA" : "STALE · LAST READ " + fmtStamp(lastOkAt),
     feedOk ? "#57e6ff" : "#ffb52e");
 }
 
@@ -362,7 +417,8 @@ function tick(){
     var inZone = now >= cur.open - 30*60000 && now <= cur.close + 30*60000;
     if(inZone){
       setBubble("live");
-      setLamp("IN WINDOW · LIVE", "#ffb52e");
+      setLamp(feedOk ? "IN WINDOW · LIVE" : "IN WINDOW · STALE · LAST READ " + fmtStamp(lastOkAt),
+        "#ffb52e");
     } else if(now < cur.open){
       setBubble("plate", "WINDOW OPENS " + fmtDay(cur.open) + " · " + fmtClock(cur.open) +
         " — COVERAGE: NASASPACEFLIGHT LIVE");
@@ -370,26 +426,73 @@ function tick(){
       setBubble("plate", "WINDOW CLOSED — AWAITING THE NEXT BOARD");
     }
   } else {
-    setBubble("plate", feedOk ? "NO SPACEX WINDOW CARRIED" : "SOURCE UNREACHABLE");
+    setBubble("plate", feedOk ? "NO SPACEX WINDOW CARRIED" :
+      (lastGood ? "SOURCE UNREACHABLE · SHOWING LAST READ " + fmtStamp(lastOkAt)
+                : "SOURCE UNREACHABLE · RETRYING"));
   }
 }
 
+function scheduleNext(ms){
+  if(refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(fetchData, ms);
+}
+
+function fetchFeedText(){
+  /* One read of the feed, bounded: settles by FEED_TIMEOUT_MS
+     even when the network neither answers nor refuses. */
+  return new Promise(function(resolve, reject){
+    var done = false;
+    var ctrl = ("AbortController" in window) ? new AbortController() : null;
+    var timer = setTimeout(function(){
+      if(done) return; done = true;
+      if(ctrl){ try { ctrl.abort(); } catch(e){} }
+      reject(new Error("feed timeout"));
+    }, FEED_TIMEOUT_MS);
+    var opts = { cache: "no-store" };
+    if(ctrl) opts.signal = ctrl.signal;
+    fetch(FEED_URL, opts)
+      .then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.text(); })
+      .then(function(t){ if(done) return; done = true; clearTimeout(timer); resolve(t); })
+      .catch(function(e){ if(done) return; done = true; clearTimeout(timer); reject(e); });
+  });
+}
+
 function fetchData(){
-  fetch(FEED_URL, { cache: "no-store" })
-    .then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.text(); })
+  if(fetchInFlight) return;
+  fetchInFlight = true;
+  fetchFeedText()
     .then(function(txt){
       var parsed = parseFeed(txt);
-      cur = parsed.current; nextAny = parsed.nextAny;
-      feedOk = true; lastOkAt = Date.now();
+      feedOk = true; retryStep = 0;
+      window.__boardState.feedOk = true;
+      applyBoard(parsed, Date.now());
+      saveBoard();
       renderData(); tick();
+      scheduleNext(REFRESH_MS);
     })
     .catch(function(){
       feedOk = false;
+      window.__boardState.feedOk = false;
+      window.__boardState.retries++;
+      if(!cur && lastGood){ cur = lastGood.cur; nextAny = lastGood.nextAny; lastOkAt = lastGood.at; }
       renderData(); tick();
-    });
+      var delay = RETRY_STEPS[Math.min(retryStep, RETRY_STEPS.length - 1)];
+      retryStep++;
+      scheduleNext(delay);
+    })
+    .then(function(){ fetchInFlight = false; });
+}
+
+/* Boot: paint the held board first (STALE · LAST READ), then read. */
+var heldBoard = loadBoard();
+if(heldBoard){
+  lastGood = heldBoard;
+  cur = heldBoard.cur; nextAny = heldBoard.nextAny; lastOkAt = heldBoard.at;
+  window.__boardState.held = true;
+  window.__boardState.lastOkAt = heldBoard.at;
+  renderData(); tick();
 }
 fetchData();
-setInterval(fetchData, 300000);
 setInterval(tick, 1000);
 
 /* ================= GOD'S-EYE TOWER =================
