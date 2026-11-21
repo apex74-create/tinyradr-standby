@@ -4,10 +4,10 @@
   "catalogue": "public/depot/catalog.json",
   "appleStoreFeed": "public/apple-store/source.json"
  },
- "faces": 41,
+ "faces": 56,
  "planes": 2,
- "builds": 82,
- "androidOnShelf": 41,
+ "builds": 112,
+ "androidOnShelf": 56,
  "appleOnShelf": 0,
  "priceUsd": 9.99,
  "listingRule": "IN: any landed build that is a watch face when it lands \u2014 it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $9.99 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) \u2014 they keep their already-set pricing schemas.",
@@ -913,6 +913,336 @@
    "apple": {
     "plane": "apple",
     "bundleId": "app.lovable.apexsignal.formed.radiosphere",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "hero-p39",
+   "name": "Apex Face \u2014 Hero P-39D Airacobra",
+   "title": "APEX \u2014 Hero Line \u00b7 P-39D Airacobra",
+   "note": "Hero Line (Nov 20, 2026): the P-39D Airacobra, nose-on \u2014 the owner's favourite \u2014 in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.herop39",
+    "apkPath": "/depot/hero-p39.apk",
+    "apkSha256": "fb67a155d1133a6d3b0a0e36a9ff4b3333a40de5d9b9b9b789b43f83e3de6f56",
+    "apkSizeBytes": 3204040,
+    "facePath": "/faces/hero-p39.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.herop39",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "hero-corsair",
+   "name": "Apex Face \u2014 Hero F4U Corsair",
+   "title": "APEX \u2014 Hero Line \u00b7 F4U Corsair",
+   "note": "Hero Line (Nov 20, 2026): the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.herocorsair",
+    "apkPath": "/depot/hero-corsair.apk",
+    "apkSha256": "ba710eb1eff046549edd8be5d2b7cfda9b360872db6ff5b68c86a8070d94dcea",
+    "apkSizeBytes": 3204040,
+    "facePath": "/faces/hero-corsair.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.herocorsair",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "hero-f14",
+   "name": "Apex Face \u2014 Hero F-14 Tomcat",
+   "title": "APEX \u2014 Hero Line \u00b7 F-14 Tomcat",
+   "note": "Hero Line (Nov 20, 2026): the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.herof14",
+    "apkPath": "/depot/hero-f14.apk",
+    "apkSha256": "8479553269f9556e105886321128d0cde88a52fcd10fbf0a2e2a77f7cf004136",
+    "apkSizeBytes": 3204080,
+    "facePath": "/faces/hero-f14.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.herof14",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "hotrod-ratrod",
+   "name": "Apex Face \u2014 Hot Rod Rat Rod",
+   "title": "APEX \u2014 Hot Rod Line \u00b7 Rat Rod",
+   "note": "Hot Rod Line (Nov 20, 2026): an original Apex monster in a rusty blown rat rod \u2014 the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character \u2014 with a compass dial and the time in analog and digital.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.hotrodratrod",
+    "apkPath": "/depot/hotrod-ratrod.apk",
+    "apkSha256": "01c883432693886d6bb8f210596543f6e55ca73c8571292b202107372fb2a483",
+    "apkSizeBytes": 3203868,
+    "facePath": "/faces/hotrod-ratrod.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.hotrodratrod",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "hotrod-blown",
+   "name": "Apex Face \u2014 Hot Rod Blown Drag",
+   "title": "APEX \u2014 Hot Rod Line \u00b7 Blown Drag",
+   "note": "Hot Rod Line (Nov 20, 2026): an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.hotrodblown",
+    "apkPath": "/depot/hotrod-blown.apk",
+    "apkSha256": "be208a5ec4533470f1093416e457a7067dde41587157bebf7982ef93cf23f480",
+    "apkSizeBytes": 3203868,
+    "facePath": "/faces/hotrod-blown.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.hotrodblown",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "hotrod-coupe",
+   "name": "Apex Face \u2014 Hot Rod Full Coupe",
+   "title": "APEX \u2014 Hot Rod Line \u00b7 Full Coupe",
+   "note": "Hot Rod Line (Nov 20, 2026): an original wild-haired Apex monster bursting from a flamed coupe \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.hotrodcoupe",
+    "apkPath": "/depot/hotrod-coupe.apk",
+    "apkSha256": "7ff6697fc90c1450743e6314c348389cdb6bf85b02897e34c7bd02219319a023",
+    "apkSizeBytes": 3203884,
+    "facePath": "/faces/hotrod-coupe.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.hotrodcoupe",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "spacex-launch-watch",
+   "name": "Apex Face \u2014 SpaceX Launch Watch",
+   "title": "APEX \u2014 SpaceX Launch Watch \u00b7 Phase Two",
+   "note": "SpaceX Launch Watch \u00b7 Phase Two (Nov 20, 2026): names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE \u2014 the source publishes none and the face invents none. Compass dial and time, analog and digital.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.spacexlaunchwatch",
+    "apkPath": "/depot/spacex-launch-watch.apk",
+    "apkSha256": "2ff2fc5b1b45ad75799ad6541ead1e95b4e5f79db47b70d999ce3dcd19d97115",
+    "apkSizeBytes": 3211528,
+    "facePath": "/faces/spacex-launch-watch.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.spacexlaunchwatch",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "tesla-scope",
+   "name": "Apex Face \u2014 Tesla Scope",
+   "title": "APEX \u2014 Signal Watch \u00b7 TESLA SCOPE",
+   "note": "Tesla Scope (Nov 20, 2026): a Tesla companion panel in the Scope pipe, wired field-by-field to Tesla's documented Fleet API shapes (charge level and state, range, charge limit, time-to-full; lock, odometer, software, climate). Ships unpaired \u2014 NO CAR PAIRED, every vehicle readout NO MEASURE, no token held, no Tesla calls made; pairing is Tesla's documented OAuth, inert until a real car is authorized. Vehicle location is deliberately never requested.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.teslascope",
+    "apkPath": "/depot/tesla-scope.apk",
+    "apkSha256": "150d8c0a29d430768cb6ed737847c7c14a81b5d8b3c45517f725d2dffe7c3a1f",
+    "apkSizeBytes": 3213332,
+    "facePath": "/faces/tesla-scope.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.teslascope",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "j58-dark",
+   "name": "Apex Face \u2014 P&W J58 Dark Edition",
+   "title": "APEX \u2014 P&W J58 \u00b7 DARK EDITION \u00b7 Motors Under Glass",
+   "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole J58 machine \u2014 both views, flow and random ingest \u2014 carried onto blackened plates. The dark twin of the J58 seat.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.j58dark",
+    "apkPath": "/depot/j58-dark.apk",
+    "apkSha256": "21a43eec8d85e3732cf239b7da995aa206bb3d01c39bb455a552e3d1ca6292ce",
+    "apkSizeBytes": 3217356,
+    "facePath": "/faces/j58-dark.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.j58dark",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "j79-dark",
+   "name": "Apex Face \u2014 GE J79 Dark Edition",
+   "title": "APEX \u2014 GE J79 \u00b7 DARK EDITION \u00b7 Motors Under Glass",
+   "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole J79 machine \u2014 both views, flow and random ingest \u2014 on a charcoal-burnt wood plate. The dark twin of the J79 Blackbird seat.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.j79dark",
+    "apkPath": "/depot/j79-dark.apk",
+    "apkSha256": "ac6b680a9abbf557b1a1c1d11261c4742facc76bea620941c6aa05012d2922db",
+    "apkSizeBytes": 3211796,
+    "facePath": "/faces/j79-dark.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.j79dark",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "raptor-dark",
+   "name": "Apex Face \u2014 Raptor Dark Edition",
+   "title": "APEX \u2014 Raptor \u00b7 DARK EDITION \u00b7 Motors Under Glass",
+   "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole Raptor machine \u2014 exploded and end views, flow and random ingest \u2014 on a deep-space plate. The dark twin of the Raptor seat.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.raptordark",
+    "apkPath": "/depot/raptor-dark.apk",
+    "apkSha256": "f4fc1cada3ed6af85fc7efcd3fdad31ff676a3d13f40e8d716c9d1d215508d7a",
+    "apkSizeBytes": 3213040,
+    "facePath": "/faces/raptor-dark.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.raptordark",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "prop-gear",
+   "name": "Apex Face \u2014 Propeller & Gears",
+   "title": "APEX \u2014 Propeller & Gears \u00b7 The Propeller Wing",
+   "note": "The Propeller Wing (Nov 20, 2026): a propeller on a 36T great gear, clock gears behind it meshing at true ratios 36:20:12, the 12T gear carrying real clock hands \u2014 propellers turning like clock gears, with clock gears behind them.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.propgear",
+    "apkPath": "/depot/prop-gear.apk",
+    "apkSha256": "e35774496a1e0f416456a6033caa2d51dd264f7b9e7a06d7beb8d594a0ef5d14",
+    "apkSizeBytes": 3204476,
+    "facePath": "/faces/prop-gear.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.propgear",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "war-corsair",
+   "name": "Apex Face \u2014 War Corsair Cowling",
+   "title": "APEX \u2014 War Edition \u00b7 Corsair Cowling \u00b7 The Propeller Wing",
+   "note": "The Propeller Wing (Nov 20, 2026): the F4U Corsair seat \u2014 nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.warcorsair",
+    "apkPath": "/depot/war-corsair.apk",
+    "apkSha256": "9e2ec15720f2382c8d0c1ca08e5a52efac69cea96d549c24bfa25b4acf876fb0",
+    "apkSizeBytes": 3205472,
+    "facePath": "/faces/war-corsair.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.warcorsair",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "war-p51",
+   "name": "Apex Face \u2014 War P51 Cowling",
+   "title": "APEX \u2014 War Edition \u00b7 P51 Cowling \u00b7 The Propeller Wing",
+   "note": "The Propeller Wing (Nov 20, 2026): the P-51 seat \u2014 tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.warp51",
+    "apkPath": "/depot/war-p51.apk",
+    "apkSha256": "91e69ef51129b32dbc5824c6d583155a0d9d99b7704cf14f3557c03a955699a1",
+    "apkSizeBytes": 3205684,
+    "facePath": "/faces/war-p51.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.warp51",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "ultralight-wireframe",
+   "name": "Apex Face \u2014 Ultralight Wireframe Helicopter",
+   "title": "APEX \u2014 Ultralight Wireframe Helicopter \u00b7 The Propeller Wing \u00b7 TENTATIVE",
+   "note": "The Propeller Wing (Nov 20, 2026) \u2014 TENTATIVE, the owner's 'maybe', flagged for his end-grade: a wireframe helicopter \u2014 open truss, mast gear, main rotor with blade-passage beat, tail rotor at 5x, skids.",
+   "priceUsd": 9.99,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.ultralightwireframe",
+    "apkPath": "/depot/ultralight-wireframe.apk",
+    "apkSha256": "1538b041d5d8fa22784b1e82c574c81ebeb08a9c3568fc2b89d16ba32ac95da1",
+    "apkSizeBytes": 3204360,
+    "facePath": "/faces/ultralight-wireframe.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.ultralightwireframe",
     "state": "not-formed"
    }
   }

@@ -790,6 +790,291 @@
       "note": "Radiosphere (Nov 16, 2026) - the signal-sphere face: the owner's bench proof of the same name (spinning sphere, height = strength, colour = plane) wired for production to the APEX SCAN FEED contract v1, the same contract Globe Tracker reads. The face paints ONLY what the shell publishes and re-reads the feed every frame: height is measured strength on the spec scale (h = 3 + (dBm + 95) x 30/65, floored at 2), colour is the plane (WIFI / BLE / RID / CELL / GNSS), width is a fixed footing stated on the face and never read as data, entries with no strength in the feed stand as footing dots and count as NO MEASURE, unknown planes are never plotted, and at most the 24 strongest are shown with the count stated on the face. Honest states hold in every build: SCAN - NO FEED (the web build has no shell and reports exactly that), SCAN - NO SIGNALS, and FEED STALE when the feed ages past 15 seconds. Receive-only: the face never connects, pairs, probes or transmits. No bench data ships in the production file. Vanilla single file; the clock rides the title box.",
       "bay": 47,
       "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "hero-p39",
+      "name": "Apex Face — Hero P-39D Airacobra",
+      "title": "APEX — Hero Line · P-39D Airacobra",
+      "package": "app.lovable.apexsignal.face.herop39",
+      "apkPath": "/depot/hero-p39.apk",
+      "apkSha256": "fb67a155d1133a6d3b0a0e36a9ff4b3333a40de5d9b9b9b789b43f83e3de6f56",
+      "apkSizeBytes": 3204040,
+      "facePath": "/faces/hero-p39.html",
+      "faceSha256": "ee091c7bc09b0f027ea33c6e900db979806e4f4e8410714f71aa8f400e3a3fb6",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Hero Line (Nov 20, 2026): the P-39D Airacobra, nose-on — the owner's favourite — in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs.",
+      "bay": 48,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "hero-corsair",
+      "name": "Apex Face — Hero F4U Corsair",
+      "title": "APEX — Hero Line · F4U Corsair",
+      "package": "app.lovable.apexsignal.face.herocorsair",
+      "apkPath": "/depot/hero-corsair.apk",
+      "apkSha256": "ba710eb1eff046549edd8be5d2b7cfda9b360872db6ff5b68c86a8070d94dcea",
+      "apkSizeBytes": 3204040,
+      "facePath": "/faces/hero-corsair.html",
+      "faceSha256": "9a0efb84ab6aca394a79de08bb67309432ec04fa19476bf9fe791e5e02644f99",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Hero Line (Nov 20, 2026): the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat.",
+      "bay": 49,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "hero-f14",
+      "name": "Apex Face — Hero F-14 Tomcat",
+      "title": "APEX — Hero Line · F-14 Tomcat",
+      "package": "app.lovable.apexsignal.face.herof14",
+      "apkPath": "/depot/hero-f14.apk",
+      "apkSha256": "8479553269f9556e105886321128d0cde88a52fcd10fbf0a2e2a77f7cf004136",
+      "apkSizeBytes": 3204080,
+      "facePath": "/faces/hero-f14.html",
+      "faceSha256": "fcc537a2bad0d5c4bf6eaf5b333a8bbcb17acceba8a4b49ec55ef6c655da530f",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Hero Line (Nov 20, 2026): the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat.",
+      "bay": 50,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "hotrod-ratrod",
+      "name": "Apex Face — Hot Rod Rat Rod",
+      "title": "APEX — Hot Rod Line · Rat Rod",
+      "package": "app.lovable.apexsignal.face.hotrodratrod",
+      "apkPath": "/depot/hotrod-ratrod.apk",
+      "apkSha256": "01c883432693886d6bb8f210596543f6e55ca73c8571292b202107372fb2a483",
+      "apkSizeBytes": 3203868,
+      "facePath": "/faces/hotrod-ratrod.html",
+      "faceSha256": "19f1d7b1dcb0d900cb63843c52d60b926a0aaffe607455882727713fe5193da4",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Hot Rod Line (Nov 20, 2026): an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital.",
+      "bay": 51,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "hotrod-blown",
+      "name": "Apex Face — Hot Rod Blown Drag",
+      "title": "APEX — Hot Rod Line · Blown Drag",
+      "package": "app.lovable.apexsignal.face.hotrodblown",
+      "apkPath": "/depot/hotrod-blown.apk",
+      "apkSha256": "be208a5ec4533470f1093416e457a7067dde41587157bebf7982ef93cf23f480",
+      "apkSizeBytes": 3203868,
+      "facePath": "/faces/hotrod-blown.html",
+      "faceSha256": "f89ed7d8fc4068207e58c94b436de2567d1adedad57f460f2b7d194bf28c9065",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Hot Rod Line (Nov 20, 2026): an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital.",
+      "bay": 52,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "hotrod-coupe",
+      "name": "Apex Face — Hot Rod Full Coupe",
+      "title": "APEX — Hot Rod Line · Full Coupe",
+      "package": "app.lovable.apexsignal.face.hotrodcoupe",
+      "apkPath": "/depot/hotrod-coupe.apk",
+      "apkSha256": "7ff6697fc90c1450743e6314c348389cdb6bf85b02897e34c7bd02219319a023",
+      "apkSizeBytes": 3203884,
+      "facePath": "/faces/hotrod-coupe.html",
+      "faceSha256": "a255441f776471b08230e65a47a5a520a185940969f052e2be7db4bb743cabad",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Hot Rod Line (Nov 20, 2026): an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital.",
+      "bay": 53,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "spacex-launch-watch",
+      "name": "Apex Face — SpaceX Launch Watch",
+      "title": "APEX — SpaceX Launch Watch · Phase Two",
+      "package": "app.lovable.apexsignal.face.spacexlaunchwatch",
+      "apkPath": "/depot/spacex-launch-watch.apk",
+      "apkSha256": "2ff2fc5b1b45ad75799ad6541ead1e95b4e5f79db47b70d999ce3dcd19d97115",
+      "apkSizeBytes": 3211528,
+      "facePath": "/faces/spacex-launch-watch.html",
+      "faceSha256": "e2c990561fc90fe86cc2f0ceb11e67946d931157a502d6dcba2a0086d2a93f03",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "SpaceX Launch Watch · Phase Two (Nov 20, 2026): names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE — the source publishes none and the face invents none. Compass dial and time, analog and digital.",
+      "bay": 54,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "tesla-scope",
+      "name": "Apex Face — Tesla Scope",
+      "title": "APEX — Signal Watch · TESLA SCOPE",
+      "package": "app.lovable.apexsignal.face.teslascope",
+      "apkPath": "/depot/tesla-scope.apk",
+      "apkSha256": "150d8c0a29d430768cb6ed737847c7c14a81b5d8b3c45517f725d2dffe7c3a1f",
+      "apkSizeBytes": 3213332,
+      "facePath": "/faces/tesla-scope.html",
+      "faceSha256": "3d1fa17bebd4327ac634b9c7c38b41c0457f3d5cbeb40c2e21d3f52cfe186e10",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Tesla Scope (Nov 20, 2026): a Tesla companion panel in the Scope pipe, wired field-by-field to Tesla's documented Fleet API shapes (charge level and state, range, charge limit, time-to-full; lock, odometer, software, climate). Ships unpaired — NO CAR PAIRED, every vehicle readout NO MEASURE, no token held, no Tesla calls made; pairing is Tesla's documented OAuth, inert until a real car is authorized. Vehicle location is deliberately never requested.",
+      "bay": 55,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "j58-dark",
+      "name": "Apex Face — P&W J58 Dark Edition",
+      "title": "APEX — P&W J58 · DARK EDITION · Motors Under Glass",
+      "package": "app.lovable.apexsignal.face.j58dark",
+      "apkPath": "/depot/j58-dark.apk",
+      "apkSha256": "21a43eec8d85e3732cf239b7da995aa206bb3d01c39bb455a552e3d1ca6292ce",
+      "apkSizeBytes": 3217356,
+      "facePath": "/faces/j58-dark.html",
+      "faceSha256": "78d63ad366e586ecde463746c36bca152a610076e8e940af7b286ddf4b595f04",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole J58 machine — both views, flow and random ingest — carried onto blackened plates. The dark twin of the J58 seat.",
+      "bay": 56,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "j79-dark",
+      "name": "Apex Face — GE J79 Dark Edition",
+      "title": "APEX — GE J79 · DARK EDITION · Motors Under Glass",
+      "package": "app.lovable.apexsignal.face.j79dark",
+      "apkPath": "/depot/j79-dark.apk",
+      "apkSha256": "ac6b680a9abbf557b1a1c1d11261c4742facc76bea620941c6aa05012d2922db",
+      "apkSizeBytes": 3211796,
+      "facePath": "/faces/j79-dark.html",
+      "faceSha256": "4c62e148385f503ba529c6384848a11c9c476f2f58b39819b1dd82d3c9dc35ae",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole J79 machine — both views, flow and random ingest — on a charcoal-burnt wood plate. The dark twin of the J79 Blackbird seat.",
+      "bay": 57,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "raptor-dark",
+      "name": "Apex Face — Raptor Dark Edition",
+      "title": "APEX — Raptor · DARK EDITION · Motors Under Glass",
+      "package": "app.lovable.apexsignal.face.raptordark",
+      "apkPath": "/depot/raptor-dark.apk",
+      "apkSha256": "f4fc1cada3ed6af85fc7efcd3fdad31ff676a3d13f40e8d716c9d1d215508d7a",
+      "apkSizeBytes": 3213040,
+      "facePath": "/faces/raptor-dark.html",
+      "faceSha256": "fb5cc84d32433ebf120c130919edc312c5cfcff88bf93eeb9fab6cc53d45c6f9",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole Raptor machine — exploded and end views, flow and random ingest — on a deep-space plate. The dark twin of the Raptor seat.",
+      "bay": 58,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "prop-gear",
+      "name": "Apex Face — Propeller & Gears",
+      "title": "APEX — Propeller & Gears · The Propeller Wing",
+      "package": "app.lovable.apexsignal.face.propgear",
+      "apkPath": "/depot/prop-gear.apk",
+      "apkSha256": "e35774496a1e0f416456a6033caa2d51dd264f7b9e7a06d7beb8d594a0ef5d14",
+      "apkSizeBytes": 3204476,
+      "facePath": "/faces/prop-gear.html",
+      "faceSha256": "c5606be79ff5c8bca067e0383cfe101678a36e24e49cc6eb9c7bc15525a67d0a",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The Propeller Wing (Nov 20, 2026): a propeller on a 36T great gear, clock gears behind it meshing at true ratios 36:20:12, the 12T gear carrying real clock hands — propellers turning like clock gears, with clock gears behind them.",
+      "bay": 59,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "war-corsair",
+      "name": "Apex Face — War Corsair Cowling",
+      "title": "APEX — War Edition · Corsair Cowling · The Propeller Wing",
+      "package": "app.lovable.apexsignal.face.warcorsair",
+      "apkPath": "/depot/war-corsair.apk",
+      "apkSha256": "9e2ec15720f2382c8d0c1ca08e5a52efac69cea96d549c24bfa25b4acf876fb0",
+      "apkSizeBytes": 3205472,
+      "facePath": "/faces/war-corsair.html",
+      "faceSha256": "42cdfc857eacc32ff3f8b94ef7741b58dee13b84ca8bc76dd6fc170dd456cf70",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The Propeller Wing (Nov 20, 2026): the F4U Corsair seat — nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+      "bay": 60,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "war-p51",
+      "name": "Apex Face — War P51 Cowling",
+      "title": "APEX — War Edition · P51 Cowling · The Propeller Wing",
+      "package": "app.lovable.apexsignal.face.warp51",
+      "apkPath": "/depot/war-p51.apk",
+      "apkSha256": "91e69ef51129b32dbc5824c6d583155a0d9d99b7704cf14f3557c03a955699a1",
+      "apkSizeBytes": 3205684,
+      "facePath": "/faces/war-p51.html",
+      "faceSha256": "e50b7ffd759d7912ca418fec3570333019d16e1281532be5b1ae43b07e69f698",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The Propeller Wing (Nov 20, 2026): the P-51 seat — tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+      "bay": 61,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "ultralight-wireframe",
+      "name": "Apex Face — Ultralight Wireframe Helicopter",
+      "title": "APEX — Ultralight Wireframe Helicopter · The Propeller Wing · TENTATIVE",
+      "package": "app.lovable.apexsignal.face.ultralightwireframe",
+      "apkPath": "/depot/ultralight-wireframe.apk",
+      "apkSha256": "1538b041d5d8fa22784b1e82c574c81ebeb08a9c3568fc2b89d16ba32ac95da1",
+      "apkSizeBytes": 3204360,
+      "facePath": "/faces/ultralight-wireframe.html",
+      "faceSha256": "2794700d06349ba1272612f67d35b830718124818aa485cb0918dfa620c78897",
+      "priceUsd": 9.99,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The Propeller Wing (Nov 20, 2026) — TENTATIVE, the owner's 'maybe', flagged for his end-grade: a wireframe helicopter — open truss, mast gear, main rotor with blade-passage beat, tail rotor at 5x, skids.",
+      "bay": 62,
+      "garageStatus": "IN THE GARAGE"
     }
   ],
   "garage": {
