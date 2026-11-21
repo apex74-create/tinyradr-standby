@@ -1,26 +1,26 @@
 {
  "checkedTwice": true,
- "date": "2026-11-19",
+ "date": "2026-11-20",
  "games": {
-  "daily3": "834",
-  "daily4": "1539",
+  "daily3": "895",
+  "daily4": "1542",
   "fantasy5": [
-   3,
-   22,
-   28,
+   9,
+   12,
+   19,
    33,
    39
   ],
   "fantasy5DoublePlay": [
-   5,
-   24,
+   2,
+   13,
    27,
-   34,
-   38
+   30,
+   39
   ]
  },
  "grades": {
-  "date": "2026-11-19",
+  "date": "2026-11-20",
   "fantasy5DoublePlay": "No win on the Double Play.",
   "games": {
    "daily3": {
@@ -30,7 +30,7 @@
     },
     "main": {
      "anyOrder": false,
-     "drawn": "834",
+     "drawn": "895",
      "positionMatches": 0,
      "prize": "NO MEASURE",
      "result": "NO WIN",
@@ -45,7 +45,7 @@
     },
     "main": {
      "anyOrder": false,
-     "drawn": "1539",
+     "drawn": "1542",
      "positionMatches": 0,
      "prize": "NO MEASURE",
      "result": "NO WIN",
@@ -56,32 +56,28 @@
    "fantasy5": {
     "doublePlay": {
      "drawn": [
-      5,
-      24,
+      2,
+      13,
       27,
-      34,
-      38
+      30,
+      39
      ],
-     "matchCount": 1,
-     "matched": [
-      27
-     ],
+     "matchCount": 0,
+     "matched": [],
      "prize": 0.0,
      "result": "NO WIN",
      "status": "graded"
     },
     "main": {
      "drawn": [
-      3,
-      22,
-      28,
+      9,
+      12,
+      19,
       33,
       39
      ],
-     "matchCount": 1,
-     "matched": [
-      33
-     ],
+     "matchCount": 0,
+     "matched": [],
      "prize": 0.0,
      "result": "NO WIN",
      "status": "graded"
@@ -92,5 +88,5 @@
    "prizeTotal": 0.0
   }
  },
- "postedAt": "2026-11-19T20:49:15-05:00"
+ "postedAt": "2026-11-20T20:50:38-05:00"
 }
