@@ -1,26 +1,26 @@
 {
  "checkedTwice": true,
- "date": "2026-11-20",
+ "date": "2026-11-21",
  "games": {
-  "daily3": "895",
-  "daily4": "1542",
+  "daily3": "340",
+  "daily4": "4219",
   "fantasy5": [
-   9,
-   12,
-   19,
-   33,
-   39
+   1,
+   5,
+   18,
+   28,
+   32
   ],
   "fantasy5DoublePlay": [
-   2,
-   13,
-   27,
-   30,
-   39
+   3,
+   7,
+   16,
+   20,
+   21
   ]
  },
  "grades": {
-  "date": "2026-11-20",
+  "date": "2026-11-21",
   "fantasy5DoublePlay": "No win on the Double Play.",
   "games": {
    "daily3": {
@@ -30,7 +30,7 @@
     },
     "main": {
      "anyOrder": false,
-     "drawn": "895",
+     "drawn": "340",
      "positionMatches": 0,
      "prize": "NO MEASURE",
      "result": "NO WIN",
@@ -45,7 +45,7 @@
     },
     "main": {
      "anyOrder": false,
-     "drawn": "1542",
+     "drawn": "4219",
      "positionMatches": 0,
      "prize": "NO MEASURE",
      "result": "NO WIN",
@@ -56,25 +56,27 @@
    "fantasy5": {
     "doublePlay": {
      "drawn": [
-      2,
-      13,
-      27,
-      30,
-      39
+      3,
+      7,
+      16,
+      20,
+      21
      ],
-     "matchCount": 0,
-     "matched": [],
+     "matchCount": 1,
+     "matched": [
+      20
+     ],
      "prize": 0.0,
      "result": "NO WIN",
      "status": "graded"
     },
     "main": {
      "drawn": [
-      9,
-      12,
-      19,
-      33,
-      39
+      1,
+      5,
+      18,
+      28,
+      32
      ],
      "matchCount": 0,
      "matched": [],
@@ -82,11 +84,22 @@
      "result": "NO WIN",
      "status": "graded"
     }
+   },
+   "powerball": {
+    "doublePlay": {
+     "drawingKey": "doublePlay",
+     "result": "NOT GRADED \u2014 the Powerball Double Play drawing is missing from the record",
+     "status": "missing"
+    },
+    "main": {
+     "result": "NOT GRADED \u2014 main drawing missing",
+     "status": "missing"
+    }
    }
   },
   "totals": {
    "prizeTotal": 0.0
   }
  },
- "postedAt": "2026-11-20T20:50:38-05:00"
+ "postedAt": "2026-11-21T20:49:40-05:00"
 }
