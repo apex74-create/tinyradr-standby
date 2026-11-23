@@ -1740,10 +1740,17 @@
     else if (S.hr !== null) { hrVal = 'NO MEASURE'; hrTag = ''; }
     else { hrVal = '—'; hrTag = ' <span class="bl">' + S.hrState + '</span>'; }
     rows += '<span data-act="hr" style="cursor:pointer"><span class="bl">HEART RATE</span> <span class="bheart">♥</span> <span class="bv">' + hrVal + '</span>' + hrTag + '</span><br>';
-    rows += '<span class="bl">O2</span> <span class="bv">' + (S.spo2 !== null && fresh(T.spo2, 60000) ? S.spo2 + '%' : 'NO MEASURE') + '</span><br>';
-    rows += '<span class="bl">HRV</span> <span class="bv">' + (S.hrv !== null && fresh(T.hrv, 60000) ? S.hrv + ' MS' : 'NO MEASURE') + '</span><br>';
     rows += '<span class="bl">STEPS</span> <span class="bv">' + (S.steps !== null && fresh(T.steps, 300000) ? S.steps : 'NO MEASURE') + '</span><br>';
-    rows += '<span class="bl">SLEEP</span> <span class="bv">' + (S.sleep !== null && fresh(T.sleep, 12 * 3600 * 1000) ? fmtSleep(S.sleep) : 'NO MEASURE') + '</span><br>';
+    // (V8, Nov 23, 2026 — owner charge: fields the device cannot feed
+    // come OFF the face; no HOLLOW fields ship. The O2, HRV and SLEEP
+    // rows are REMOVED, not merely unpowered: this device class
+    // (LOKMAT / MT6739) exposes no SpO2 to Android at all, its
+    // heart-rate sensor reports averaged BPM with no RR intervals to
+    // derive HRV from, and sleep is an inference, not a measure.
+    // HEART RATE and STEPS stay: the container bridge now feeds them
+    // from the watch's own PPG and step sensors. The bridge contract
+    // still accepts spo2/hrv/sleep keys — held, shown nowhere, the
+    // same candidate rail as resp/temp — until hardware proves them.)
     rows += '<span data-act="gps" style="cursor:pointer"><span class="bl">GPS</span> <span class="bv">' + (S.gps ? S.gps : '—') + '</span>' + (S.gps ? '' : ' <span class="bl">TAP</span>') + '</span><br>';
     rows += '<span class="bl">NET</span> <span class="bv">' + netText() + '</span><br>';
     rows += '<span class="bl">RF</span> <span class="bv">' + rfText() + '</span>';

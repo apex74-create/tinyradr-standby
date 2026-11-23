@@ -40,7 +40,7 @@
    "slug": "signal-scope-v4",
    "name": "Apex Face \u2014 Signal Scope V4",
    "title": "APEX \u2014 Signal Watch \u00b7 SIGNAL SCOPE V4",
-   "note": "The face that listens to the watch: bios column reads only what a real hook returns, honest blanks otherwise.",
+   "note": "Fox Hunt Edition. V8 (Nov 23, 2026): the bios reads only what the container now feeds \u2014 HR and steps from the watch's own sensors, WiFi scans, network state, gateway ping \u2014 and the O2/HRV/SLEEP rows are removed: this device class cannot measure them, and a field that cannot be fed does not ship.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -48,8 +48,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.signalscopev4",
     "apkPath": "/depot/signal-scope-v4.apk",
-    "apkSha256": "ce312661449c63754228dc522d52c4828bfb5cc9a8def2e7821462b6e2279896",
-    "apkSizeBytes": 3240336,
+    "apkSha256": "5f53033d37335838edf5c5d7c39ee319bd9e29230647966b485112b81456a303",
+    "apkSizeBytes": 53713,
     "facePath": "/faces/signal-scope-v4.html"
    },
    "apple": {
@@ -502,7 +502,7 @@
    "slug": "the-19",
    "name": "Apex Face \u2014 The 19",
    "title": "APEX \u2014 THE 19 \u00b7 Hierographic",
-   "note": "The 19 (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-1 (Specimen Zero, verdict PLUG): the estate's first LAUNCHER FACE. The Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) IS the product's own hero - and the steel 19 bezel in the art was never decoration: it is a BUTTON, pre-drawn. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE CALL - RUNG A (this build): a generous tap target (34% of stage) rides ON the plate's 19 dial (centre at stage fractions 0.059/0.574 - the dial hangs at the plate's left edge and the target with it; geometry grounded against the plate art and the rendered captures, delta 0.00 in both frame states) and OPENS ENCRYPTED CB (https://encryptedcb.com) - the COMMS-door pattern transplanted from the extension rail. The affordance is a soft pulse ring breathing on the dial's rim in the plate's mesh cyan - an outline only, never a fill or shade over the art. RUNG B (the same tap launching the installed Cryptid CB native companion) is NOT in this build: it inherits Cryptid v2.1's unproven on-device state; nothing here wires, fakes, or implies it. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) - big Casio readout (house DSEG7, hollow digits, OLED-black hearts, on a solid chip), the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS - NO FIX; coordinates never invented). ONE plate hangs - no backdrop switcher. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings - case metal only in the rim, the glass window genuinely open; frame-ON pixel census over the glass interior: 0 case-fill pixels in 126,225, 53,411 distinct colours (the world paints). PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 17/17 hard checks - clock exact (advanced 5 s over 4.6 s wall), drones moving, pulse phase locked to the wall second, frame toggles ON-OFF-ON, the call: window.__call19 carries Rung A + the URL, a synthetic click on the dial target fired the opener exactly once with https://encryptedcb.com, target centre delta 0.00 px seated and unseated; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness - the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase).",
+   "note": "The 19 (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-1 (Specimen Zero, verdict PLUG): the estate's first LAUNCHER FACE. The Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) IS the product's own hero - and the steel 19 bezel in the art was never decoration: it is a BUTTON, pre-drawn. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE CALL - RUNG A (this build): a generous tap target (34% of stage) rides ON the plate's 19 dial (centre at stage fractions 0.059/0.574 - the dial hangs at the plate's left edge and the target with it; geometry grounded against the plate art and the rendered captures, delta 0.00 in both frame states) and OPENS ENCRYPTED CB (https://encryptedcb.com) - the COMMS-door pattern transplanted from the extension rail. The affordance is a soft pulse ring breathing on the dial's rim in the plate's mesh cyan - an outline only, never a fill or shade over the art. RUNG B (the same tap launching the installed Cryptid CB native companion) is NOT in this build: it inherits Cryptid v2.1's unproven on-device state; nothing here wires, fakes, or implies it. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) - big Casio readout (house DSEG7, hollow digits, OLED-black hearts, on a solid chip), the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS - NO FIX; coordinates never invented). ONE plate hangs - no backdrop switcher. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings - case metal only in the rim, the glass window genuinely open; frame-ON pixel census over the glass interior: 0 case-fill pixels in 126,225, 53,411 distinct colours (the world paints). PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 17/17 hard checks - clock exact (advanced 5 s over 4.6 s wall), drones moving, pulse phase locked to the wall second, frame toggles ON-OFF-ON, the call: window.__call19 carries Rung A + the URL, a synthetic click on the dial target fired the opener exactly once with https://encryptedcb.com, target centre delta 0.00 px seated and unseated; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness - the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase). BOUND FIX (Nov 23, 2026): Direct Parameter Load \u2014 the container senses the display once and loads it as ApexBound; the dial paints its square to the loaded bound at 15/16 with one verification pass, instead of measuring the viewport at paint time (owner field exhibit: dial painted off its frame on the LOKMAT).",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -510,8 +510,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.the19",
     "apkPath": "/depot/the-19.apk",
-    "apkSha256": "13e161a79da79a55e30e76fc6ff1bfbf57104bcb95ef06022c2ae3aa28fc7a7f",
-    "apkSizeBytes": 3038953,
+    "apkSha256": "5a479e972cdbf6ce024940e2808a70ad9a9b8e3fd10668734d80b303637da8c3",
+    "apkSizeBytes": 156113,
     "facePath": "/faces/the-19.html"
    },
    "apple": {

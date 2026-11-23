@@ -380,17 +380,43 @@ function sizeStage(){
      the size of the layout viewport's shorter side — the face's
      canonical build is SQUARE (shape-at-purchase), and the frame
      seats into the largest centred square the window offers. */
-  var nVW = Math.max(1, Math.round(Math.min(window.innerWidth, window.innerHeight)));
+  /* BOUND — DIRECT PARAMETER LOAD (fleet bound fix pattern, Nov 23,
+     2026; owner field exhibit: this face painted off its frame on the
+     LOKMAT because sizeStage measured window.innerWidth at paint
+     time, and this vendor WebView's viewport claim is not the glass).
+     The container senses the display ONCE and loads it as the
+     ApexBound parameter; the stage paints its square to the LOADED
+     bound at 15/16 (sensed 640 -> paint 600) and centres by loaded
+     pixel offsets. The viewport is never measured to size the stage.
+     Fallback (bench / plain web, no container parameter): the
+     window's own inner size, same margin. ONE verification pass
+     after layout corrects the paint once if the painted stage does
+     not measure to the loaded bound — a correction, not a search.
+     window.__boundReport carries the bench record. */
+  var bw = window.innerWidth || 0, bh = window.innerHeight || 0, bsrc = "window";
+  try {
+    if (window.ApexBound && ApexBound.getW() > 0 && ApexBound.getH() > 0) {
+      var aw = ApexBound.getW(), ah = ApexBound.getH();
+      /* rotation: if the window's orientation disagrees with the
+         sensed frame, the sensed frame is the stale one — swap it */
+      if ((bw > bh) !== (aw > ah) && aw !== ah) { var t2 = aw; aw = ah; ah = t2; }
+      bw = aw; bh = ah; bsrc = "container";
+    }
+  } catch (e) {}
+  if (!bw || !bh) return;
+  var sensed = Math.min(bw, bh);
+  var nVW = Math.max(1, Math.floor(sensed * 15 / 16));
   var nVH = nVW;
   var moved = (nVW !== VW || nVH !== VH);
   VW = nVW; VH = nVH;
   stage.style.width = VW + "px"; stage.style.height = VH + "px";
+  window.__boundReport = { src: bsrc, sensedW: bw, sensedH: bh, sensed: sensed, paint: nVW, corr: 1 };
   /* CENTRED IN THE VIEWPORT (owner field report, Nov 20, 2026):
      the square stage seats in the middle of the window, letterboxed
      — black strips left/right in landscape, black bands top/bottom
      in portrait — never hugged to the left or pushed to the top. */
-  stage.style.left = Math.round((window.innerWidth - VW) / 2) + "px";
-  stage.style.top = Math.round((window.innerHeight - VH) / 2) + "px";
+  stage.style.left = Math.round((bw - VW) / 2) + "px";
+  stage.style.top = Math.round((bh - VH) / 2) + "px";
   document.documentElement.style.height = VH + "px";
   document.body.style.height = VH + "px";
   /* the stage is positioned, so html/body collapse to their
@@ -409,6 +435,26 @@ function sizeStage(){
   cv.style.left = frameInset + "px"; cv.style.top = frameInsetY + "px";
   cv.style.width = innerW() + "px"; cv.style.height = innerH() + "px";
   layoutHud();
+  /* one verification pass against the loaded bound (see header) */
+  var myPaint = VW, myBw = bw, myBh = bh;
+  requestAnimationFrame(function(){
+    if (VW !== myPaint || !window.__boundReport) return;
+    var r = stage.getBoundingClientRect();
+    if (!r.width) return;
+    window.__boundReport.rect = Math.round(r.width * 10) / 10;
+    var corr = myPaint / r.width;
+    window.__boundReport.corr = Math.round(corr * 1000) / 1000;
+    if (Math.abs(corr - 1) > 0.02 && !sizeStage._corrected) {
+      sizeStage._corrected = true;
+      var p2 = Math.max(1, Math.round(myPaint * corr));
+      VW = p2; VH = p2;
+      stage.style.width = p2 + "px"; stage.style.height = p2 + "px";
+      stage.style.left = Math.round((myBw - p2) / 2) + "px";
+      stage.style.top = Math.round((myBh - p2) / 2) + "px";
+      window.__boundReport.paint = p2;
+      layoutHud();
+    }
+  });
   /* the patrol is fraction-seeded against the stage, so a real
      viewport change reseeds it — but a bare frame toggle is not
      a viewport change and must not teleport the craft */
