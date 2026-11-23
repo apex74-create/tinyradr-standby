@@ -562,6 +562,11 @@ const GodsEye = (() => {
       const wa = pieceWorld(a), wb = pieceWorld(b);
       return project(wa.x, wa.y, 0).d - project(wb.x, wb.y, 0).d;
     });
+    /* Plate discipline (owner audit, Nov 23): a name plate that would land
+       on top of a plate already drawn this frame is HELD, not stacked —
+       stacked plates read as nothing. The glyph and colour still read;
+       selecting the piece always draws its plate. */
+    const drawnPlates = [];
     for (const p of sorted) {
       const w = pieceWorld(p);
       const c = project(w.x, w.y, 0.25);
@@ -583,6 +588,11 @@ const GodsEye = (() => {
         (p.parkedAtLt.length ? " · Q@LT " + p.parkedAtLt.length : "") + (p.pending.length ? " · Q " + p.pending.length : "");
       ctx.font = "bold 9px Courier New";
       const wdt = Math.max(ctx.measureText(plate).width, ctx.measureText(sub).width) + 12;
+      const pr = { x: c.x - wdt / 2, y: c.y - 46, w: wdt, h: 24 };
+      const hits = drawnPlates.some(q =>
+        pr.x < q.x + q.w + 2 && pr.x + pr.w + 2 > q.x && pr.y < q.y + q.h + 2 && pr.y + pr.h + 2 > q.y);
+      if (hits && !sel) continue;
+      drawnPlates.push(pr);
       ctx.fillStyle = "rgba(4,10,14,.8)";
       ctx.fillRect(c.x - wdt / 2, c.y - 46, wdt, 24);
       ctx.strokeStyle = "rgba(160,220,255,.25)"; ctx.lineWidth = 1;

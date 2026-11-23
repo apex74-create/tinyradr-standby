@@ -8,10 +8,19 @@
   html, body { margin:0; padding:0; height:100%; background:#04070c; color:#cfe8dd;
     font-family:"Courier New", monospace; overflow:hidden; }
   #stage { position:absolute; inset:0; display:flex; }
-  #boardWrap { position:relative; flex:1 1 auto; min-width:0;
+  #boardWrap { flex:1 1 auto; min-width:0; display:flex; flex-direction:column;
     box-shadow: inset 0 0 0 1px rgba(140,255,190,.14), inset 0 0 42px rgba(57,255,122,.05); }
-  #boardWrap::before { content:""; position:absolute; inset:6px; z-index:2; pointer-events:none;
-    border:1px solid rgba(110,231,255,.10); border-radius:10px;
+  /* Announcements live in FLOW — header and footer strips take real layout
+     space; the board area below them is never floated over or covered. */
+  #topStrip { flex:0 0 auto; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:flex-start;
+    justify-content:space-between; padding:10px 12px;
+    background:rgba(8,14,20,.72); border-bottom:1px solid rgba(110,231,255,.18); }
+  #topRight { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  #footStrip { flex:0 0 auto; display:flex; flex-wrap:wrap; gap:6px 16px; align-items:flex-start;
+    padding:8px 12px; background:rgba(8,14,20,.72); border-top:1px solid rgba(110,231,255,.18); }
+  #boardArea { position:relative; flex:1 1 auto; min-height:0; }
+  #boardArea::before { content:""; position:absolute; inset:6px; z-index:2; pointer-events:none;
+    border:1px solid rgba(110,231,255,.10);
     background:
       radial-gradient(circle 4px at 14px 14px, rgba(220,255,235,.85) 1.6px, rgba(120,160,140,.35) 2.6px, transparent 4px),
       radial-gradient(circle 4px at calc(100% - 14px) 14px, rgba(220,255,235,.85) 1.6px, rgba(120,160,140,.35) 2.6px, transparent 4px),
@@ -26,7 +35,7 @@
   #board { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
   #board:active { cursor:grabbing; }
   #signalRings { width:100%; height:96px; display:block; }
-  #hud { position:absolute; top:10px; left:12px; pointer-events:none; z-index:5; }
+  #hud { pointer-events:none; min-width:0; }
   #hud .t { font-size:15px; letter-spacing:2px; color:#eafff3; }
   #hud .s { font-size:10px; letter-spacing:1px; color:#57b98a; margin-top:2px; }
   #lamps { display:flex; gap:12px; margin-top:6px; font-size:9px; letter-spacing:1px; color:#7fa892; }
@@ -35,18 +44,18 @@
   .dot.on { background:#39ff7a; box-shadow:0 0 8px #39ff7a; }
   .dot.amber.on { background:#ffb340; box-shadow:0 0 8px #ffb340; }
   .dot.cyan.on { background:#6ee7ff; box-shadow:0 0 8px #6ee7ff; }
-  #beat { position:absolute; top:10px; right:12px; font-size:11px; letter-spacing:2px; color:#6ee7ff; z-index:5;
+  #beat { font-size:11px; letter-spacing:2px; color:#6ee7ff; white-space:nowrap;
     background:rgba(10,16,22,.55); padding:4px 8px; border:1px solid rgba(110,231,255,.3);
-    border-radius:6px; backdrop-filter:blur(6px); pointer-events:none; }
-  #honest { position:absolute; left:12px; bottom:10px; font-size:10px; letter-spacing:.5px; z-index:5;
+    pointer-events:none; }
+  #honest { flex:1 1 320px; min-width:0; font-size:10px; letter-spacing:.5px;
     color:#ffb340; background:rgba(10,16,12,.55); padding:5px 8px; border:1px solid rgba(255,179,64,.35);
-    border-radius:6px; backdrop-filter:blur(6px); pointer-events:none; line-height:1.6; max-width:72%; }
-  #hint { position:absolute; right:12px; bottom:10px; font-size:10px; letter-spacing:1px; color:#6f8f80;
-    pointer-events:none; z-index:5; }
+    pointer-events:none; line-height:1.6; }
+  #hint { flex:0 1 auto; font-size:10px; letter-spacing:1px; color:#6f8f80;
+    pointer-events:none; padding-top:4px; text-align:right; }
   #panel { flex:0 0 330px; display:flex; flex-direction:column; gap:10px; padding:12px;
     background:rgba(8,14,20,.72); border-left:1px solid rgba(110,231,255,.18);
     backdrop-filter:blur(10px); overflow-y:auto; overflow-x:hidden; }
-  .card { border:1px solid rgba(160,220,255,.16); border-radius:10px; padding:10px;
+  .card { border:1px solid rgba(160,220,255,.16);padding:10px;
     background-color:rgba(16,26,34,.55);
     background-image:
       radial-gradient(circle 3px at 10px 10px, rgba(220,255,235,.8) 1.2px, rgba(120,160,140,.3) 2px, transparent 3px),
@@ -58,6 +67,9 @@
     backdrop-filter:blur(8px); }
   .card h3 { margin:0 0 8px; font-size:11px; letter-spacing:2px; color:#8fd8ff; font-weight:normal; }
   .row { display:flex; gap:6px; flex-wrap:wrap; }
+  /* CORNER GRAMMAR (owner ruling, Nov 23): square = INFORMATION (plates,
+     labels, scrims, panels stay square-cut); round = ACTION (genuinely
+     pressable controls keep round edges — round tells the eye "button"). */
   .btn { font:inherit; font-size:11px; letter-spacing:1px; padding:8px 10px; border-radius:7px;
     background:rgba(24,44,58,.75); color:#eafff3; border:1px solid rgba(110,231,255,.3); cursor:pointer; }
   .btn:hover { background:rgba(34,64,84,.85); }
@@ -74,9 +86,9 @@
   label.chk { font-size:10px; letter-spacing:1px; color:#9fc4b2; display:flex; gap:6px; align-items:center; }
   #pieces { overflow-y:auto; max-height:300px; padding-right:2px; }
   .boardHead { font-size:10px; letter-spacing:1.5px; color:#8fd8ff; margin:8px 0 4px; }
-  .pbtn { font:inherit; font-size:10px; letter-spacing:.5px; text-align:left; padding:6px 7px; width:100%;
+  .pbtn { font:inherit; font-size:10px; letter-spacing:.5px; text-align:left; padding:6px 7px; border-radius:7px; width:100%;
     background:rgba(20,34,44,.6); color:#cfe8dd; border:1px solid rgba(160,220,255,.16);
-    border-radius:7px; cursor:pointer; line-height:1.5; margin-bottom:4px; display:block; }
+   cursor:pointer; line-height:1.5; margin-bottom:4px; display:block; }
   .pbtn small { color:#7fa892; display:block; font-size:9px; }
   .pbtn .cut { color:#ff7a6e; } .pbtn .live { color:#39ff7a; }
   #selInfo { font-size:11px; line-height:1.7; min-height:40px; }
@@ -94,11 +106,11 @@
   #log .fly { color:#6ee7ff; } #log .dim { color:#7fa892; }
   body.spectator #panel { pointer-events:none; opacity:.35; }
   body.spectator #specBanner { display:block; }
-  #specBanner { display:none; position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:5;
-    font-size:12px; letter-spacing:3px; color:#ffd75e; background:rgba(10,16,12,.6);
-    padding:6px 14px; border:1px solid rgba(255,215,94,.5); border-radius:6px; pointer-events:none; }
+  #specBanner { display:none; font-size:12px; letter-spacing:3px; color:#ffd75e;
+    background:rgba(10,16,12,.6); white-space:nowrap;
+    padding:6px 14px; border:1px solid rgba(255,215,94,.5);pointer-events:none; }
   @media (max-width:760px) {
-    #stage { flex-direction:column; } #panel { flex:0 0 48%; border-left:none;
+    #stage { flex-direction:column; } #panel { flex:0 0 44%; border-left:none;
       border-top:1px solid rgba(110,231,255,.18); }
   }
 </style>
@@ -106,23 +118,31 @@
 <body>
 <div id="stage">
   <div id="boardWrap">
-    <canvas id="board"></canvas>
-    <div id="sweep"></div>
-    <div id="hud">
-      <div class="t">◎ APEX RONIN</div>
-      <div class="s">THE DRAG RACE · RUN WHAT YOU BRUNG · HOUSE TRANSPORT, LIVE ON THE BOARD</div>
-      <div class="s" style="color:#c9a86a">A commercial gamification of the bench-proven end-to-end assembly — the saddle-and-workers machinery, orchestrated to make plays on the board.</div>
-      <div id="lamps">
-        <span class="lamp"><span class="dot" id="lampBeat"></span>BEAT</span>
-        <span class="lamp"><span class="dot cyan" id="lampPipe"></span>PIPE</span>
-        <span class="lamp"><span class="dot amber" id="lampSeat"></span>SEAT</span>
+    <div id="topStrip">
+      <div id="hud">
+        <div class="t">◎ APEX RONIN</div>
+        <div class="s">THE DRAG RACE · RUN WHAT YOU BRUNG · HOUSE TRANSPORT, LIVE ON THE BOARD</div>
+        <div class="s" style="color:#c9a86a">A commercial gamification of the bench-proven end-to-end assembly — the saddle-and-workers machinery, orchestrated to make plays on the board.</div>
+        <div id="lamps">
+          <span class="lamp"><span class="dot" id="lampBeat"></span>BEAT</span>
+          <span class="lamp"><span class="dot cyan" id="lampPipe"></span>PIPE</span>
+          <span class="lamp"><span class="dot amber" id="lampSeat"></span>SEAT</span>
+        </div>
+      </div>
+      <div id="topRight">
+        <div id="beat">LOCKSTEP · BEAT 0</div>
+        <div id="specBanner">SPECTATOR — GOD'S EYE · NO CONTROLS</div>
       </div>
     </div>
-    <div id="beat">LOCKSTEP · BEAT 0</div>
-    <div id="specBanner">SPECTATOR — GOD'S EYE · NO CONTROLS</div>
-    <div id="honest">House MTOF/2 envelope — same format and integrity construction as the estate reference implementation, running in-page (loopback) for demonstration. No RF bearer in this build.<br>
-    burst transport, encrypted at both ends, re-arranged at every hop, on a lockstep beat — in-page loopback demonstrator. Demo secret held in-page at both ends.</div>
-    <div id="hint">DRAG — SPIN · WHEEL — ZOOM · CLICK — SELECT / TARGET</div>
+    <div id="boardArea">
+      <canvas id="board"></canvas>
+      <div id="sweep"></div>
+    </div>
+    <div id="footStrip">
+      <div id="honest">House MTOF/2 envelope — same format and integrity construction as the estate reference implementation, running in-page (loopback) for demonstration. No RF bearer in this build.<br>
+      burst transport, encrypted at both ends, re-arranged at every hop, on a lockstep beat — in-page loopback demonstrator. Demo secret held in-page at both ends.</div>
+      <div id="hint">DRAG — SPIN · WHEEL — ZOOM · CLICK — SELECT / TARGET</div>
+    </div>
   </div>
   <div id="panel">
     <div class="card">
@@ -150,7 +170,7 @@
       BYO COMPUTE: a guest seat runs on the guest's own compute — their model, their meter.
       The house meter runs the track, the referee, and the house seats only.</div>
       <div id="seatLines" style="margin-top:6px"></div>
-      <canvas id="signalRings" width="296" height="96" style="width:100%;display:block;margin-top:8px;background:rgba(6,12,10,.5);border:1px solid rgba(57,255,122,.18);border-radius:6px"></canvas>
+      <canvas id="signalRings" width="296" height="96" style="width:100%;display:block;margin-top:8px;background:rgba(6,12,10,.5);border:1px solid rgba(57,255,122,.18)"></canvas>
       <div class="note">SIGNAL RINGS — the deformed donuts: one ring per board. Ring size = the board's
       state-space measure; the wobble = calls in flight on that board, live.</div>
       <h3 style="margin-top:10px">SERIES LADDER</h3>
