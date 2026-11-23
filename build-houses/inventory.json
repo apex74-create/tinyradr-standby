@@ -4,10 +4,10 @@
   "catalogue": "public/depot/catalog.json",
   "appleStoreFeed": "public/apple-store/source.json"
  },
- "faces": 55,
+ "faces": 56,
  "planes": 2,
- "builds": 110,
- "androidOnShelf": 55,
+ "builds": 112,
+ "androidOnShelf": 56,
  "appleOnShelf": 0,
  "priceUsd": 10,
  "listingRule": "IN: any landed build that is a watch face when it lands \u2014 it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $10 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) \u2014 they keep their already-set pricing schemas.",
@@ -1221,6 +1221,28 @@
    "apple": {
     "plane": "apple",
     "bundleId": "app.lovable.apexsignal.formed.warp51",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "radar-scope",
+   "name": "Apex Face \u2014 Radar Scope \u00b7 Wi-Fi Overlay",
+   "title": "APEX \u2014 Signal Watch \u00b7 RADAR SCOPE",
+   "note": "The owner's own design, scoped by him Nov 13-15, 2026 and never built until now: a sweeping radar scope whose contacts are the live Wi-Fi scape, a frequency/channel-occupancy graph along the bottom, and his vitals strip (battery, heart rate, steps, gateway-ping heartbeat, tap, time). Built on the pipe container (v3 lineage) that reads the analyzer's ApexWifi/1 ingest with the container's own scan as the named fallback; every value prints SRC ANALYZER / SRC CONTAINER. Range is the RSSI ring and is labelled an estimate on the glass; bearing is NO MEASURE and the angle around the ring is signal order, printed as such. O2/HRV/SLEEP are named NO MEASURE - not fed on this device class. Five-step scrub on the ingest, signal-lane mapping per the pipe contract.",
+   "priceUsd": 10,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.radarscope",
+    "apkPath": "/depot/radar-scope.apk",
+    "apkSha256": "3f232f8910e7dbfb6e270fbd45ceb7174b7dff959e10e33f338b2c9dbff9b47c",
+    "apkSizeBytes": 29137,
+    "facePath": "/faces/radar-scope.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.radarscope",
     "state": "not-formed"
    }
   }

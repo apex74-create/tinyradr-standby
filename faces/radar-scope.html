@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — Radar Scope · Wi-Fi Overlay</title>
+<style>
+  html, body { margin:0; padding:0; background:#010402; color:#39ff7a; font-family:"Courier New", monospace; overflow:hidden; }
+  #stage { position:absolute; inset:0; display:flex; flex-direction:column; }
+  #head { padding:4px 8px 2px; font-size:11px; letter-spacing:1px; display:flex; justify-content:space-between; gap:6px; white-space:nowrap; }
+  #head .dim { color:#1d7a44; }
+  #src { padding:0 8px 2px; font-size:10px; color:#ffb340; letter-spacing:1px; white-space:nowrap; overflow:hidden; }
+  #scopeWrap { position:relative; flex:0 0 auto; margin:0 auto; }
+  canvas { display:block; }
+  #graphWrap { padding:2px 8px 0; }
+  #vitals { padding:3px 8px 1px; font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; }
+  #vitals .nm { color:#8a5a13; }
+  #unfed { padding:0 8px 2px; font-size:9px; color:#8a5a13; letter-spacing:1px; white-space:nowrap; overflow:hidden; }
+  #list { flex:1 1 auto; overflow:hidden; padding:2px 8px 6px; font-size:10px; line-height:1.5; }
+  #list .row { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #list .stale { color:#5c5c5c; }
+  #list .hd { color:#1d7a44; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="head"><span>◉ RADAR SCOPE · WI-FI OVERLAY</span><span class="dim" id="clock">--:--:--</span></div>
+  <div id="src">SRC — NO MEASURE · NODE —</div>
+  <div id="scopeWrap"><canvas id="scope"></canvas></div>
+  <div id="graphWrap"><canvas id="graph"></canvas></div>
+  <div id="vitals">BATT — · HR — · STEPS — · PING — · TAP 0</div>
+  <div id="unfed">O2 · HRV · SLEEP — NO MEASURE · NOT FED ON THIS DEVICE CLASS</div>
+  <div id="list"><div class="row hd">CONTACTS — NO FEED</div></div>
+</div>
+<script>
+'use strict';
+var GOLDEN = 2.399963; // rad — display spread only, never a bearing
+var FRESH_MS = 180000, STALE_MS = 300000;
+var contacts = {};   // bssid -> contact
+var order = [];      // bssids ranked strongest first (NARROW output)
+var snap = null;     // last scrubbed snapshot {at, src, node}
+var sensors = {};
+var lastPing = null;
+var taps = 0;
+var headingDeg = null;
+var sweep = { angle: 0, last: null };
+var chanMap = {};    // channel -> {count, best}
+
+function nowMs() { return Date.now(); }
+
+/* THE FIVE-STEP SCRUB — signal lane (owner's protocol, Nov 3;
+   mapping per the pipe contract, Nov 23):
+   0 PRE-TREAT  schema/freshness gate; a failed record never paints.
+   1 WHIP       duplicate BSSIDs collapse to the strongest read; each
+                BSSID keeps its RSSI track — the swing is what registers.
+   2 NARROW     project to the fields the scope consumes, rank
+                strongest first, cap the field.
+   3 ±SPEED     per-BSSID tracks read both ways: RSSI rising = approach,
+      TRACKS    falling = departure; the trend, not a snapshot.
+   4 HANG       the scope paints whole scrubbed snapshots, each stamped
+      STILLS    with its age; past the bound the still comes down. */
+function scrub(s) {
+  if (!s || !Array.isArray(s.aps) || typeof s.at !== 'number') return null;      // 0
+  if (s.at > nowMs() + 30000) return null;                                       // 0
+  var byB = {}, anon = [];
+  s.aps.forEach(function (a) {                                                   // 1
+    if (!a) return;
+    if (a.bssid) {
+      var p = byB[a.bssid];
+      if (!p || (a.rssi || -999) > p.rssi) byB[a.bssid] = a;
+    } else if (a.ssid) anon.push(a);
+  });
+  var rows = Object.keys(byB).map(function (k) { return byB[k]; }).concat(anon)
+    .map(function (a) {                                                          // 2
+      return { ssid: a.ssid || '', bssid: a.bssid || '', bandGhz: a.bandGhz || 0,
+               channel: a.channel || 0, rssi: a.rssi };
+    })
+    .filter(function (a) { return typeof a.rssi === 'number'; })
+    .sort(function (x, y) { return y.rssi - x.rssi; })
+    .slice(0, 24);
+  return { at: s.at, src: s.src || 'CONTAINER', node: s.node || '', aps: rows };
+}
+
+window.ApexWifiPush = function (s) {
+  var clean = scrub(s);
+  if (!clean) return;
+  var seen = {};
+  clean.aps.forEach(function (a) {
+    var key = a.bssid || ('ssid:' + a.ssid);
+    seen[key] = true;
+    var c = contacts[key];
+    if (!c) { c = contacts[key] = { key: key, hist: [], miss: 0 }; }
+    c.ssid = a.ssid; c.bssid = a.bssid; c.bandGhz = a.bandGhz;
+    c.channel = a.channel; c.rssi = a.rssi; c.lastSeen = clean.at; c.miss = 0;
+    c.hist.push(a.rssi); if (c.hist.length > 8) c.hist.shift();                  // 1/3
+    c.swing = Math.max.apply(null, c.hist) - Math.min.apply(null, c.hist);
+    var d = c.hist.length > 1 ? c.hist[c.hist.length - 1] - c.hist[0] : 0;
+    c.trend = d >= 3 ? 'APPROACH' : (d <= -3 ? 'DEPART' : 'HOLD');               // 3
+  });
+  Object.keys(contacts).forEach(function (k) {
+    if (!seen[k]) { contacts[k].miss++; if (contacts[k].miss >= 2) delete contacts[k]; }
+  });
+  order = Object.keys(contacts).sort(function (x, y) { return contacts[y].rssi - contacts[x].rssi; });
+  order.forEach(function (k, i) { contacts[k].slot = i; contacts[k].ang = i * GOLDEN; });
+  chanMap = {};
+  clean.aps.forEach(function (a) {
+    if (!a.channel) return;
+    var m = chanMap[a.channel] || (chanMap[a.channel] = { count: 0, best: -999 });
+    m.count++; if (a.rssi > m.best) m.best = a.rssi;
+  });
+  snap = clean;                                                                  // 4
+  renderList();
+};
+
+window.ApexSensorsPush = function (o) { if (o) { sensors = o; renderVitals(); } };
+window.ApexPingPush = function (p) { if (p && typeof p.rttMs === 'number') { lastPing = p; renderVitals(); } };
+window.ApexNetPush = function () {};
+
+function snapAge() { return snap ? nowMs() - snap.at : null; }
+function feedLive() { var a = snapAge(); return a !== null && a <= FRESH_MS; }
+
+function renderList() {
+  var el = document.getElementById('list');
+  if (!order.length) { el.innerHTML = '<div class="row hd">CONTACTS — NO FEED</div>'; return; }
+  var html = '<div class="row hd">CONTACTS ' + order.length + ' · RANGE=RSSI RING (EST) · ANGLE=SIGNAL ORDER — BEARING NO MEASURE</div>';
+  order.slice(0, 8).forEach(function (k) {
+    var c = contacts[k], stale = (nowMs() - c.lastSeen) > 60000 || c.miss > 0;
+    html += '<div class="row' + (stale ? ' stale' : '') + '">' +
+      (c.ssid || '(hidden)') + ' · CH ' + (c.channel || '—') + ' · ' + c.rssi + ' dBm · ' +
+      c.trend + ' · SWING ' + c.swing + ' dB' + (stale ? ' · STALE' : '') + '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function renderVitals() {
+  var t = new Date();
+  document.getElementById('clock').textContent =
+    ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2) + ':' + ('0' + t.getSeconds()).slice(-2);
+  function f(label, v, unit) {
+    return v === undefined || v === null
+      ? '<span class="nm">' + label + ' NO MEASURE</span>'
+      : label + ' ' + v + (unit || '');
+  }
+  document.getElementById('vitals').innerHTML =
+    f('BATT', sensors.batt, '%') + ' · ' + f('HR', sensors.hr) + ' · ' +
+    f('STEPS', sensors.steps) + ' · ' + f('PING', lastPing ? lastPing.rttMs : null, 'ms') +
+    ' · TAP ' + taps;
+  var fed = [];
+  ['spo2', 'hrv', 'sleep'].forEach(function (k) { if (sensors[k] !== undefined) fed.push(k.toUpperCase()); });
+  document.getElementById('unfed').textContent = fed.length
+    ? 'ALSO FED: ' + fed.join(' · ')
+    : 'O2 · HRV · SLEEP — NO MEASURE · NOT FED ON THIS DEVICE CLASS';
+  var a = snapAge();
+  document.getElementById('src').textContent = snap
+    ? 'SRC ' + snap.src + (snap.node ? ' · NODE ' + snap.node : '') +
+      ' · SNAPSHOT ' + Math.max(0, Math.round(a / 1000)) + 'S OLD' + (feedLive() ? '' : ' · NO FEED — STILL DOWN')
+    : 'SRC — NO MEASURE · NODE —';
+}
+
+/* ---- scope drawing ---- */
+var scopeCv = document.getElementById('scope'), sctx = scopeCv.getContext('2d');
+var graphCv = document.getElementById('graph'), gctx = graphCv.getContext('2d');
+var W = 400, H = 400;
+try { if (window.ApexBound) { W = ApexBound.getW(); H = ApexBound.getH(); } } catch (e) {}
+if (!window.ApexBound) { W = window.innerWidth; H = window.innerHeight; }
+var scopeSide = Math.max(180, Math.min(W - 8, Math.floor(H * 0.52)));
+scopeCv.width = scopeSide; scopeCv.height = scopeSide;
+scopeCv.style.width = scopeSide + 'px'; scopeCv.style.height = scopeSide + 'px';
+document.getElementById('scopeWrap').style.width = scopeSide + 'px';
+graphCv.width = W - 16; graphCv.height = Math.max(44, Math.floor(H * 0.13));
+graphCv.style.width = (W - 16) + 'px'; graphCv.style.height = graphCv.height + 'px';
+
+function ringFrac(rssi) { return Math.max(0, Math.min(1, (rssi + 95) / 60)); }
+
+function drawScope() {
+  var R = scopeSide / 2 - 6, cx = scopeSide / 2, cy = scopeSide / 2;
+  sctx.clearRect(0, 0, scopeSide, scopeSide);
+  sctx.fillStyle = '#010402'; sctx.fillRect(0, 0, scopeSide, scopeSide);
+  var rings = [-90, -75, -60, -45];
+  sctx.strokeStyle = 'rgba(57,255,122,0.28)'; sctx.fillStyle = 'rgba(57,255,122,0.55)';
+  sctx.font = '8px "Courier New"'; sctx.lineWidth = 1;
+  rings.forEach(function (db) {
+    var r = R * (1 - ringFrac(db) * 0.92);
+    sctx.beginPath(); sctx.arc(cx, cy, r, 0, 6.2832); sctx.stroke();
+    sctx.fillText(db + '', cx + 2, cy - r + 9);
+  });
+  sctx.strokeStyle = 'rgba(57,255,122,0.15)';
+  sctx.beginPath(); sctx.moveTo(cx - R, cy); sctx.lineTo(cx + R, cy);
+  sctx.moveTo(cx, cy - R); sctx.lineTo(cx, cy + R); sctx.stroke();
+  if (headingDeg !== null) {
+    var ha = headingDeg * Math.PI / 180;
+    sctx.fillStyle = '#ffb340';
+    sctx.fillText('N', cx + Math.sin(ha) * (R - 8) - 3, cy - Math.cos(ha) * (R - 8) + 3);
+  }
+  // sweep wedge (afterglow behind the beam)
+  for (var i = 0; i < 28; i++) {
+    var a0 = sweep.angle - i * 0.035, al = 0.16 * (1 - i / 28);
+    sctx.fillStyle = 'rgba(57,255,122,' + al.toFixed(3) + ')';
+    sctx.beginPath(); sctx.moveTo(cx, cy);
+    sctx.arc(cx, cy, R, a0 - 0.035, a0); sctx.closePath(); sctx.fill();
+  }
+  sctx.strokeStyle = 'rgba(140,255,180,0.9)';
+  sctx.beginPath(); sctx.moveTo(cx, cy);
+  sctx.lineTo(cx + Math.cos(sweep.angle) * R, cy + Math.sin(sweep.angle) * R); sctx.stroke();
+
+  if (!feedLive()) {
+    sctx.fillStyle = '#ffb340'; sctx.font = 'bold 13px "Courier New"';
+    sctx.fillText(snap ? 'NO FEED — STILL DOWN' : 'NO FEED — WAITING FOR SCAN', cx - 86, cy + 4);
+    return;
+  }
+  order.forEach(function (k) {
+    var c = contacts[k];
+    var stale = (nowMs() - c.lastSeen) > 60000 || c.miss > 0;
+    var r = R * (1 - ringFrac(c.rssi) * 0.92);
+    var x = cx + Math.cos(c.ang) * r, y = cy + Math.sin(c.ang) * r;
+    var behind = (sweep.angle - c.ang) % 6.2832; if (behind < 0) behind += 6.2832;
+    var glow = Math.max(0.18, 1 - behind / 4.5);
+    var col = c.bandGhz >= 4.9 ? '0,229,255' : '255,179,64';
+    sctx.fillStyle = stale ? 'rgba(120,120,120,' + (0.35 * glow).toFixed(2) + ')'
+                           : 'rgba(' + col + ',' + glow.toFixed(2) + ')';
+    sctx.beginPath(); sctx.arc(x, y, stale ? 3 : 4.5, 0, 6.2832); sctx.fill();
+    sctx.font = '8px "Courier New"';
+    sctx.fillText((c.ssid || '?').slice(0, 10), x + 6, y + 3);
+  });
+  sctx.fillStyle = '#39ff7a';
+  sctx.beginPath(); sctx.arc(cx, cy, 2.5, 0, 6.2832); sctx.fill();
+}
+
+var CH5 = [36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165];
+function drawGraph() {
+  var w = graphCv.width, h = graphCv.height;
+  gctx.clearRect(0, 0, w, h);
+  gctx.fillStyle = '#010402'; gctx.fillRect(0, 0, w, h);
+  var chans = [];
+  for (var c = 1; c <= 14; c++) chans.push(c);
+  CH5.forEach(function (c) { chans.push(c); });
+  var bw = w / chans.length;
+  gctx.font = '7px "Courier New"';
+  chans.forEach(function (ch, i) {
+    var m = chanMap[ch];
+    var bh = m ? Math.max(3, ringFrac(m.best) * (h - 14)) : 0;
+    gctx.fillStyle = ch <= 14 ? 'rgba(255,179,64,0.85)' : 'rgba(0,229,255,0.85)';
+    if (bh) gctx.fillRect(i * bw + 1, h - 10 - bh, bw - 2, bh);
+    gctx.fillStyle = 'rgba(57,255,122,0.6)';
+    if (ch <= 14 || ch % 16 === 4 || ch === 149) gctx.fillText(ch + '', i * bw + 1, h - 1);
+    if (m && m.count > 1) { gctx.fillStyle = '#ffb340'; gctx.fillText('×' + m.count, i * bw + 1, h - 12 - bh); }
+  });
+  gctx.fillStyle = 'rgba(57,255,122,0.8)';
+  gctx.fillText('FREQUENCY · CHANNEL OCCUPANCY — SRC ' + (snap ? snap.src : 'NO MEASURE'), 2, 9);
+}
+
+function frame(t) {
+  if (sweep.last === null) sweep.last = t;
+  var dt = t - sweep.last; sweep.last = t;
+  if (dt > 500) dt = 16.7;                    // gap re-primes, house sweep law
+  dt = Math.max(0, Math.min(50, dt));         // clamped monotonic delta
+  sweep.angle = (sweep.angle + dt / 6000 * 6.2832) % 6.2832;
+  drawScope(); drawGraph();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+setInterval(renderVitals, 1000);
+setInterval(function () { if (snap) renderList(); }, 5000);
+renderVitals();
+
+scopeCv.addEventListener('click', function () {
+  taps++; renderVitals();
+  if (typeof window.ApexWifiRequestScan === 'function') { try { window.ApexWifiRequestScan(); } catch (e) {} }
+});
+window.addEventListener('deviceorientationabsolute', function (e) {
+  if (e.alpha !== null && e.alpha !== undefined) headingDeg = (360 - e.alpha) % 360;
+});
+window.addEventListener('deviceorientation', function (e) {
+  if (headingDeg === null && e.alpha !== null && e.alpha !== undefined) headingDeg = (360 - e.alpha) % 360;
+});
+
+window.__radar = {
+  state: function () {
+    return { live: feedLive(), src: snap ? snap.src : null, node: snap ? snap.node : null,
+             snapAt: snap ? snap.at : null, contacts: order.length, headingDeg: headingDeg,
+             sweepRad: +sweep.angle.toFixed(3) };
+  },
+  contacts: function () {
+    return order.map(function (k) { var c = contacts[k];
+      return { ssid: c.ssid, bssid: c.bssid, channel: c.channel, bandGhz: c.bandGhz,
+               rssi: c.rssi, trend: c.trend, swing: c.swing, slot: c.slot }; });
+  },
+  graph: function () { return chanMap; }
+};
+</script>
+</body>
+</html>

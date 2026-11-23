@@ -946,6 +946,23 @@
    ],
    "status": "BUILT",
    "note": "The Propeller Wing: the P-51 seat \u2014 tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors."
+  },
+  {
+   "slug": "radar-scope",
+   "name": "Apex Face \u2014 Radar Scope \u00b7 Wi-Fi Overlay",
+   "title": "APEX \u2014 Signal Watch \u00b7 RADAR SCOPE",
+   "package": "app.lovable.apexsignal.face.radarscope",
+   "apkPath": "/depot/radar-scope.apk",
+   "apkSha256": "3f232f8910e7dbfb6e270fbd45ceb7174b7dff959e10e33f338b2c9dbff9b47c",
+   "apkSizeBytes": 29137,
+   "facePath": "/faces/radar-scope.html",
+   "faceSha256": "f33900edfb7f368e36168bfbd03191418a4b631bec324a89818f8228bfc5f943",
+   "priceUsd": 10,
+   "functions": [
+    "clock"
+   ],
+   "status": "BUILT",
+   "note": "The owner's own design, scoped by him Nov 13-15, 2026 and never built until now: a sweeping radar scope whose contacts are the live Wi-Fi scape, a frequency/channel-occupancy graph along the bottom, and his vitals strip (battery, heart rate, steps, gateway-ping heartbeat, tap, time). Built on the pipe container (v3 lineage) that reads the analyzer's ApexWifi/1 ingest with the container's own scan as the named fallback; every value prints SRC ANALYZER / SRC CONTAINER. Range is the RSSI ring and is labelled an estimate on the glass; bearing is NO MEASURE and the angle around the ring is signal order, printed as such. O2/HRV/SLEEP are named NO MEASURE - not fed on this device class. Five-step scrub on the ingest, signal-lane mapping per the pipe contract."
   }
  ]
 }
