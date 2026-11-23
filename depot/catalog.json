@@ -1,14 +1,14 @@
 {
- "depot": "Application Depot — tinyradr.com",
+ "depot": "Application Depot \u2014 tinyradr.com",
  "priceUsd": 10,
- "listingRule": "IN: any landed build that is a watch face when it lands — it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $10 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) — they keep their already-set pricing schemas.",
+ "listingRule": "IN: any landed build that is a watch face when it lands \u2014 it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $10 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) \u2014 they keep their already-set pricing schemas.",
  "venue": "Interim estate-owned shelf on tinyradr.com, until the appropriate domain name is secured and the builds are pushed to the Play Store.",
  "checkoutState": "Posted shelf. Card checkout opens with the licensed launch; until then orders are reserved by email to sales@apexairsolutions.com and the house delivers the posted APK by link.",
  "faces": [
   {
    "slug": "personal-face-solid",
-   "name": "Apex Face — Solid",
-   "title": "APEX — Personal Face · SOLID (Traced)",
+   "name": "Apex Face \u2014 Solid",
+   "title": "APEX \u2014 Personal Face \u00b7 SOLID (Traced)",
    "package": "app.lovable.apexsignal.face",
    "apkPath": "/depot/personal-face-solid.apk",
    "apkSha256": "957b80ab31a7c2ef168dbee378bcae133068534619f9a3edd08edb3d9cc3ef29",
@@ -24,8 +24,8 @@
   },
   {
    "slug": "signal-scope-v4",
-   "name": "Apex Face — Signal Scope V4",
-   "title": "APEX — Signal Watch · SIGNAL SCOPE V4",
+   "name": "Apex Face \u2014 Signal Scope V4",
+   "title": "APEX \u2014 Signal Watch \u00b7 SIGNAL SCOPE V4",
    "package": "app.lovable.apexsignal.face.signalscopev4",
    "apkPath": "/depot/signal-scope-v4.apk",
    "apkSha256": "5f53033d37335838edf5c5d7c39ee319bd9e29230647966b485112b81456a303",
@@ -37,12 +37,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Fox Hunt Edition. V8 (Nov 23, 2026): the bios reads only what the container now feeds — HR and steps from the watch's own sensors, WiFi scans, network state, gateway ping — and the O2/HRV/SLEEP rows are removed: this device class cannot measure them, and a field that cannot be fed does not ship."
+   "note": "Fox Hunt Edition. V8 (Nov 23, 2026): the bios reads only what the container now feeds \u2014 HR and steps from the watch's own sensors, WiFi scans, network state, gateway ping \u2014 and the O2/HRV/SLEEP rows are removed: this device class cannot measure them, and a field that cannot be fed does not ship."
   },
   {
    "slug": "machinery-clock-square",
-   "name": "Apex Face — Machinery Clock Square",
-   "title": "Apex Service Machinery Clock — SQUARE",
+   "name": "Apex Face \u2014 Machinery Clock Square",
+   "title": "Apex Service Machinery Clock \u2014 SQUARE",
    "package": "app.lovable.apexsignal.face.machineryclocksquare",
    "apkPath": "/depot/machinery-clock-square.apk",
    "apkSha256": "fd735327b39be2b073921d2fbf3c0359abdcf034ae5a16d4e73234c87ab3bf1b",
@@ -58,8 +58,8 @@
   },
   {
    "slug": "apex-weather",
-   "name": "Apex Face — APEX Weather",
-   "title": "APEX — Static Weather Face",
+   "name": "Apex Face \u2014 APEX Weather",
+   "title": "APEX \u2014 Static Weather Face",
    "package": "app.lovable.apexsignal.face.apexweather",
    "apkPath": "/depot/apex-weather.apk",
    "apkSha256": "952196d8971fc3f39f45ec409d2390ed94a81da2d0111ad165c8186c45788634",
@@ -76,8 +76,8 @@
   },
   {
    "slug": "betta-v2",
-   "name": "Apex Face — Glass House Betta V2",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Yin-Yang Clock Face V2)",
+   "name": "Apex Face \u2014 Glass House Betta V2",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Yin-Yang Clock Face V2)",
    "package": "app.lovable.apexsignal.face.bettav2",
    "apkPath": "/depot/betta-v2.apk",
    "apkSha256": "e2966de46bf6ef5eafac2873beca539f0786d564232c53469e823d503bad7bc9",
@@ -93,8 +93,8 @@
   },
   {
    "slug": "blocks",
-   "name": "Apex Face — BLOCKS",
-   "title": "APEX — Waterfall BLOCKS · Fall + Die",
+   "name": "Apex Face \u2014 BLOCKS",
+   "title": "APEX \u2014 Waterfall BLOCKS \u00b7 Fall + Die",
    "package": "app.lovable.apexsignal.face.blocks",
    "apkPath": "/depot/blocks.apk",
    "apkSha256": "a72b9cfe019209880534ed5cc7b5271c9cbc3ee48bd8bb1c606a375bf370029d",
@@ -110,8 +110,8 @@
   },
   {
    "slug": "glass-house-flagship",
-   "name": "Apex Face — Glass House Flagship",
-   "title": "APEX GLASS HOUSE — FLAGSHIP (Engine + Aquarium)",
+   "name": "Apex Face \u2014 Glass House Flagship",
+   "title": "APEX GLASS HOUSE \u2014 FLAGSHIP (Engine + Aquarium)",
    "package": "app.lovable.apexsignal.face.glasshouseflagship",
    "apkPath": "/depot/glass-house-flagship.apk",
    "apkSha256": "b62a71320321e2506111063425ea9ad975ce194ebbfc89f5c8bd0070afecde63",
@@ -128,8 +128,8 @@
   },
   {
    "slug": "glass-house-flagship-machinery",
-   "name": "Apex Face — Glass House Flagship Machinery",
-   "title": "APEX GLASS HOUSE — FLAGSHIP MACHINERY (Working Train + Aquarium)",
+   "name": "Apex Face \u2014 Glass House Flagship Machinery",
+   "title": "APEX GLASS HOUSE \u2014 FLAGSHIP MACHINERY (Working Train + Aquarium)",
    "package": "app.lovable.apexsignal.face.glasshouseflagshipmachinery",
    "apkPath": "/depot/glass-house-flagship-machinery.apk",
    "apkSha256": "fc39737dba6affc11b2511e532122b80241895c375bebf21bc95d629633ca814",
@@ -142,12 +142,12 @@
     "weather-call"
    ],
    "status": "BUILT",
-   "note": "The working-machinery build of the flagship: the plate's gears turn on House Standard Train H-1 at true ratios — centre 3600 s, third 450 s, fourth 60 s, escape 5 s — with the fish swimming in the machine."
+   "note": "The working-machinery build of the flagship: the plate's gears turn on House Standard Train H-1 at true ratios \u2014 centre 3600 s, third 450 s, fourth 60 s, escape 5 s \u2014 with the fish swimming in the machine."
   },
   {
    "slug": "glass-house-flagship-dark",
-   "name": "Apex Face — Glass House Flagship Dark",
-   "title": "APEX GLASS HOUSE — FLAGSHIP MACHINERY DARK (The Machine Eats)",
+   "name": "Apex Face \u2014 Glass House Flagship Dark",
+   "title": "APEX GLASS HOUSE \u2014 FLAGSHIP MACHINERY DARK (The Machine Eats)",
    "package": "app.lovable.apexsignal.face.glasshouseflagshipdark",
    "apkPath": "/depot/glass-house-flagship-dark.apk",
    "apkSha256": "bdcd936922a02d13132722602e8859a314f52373418fa8729e0f2efbfb310044",
@@ -160,12 +160,12 @@
     "weather-call"
    ],
    "status": "BUILT",
-   "note": "The dark-humor edition, in the owner's words: the fish are not hemmed to the circle — they free-float, and when one meets a turning wheel the machine eats: caught, dissolved into little red lines, gone. Then a smaller fish appears and grows — until it gets caught. No counters, no score."
+   "note": "The dark-humor edition, in the owner's words: the fish are not hemmed to the circle \u2014 they free-float, and when one meets a turning wheel the machine eats: caught, dissolved into little red lines, gone. Then a smaller fish appears and grows \u2014 until it gets caught. No counters, no score."
   },
   {
    "slug": "barracuda",
-   "name": "Apex Face — Barracuda",
-   "title": "APEX — Barracuda V8 · Motors Under Glass",
+   "name": "Apex Face \u2014 Barracuda",
+   "title": "APEX \u2014 Barracuda V8 \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.barracuda",
    "apkPath": "/depot/barracuda.apk",
    "apkSha256": "cc613e7bfaccbd2d1e03d3372cfdc4d387bef1e78529f5eb8f7f3603071d3b6c",
@@ -181,8 +181,8 @@
   },
   {
    "slug": "dumb-agachi",
-   "name": "Apex Face — Dumb Agachi",
-   "title": "APEX — Dumb Agachi · Virtual Pony Watch Face",
+   "name": "Apex Face \u2014 Dumb Agachi",
+   "title": "APEX \u2014 Dumb Agachi \u00b7 Virtual Pony Watch Face",
    "package": "app.lovable.apexsignal.face.dumbagachi",
    "apkPath": "/depot/dumb-agachi.apk",
    "apkSha256": "403741dd1b6624007316b776d9bc7870672898a2dc248003a1e0d1bc160a64ba",
@@ -198,12 +198,12 @@
   },
   {
    "slug": "j58",
-   "name": "Apex Face — J58",
-   "title": "APEX — P&W J58 · Motors Under Glass",
+   "name": "Apex Face \u2014 J58",
+   "title": "APEX \u2014 P&W J58 \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.j58",
    "apkPath": "/depot/j58.apk",
-   "apkSha256": "81d5343d302979e0013d6779b276d864ea73c5336afe24012df14fe3aeffd0ad",
-   "apkSizeBytes": 2911977,
+   "apkSha256": "8071cec1cfc7aa565b2920fd80e5641d6248596096e4cd9a9de6f8e8c6f3d206",
+   "apkSizeBytes": 279059,
    "facePath": "/faces/j58.html",
    "faceSha256": "68126da3923296e04e925ceeeb3aae1727688981f3e9653a3fc18f5cf4b89e55",
    "priceUsd": 10,
@@ -211,16 +211,16 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Motors Under Glass series: the Pratt & Whitney J58, the SR-71 turbojet with its spike intake, with the clock."
+   "note": "Motors Under Glass series: the Pratt & Whitney J58, the SR-71 turbojet with its spike intake, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero image load errors."
   },
   {
    "slug": "j79-blackbird",
-   "name": "Apex Face — J79 Blackbird",
-   "title": "APEX — GE J79 · Motors Under Glass",
+   "name": "Apex Face \u2014 J79 Blackbird",
+   "title": "APEX \u2014 GE J79 \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.j79blackbird",
    "apkPath": "/depot/j79-blackbird.apk",
-   "apkSha256": "5fcec1656f835ac25955ec3861ae93332713a92dff87bf782cfe9c7587add8b9",
-   "apkSizeBytes": 2911977,
+   "apkSha256": "63af8d6ecf6777f89e51aaddcc739888e25faeb6f2572a4f7976899b1f1efa20",
+   "apkSizeBytes": 340499,
    "facePath": "/faces/j79-blackbird.html",
    "faceSha256": "56c7b3ecb46f9184cf117e8ebb4d0582bb6674f6ab27cb4c9b7dd64a4d9351b8",
    "priceUsd": 10,
@@ -228,12 +228,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Motors Under Glass series: the GE J79 single-spool turbojet, with the clock."
+   "note": "Motors Under Glass series: the GE J79 single-spool turbojet, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero load errors."
   },
   {
    "slug": "lamborghini-v12",
-   "name": "Apex Face — Lamborghini V12",
-   "title": "APEX — Lamborghini V12 · Motors Under Glass",
+   "name": "Apex Face \u2014 Lamborghini V12",
+   "title": "APEX \u2014 Lamborghini V12 \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.lamborghiniv12",
    "apkPath": "/depot/lamborghini-v12.apk",
    "apkSha256": "42ca3bf980aaf0e9d7b8282b82bd606b6b1fd6b6a4481d13459c4f2db8173d8c",
@@ -249,12 +249,12 @@
   },
   {
    "slug": "raptor",
-   "name": "Apex Face — Raptor",
-   "title": "APEX — Raptor · Motors Under Glass",
+   "name": "Apex Face \u2014 Raptor",
+   "title": "APEX \u2014 Raptor \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.raptor",
    "apkPath": "/depot/raptor.apk",
-   "apkSha256": "05e06e269eceb9be17840a8ec4ebb66216223d076b31304ce72be7ed79a26259",
-   "apkSizeBytes": 2911977,
+   "apkSha256": "e7680fa0cc46a5b69a3390566e98ff7dc290a8312c0872523cbc3930cbc32006",
+   "apkSizeBytes": 360982,
    "facePath": "/faces/raptor.html",
    "faceSha256": "f15e5681b98468fb17659a0a4778984751d80b845fe0dbb20bf09584b9fbfb7e",
    "priceUsd": 10,
@@ -262,12 +262,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Motors Under Glass series: the Raptor, full-flow staged combustion, with the clock."
+   "note": "Motors Under Glass series: the Raptor, full-flow staged combustion, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero load errors."
   },
   {
    "slug": "betta-city",
-   "name": "Apex Face — Betta Ultra Deluxe City",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Ultra Deluxe V3.1 — City Plate)",
+   "name": "Apex Face \u2014 Betta Ultra Deluxe City",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Ultra Deluxe V3.1 \u2014 City Plate)",
    "package": "app.lovable.apexsignal.face.bettacity",
    "apkPath": "/depot/betta-city.apk",
    "apkSha256": "ac19404c9044fda88794bbaf69b070fedab2e61bf0833851ad5ee6db5a2d5c32",
@@ -279,12 +279,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Betta Ultra Deluxe V3.1 — CITY PLATE BACKDROP variant (Nov 10, 2026; Package Scope Inspector BO-3 plate swap). Only the <g id=\"tankBackdrop\"> contents differ from the base face: Hierographic Plate 2 (the City, 918x2048 phone shot) seated in the apex-backdrop-slot as an embedded raster — the art lives in the shot's middle band, cropped out at build time, cover-cropped to the tank's 4:3, resized 1280x960 JPEG carried as a data URI (standalone-file law: zero external images). Everything else — ceremony, dim/wake, frame toggle — is the base V3.1 face byte-for-byte."
+   "note": "Betta Ultra Deluxe V3.1 \u2014 CITY PLATE BACKDROP variant (Nov 10, 2026; Package Scope Inspector BO-3 plate swap). Only the <g id=\"tankBackdrop\"> contents differ from the base face: Hierographic Plate 2 (the City, 918x2048 phone shot) seated in the apex-backdrop-slot as an embedded raster \u2014 the art lives in the shot's middle band, cropped out at build time, cover-cropped to the tank's 4:3, resized 1280x960 JPEG carried as a data URI (standalone-file law: zero external images). Everything else \u2014 ceremony, dim/wake, frame toggle \u2014 is the base V3.1 face byte-for-byte."
   },
   {
    "slug": "betta-globe",
-   "name": "Apex Face — Betta Ultra Deluxe Globe",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Ultra Deluxe V3.1 — Globe Plate)",
+   "name": "Apex Face \u2014 Betta Ultra Deluxe Globe",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Ultra Deluxe V3.1 \u2014 Globe Plate)",
    "package": "app.lovable.apexsignal.face.bettaglobe",
    "apkPath": "/depot/betta-globe.apk",
    "apkSha256": "eb90633fc5de5247b0725491914170b02ea2b3e2411c8b95cbf983d11f5d893c",
@@ -296,12 +296,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Betta Ultra Deluxe V3.1 — GLOBE PLATE BACKDROP variant (Nov 10, 2026; Package Scope Inspector BO-3 plate swap). Only the <g id=\"tankBackdrop\"> contents differ from the base face: Hierographic Plate 1 (the Globe, 1920x1088) seated in the apex-backdrop-slot as an embedded raster — cover-cropped to the tank's 4:3 with the globe kept the subject, resized 1280x960 JPEG carried as a data URI (standalone-file law: zero external images). Everything else — ceremony, dim/wake, frame toggle — is the base V3.1 face byte-for-byte."
+   "note": "Betta Ultra Deluxe V3.1 \u2014 GLOBE PLATE BACKDROP variant (Nov 10, 2026; Package Scope Inspector BO-3 plate swap). Only the <g id=\"tankBackdrop\"> contents differ from the base face: Hierographic Plate 1 (the Globe, 1920x1088) seated in the apex-backdrop-slot as an embedded raster \u2014 cover-cropped to the tank's 4:3 with the globe kept the subject, resized 1280x960 JPEG carried as a data URI (standalone-file law: zero external images). Everything else \u2014 ceremony, dim/wake, frame toggle \u2014 is the base V3.1 face byte-for-byte."
   },
   {
    "slug": "betta-ultra-deluxe-gears",
-   "name": "Apex Face — Betta Ultra Deluxe Gears",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Ultra Deluxe V3.1 — Grinding Gears)",
+   "name": "Apex Face \u2014 Betta Ultra Deluxe Gears",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Ultra Deluxe V3.1 \u2014 Grinding Gears)",
    "package": "app.lovable.apexsignal.face.bettaultradeluxegears",
    "apkPath": "/depot/betta-ultra-deluxe-gears.apk",
    "apkSha256": "8e2a54d38bada46980700d95d10c522e4a9c591ffac6988fd789a6d43afe2190",
@@ -313,12 +313,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Betta Ultra Deluxe V3.1 — GRINDING GEARS variant (Nov 10, 2026). The Apex Frame edition plus a three-gear meshing train under the yin-yang disc (centres (250,410) (301,410) (352,410); pitch radii 30/21/30, centre distances equal to pitch sums so the teeth truly mesh; teeth 14/10/14, directions alternate, speeds inverse to tooth count, rotation a direct function of the real clock from first paint). The gears carry no hands. Everything else — ceremony, dim, frame toggle, stock oled-void backdrop — is the base V3.1 face."
+   "note": "Betta Ultra Deluxe V3.1 \u2014 GRINDING GEARS variant (Nov 10, 2026). The Apex Frame edition plus a three-gear meshing train under the yin-yang disc (centres (250,410) (301,410) (352,410); pitch radii 30/21/30, centre distances equal to pitch sums so the teeth truly mesh; teeth 14/10/14, directions alternate, speeds inverse to tooth count, rotation a direct function of the real clock from first paint). The gears carry no hands. Everything else \u2014 ceremony, dim, frame toggle, stock oled-void backdrop \u2014 is the base V3.1 face."
   },
   {
    "slug": "betta-ultra-deluxe-reef",
-   "name": "Apex Face — Betta Ultra Deluxe Reef",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Ultra Deluxe V3.1 — Deep Reef Backdrop)",
+   "name": "Apex Face \u2014 Betta Ultra Deluxe Reef",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Ultra Deluxe V3.1 \u2014 Deep Reef Backdrop)",
    "package": "app.lovable.apexsignal.face.bettaultradeluxereef",
    "apkPath": "/depot/betta-ultra-deluxe-reef.apk",
    "apkSha256": "9efeb7c4f9007e47b5a6027387bdad3ca29a4d6ad5ed7adad83a93529943f836",
@@ -330,12 +330,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Betta Ultra Deluxe V3.1 — DEEP REEF BACKDROP variant (Nov 10, 2026), the demonstration swap for the apex-backdrop-slot: only the <g id=\"tankBackdrop\"> contents differ from the base face — a deep-water reef backdrop (called teal depth gradient, surface light rays, reef silhouette shelves, coral branches, plankton motes in the principals' cyan) drawn in the face's own vector idiom, zero external images. Proves the owner's aquarium-backdrop mechanism: the tank's back wall is one swappable picture; a wallpaper library/customer backdrop rides this slot."
+   "note": "Betta Ultra Deluxe V3.1 \u2014 DEEP REEF BACKDROP variant (Nov 10, 2026), the demonstration swap for the apex-backdrop-slot: only the <g id=\"tankBackdrop\"> contents differ from the base face \u2014 a deep-water reef backdrop (called teal depth gradient, surface light rays, reef silhouette shelves, coral branches, plankton motes in the principals' cyan) drawn in the face's own vector idiom, zero external images. Proves the owner's aquarium-backdrop mechanism: the tank's back wall is one swappable picture; a wallpaper library/customer backdrop rides this slot."
   },
   {
    "slug": "cast-net",
-   "name": "Apex Face — Cast Net",
-   "title": "APEX — CAST NET · Hierographic",
+   "name": "Apex Face \u2014 Cast Net",
+   "title": "APEX \u2014 CAST NET \u00b7 Hierographic",
    "package": "app.lovable.apexsignal.face.castnet",
    "apkPath": "/depot/cast-net.apk",
    "apkSha256": "45de792de634d8c6866652b4c5f0a2e0411180e3c2bcd23be7574b3fd2dbfc3e",
@@ -347,12 +347,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Cast Net (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-2a (Specimen One, the Cast Net Package, verdict BOUNCE: the called app does not yet exist as a build; the face half fits today): the face that opens the net. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE PLATE: the Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) — the art literally depicts a wrist casting the mesh this package is about; ONE plate hangs, no switcher. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) via The 19 (BO-1) — the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS — NO FIX; coordinates never invented). TWO READOUTS — the paper's BO-2a options, one file, switched by the READOUT button (a mode control; SHAPE stays baked): DIGITAL (default), the house Casio readout (DSEG7, hollow digits, OLED-black hearts, on a solid chip); HANDS, the analog-smooth reading — hour/minute/second hands SWEPT on the real clock from the centre post pin (Face Law 1) on a matching chip. THE MODEL, PRESENTED: a panel at the foot carries SEE · TALK · LOCATE, the ratified mesh model as three labelled legs whose state words ride the same bucket contract — bucket empty, so every leg reads NO STATE; no nodes, peers, links, positions or traffic are drawn or implied anywhere, and the panel itself carries the line '3D FLOOR APP — NOT BUILT (BO-2B)'. THE CALL — RUNG A (this build): the panel's CAST NET button OPENS THE CAST NET PRODUCT SURFACE (https://castnetmesh.com) — what exists today, labelled as such (the COMMS-door pattern); NO native launch is wired — the Cast Net wrist app (BO-2b, the spinnable 3D floor mesh) does not exist as a build and nothing here fakes or implies it. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings — case metal only in the rim, the glass window genuinely open; frame census by the case-hidden discrimination (Globe's own test): hiding the case layer changes the in-box exact-#0a0c0e count by 0 (2,191 -> 2,191) — the frame paints nothing inside the window; every in-box match is seated-world content (HUD chips/panel darks + plate foreground), all in the panel's row bands, none rim-adjacent. PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 21/21 hard checks — clock exact, drones moving, pulse phase locked, frame toggles, mesh legs NO STATE on every sample, the call: window.__callCast carries Rung A + castnetmesh.com + appBuilt false, a synthetic click on the panel button fired the opener exactly once with https://castnetmesh.com; the readouts: default DIGITAL, toggle to HANDS shows the dial with the second hand swept 10.4 degrees over ~1.7 s of wall, toggle back restores DIGITAL; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness — the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase)."
+   "note": "Cast Net (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-2a (Specimen One, the Cast Net Package, verdict BOUNCE: the called app does not yet exist as a build; the face half fits today): the face that opens the net. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE PLATE: the Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) \u2014 the art literally depicts a wrist casting the mesh this package is about; ONE plate hangs, no switcher. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) via The 19 (BO-1) \u2014 the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS \u2014 NO FIX; coordinates never invented). TWO READOUTS \u2014 the paper's BO-2a options, one file, switched by the READOUT button (a mode control; SHAPE stays baked): DIGITAL (default), the house Casio readout (DSEG7, hollow digits, OLED-black hearts, on a solid chip); HANDS, the analog-smooth reading \u2014 hour/minute/second hands SWEPT on the real clock from the centre post pin (Face Law 1) on a matching chip. THE MODEL, PRESENTED: a panel at the foot carries SEE \u00b7 TALK \u00b7 LOCATE, the ratified mesh model as three labelled legs whose state words ride the same bucket contract \u2014 bucket empty, so every leg reads NO STATE; no nodes, peers, links, positions or traffic are drawn or implied anywhere, and the panel itself carries the line '3D FLOOR APP \u2014 NOT BUILT (BO-2B)'. THE CALL \u2014 RUNG A (this build): the panel's CAST NET button OPENS THE CAST NET PRODUCT SURFACE (https://castnetmesh.com) \u2014 what exists today, labelled as such (the COMMS-door pattern); NO native launch is wired \u2014 the Cast Net wrist app (BO-2b, the spinnable 3D floor mesh) does not exist as a build and nothing here fakes or implies it. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings \u2014 case metal only in the rim, the glass window genuinely open; frame census by the case-hidden discrimination (Globe's own test): hiding the case layer changes the in-box exact-#0a0c0e count by 0 (2,191 -> 2,191) \u2014 the frame paints nothing inside the window; every in-box match is seated-world content (HUD chips/panel darks + plate foreground), all in the panel's row bands, none rim-adjacent. PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 21/21 hard checks \u2014 clock exact, drones moving, pulse phase locked, frame toggles, mesh legs NO STATE on every sample, the call: window.__callCast carries Rung A + castnetmesh.com + appBuilt false, a synthetic click on the panel button fired the opener exactly once with https://castnetmesh.com; the readouts: default DIGITAL, toggle to HANDS shows the dial with the second hand swept 10.4 degrees over ~1.7 s of wall, toggle back restores DIGITAL; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness \u2014 the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase)."
   },
   {
    "slug": "deep-space-wallpaper",
-   "name": "Apex Face — Deep Space Wallpaper",
-   "title": "APEX — DEEP SPACE WALLPAPER",
+   "name": "Apex Face \u2014 Deep Space Wallpaper",
+   "title": "APEX \u2014 DEEP SPACE WALLPAPER",
    "package": "app.lovable.apexsignal.face.deepspacewallpaper",
    "apkPath": "/depot/deep-space-wallpaper.apk",
    "apkSha256": "db9d9baf0369e728f270bea1c4a6793e8da9dc40e92921167471d8e9d78896ee",
@@ -364,12 +364,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Deep Space Wallpaper (Nov 10, 2026) — the owner's brief minutes after his wrist verdict on UAP Space Scene V2 (21:24-21:29 EST): straight up the wallpaper — the actual V2 living scene running edge-to-edge as the whole glass, a large digital clock front and centre, the randomness going by, plus extra pinpoint stars; \"that's it\" is the scope lock (his aquarium line: spaceships floating around with the galaxy spinning in the background). THE SCENE IS THE WHOLE GLASS: V2's top clock rail, label lines and bordered sky box are gone; the dimensional four-arm galaxies spin and breathe behind everything, and the ORGANIC POPULATION runs untouched (continuous spawn pressure, random wander, density-made laser fights + explosions, accretion toilet-flush captures, boom-and-bust). THE CLOCK: DSEG7 segment digits (house ApexDigital embed, SIL OFL, zero external calls), HOLLOW — OLED-black heart, bright stroke in the scene's clock cyan — floating centred over the scene; readability is held by a soft dark halo behind the digits only (no panel, no bezel, no other readout). EXTRA PINPOINT STARS: a second seeded field of 640 tiny sharp stars over V2's 420 (own seed stream — the V2 sky is untouched). SHAPE BAKED AT PURCHASE: no in-face shape controls; this file is the SQUARE build. Motion from first paint: no REST/observe governor, no auto-exit; dim-only battery overlay after 60 s idle. Real-render proof (Chromium 156): WALL pass at accel 1 — clock exact (35 s over 34.5 s wall), combat 1->14, accretion 0->2, 295 laser shots, ships moving (139/139 adjacent pairs), galaxy angle/pulse/R evolving, zero exceptions; ECOLOGY pass at bench accel 12x (labelled): pop 8 -> peak 15 -> crash 7 over 408 sim-seconds, 187 deaths; pinpoint corner-census estimate 59 speck clusters vs V2's 23 (2.57x — per-cluster estimate; source counts 1060 vs 420). Busy-frame screenshot shows the readout legible with ships crossing the clock band. Source build deep-space-wallpaper-2026-11-10.html."
+   "note": "Deep Space Wallpaper (Nov 10, 2026) \u2014 the owner's brief minutes after his wrist verdict on UAP Space Scene V2 (21:24-21:29 EST): straight up the wallpaper \u2014 the actual V2 living scene running edge-to-edge as the whole glass, a large digital clock front and centre, the randomness going by, plus extra pinpoint stars; \"that's it\" is the scope lock (his aquarium line: spaceships floating around with the galaxy spinning in the background). THE SCENE IS THE WHOLE GLASS: V2's top clock rail, label lines and bordered sky box are gone; the dimensional four-arm galaxies spin and breathe behind everything, and the ORGANIC POPULATION runs untouched (continuous spawn pressure, random wander, density-made laser fights + explosions, accretion toilet-flush captures, boom-and-bust). THE CLOCK: DSEG7 segment digits (house ApexDigital embed, SIL OFL, zero external calls), HOLLOW \u2014 OLED-black heart, bright stroke in the scene's clock cyan \u2014 floating centred over the scene; readability is held by a soft dark halo behind the digits only (no panel, no bezel, no other readout). EXTRA PINPOINT STARS: a second seeded field of 640 tiny sharp stars over V2's 420 (own seed stream \u2014 the V2 sky is untouched). SHAPE BAKED AT PURCHASE: no in-face shape controls; this file is the SQUARE build. Motion from first paint: no REST/observe governor, no auto-exit; dim-only battery overlay after 60 s idle. Real-render proof (Chromium 156): WALL pass at accel 1 \u2014 clock exact (35 s over 34.5 s wall), combat 1->14, accretion 0->2, 295 laser shots, ships moving (139/139 adjacent pairs), galaxy angle/pulse/R evolving, zero exceptions; ECOLOGY pass at bench accel 12x (labelled): pop 8 -> peak 15 -> crash 7 over 408 sim-seconds, 187 deaths; pinpoint corner-census estimate 59 speck clusters vs V2's 23 (2.57x \u2014 per-cluster estimate; source counts 1060 vs 420). Busy-frame screenshot shows the readout legible with ships crossing the clock band. Source build deep-space-wallpaper-2026-11-10.html."
   },
   {
    "slug": "globe-tracker",
-   "name": "Apex Face — Globe Tracker",
-   "title": "APEX — GLOBE TRACKER · Hierographic 01",
+   "name": "Apex Face \u2014 Globe Tracker",
+   "title": "APEX \u2014 GLOBE TRACKER \u00b7 Hierographic 01",
    "package": "app.lovable.apexsignal.face.globetracker",
    "apkPath": "/depot/globe-tracker.apk",
    "apkSha256": "c07b169e9714f1f4df4bc08a01715fa2d0b5d40c469363c746587de5829b496a",
@@ -385,8 +385,8 @@
   },
   {
    "slug": "the-19",
-   "name": "Apex Face — The 19",
-   "title": "APEX — THE 19 · Hierographic",
+   "name": "Apex Face \u2014 The 19",
+   "title": "APEX \u2014 THE 19 \u00b7 Hierographic",
    "package": "app.lovable.apexsignal.face.the19",
    "apkPath": "/depot/the-19.apk",
    "apkSha256": "5a479e972cdbf6ce024940e2808a70ad9a9b8e3fd10668734d80b303637da8c3",
@@ -398,12 +398,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "The 19 (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-1 (Specimen Zero, verdict PLUG): the estate's first LAUNCHER FACE. The Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) IS the product's own hero - and the steel 19 bezel in the art was never decoration: it is a BUTTON, pre-drawn. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE CALL - RUNG A (this build): a generous tap target (34% of stage) rides ON the plate's 19 dial (centre at stage fractions 0.059/0.574 - the dial hangs at the plate's left edge and the target with it; geometry grounded against the plate art and the rendered captures, delta 0.00 in both frame states) and OPENS ENCRYPTED CB (https://encryptedcb.com) - the COMMS-door pattern transplanted from the extension rail. The affordance is a soft pulse ring breathing on the dial's rim in the plate's mesh cyan - an outline only, never a fill or shade over the art. RUNG B (the same tap launching the installed Cryptid CB native companion) is NOT in this build: it inherits Cryptid v2.1's unproven on-device state; nothing here wires, fakes, or implies it. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) - big Casio readout (house DSEG7, hollow digits, OLED-black hearts, on a solid chip), the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS - NO FIX; coordinates never invented). ONE plate hangs - no backdrop switcher. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings - case metal only in the rim, the glass window genuinely open; frame-ON pixel census over the glass interior: 0 case-fill pixels in 126,225, 53,411 distinct colours (the world paints). PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 17/17 hard checks - clock exact (advanced 5 s over 4.6 s wall), drones moving, pulse phase locked to the wall second, frame toggles ON-OFF-ON, the call: window.__call19 carries Rung A + the URL, a synthetic click on the dial target fired the opener exactly once with https://encryptedcb.com, target centre delta 0.00 px seated and unseated; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness - the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase). BOUND FIX (Nov 23, 2026): Direct Parameter Load — the container senses the display once and loads it as ApexBound; the dial paints its square to the loaded bound at 15/16 with one verification pass, instead of measuring the viewport at paint time (owner field exhibit: dial painted off its frame on the LOKMAT)."
+   "note": "The 19 (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-1 (Specimen Zero, verdict PLUG): the estate's first LAUNCHER FACE. The Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) IS the product's own hero - and the steel 19 bezel in the art was never decoration: it is a BUTTON, pre-drawn. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE CALL - RUNG A (this build): a generous tap target (34% of stage) rides ON the plate's 19 dial (centre at stage fractions 0.059/0.574 - the dial hangs at the plate's left edge and the target with it; geometry grounded against the plate art and the rendered captures, delta 0.00 in both frame states) and OPENS ENCRYPTED CB (https://encryptedcb.com) - the COMMS-door pattern transplanted from the extension rail. The affordance is a soft pulse ring breathing on the dial's rim in the plate's mesh cyan - an outline only, never a fill or shade over the art. RUNG B (the same tap launching the installed Cryptid CB native companion) is NOT in this build: it inherits Cryptid v2.1's unproven on-device state; nothing here wires, fakes, or implies it. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) - big Casio readout (house DSEG7, hollow digits, OLED-black hearts, on a solid chip), the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS - NO FIX; coordinates never invented). ONE plate hangs - no backdrop switcher. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings - case metal only in the rim, the glass window genuinely open; frame-ON pixel census over the glass interior: 0 case-fill pixels in 126,225, 53,411 distinct colours (the world paints). PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 17/17 hard checks - clock exact (advanced 5 s over 4.6 s wall), drones moving, pulse phase locked to the wall second, frame toggles ON-OFF-ON, the call: window.__call19 carries Rung A + the URL, a synthetic click on the dial target fired the opener exactly once with https://encryptedcb.com, target centre delta 0.00 px seated and unseated; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness - the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase). BOUND FIX (Nov 23, 2026): Direct Parameter Load \u2014 the container senses the display once and loads it as ApexBound; the dial paints its square to the loaded bound at 15/16 with one verification pass, instead of measuring the viewport at paint time (owner field exhibit: dial painted off its frame on the LOKMAT)."
   },
   {
    "slug": "uap-space-scene",
-   "name": "Apex Face — UAP Space Scene",
-   "title": "APEX — UAP SPACE SCENE · V2",
+   "name": "Apex Face \u2014 UAP Space Scene",
+   "title": "APEX \u2014 UAP SPACE SCENE \u00b7 V2",
    "package": "app.lovable.apexsignal.face.uapspacescene",
    "apkPath": "/depot/uap-space-scene.apk",
    "apkSha256": "7e2021e53c491ad73d4b57884ffda238da725bfbdcfa5276c0394af5dc3d33fa",
@@ -419,8 +419,8 @@
   },
   {
    "slug": "glass-house-flagship-dark-suite",
-   "name": "Apex Face — Glass House Flagship Dark Suite",
-   "title": "APEX GLASS HOUSE — FLAGSHIP MACHINERY DARK · SUITE EDITION (The Machine Eats + Weather + Comms Suite)",
+   "name": "Apex Face \u2014 Glass House Flagship Dark Suite",
+   "title": "APEX GLASS HOUSE \u2014 FLAGSHIP MACHINERY DARK \u00b7 SUITE EDITION (The Machine Eats + Weather + Comms Suite)",
    "package": "app.lovable.apexsignal.face.glasshouseflagshipdarksuite",
    "apkPath": "/depot/glass-house-flagship-dark-suite.apk",
    "apkSha256": "59d9a23ed9e2002a1e6de92fe57605855a38993f572a1ffc4d0a7a66da126807",
@@ -432,12 +432,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Suite Edition of the Glass House Flagship Machinery Dark (Nov 11, 2026) - the Product Inventory Review routine's FITTINGS FIRST CONTAINER (owner order, Nov 11, 23:20 EST; push-through ordered 23:33 EST): the plain Dark build beside it, byte-untouched, plus the two standard fittings. WEATHER: the base face's own failure-isolated Enphase prediction line, carried over untouched - paints PREDICTION ENGINE · NO MEASURE on failure and touches nothing else. COMMS SUITE (rides in the background): simplified Companion + Wrist copies hand-reduced from the house's landed client guts (companion-core.js / companion-voice.js / companion-local.js - the code the Companion native container carries: ECDH P-256 identity, pairing lobby with public keys only, AES-GCM sealed bus, hold-to-talk voice lifecycle with 8 s bursts, serverless WebRTC LAN transport) - channels 19 (voice) / 19.1 (burst porch) / 19.1.1 (private) as room tags on the sealed bus; PTT key handling stays at the container/system layer, the face carries a hold-to-talk door only. RANGE: the landed receive-side haversine distance filter (companion-range.js + communicator-range.ts - paired spots fresh 90 s, voice/text from beyond the selected ring dropped in the receive path; no fresh pair of spots = within null, state line ends NO FIX, nothing dropped and no in-range claim made) with ladder 3.2 / 20 / 50 / 100 / 250 km + WORLDWIDE (filter off); the 3.2 km first rung (SHORT · 2 MI, the owner's park tier) is an OWNER-ORDERED EXTENSION RUNG (Nov 11, 23:33 EST), not a ring the landed guts carry, and the ladder defaults to it as its tightest rung. The tile map is NOT in this build - positions are used for ranging only, never displayed. Face furniture: one solid plate strip (PAIR · channel door · RNG door · HOLD TO TALK · honest state line) measured clear of the bottom no-fly zone (worst actionable bottom 410.1 px vs the 433.0 px band limit at the 640x480 stage). PROOF (staging, real render, headless Chromium 156, 640x480): 14/14 checks twice (first build), 25/25 twice (range addendum), 27/27 twice (Stage 1, the 2-mile rung) - clock exact vs Detroit wall, motion from first paint, weather NO MEASURE failure posture, comms hook honest throughout (connected:false, paired:false - no connection, peer, or voice faked), haversine vectors incl. 1.11 km within=true and 11.12 km within=false against the 3.2 km ring, stale spots fall back to within=null, zero uncaught page exceptions; full build record at ~/workspace/fittings-first-container/BUILD-RECORD.md. Staged file 377,641 B, sha256 b974f0aed9fdf3de3406f1b4ea163a5fbc322459b6e0106b2d3257e724a8d7a7. LIBRARY ONLY: not a depot listing, carries no price - suite-edition pricing is UNRULED and none was invented; not added to catalog.json or garage.json. NO MEASURE: on-device rendering; live bus pairing and voice on hardware (the web bench cannot prove voice)."
+   "note": "Suite Edition of the Glass House Flagship Machinery Dark (Nov 11, 2026) - the Product Inventory Review routine's FITTINGS FIRST CONTAINER (owner order, Nov 11, 23:20 EST; push-through ordered 23:33 EST): the plain Dark build beside it, byte-untouched, plus the two standard fittings. WEATHER: the base face's own failure-isolated Enphase prediction line, carried over untouched - paints PREDICTION ENGINE \u00b7 NO MEASURE on failure and touches nothing else. COMMS SUITE (rides in the background): simplified Companion + Wrist copies hand-reduced from the house's landed client guts (companion-core.js / companion-voice.js / companion-local.js - the code the Companion native container carries: ECDH P-256 identity, pairing lobby with public keys only, AES-GCM sealed bus, hold-to-talk voice lifecycle with 8 s bursts, serverless WebRTC LAN transport) - channels 19 (voice) / 19.1 (burst porch) / 19.1.1 (private) as room tags on the sealed bus; PTT key handling stays at the container/system layer, the face carries a hold-to-talk door only. RANGE: the landed receive-side haversine distance filter (companion-range.js + communicator-range.ts - paired spots fresh 90 s, voice/text from beyond the selected ring dropped in the receive path; no fresh pair of spots = within null, state line ends NO FIX, nothing dropped and no in-range claim made) with ladder 3.2 / 20 / 50 / 100 / 250 km + WORLDWIDE (filter off); the 3.2 km first rung (SHORT \u00b7 2 MI, the owner's park tier) is an OWNER-ORDERED EXTENSION RUNG (Nov 11, 23:33 EST), not a ring the landed guts carry, and the ladder defaults to it as its tightest rung. The tile map is NOT in this build - positions are used for ranging only, never displayed. Face furniture: one solid plate strip (PAIR \u00b7 channel door \u00b7 RNG door \u00b7 HOLD TO TALK \u00b7 honest state line) measured clear of the bottom no-fly zone (worst actionable bottom 410.1 px vs the 433.0 px band limit at the 640x480 stage). PROOF (staging, real render, headless Chromium 156, 640x480): 14/14 checks twice (first build), 25/25 twice (range addendum), 27/27 twice (Stage 1, the 2-mile rung) - clock exact vs Detroit wall, motion from first paint, weather NO MEASURE failure posture, comms hook honest throughout (connected:false, paired:false - no connection, peer, or voice faked), haversine vectors incl. 1.11 km within=true and 11.12 km within=false against the 3.2 km ring, stale spots fall back to within=null, zero uncaught page exceptions; full build record at ~/workspace/fittings-first-container/BUILD-RECORD.md. Staged file 377,641 B, sha256 b974f0aed9fdf3de3406f1b4ea163a5fbc322459b6e0106b2d3257e724a8d7a7. LIBRARY ONLY: not a depot listing, carries no price - suite-edition pricing is UNRULED and none was invented; not added to catalog.json or garage.json. NO MEASURE: on-device rendering; live bus pairing and voice on hardware (the web bench cannot prove voice)."
   },
   {
    "slug": "betta-ultra-deluxe",
-   "name": "Apex Face — Betta Ultra Deluxe",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Ultra Deluxe V3.1 — Apex Frame Edition)",
+   "name": "Apex Face \u2014 Betta Ultra Deluxe",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Ultra Deluxe V3.1 \u2014 Apex Frame Edition)",
    "package": "app.lovable.apexsignal.face.bettaultradeluxe",
    "apkPath": "/depot/betta-ultra-deluxe.apk",
    "apkSha256": "09dc3fdd7c01a7dbbab8bff6feb3a494eb8e0758c40c7fa0fe0cac4e6f34f35a",
@@ -449,12 +449,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Betta Ultra Deluxe V3.1 (Nov 10, 2026) — V3 as field-verified by the owner (electrocution ceremony, dim-with-fish-visible, wake on touch; ruled a go to hang), plus the APEX FRAME layer: the engine face family's LOKMAT FRAME (chunky case, hex bolts, ADJUST/MODE/LIGHT/START·STOP) ported 1:1 at 640x480 as a FRAME ON/OFF button. Frame ON seats the whole tank inside the glass by one uniform transform (translate(45.5 34) scale(0.858333)) — no clip path, nothing stretched, no content clipped; FRAME OFF is V3's full-bleed tank exactly. Default ON. Tank back is now one named swappable layer (<g id=\"tankBackdrop\">, apex-backdrop-slot v1); this file carries the stock oled-void backdrop."
+   "note": "Betta Ultra Deluxe V3.1 (Nov 10, 2026) \u2014 V3 as field-verified by the owner (electrocution ceremony, dim-with-fish-visible, wake on touch; ruled a go to hang), plus the APEX FRAME layer: the engine face family's LOKMAT FRAME (chunky case, hex bolts, ADJUST/MODE/LIGHT/START\u00b7STOP) ported 1:1 at 640x480 as a FRAME ON/OFF button. Frame ON seats the whole tank inside the glass by one uniform transform (translate(45.5 34) scale(0.858333)) \u2014 no clip path, nothing stretched, no content clipped; FRAME OFF is V3's full-bleed tank exactly. Default ON. Tank back is now one named swappable layer (<g id=\"tankBackdrop\">, apex-backdrop-slot v1); this file carries the stock oled-void backdrop."
   },
   {
    "slug": "wish-face",
-   "name": "Apex Face — Wish Face",
-   "title": "APEX — WISH FACE · Hierographic",
+   "name": "Apex Face \u2014 Wish Face",
+   "title": "APEX \u2014 WISH FACE \u00b7 Hierographic",
    "package": "app.lovable.apexsignal.face.wishface",
    "apkPath": "/depot/wish-face.apk",
    "apkSha256": "5c288c956b29053d814a1188a37ac6f36c48a8ff1579f5f5c28ddf8faebe363d",
@@ -470,8 +470,8 @@
   },
   {
    "slug": "scope",
-   "name": "Apex Face — Waterfall LIVE · SCOPE",
-   "title": "APEX — Waterfall LIVE · SCOPE",
+   "name": "Apex Face \u2014 Waterfall LIVE \u00b7 SCOPE",
+   "title": "APEX \u2014 Waterfall LIVE \u00b7 SCOPE",
    "package": "app.lovable.apexsignal.face.scope",
    "apkPath": "/depot/scope.apk",
    "apkSha256": "55416586123544f0707b470ad1bee30a3635242c0a3b756cdb4e160fadd747d2",
@@ -483,12 +483,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "The SCOPE build whose frozen copy is Lokmat's Kit (snapshot SHA-256 ce7f9241…, byte-identical to this source). The snapshot file itself is never edited or moved; this is the live source build."
+   "note": "The SCOPE build whose frozen copy is Lokmat's Kit (snapshot SHA-256 ce7f9241\u2026, byte-identical to this source). The snapshot file itself is never edited or moved; this is the live source build."
   },
   {
    "slug": "signal-scope",
-   "name": "Apex Face — Signal Scope V2",
-   "title": "APEX — Signal Watch · SIGNAL SCOPE V2",
+   "name": "Apex Face \u2014 Signal Scope V2",
+   "title": "APEX \u2014 Signal Watch \u00b7 SIGNAL SCOPE V2",
    "package": "app.lovable.apexsignal.face.signalscope",
    "apkPath": "/depot/signal-scope.apk",
    "apkSha256": "6443e0e967e35a639a68c232a5a4aa4fc8c8d7f77bf4ef2c43ad767e0086bc28",
@@ -504,8 +504,8 @@
   },
   {
    "slug": "signal-watch",
-   "name": "Apex Face — Signal Watch",
-   "title": "APEX — Signal Watch · WEATHER",
+   "name": "Apex Face \u2014 Signal Watch",
+   "title": "APEX \u2014 Signal Watch \u00b7 WEATHER",
    "package": "app.lovable.apexsignal.face.signalwatch",
    "apkPath": "/depot/signal-watch.apk",
    "apkSha256": "8fa4687f660b62272a3fe202bb736726144815f12a6d40adda9f50d67f1eb331",
@@ -517,12 +517,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Signal Watch weather face (Nov 12, 2026) - the Apex Signal Watch build's standalone watch page (public/watch.html @ main ca99adab), isolated as its own gallery face under owner order Nov 11-12, 2026. This is the face in the owner's Nov 6, 2026 LOKMAT field photo, line for line, and every photo line is produced by this file's own code: giant clock (measure-and-jam fit), date line in the toDateString format (FRI NOV 06 2026), the house weather pipe (forecast + conditions proxies) behind the photo's WX 39F and PEAK 11-07 39F 97% lines, the microclimate water line (Lake Michigan −0.8F signed shift), sun and moon markers counter-positioned on the radar-ring dial at their true computed azimuths (closed-form astronomy, no network), neon palette (#00ff88 / #00eeff / #ff3bd4 / #ffb000) on black, circuit traces through the dial. Compass layer failure-isolated as designed: a real heading when a sensor answers, the bearing settles to NO COMPASS when none does - clock and weather unaffected either way (the photo's posture, and the bench's). ISOLATION CUT, verified by diff: one provenance comment added under the title; the six-link app nav grid and the CB faceswap link removed, so the face stands alone and nothing actionable sits in the bottom nav band; every other byte preserved. Honest data posture: where the prediction engine cannot answer, the face holds WX --- / PEAK --- / WATER --- placeholders and invents nothing. PROOF (real render, headless Chromium 480x480): 10/10 - live clock, date line in the photo's format, NO COMPASS on the sensorless bench, sun/moon transforms set by the face's own astronomy, face topmost at 144/144 grid points at both samples, zero page exceptions (record: weather-face-isolation/proof/proof-result.json). NO MEASURE: on-device paint of this isolated copy (the Nov 6 photo is the owner's evidence for the source face); live weather values over the real network path - the bench served the file off-origin, the pipe 404'd, and the placeholders held."
+   "note": "Signal Watch weather face (Nov 12, 2026) - the Apex Signal Watch build's standalone watch page (public/watch.html @ main ca99adab), isolated as its own gallery face under owner order Nov 11-12, 2026. This is the face in the owner's Nov 6, 2026 LOKMAT field photo, line for line, and every photo line is produced by this file's own code: giant clock (measure-and-jam fit), date line in the toDateString format (FRI NOV 06 2026), the house weather pipe (forecast + conditions proxies) behind the photo's WX 39F and PEAK 11-07 39F 97% lines, the microclimate water line (Lake Michigan \u22120.8F signed shift), sun and moon markers counter-positioned on the radar-ring dial at their true computed azimuths (closed-form astronomy, no network), neon palette (#00ff88 / #00eeff / #ff3bd4 / #ffb000) on black, circuit traces through the dial. Compass layer failure-isolated as designed: a real heading when a sensor answers, the bearing settles to NO COMPASS when none does - clock and weather unaffected either way (the photo's posture, and the bench's). ISOLATION CUT, verified by diff: one provenance comment added under the title; the six-link app nav grid and the CB faceswap link removed, so the face stands alone and nothing actionable sits in the bottom nav band; every other byte preserved. Honest data posture: where the prediction engine cannot answer, the face holds WX --- / PEAK --- / WATER --- placeholders and invents nothing. PROOF (real render, headless Chromium 480x480): 10/10 - live clock, date line in the photo's format, NO COMPASS on the sensorless bench, sun/moon transforms set by the face's own astronomy, face topmost at 144/144 grid points at both samples, zero page exceptions (record: weather-face-isolation/proof/proof-result.json). NO MEASURE: on-device paint of this isolated copy (the Nov 6 photo is the owner's evidence for the source face); live weather values over the real network path - the bench served the file off-origin, the pipe 404'd, and the placeholders held."
   },
   {
    "slug": "uap-hero-face",
-   "name": "Apex Face — UAP Hero",
-   "title": "APEX — UAP HERO FACE (the website wallpaper, with the clock in the black hole)",
+   "name": "Apex Face \u2014 UAP Hero",
+   "title": "APEX \u2014 UAP HERO FACE (the website wallpaper, with the clock in the black hole)",
    "package": "app.lovable.apexsignal.face.uapheroface",
    "apkPath": "/depot/uap-hero-face.apk",
    "apkSha256": "4c3daa7a7d28541efe8c1208e093981cd8de440113ea0a9f138f63ab3429a449",
@@ -534,12 +534,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "UAP hero face V1 — the isawauap live-drawn sky scene as a watch face. Built Nov 11, never landed until this branch."
+   "note": "UAP hero face V1 \u2014 the isawauap live-drawn sky scene as a watch face. Built Nov 11, never landed until this branch."
   },
   {
    "slug": "uap-hero-face-v2",
-   "name": "Apex Face — UAP Hero V2",
-   "title": "APEX — UAP HERO FACE V2 (the website wallpaper, at war, clock in the black hole)",
+   "name": "Apex Face \u2014 UAP Hero V2",
+   "title": "APEX \u2014 UAP HERO FACE V2 (the website wallpaper, at war, clock in the black hole)",
    "package": "app.lovable.apexsignal.face.uapherofacev2",
    "apkPath": "/depot/uap-hero-face-v2.apk",
    "apkSha256": "7366f7314e10f8a7684d2af392dd7d7dfa0cb90ea2e48a039be2c8c9b7361d3f",
@@ -551,12 +551,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "UAP hero face V2 — more stars, layered spinning galaxy arms, saucers fighting triangles, grays fighting mantids (owner's Nov 11 beats)."
+   "note": "UAP hero face V2 \u2014 more stars, layered spinning galaxy arms, saucers fighting triangles, grays fighting mantids (owner's Nov 11 beats)."
   },
   {
    "slug": "uap-iss-face",
-   "name": "Apex Face — UAP ISS Edition",
-   "title": "APEX — UAP ISS EDITION (the website wallpaper, the clock in the black hole, the station overhead)",
+   "name": "Apex Face \u2014 UAP ISS Edition",
+   "title": "APEX \u2014 UAP ISS EDITION (the website wallpaper, the clock in the black hole, the station overhead)",
    "package": "app.lovable.apexsignal.face.uapissface",
    "apkPath": "/depot/uap-iss-face.apk",
    "apkSha256": "da6074f195d159ed0e238dbf6d99ca04f47757166ff0c66c65b8c375779efd69",
@@ -569,12 +569,12 @@
     "iss-telemetry"
    ],
    "status": "BUILT",
-   "note": "ISS edition V1: REAL live ISS telemetry (wheretheiss.at) + weather + clock + comms doors. Honest NO FEED when the feed is unreachable — never simulated."
+   "note": "ISS edition V1: REAL live ISS telemetry (wheretheiss.at) + weather + clock + comms doors. Honest NO FEED when the feed is unreachable \u2014 never simulated."
   },
   {
    "slug": "uap-iss-face-v2",
-   "name": "Apex Face — UAP ISS Edition V2 · Overhead Pass",
-   "title": "APEX — UAP ISS EDITION V2 · OVERHEAD PASS (the globe turns, the station stays in view, the arch is a cuckoo)",
+   "name": "Apex Face \u2014 UAP ISS Edition V2 \u00b7 Overhead Pass",
+   "title": "APEX \u2014 UAP ISS EDITION V2 \u00b7 OVERHEAD PASS (the globe turns, the station stays in view, the arch is a cuckoo)",
    "package": "app.lovable.apexsignal.face.uapissfacev2",
    "apkPath": "/depot/uap-iss-face-v2.apk",
    "apkSha256": "0d01cc433e0818efc8877298553dd65a0a8a6bf3cad181512f5ac2635cdc2258",
@@ -592,8 +592,8 @@
   },
   {
    "slug": "betta-hyperdetail-freefloat",
-   "name": "Apex Face — Betta Hyperdetail Freefloat",
-   "title": "APEX GLASS HOUSE — Aquarium (Betta Hyper-Detail Free Floaters V2)",
+   "name": "Apex Face \u2014 Betta Hyperdetail Freefloat",
+   "title": "APEX GLASS HOUSE \u2014 Aquarium (Betta Hyper-Detail Free Floaters V2)",
    "package": "app.lovable.apexsignal.face.bettahyperdetailfreefloat",
    "apkPath": "/depot/betta-hyperdetail-freefloat.apk",
    "apkSha256": "a0deb53ada9ea3e688a3662f46d5aa11a724cc7997fd7054073a7a0c82a0beb6",
@@ -609,7 +609,7 @@
   },
   {
    "slug": "machinery-clock",
-   "name": "Apex Face — Machinery Clock",
+   "name": "Apex Face \u2014 Machinery Clock",
    "title": "Apex Service Machinery Clock",
    "package": "app.lovable.apexsignal.face.machineryclock",
    "apkPath": "/depot/machinery-clock.apk",
@@ -626,8 +626,8 @@
   },
   {
    "slug": "motion-wallpaper",
-   "name": "Apex Face — Motion Wallpaper",
-   "title": "House Library · Entry #1 — Glint Chasing Screen Mesh (Motion Wallpaper)",
+   "name": "Apex Face \u2014 Motion Wallpaper",
+   "title": "House Library \u00b7 Entry #1 \u2014 Glint Chasing Screen Mesh (Motion Wallpaper)",
    "package": "app.lovable.apexsignal.face.motionwallpaper",
    "apkPath": "/depot/motion-wallpaper.apk",
    "apkSha256": "8fb966238c192bd1c841a667abab1f26643f6c1fd55f6e11d2948ea8486be318",
@@ -643,8 +643,8 @@
   },
   {
    "slug": "condensed-engine-wallpaper",
-   "name": "Apex Face — Condensed Engine Wallpaper",
-   "title": "Apex Condensed Engine Face — No.1",
+   "name": "Apex Face \u2014 Condensed Engine Wallpaper",
+   "title": "Apex Condensed Engine Face \u2014 No.1",
    "package": "app.lovable.apexsignal.face.condensedenginewallpaper",
    "apkPath": "/depot/condensed-engine-wallpaper.apk",
    "apkSha256": "1bbc7ec43897ef0a2438c447dcc084f2c1e17bafc6fa156112700d9af6fe8a91",
@@ -660,8 +660,8 @@
   },
   {
    "slug": "hollys-face",
-   "name": "Apex Face — Holly's Face",
-   "title": "HOLLYWOOD — Holly's Face · Game Skin",
+   "name": "Apex Face \u2014 Holly's Face",
+   "title": "HOLLYWOOD \u2014 Holly's Face \u00b7 Game Skin",
    "package": "app.lovable.apexsignal.face.hollysface",
    "apkPath": "/depot/hollys-face.apk",
    "apkSha256": "90296797c9210da2b05235ce9ffcc0bcdba2ac0897ddcb498c35c2300347731c",
@@ -673,12 +673,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Holly's face from the visual stack. File landed in the faces line Nov 13 (PR #91) and held off the sales catalogue as the owner's explicit call; listed for sale Nov 13, 2026 on his blanket go (15:43 EST) — the catalogue flip."
+   "note": "Holly's face from the visual stack. File landed in the faces line Nov 13 (PR #91) and held off the sales catalogue as the owner's explicit call; listed for sale Nov 13, 2026 on his blanket go (15:43 EST) \u2014 the catalogue flip."
   },
   {
    "slug": "the-sextant",
-   "name": "Apex Face — The Sextant",
-   "title": "APEX — THE SEXTANT",
+   "name": "Apex Face \u2014 The Sextant",
+   "title": "APEX \u2014 THE SEXTANT",
    "package": "app.lovable.apexsignal.face.thesextant",
    "apkPath": "/depot/the-sextant.apk",
    "apkSha256": "0297121334313efd112fc09c94e9999b50bcc789b994689de6309df5ad4b96f3",
@@ -694,8 +694,8 @@
   },
   {
    "slug": "radiosphere",
-   "name": "Apex Face — Radiosphere",
-   "title": "APEX — RADIOSPHERE",
+   "name": "Apex Face \u2014 Radiosphere",
+   "title": "APEX \u2014 RADIOSPHERE",
    "package": "app.lovable.apexsignal.face.radiosphere",
    "apkPath": "/depot/radiosphere.apk",
    "apkSha256": "1f4a7f41062b2395bcbb4c1bfd4a9a8c197e688fcc69683d04ba8e26e4a744a2",
@@ -711,8 +711,8 @@
   },
   {
    "slug": "hero-p39",
-   "name": "Apex Face — Hero P-39D Airacobra",
-   "title": "APEX — Hero Line · P-39D Airacobra",
+   "name": "Apex Face \u2014 Hero P-39D Airacobra",
+   "title": "APEX \u2014 Hero Line \u00b7 P-39D Airacobra",
    "package": "app.lovable.apexsignal.face.herop39",
    "apkPath": "/depot/hero-p39.apk",
    "apkSha256": "cf14790ec7753ca2065949a7ce3fb8a617af01e69c024c7eb03375f5407e8b1d",
@@ -724,12 +724,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hero Line: the P-39D Airacobra, nose-on — the owner's favourite — in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) — the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
+   "note": "Hero Line: the P-39D Airacobra, nose-on \u2014 the owner's favourite \u2014 in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) \u2014 the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
   },
   {
    "slug": "hero-corsair",
-   "name": "Apex Face — Hero F4U Corsair",
-   "title": "APEX — Hero Line · F4U Corsair",
+   "name": "Apex Face \u2014 Hero F4U Corsair",
+   "title": "APEX \u2014 Hero Line \u00b7 F4U Corsair",
    "package": "app.lovable.apexsignal.face.herocorsair",
    "apkPath": "/depot/hero-corsair.apk",
    "apkSha256": "fa048c0e592a0af4d65508e31c9c6e9d640abcbaf905f0309ab9247ac2d1508a",
@@ -741,12 +741,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) — the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
+   "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) \u2014 the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
   },
   {
    "slug": "hero-f14",
-   "name": "Apex Face — Hero F-14 Tomcat",
-   "title": "APEX — Hero Line · F-14 Tomcat",
+   "name": "Apex Face \u2014 Hero F-14 Tomcat",
+   "title": "APEX \u2014 Hero Line \u00b7 F-14 Tomcat",
    "package": "app.lovable.apexsignal.face.herof14",
    "apkPath": "/depot/hero-f14.apk",
    "apkSha256": "8270bc576654f1e206318dc012826fb1d118478613019598042e18c62f49cf0c",
@@ -758,16 +758,16 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) — the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
+   "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) \u2014 the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
   },
   {
    "slug": "hotrod-ratrod",
-   "name": "Apex Face — Hot Rod Rat Rod",
-   "title": "APEX — Hot Rod Line · Rat Rod",
+   "name": "Apex Face \u2014 Hot Rod Rat Rod",
+   "title": "APEX \u2014 Hot Rod Line \u00b7 Rat Rod",
    "package": "app.lovable.apexsignal.face.hotrodratrod",
    "apkPath": "/depot/hotrod-ratrod.apk",
-   "apkSha256": "01c883432693886d6bb8f210596543f6e55ca73c8571292b202107372fb2a483",
-   "apkSizeBytes": 3203868,
+   "apkSha256": "14e9e50e55171687ca5d3f40a9820dcda3cb58e2572d29517042882ef56208e8",
+   "apkSizeBytes": 455191,
    "facePath": "/faces/hotrod-ratrod.html",
    "faceSha256": "19f1d7b1dcb0d900cb63843c52d60b926a0aaffe607455882727713fe5193da4",
    "priceUsd": 10,
@@ -775,16 +775,16 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital."
+   "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod \u2014 the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors."
   },
   {
    "slug": "hotrod-blown",
-   "name": "Apex Face — Hot Rod Blown Drag",
-   "title": "APEX — Hot Rod Line · Blown Drag",
+   "name": "Apex Face \u2014 Hot Rod Blown Drag",
+   "title": "APEX \u2014 Hot Rod Line \u00b7 Blown Drag",
    "package": "app.lovable.apexsignal.face.hotrodblown",
    "apkPath": "/depot/hotrod-blown.apk",
-   "apkSha256": "be208a5ec4533470f1093416e457a7067dde41587157bebf7982ef93cf23f480",
-   "apkSizeBytes": 3203868,
+   "apkSha256": "f6b37f276a83a72773e1fed3d085c571fc272b3188829ccd4375027faffe839c",
+   "apkSizeBytes": 442902,
    "facePath": "/faces/hotrod-blown.html",
    "faceSha256": "f89ed7d8fc4068207e58c94b436de2567d1adedad57f460f2b7d194bf28c9065",
    "priceUsd": 10,
@@ -792,16 +792,16 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital."
+   "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors."
   },
   {
    "slug": "hotrod-coupe",
-   "name": "Apex Face — Hot Rod Full Coupe",
-   "title": "APEX — Hot Rod Line · Full Coupe",
+   "name": "Apex Face \u2014 Hot Rod Full Coupe",
+   "title": "APEX \u2014 Hot Rod Line \u00b7 Full Coupe",
    "package": "app.lovable.apexsignal.face.hotrodcoupe",
    "apkPath": "/depot/hotrod-coupe.apk",
-   "apkSha256": "7ff6697fc90c1450743e6314c348389cdb6bf85b02897e34c7bd02219319a023",
-   "apkSizeBytes": 3203884,
+   "apkSha256": "d3ddee1026b56066589c9fba2bdf5979bc6ed7288dce912ecf226c589b5b4e34",
+   "apkSizeBytes": 479766,
    "facePath": "/faces/hotrod-coupe.html",
    "faceSha256": "a255441f776471b08230e65a47a5a520a185940969f052e2be7db4bb743cabad",
    "priceUsd": 10,
@@ -809,29 +809,29 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital."
+   "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors."
   },
   {
    "slug": "spacex-launch-watch",
-   "name": "Apex Face — SpaceX Launch Watch",
-   "title": "APEX — SpaceX Launch Watch · Phase Two",
+   "name": "Apex Face \u2014 SpaceX Launch Watch",
+   "title": "APEX \u2014 SpaceX Launch Watch \u00b7 Phase Two",
    "package": "app.lovable.apexsignal.face.spacexlaunchwatch",
    "apkPath": "/depot/spacex-launch-watch.apk",
-   "apkSha256": "e5100acaef460a1ff99e11f9f3bc42a89fa47a1cdb1526836f0f342642969e28",
-   "apkSizeBytes": 33233,
+   "apkSha256": "2ff2fc5b1b45ad75799ad6541ead1e95b4e5f79db47b70d999ce3dcd19d97115",
+   "apkSizeBytes": 3211528,
    "facePath": "/faces/spacex-launch-watch.html",
-   "faceSha256": "00a1c931b600fb5f18d7e3f8f123bfbecdad5ad8da601d3bc7364e30f93795f8",
+   "faceSha256": "e2c990561fc90fe86cc2f0ceb11e67946d931157a502d6dcba2a0086d2a93f03",
    "priceUsd": 10,
    "functions": [
     "clock"
    ],
    "status": "BUILT",
-   "note": "SpaceX Launch Watch · Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE — the source publishes none and the face invents none. Compass dial and time, analog and digital. Layout rebalanced Nov 23, 2026: the composition is driven by the loaded bound parameter (Direct Parameter Load) — a portrait column distributed over the full frame on tall bounds, the square board retained on square bounds; compass at instrument size, feed-bubble plate unclipped. This build also lands the Nov 20 feed-resilience fix in the shipped package for the first time."
+   "note": "SpaceX Launch Watch \u00b7 Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE \u2014 the source publishes none and the face invents none. Compass dial and time, analog and digital."
   },
   {
    "slug": "tesla-scope",
-   "name": "Apex Face — Tesla Scope",
-   "title": "APEX — Signal Watch · TESLA SCOPE",
+   "name": "Apex Face \u2014 Tesla Scope",
+   "title": "APEX \u2014 Signal Watch \u00b7 TESLA SCOPE",
    "package": "app.lovable.apexsignal.face.teslascope",
    "apkPath": "/depot/tesla-scope.apk",
    "apkSha256": "150d8c0a29d430768cb6ed737847c7c14a81b5d8b3c45517f725d2dffe7c3a1f",
@@ -843,12 +843,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Tesla Scope: a Tesla companion panel in the Scope pipe, wired field-by-field to Tesla's documented Fleet API shapes (charge level and state, range, charge limit, time-to-full; lock, odometer, software, climate). Ships unpaired — NO CAR PAIRED, every vehicle readout NO MEASURE, no token held, no Tesla calls made; pairing is Tesla's documented OAuth, inert until a real car is authorized. Vehicle location is deliberately never requested."
+   "note": "Tesla Scope: a Tesla companion panel in the Scope pipe, wired field-by-field to Tesla's documented Fleet API shapes (charge level and state, range, charge limit, time-to-full; lock, odometer, software, climate). Ships unpaired \u2014 NO CAR PAIRED, every vehicle readout NO MEASURE, no token held, no Tesla calls made; pairing is Tesla's documented OAuth, inert until a real car is authorized. Vehicle location is deliberately never requested."
   },
   {
    "slug": "j58-dark",
-   "name": "Apex Face — P&W J58 Dark Edition",
-   "title": "APEX — P&W J58 · DARK EDITION · Motors Under Glass",
+   "name": "Apex Face \u2014 P&W J58 Dark Edition",
+   "title": "APEX \u2014 P&W J58 \u00b7 DARK EDITION \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.j58dark",
    "apkPath": "/depot/j58-dark.apk",
    "apkSha256": "21a43eec8d85e3732cf239b7da995aa206bb3d01c39bb455a552e3d1ca6292ce",
@@ -860,12 +860,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Motors Under Glass, Dark Edition: the whole J58 machine — both views, flow and random ingest — carried onto blackened plates. The dark twin of the J58 seat."
+   "note": "Motors Under Glass, Dark Edition: the whole J58 machine \u2014 both views, flow and random ingest \u2014 carried onto blackened plates. The dark twin of the J58 seat."
   },
   {
    "slug": "j79-dark",
-   "name": "Apex Face — GE J79 Dark Edition",
-   "title": "APEX — GE J79 · DARK EDITION · Motors Under Glass",
+   "name": "Apex Face \u2014 GE J79 Dark Edition",
+   "title": "APEX \u2014 GE J79 \u00b7 DARK EDITION \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.j79dark",
    "apkPath": "/depot/j79-dark.apk",
    "apkSha256": "ac6b680a9abbf557b1a1c1d11261c4742facc76bea620941c6aa05012d2922db",
@@ -877,12 +877,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Motors Under Glass, Dark Edition: the whole J79 machine — both views, flow and random ingest — on a charcoal-burnt wood plate. The dark twin of the J79 Blackbird seat."
+   "note": "Motors Under Glass, Dark Edition: the whole J79 machine \u2014 both views, flow and random ingest \u2014 on a charcoal-burnt wood plate. The dark twin of the J79 Blackbird seat."
   },
   {
    "slug": "raptor-dark",
-   "name": "Apex Face — Raptor Dark Edition",
-   "title": "APEX — Raptor · DARK EDITION · Motors Under Glass",
+   "name": "Apex Face \u2014 Raptor Dark Edition",
+   "title": "APEX \u2014 Raptor \u00b7 DARK EDITION \u00b7 Motors Under Glass",
    "package": "app.lovable.apexsignal.face.raptordark",
    "apkPath": "/depot/raptor-dark.apk",
    "apkSha256": "f4fc1cada3ed6af85fc7efcd3fdad31ff676a3d13f40e8d716c9d1d215508d7a",
@@ -894,12 +894,12 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Motors Under Glass, Dark Edition: the whole Raptor machine — exploded and end views, flow and random ingest — on a deep-space plate. The dark twin of the Raptor seat."
+   "note": "Motors Under Glass, Dark Edition: the whole Raptor machine \u2014 exploded and end views, flow and random ingest \u2014 on a deep-space plate. The dark twin of the Raptor seat."
   },
   {
    "slug": "prop-gear",
-   "name": "Apex Face — Propeller & Gears",
-   "title": "APEX — Propeller & Gears · The Propeller Wing",
+   "name": "Apex Face \u2014 Propeller & Gears",
+   "title": "APEX \u2014 Propeller & Gears \u00b7 The Propeller Wing",
    "package": "app.lovable.apexsignal.face.propgear",
    "apkPath": "/depot/prop-gear.apk",
    "apkSha256": "e35774496a1e0f416456a6033caa2d51dd264f7b9e7a06d7beb8d594a0ef5d14",
@@ -911,16 +911,16 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "The Propeller Wing: a propeller on a 36T great gear, clock gears behind it meshing at true ratios 36:20:12, the 12T gear carrying real clock hands — propellers turning like clock gears, with clock gears behind them."
+   "note": "The Propeller Wing: a propeller on a 36T great gear, clock gears behind it meshing at true ratios 36:20:12, the 12T gear carrying real clock hands \u2014 propellers turning like clock gears, with clock gears behind them."
   },
   {
    "slug": "war-corsair",
-   "name": "Apex Face — War Corsair Cowling",
-   "title": "APEX — War Edition · Corsair Cowling · The Propeller Wing",
+   "name": "Apex Face \u2014 War Corsair Cowling",
+   "title": "APEX \u2014 War Edition \u00b7 Corsair Cowling \u00b7 The Propeller Wing",
    "package": "app.lovable.apexsignal.face.warcorsair",
    "apkPath": "/depot/war-corsair.apk",
-   "apkSha256": "9e2ec15720f2382c8d0c1ca08e5a52efac69cea96d549c24bfa25b4acf876fb0",
-   "apkSizeBytes": 3205472,
+   "apkSha256": "97faa3f153ca67508cad8e10fadad777b6da38d2cb86ead966dbb0a256daaa8b",
+   "apkSizeBytes": 152091,
    "facePath": "/faces/war-corsair.html",
    "faceSha256": "42cdfc857eacc32ff3f8b94ef7741b58dee13b84ca8bc76dd6fc170dd456cf70",
    "priceUsd": 10,
@@ -928,16 +928,16 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "The Propeller Wing: the F4U Corsair seat — nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face."
+   "note": "The Propeller Wing: the F4U Corsair seat \u2014 nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors."
   },
   {
    "slug": "war-p51",
-   "name": "Apex Face — War P51 Cowling",
-   "title": "APEX — War Edition · P51 Cowling · The Propeller Wing",
+   "name": "Apex Face \u2014 War P51 Cowling",
+   "title": "APEX \u2014 War Edition \u00b7 P51 Cowling \u00b7 The Propeller Wing",
    "package": "app.lovable.apexsignal.face.warp51",
    "apkPath": "/depot/war-p51.apk",
-   "apkSha256": "91e69ef51129b32dbc5824c6d583155a0d9d99b7704cf14f3557c03a955699a1",
-   "apkSizeBytes": 3205684,
+   "apkSha256": "24039dc7acad3f9710583ea338ed3cfe33f554ca322cc319b722724e041c85b6",
+   "apkSizeBytes": 164375,
    "facePath": "/faces/war-p51.html",
    "faceSha256": "e50b7ffd759d7912ca418fec3570333019d16e1281532be5b1ae43b07e69f698",
    "priceUsd": 10,
@@ -945,7 +945,7 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "The Propeller Wing: the P-51 seat — tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face."
+   "note": "The Propeller Wing: the P-51 seat \u2014 tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors."
   }
  ]
 }

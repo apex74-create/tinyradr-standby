@@ -260,7 +260,7 @@
    "slug": "j58",
    "name": "Apex Face \u2014 J58",
    "title": "APEX \u2014 P&W J58 \u00b7 Motors Under Glass",
-   "note": "Motors Under Glass series: the Pratt & Whitney J58, the SR-71 turbojet with its spike intake, with the clock.",
+   "note": "Motors Under Glass series: the Pratt & Whitney J58, the SR-71 turbojet with its spike intake, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero image load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -268,8 +268,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.j58",
     "apkPath": "/depot/j58.apk",
-    "apkSha256": "81d5343d302979e0013d6779b276d864ea73c5336afe24012df14fe3aeffd0ad",
-    "apkSizeBytes": 2911977,
+    "apkSha256": "8071cec1cfc7aa565b2920fd80e5641d6248596096e4cd9a9de6f8e8c6f3d206",
+    "apkSizeBytes": 279059,
     "facePath": "/faces/j58.html"
    },
    "apple": {
@@ -282,7 +282,7 @@
    "slug": "j79-blackbird",
    "name": "Apex Face \u2014 J79 Blackbird",
    "title": "APEX \u2014 GE J79 \u00b7 Motors Under Glass",
-   "note": "Motors Under Glass series: the GE J79 single-spool turbojet, with the clock.",
+   "note": "Motors Under Glass series: the GE J79 single-spool turbojet, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -290,8 +290,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.j79blackbird",
     "apkPath": "/depot/j79-blackbird.apk",
-    "apkSha256": "5fcec1656f835ac25955ec3861ae93332713a92dff87bf782cfe9c7587add8b9",
-    "apkSizeBytes": 2911977,
+    "apkSha256": "63af8d6ecf6777f89e51aaddcc739888e25faeb6f2572a4f7976899b1f1efa20",
+    "apkSizeBytes": 340499,
     "facePath": "/faces/j79-blackbird.html"
    },
    "apple": {
@@ -326,7 +326,7 @@
    "slug": "raptor",
    "name": "Apex Face \u2014 Raptor",
    "title": "APEX \u2014 Raptor \u00b7 Motors Under Glass",
-   "note": "Motors Under Glass series: the Raptor, full-flow staged combustion, with the clock.",
+   "note": "Motors Under Glass series: the Raptor, full-flow staged combustion, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -334,8 +334,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.raptor",
     "apkPath": "/depot/raptor.apk",
-    "apkSha256": "05e06e269eceb9be17840a8ec4ebb66216223d076b31304ce72be7ed79a26259",
-    "apkSizeBytes": 2911977,
+    "apkSha256": "e7680fa0cc46a5b69a3390566e98ff7dc290a8312c0872523cbc3930cbc32006",
+    "apkSizeBytes": 360982,
     "facePath": "/faces/raptor.html"
    },
    "apple": {
@@ -986,7 +986,7 @@
    "slug": "hotrod-ratrod",
    "name": "Apex Face \u2014 Hot Rod Rat Rod",
    "title": "APEX \u2014 Hot Rod Line \u00b7 Rat Rod",
-   "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod \u2014 the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character \u2014 with a compass dial and the time in analog and digital.",
+   "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod \u2014 the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -994,8 +994,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.hotrodratrod",
     "apkPath": "/depot/hotrod-ratrod.apk",
-    "apkSha256": "01c883432693886d6bb8f210596543f6e55ca73c8571292b202107372fb2a483",
-    "apkSizeBytes": 3203868,
+    "apkSha256": "14e9e50e55171687ca5d3f40a9820dcda3cb58e2572d29517042882ef56208e8",
+    "apkSizeBytes": 455191,
     "facePath": "/faces/hotrod-ratrod.html"
    },
    "apple": {
@@ -1008,7 +1008,7 @@
    "slug": "hotrod-blown",
    "name": "Apex Face \u2014 Hot Rod Blown Drag",
    "title": "APEX \u2014 Hot Rod Line \u00b7 Blown Drag",
-   "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital.",
+   "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1016,8 +1016,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.hotrodblown",
     "apkPath": "/depot/hotrod-blown.apk",
-    "apkSha256": "be208a5ec4533470f1093416e457a7067dde41587157bebf7982ef93cf23f480",
-    "apkSizeBytes": 3203868,
+    "apkSha256": "f6b37f276a83a72773e1fed3d085c571fc272b3188829ccd4375027faffe839c",
+    "apkSizeBytes": 442902,
     "facePath": "/faces/hotrod-blown.html"
    },
    "apple": {
@@ -1030,7 +1030,7 @@
    "slug": "hotrod-coupe",
    "name": "Apex Face \u2014 Hot Rod Full Coupe",
    "title": "APEX \u2014 Hot Rod Line \u00b7 Full Coupe",
-   "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital.",
+   "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1038,8 +1038,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.hotrodcoupe",
     "apkPath": "/depot/hotrod-coupe.apk",
-    "apkSha256": "7ff6697fc90c1450743e6314c348389cdb6bf85b02897e34c7bd02219319a023",
-    "apkSizeBytes": 3203884,
+    "apkSha256": "d3ddee1026b56066589c9fba2bdf5979bc6ed7288dce912ecf226c589b5b4e34",
+    "apkSizeBytes": 479766,
     "facePath": "/faces/hotrod-coupe.html"
    },
    "apple": {
@@ -1052,7 +1052,7 @@
    "slug": "spacex-launch-watch",
    "name": "Apex Face \u2014 SpaceX Launch Watch",
    "title": "APEX \u2014 SpaceX Launch Watch \u00b7 Phase Two",
-   "note": "SpaceX Launch Watch \u00b7 Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE \u2014 the source publishes none and the face invents none. Compass dial and time, analog and digital. Layout rebalanced Nov 23, 2026: the composition is driven by the loaded bound parameter (Direct Parameter Load) \u2014 a portrait column distributed over the full frame on tall bounds, the square board retained on square bounds; compass at instrument size, feed-bubble plate unclipped. This build also lands the Nov 20 feed-resilience fix in the shipped package for the first time.",
+   "note": "SpaceX Launch Watch \u00b7 Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE \u2014 the source publishes none and the face invents none. Compass dial and time, analog and digital.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1060,8 +1060,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.spacexlaunchwatch",
     "apkPath": "/depot/spacex-launch-watch.apk",
-    "apkSha256": "e5100acaef460a1ff99e11f9f3bc42a89fa47a1cdb1526836f0f342642969e28",
-    "apkSizeBytes": 33233,
+    "apkSha256": "2ff2fc5b1b45ad75799ad6541ead1e95b4e5f79db47b70d999ce3dcd19d97115",
+    "apkSizeBytes": 3211528,
     "facePath": "/faces/spacex-launch-watch.html"
    },
    "apple": {
@@ -1184,7 +1184,7 @@
    "slug": "war-corsair",
    "name": "Apex Face \u2014 War Corsair Cowling",
    "title": "APEX \u2014 War Edition \u00b7 Corsair Cowling \u00b7 The Propeller Wing",
-   "note": "The Propeller Wing: the F4U Corsair seat \u2014 nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+   "note": "The Propeller Wing: the F4U Corsair seat \u2014 nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1192,8 +1192,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.warcorsair",
     "apkPath": "/depot/war-corsair.apk",
-    "apkSha256": "9e2ec15720f2382c8d0c1ca08e5a52efac69cea96d549c24bfa25b4acf876fb0",
-    "apkSizeBytes": 3205472,
+    "apkSha256": "97faa3f153ca67508cad8e10fadad777b6da38d2cb86ead966dbb0a256daaa8b",
+    "apkSizeBytes": 152091,
     "facePath": "/faces/war-corsair.html"
    },
    "apple": {
@@ -1206,7 +1206,7 @@
    "slug": "war-p51",
    "name": "Apex Face \u2014 War P51 Cowling",
    "title": "APEX \u2014 War Edition \u00b7 P51 Cowling \u00b7 The Propeller Wing",
-   "note": "The Propeller Wing: the P-51 seat \u2014 tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+   "note": "The Propeller Wing: the P-51 seat \u2014 tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1214,8 +1214,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.warp51",
     "apkPath": "/depot/war-p51.apk",
-    "apkSha256": "91e69ef51129b32dbc5824c6d583155a0d9d99b7704cf14f3557c03a955699a1",
-    "apkSizeBytes": 3205684,
+    "apkSha256": "24039dc7acad3f9710583ea338ed3cfe33f554ca322cc319b722724e041c85b6",
+    "apkSizeBytes": 164375,
     "facePath": "/faces/war-p51.html"
    },
    "apple": {
