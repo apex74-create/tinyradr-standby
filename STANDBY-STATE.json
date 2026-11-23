@@ -1,15 +1,15 @@
 {
   "property": "tinyradr.com",
-  "builtFromSha": "875fd247f63e765b569640c4904fd8040c95d150",
-  "builtAt": "2026-11-22T20:26:47.524Z",
+  "builtFromSha": "fe2e69b226076096ad95ebbe334de3a97bc5849b",
+  "builtAt": "2026-11-23T00:33:31.648Z",
   "routes": {
     "/": {
       "status": 200,
-      "bytes": 206619
+      "bytes": 207760
     },
     "/depot": {
       "status": 200,
-      "bytes": 152139
+      "bytes": 150951
     },
     "/forecast": {
       "status": 200,
