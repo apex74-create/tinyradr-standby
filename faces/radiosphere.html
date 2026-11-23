@@ -130,7 +130,13 @@
    state changes:
 
        window.__apexScanFeed = { on: Boolean, entries: [...],
-                                 denied: [...], off: [...] }
+                                 denied: [...], off: [...],
+                                 src: "ANALYZER" | "CONTAINER" }
+
+   src names the pipe that fed the entries (Phase 2, Nov 23, 2026):
+   ANALYZER = the Apex Wi-Fi Analyzer's ApexWifi/1 ingest set, read
+   by the shell from the analyzer's ContentProvider; CONTAINER = the
+   shell's own scan (the named fallback). The state line prints it.
 
    entry = { plane: "wifi" | "ble" | "rid" | "cell" | "gnss",
              type, id, label (as broadcast), strength (dBm or null),
@@ -457,6 +463,7 @@ function drawLabels(faces) {
 
 var angleOut = document.getElementById("angleOut");
 var stateEl = document.getElementById("state");
+function feedSrc() { var f = window.__apexScanFeed; return (f && f.src) ? f.src : ""; }
 var clockEl = document.getElementById("clock");
 function frame() {
   /* Re-read the feed every frame; rebuild only when it changed. */
@@ -485,8 +492,8 @@ function frame() {
   feedOff.forEach(function (p) { planeNote += " · " + PLANE_NAMES[p] + " OFF"; });
   stateEl.textContent =
     feedState === "nofeed" ? "SCAN — NO FEED" :
-    feedState === "nosignals" ? "SCAN — NO SIGNALS" + planeNote :
-    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "") + planeNote;
+    feedState === "nosignals" ? "SCAN — NO SIGNALS" + (feedSrc() ? " · SRC " + feedSrc() : "") + planeNote :
+    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "") + (feedSrc() ? " · SRC " + feedSrc() : "") + planeNote;
 }
 
 /* ---- HUD text -------------------------------------------------------- */

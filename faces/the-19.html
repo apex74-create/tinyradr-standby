@@ -96,7 +96,11 @@
   are nothing. The APK shell owns the radios; the face owns the
   painting. The shell publishes ONE object:
 
-      window.__apexScanFeed = { on: Boolean, entries: [...] }
+      window.__apexScanFeed = { on: Boolean, entries: [...], src: "ANALYZER" | "CONTAINER" }
+   (src names the pipe that fed the entries: ANALYZER = the Apex
+   Wi-Fi Analyzer's ApexWifi/1 ingest set via its ContentProvider;
+   CONTAINER = the shell's own scan. The face prints it on the scan
+   layer — a marker whose source is absent was never fed.)
 
   ENTRY FIELDS (one entry = one heard emitter):
     plane     — "wifi" | "ble" | "rid" | "cell" | "gnss": the
@@ -602,11 +606,11 @@ function drawMarker(e, x, y, nowMs){
 }
 function drawScanLayer(nowMs){
   var feed = readScanFeed();
-  scanBenchState = { on: feed.on, entries: feed.entries.length };
+  scanBenchState = { on: feed.on, entries: feed.entries.length, src: feed.src || null };
   scanPlotted = [];
   if (!feed.on){ drawScanState("SCAN — NO FEED"); return; }
   var bands = scanBands(feed);
-  if (!bands.length){ drawScanState("SCAN — NO SIGNALS"); return; }
+  if (!bands.length){ drawScanState("SCAN — NO SIGNALS" + (feed.src ? " · SRC " + feed.src : "")); return; }
   var W = innerW(), H = innerH();
   var fieldTop = H * 0.30, fieldBot = H * 0.80;
   var bandH = (fieldBot - fieldTop) / bands.length;
@@ -626,6 +630,13 @@ function drawScanLayer(nowMs){
       scanPlotted.push({ plane: e.plane, label: String(e.label || e.id || "?"),
                          strength: (typeof e.strength === "number") ? e.strength : null });
     }
+  }
+  if (feed.src){
+    ctx.font = "600 " + Math.max(8, Math.round(W * 0.016)) + "px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = PAL.glyph; ctx.globalAlpha = 0.9;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("SRC " + feed.src, W / 2, H * 0.845);
+    ctx.globalAlpha = 1;
   }
 }
 

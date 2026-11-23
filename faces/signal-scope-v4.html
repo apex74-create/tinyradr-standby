@@ -543,7 +543,7 @@
   var SNAP_FRESH_MS = 60000;      // freshness bound: past it, RF = NO FEED
   var PIN_DROP_MS = 150000;       // an AP unheard this long loses its pin
   var REANCHOR_M = 10;            // displacement bound (spec §6)
-  var RF = { snapAt: 0, aps: [], connBssid: '', pins: {}, order: [] };
+  var RF = { snapAt: 0, aps: [], connBssid: '', pins: {}, order: [], src: '' };
   var FRAME = { origin: null, x: 0, y: 0, courseDeg: null, courseAt: 0, headingDeg: null, headingAt: 0, fixes: 0, reanchorAt: 0 };
   var HUNT = { bssid: null, score: 0 };
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
@@ -568,6 +568,7 @@
     if (!snap || typeof snap.at !== 'number') return;
     var now = Date.now();
     RF.snapAt = snap.at; RF.aps = snap.aps || []; RF.connBssid = snap.connectedBssid || '';
+    RF.src = snap.src || 'CONTAINER';
     if (snap.sim) SIM.on = true;
     var anchor = FRAME.origin ? { x: FRAME.x, y: FRAME.y } : null;
     var seen = {};
@@ -1118,6 +1119,14 @@
   //     a payload never supplies reads NO MEASURE in the census —
   //     never zero, which would claim "none heard".
   //   ApexBeat    { pulseMs, phaseMs, at, sim }
+  //   SOURCE (Phase 2 pipe, Nov 23, 2026): every payload above may
+  //     carry src:'ANALYZER'|'CONTAINER'. ANALYZER = the Apex Wi-Fi
+  //     Analyzer's ApexWifi/1 ingest set, read by the container from
+  //     the analyzer's ContentProvider (the richer, logged, GPS-tagged
+  //     dataset). CONTAINER = the container's own scan/connection read
+  //     (the named fallback when the analyzer is absent or stale).
+  //     The face prints the source beside the values it fed — a field
+  //     whose source is absent was never fed and reads NO MEASURE.
   //   ApexPing    { rttMs, at, sim } — the connected AP's ping RTT,
   //     one payload per answered ping (the ROUTER HEARTBEAT source,
   //     V6). ApexNet payloads may carry the same reading as pingMs.
@@ -1132,10 +1141,10 @@
             steps: null, sleep: null, gps: null, batt: null,
             resp: null, temp: null };
   var T = { hr: 0, spo2: 0, hrv: 0, steps: 0, sleep: 0, batt: 0 };
-  var NET = { transport: '', ssid: '', bssid: '', bandGhz: null, channel: null, rssi: null, gen: '', at: 0, sig: '' };
+  var NET = { transport: '', ssid: '', bssid: '', bandGhz: null, channel: null, rssi: null, gen: '', at: 0, sig: '', src: '' };
   var FB = { pulseMs: 180000, phaseMs: 0, at: 0, freshAt: 0, sig: '' };
   var BEAT = { src: 'TICK' };
-  var PING = { series: [], lastAt: 0, lastRtt: null };
+  var PING = { series: [], lastAt: 0, lastRtt: null, src: '' };
   var RUN = { scope: false, pulse: false, freq: false };
   var SIM = { on: false };
   var INVEST = { on: false };
@@ -1261,19 +1270,21 @@
   // bandwidth class and is deliberately never read here.
   function applyNet(n) {
     if (!n) return;
-    var sig = [n.transport, n.ssid, n.bssid, n.bandGhz, n.channel, n.rssi, n.gen, n.pingMs].join('|');
+    var sig = [n.transport, n.ssid, n.bssid, n.bandGhz, n.channel, n.rssi, n.gen, n.pingMs, n.src].join('|');
     if (sig === NET.sig && typeof n.at !== 'number') return; // set-once payload: let it age
     NET.sig = sig;
     NET.transport = n.transport || ''; NET.ssid = n.ssid || ''; NET.bssid = n.bssid || '';
     NET.bandGhz = num(n.bandGhz); NET.channel = num(n.channel); NET.rssi = num(n.rssi); NET.gen = n.gen || '';
     NET.at = (typeof n.at === 'number') ? n.at : Date.now();
+    NET.src = n.src || 'CONTAINER';
     if (n.sim) SIM.on = true;
-    if (num(n.pingMs) !== null) applyPing({ rttMs: n.pingMs, at: NET.at, sim: n.sim });
+    if (num(n.pingMs) !== null) applyPing({ rttMs: n.pingMs, at: NET.at, sim: n.sim, src: NET.src });
     if (typeof n.headingDeg === 'number') { FRAME.headingDeg = n.headingDeg; FRAME.headingAt = Date.now(); }
     renderBios();
   }
   function readNet() { if (window.ApexNet) applyNet(window.ApexNet); }
   window.ApexNetPush = function (n) { window.ApexNet = n; applyNet(n); };
+  function srcSuffix() { return NET.src ? ' · SRC ' + NET.src : ''; }
   function netText() {
     if (fresh(NET.at, 30000) && NET.transport) {
       if (NET.transport === 'wifi') {
@@ -1282,12 +1293,12 @@
         if (NET.bandGhz) s += ' · ' + NET.bandGhz + 'GHZ';
         if (NET.channel) s += ' CH' + NET.channel;
         if (NET.rssi !== null) s += ' ' + NET.rssi + 'DB';
-        return s;
+        return s + srcSuffix();
       }
-      if (NET.transport === 'cellular') return 'CELL' + (NET.gen ? ' · ' + NET.gen + ' (OS)' : ' · GEN NO MEASURE');
-      if (NET.transport === 'ethernet') return 'ETHERNET';
-      if (NET.transport === 'none') return 'NO CARRIER';
-      return String(NET.transport).toUpperCase();
+      if (NET.transport === 'cellular') return 'CELL' + (NET.gen ? ' · ' + NET.gen + ' (OS)' : ' · GEN NO MEASURE') + srcSuffix();
+      if (NET.transport === 'ethernet') return 'ETHERNET' + srcSuffix();
+      if (NET.transport === 'none') return 'NO CARRIER' + srcSuffix();
+      return String(NET.transport).toUpperCase() + srcSuffix();
     }
     var c = navigator.connection;
     if (c && c.type) {
@@ -1320,6 +1331,7 @@
     var rtt = num(p.rttMs);
     if (rtt === null || rtt < 0) return;
     var at = (typeof p.at === 'number') ? p.at : Date.now();
+    if (p.src) PING.src = p.src;
     if (at <= PING.lastAt) return; // set-once payloads must not mint answers
     PING.lastAt = at; PING.lastRtt = Math.round(rtt);
     PING.series.push({ at: at, pw: performance.now(), rtt: Math.round(rtt) });
@@ -1362,7 +1374,7 @@
   // standing rule, printed on the panel: RSSI IS SIGNAL STRENGTH,
   // NOT DISTANCE — no emitter in this view is ever ranged.
   // ================================================================
-  var CENSUS = { on: false, bt: null, cell: null, session: null, at: 0, sig: '' };
+  var CENSUS = { on: false, bt: null, cell: null, session: null, at: 0, sig: '', src: '' };
   var CENSUS_SEEN_KEY = 'apex.census.seen.v1';
   var CENSUS_WATCH = /cam|drone|spy|track|record|hidden|listen/i;
   var seenStore = null;
@@ -1401,13 +1413,14 @@
       if (snap.session) CENSUS.session = snap.session;
       CENSUS.at = at;
     }
+    if (snap.src) CENSUS.src = snap.src;
     CENSUS.sig = '';
   }
   window.ApexCensusPush = function (c) {
     if (!c) return;
     if (typeof c.at !== 'number') c.at = Date.now();
     if (c.sim) SIM.on = true;
-    censusIngest({ at: c.at, bt: c.bt, cell: c.cell, session: c.session });
+    censusIngest({ at: c.at, bt: c.bt, cell: c.cell, session: c.session, src: c.src });
     if (CENSUS.on) renderCensus();
   };
   function esc(s) {
@@ -1525,7 +1538,7 @@
     var when = new Date(d.snapAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
     var html = '<div class="cen-h">EMITTER CENSUS</div>';
     html += '<div class="cen-sub">' + when + ' · SNAPSHOT ' + ageTxt + (stale ? ' · <span class="cen-sim">STALE</span>' : '') +
-      (SIM.on ? '<br><span class="cen-sim">SIM — DECLARED DEMO DATA, NOT A LIVE SCAN</span>' : '<br>LIVE SCAN SNAPSHOT') + '</div>';
+      (SIM.on ? '<br><span class="cen-sim">SIM — DECLARED DEMO DATA, NOT A LIVE SCAN</span>' : '<br>LIVE SCAN SNAPSHOT · SOURCE: ' + (CENSUS.src || RF.src || 'CONTAINER')) + '</div>';
     var ses = d.session || {};
     var sesTxt = (typeof ses.distMi === 'number' || typeof ses.durMin === 'number')
       ? '<span class="dim">SESSION</span> ' + (typeof ses.distMi === 'number' ? ses.distMi.toFixed(1) + ' MI' : '—') + (typeof ses.durMin === 'number' ? ' · ' + Math.round(ses.durMin) + ' MIN' : '')
@@ -1725,10 +1738,10 @@
     var n24 = 0, n5 = 0, i;
     for (i = 0; i < RF.aps.length; i++) { if (RF.aps[i].bandGhz >= 4.5) n5++; else n24++; }
     var hunt = (HUNT.bssid && RF.pins[HUNT.bssid]) ? ' · HUNT ' + (RF.pins[HUNT.bssid].ssid || 'AP') : '';
-    if (INVEST.on) return 'INVESTIGATING · ' + RF.order.length + ' AP · ' + (age >= 0 ? age + 'S' : '—') + hunt;
+    if (INVEST.on) return 'INVESTIGATING · ' + RF.order.length + ' AP · ' + (age >= 0 ? age + 'S' : '—') + hunt + (RF.src ? ' · SRC ' + RF.src : '');
     if (!RF.snapAt) return 'NO FEED';
     if (age * 1000 > SNAP_FRESH_MS) return 'NO FEED · LAST ' + age + 'S';
-    return RF.order.length + ' AP · 2.4×' + n24 + ' 5×' + n5 + ' · ' + age + 'S' + hunt;
+    return RF.order.length + ' AP · 2.4×' + n24 + ' 5×' + n5 + ' · ' + age + 'S' + hunt + (RF.src ? ' · SRC ' + RF.src : '');
   }
   function renderBios() {
     var d = new Date(), h = d.getHours() % 12; if (h === 0) h = 12;
@@ -1769,7 +1782,7 @@
     } else parts.push('TICK · NO HEARTBEAT FEED');
     if (INVEST.on) parts.push('INVESTIGATING');
     var age = RF.snapAt ? Math.floor((Date.now() - RF.snapAt) / 1000) : -1;
-    parts.push((RF.snapAt && age * 1000 <= SNAP_FRESH_MS) ? 'RF ' + RF.order.length + 'AP ' + age + 'S' : 'RF NO FEED');
+    parts.push((RF.snapAt && age * 1000 <= SNAP_FRESH_MS) ? 'RF ' + RF.order.length + 'AP ' + age + 'S' + (RF.src ? ' · ' + RF.src : '') : 'RF NO FEED');
     var txt = parts.join(' · ');
     var el = document.getElementById('mode');
     if (el.textContent !== txt) el.textContent = txt;
@@ -1813,6 +1826,7 @@
         fixes: FRAME.fixes,
         course: FRAME.courseDeg,
         sim: SIM.on,
+        netSrc: NET.src, rfSrc: RF.src, pingSrc: PING.src, censusSrc: CENSUS.src,
         net: netText(),
         mode: document.getElementById('mode').textContent,
         tiles: document.getElementById('bios').textContent.replace(/\s+/g, ' ').trim()
