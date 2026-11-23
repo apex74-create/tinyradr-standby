@@ -715,8 +715,8 @@
    "title": "APEX \u2014 Hero Line \u00b7 P-39D Airacobra",
    "package": "app.lovable.apexsignal.face.herop39",
    "apkPath": "/depot/hero-p39.apk",
-   "apkSha256": "fb67a155d1133a6d3b0a0e36a9ff4b3333a40de5d9b9b9b789b43f83e3de6f56",
-   "apkSizeBytes": 3204040,
+   "apkSha256": "cf14790ec7753ca2065949a7ce3fb8a617af01e69c024c7eb03375f5407e8b1d",
+   "apkSizeBytes": 299607,
    "facePath": "/faces/hero-p39.html",
    "faceSha256": "ee091c7bc09b0f027ea33c6e900db979806e4f4e8410714f71aa8f400e3a3fb6",
    "priceUsd": 10,
@@ -724,7 +724,7 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hero Line: the P-39D Airacobra, nose-on \u2014 the owner's favourite \u2014 in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs."
+   "note": "Hero Line: the P-39D Airacobra, nose-on \u2014 the owner's favourite \u2014 in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) \u2014 the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
   },
   {
    "slug": "hero-corsair",
@@ -732,8 +732,8 @@
    "title": "APEX \u2014 Hero Line \u00b7 F4U Corsair",
    "package": "app.lovable.apexsignal.face.herocorsair",
    "apkPath": "/depot/hero-corsair.apk",
-   "apkSha256": "ba710eb1eff046549edd8be5d2b7cfda9b360872db6ff5b68c86a8070d94dcea",
-   "apkSizeBytes": 3204040,
+   "apkSha256": "fa048c0e592a0af4d65508e31c9c6e9d640abcbaf905f0309ab9247ac2d1508a",
+   "apkSizeBytes": 266846,
    "facePath": "/faces/hero-corsair.html",
    "faceSha256": "9a0efb84ab6aca394a79de08bb67309432ec04fa19476bf9fe791e5e02644f99",
    "priceUsd": 10,
@@ -741,7 +741,7 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat."
+   "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) \u2014 the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
   },
   {
    "slug": "hero-f14",
@@ -749,8 +749,8 @@
    "title": "APEX \u2014 Hero Line \u00b7 F-14 Tomcat",
    "package": "app.lovable.apexsignal.face.herof14",
    "apkPath": "/depot/hero-f14.apk",
-   "apkSha256": "8479553269f9556e105886321128d0cde88a52fcd10fbf0a2e2a77f7cf004136",
-   "apkSizeBytes": 3204080,
+   "apkSha256": "8270bc576654f1e206318dc012826fb1d118478613019598042e18c62f49cf0c",
+   "apkSizeBytes": 283223,
    "facePath": "/faces/hero-f14.html",
    "faceSha256": "fcc537a2bad0d5c4bf6eaf5b333a8bbcb17acceba8a4b49ec55ef6c655da530f",
    "priceUsd": 10,
@@ -758,7 +758,7 @@
     "clock"
    ],
    "status": "BUILT",
-   "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat."
+   "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references \u2014 generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) \u2014 the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors."
   },
   {
    "slug": "hotrod-ratrod",
