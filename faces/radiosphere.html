@@ -464,6 +464,8 @@ function drawLabels(faces) {
 var angleOut = document.getElementById("angleOut");
 var stateEl = document.getElementById("state");
 function feedSrc() { var f = window.__apexScanFeed; return (f && f.src) ? f.src : ""; }
+function feedNode() { var f = window.__apexScanFeed; return (f && f.node) ? f.node : ""; }
+function nodeLabelR(n) { if (!n) return ""; var a = { WATCH: "BT", HANDSET: "WIFI", CYD: "COMB" }[n]; return a ? n + "\u00b7" + a : n; }
 var clockEl = document.getElementById("clock");
 function frame() {
   /* Re-read the feed every frame; rebuild only when it changed. */
@@ -492,8 +494,8 @@ function frame() {
   feedOff.forEach(function (p) { planeNote += " · " + PLANE_NAMES[p] + " OFF"; });
   stateEl.textContent =
     feedState === "nofeed" ? "SCAN — NO FEED" :
-    feedState === "nosignals" ? "SCAN — NO SIGNALS" + (feedSrc() ? " · SRC " + feedSrc() : "") + planeNote :
-    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "") + (feedSrc() ? " · SRC " + feedSrc() : "") + planeNote;
+    feedState === "nosignals" ? "SCAN — NO SIGNALS" + (feedSrc() ? " · SRC " + feedSrc() : "") + (feedNode() ? " · " + nodeLabelR(feedNode()) : "") + planeNote :
+    "LIVE SCAN" + (feedStale ? " — FEED STALE · LAST UPDATE " + staleClock : "") + (feedSrc() ? " · SRC " + feedSrc() : "") + (feedNode() ? " · " + nodeLabelR(feedNode()) : "") + planeNote;
 }
 
 /* ---- HUD text -------------------------------------------------------- */

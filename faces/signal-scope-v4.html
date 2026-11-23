@@ -543,7 +543,7 @@
   var SNAP_FRESH_MS = 60000;      // freshness bound: past it, RF = NO FEED
   var PIN_DROP_MS = 150000;       // an AP unheard this long loses its pin
   var REANCHOR_M = 10;            // displacement bound (spec §6)
-  var RF = { snapAt: 0, aps: [], connBssid: '', pins: {}, order: [], src: '' };
+  var RF = { snapAt: 0, aps: [], connBssid: '', pins: {}, order: [], src: '', node: '' };
   var FRAME = { origin: null, x: 0, y: 0, courseDeg: null, courseAt: 0, headingDeg: null, headingAt: 0, fixes: 0, reanchorAt: 0 };
   var HUNT = { bssid: null, score: 0 };
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
@@ -569,6 +569,9 @@
     var now = Date.now();
     RF.snapAt = snap.at; RF.aps = snap.aps || []; RF.connBssid = snap.connectedBssid || '';
     RF.src = snap.src || 'CONTAINER';
+    if (snap.node) RF.node = snap.node;
+    var crowdByCh = {};
+    for (var ci = 0; ci < RF.aps.length; ci++) { var cc = RF.aps[ci].channel || 0; if (cc > 0) crowdByCh[cc] = (crowdByCh[cc] || 0) + 1; }
     if (snap.sim) SIM.on = true;
     var anchor = FRAME.origin ? { x: FRAME.x, y: FRAME.y } : null;
     var seen = {};
@@ -580,6 +583,22 @@
       if (!pin) { pin = RF.pins[key] = { key: key, samples: 0, anchors: [], side: 0, solved: null, ringF: null, azFallback: hashAz(key), lastSeen: 0, _px: -1, _py: -1 }; }
       pin.ssid = ap.ssid || ''; pin.bandGhz = ap.bandGhz || 0; pin.channel = ap.channel || 0;
       pin.rssi = ap.rssi; pin.lastSeen = now; pin.samples++;
+      // WHIP output, kept per pin: the RSSI track across scans. Its
+      // swing (jitter) plus this snapshot's channel crowding is the
+      // ring deformity the scope paints — measured, never styled.
+      pin.hist = pin.hist || []; pin.hist.push(ap.rssi); if (pin.hist.length > 8) pin.hist.shift();
+      pin.crowd = (ap.channel > 0 && crowdByCh[ap.channel]) ? crowdByCh[ap.channel] : 1;
+      pin.jitterDb = null;
+      if (pin.hist.length >= 2) {
+        var hm = 0, hq = 0, hi2;
+        for (hi2 = 0; hi2 < pin.hist.length; hi2++) hm += pin.hist[hi2];
+        hm /= pin.hist.length;
+        for (hi2 = 0; hi2 < pin.hist.length; hi2++) hq += (pin.hist[hi2] - hm) * (pin.hist[hi2] - hm);
+        pin.jitterDb = Math.round(Math.sqrt(hq / pin.hist.length) * 10) / 10;
+      }
+      var jitT = pin.jitterDb === null ? 0 : clamp(pin.jitterDb / 7, 0, 1);
+      var crdT = clamp((pin.crowd - 1) / 4, 0, 1);
+      pin.deform = Math.round(clamp(0.6 * jitT + 0.4 * crdT, 0, 1) * 100) / 100;
       var f = rssiFrac(ap.rssi);
       pin.ringF = (pin.ringF === null) ? f : pin.ringF + (f - pin.ringF) * 0.45;
       if (anchor) {
@@ -655,6 +674,27 @@
       var hunted = HUNT.bssid === pin.key;
       var a = alphaBase * (0.40 + 0.60 * firm);
       var sz = Rr * 0.014 + firm * Rr * 0.011;
+      // FREQUENCY RING (owner visual spec, Nov 23, 2026): one ring
+      // per AP around its pin — COLOUR = band (2.4 amber, 5 cyan,
+      // 6 violet), SIZE = RSSI, WOBBLE = the pin's measured deformity
+      // (jitter + crowding, computed at ingest). Clean signal, clean
+      // circle; degraded signal, malformed ring. The wobble phase is
+      // the pin's stable per-BSSID hash, so an AP's shape is its own.
+      var bandCol = pin.bandGhz >= 5.5 ? '#c77dff' : (pin.bandGhz >= 4.5 ? '#4dd8ff' : '#ff9f43');
+      var dfr = pin.deform || 0;
+      var rr0 = Rr * (0.035 + 0.125 * clamp((pin.rssi + 92) / 57, 0, 1));
+      ctx.save();
+      ctx.globalAlpha = a * 0.9;
+      ctx.beginPath();
+      for (var sg = 0; sg <= 48; sg++) {
+        var th = sg / 48 * Math.PI * 2;
+        var wob = 1 + dfr * (0.55 * Math.sin(3 * th + pin.azFallback) + 0.30 * Math.sin(5 * th + 1.7 * pin.azFallback) + 0.15 * Math.sin(8 * th + 0.6 * pin.azFallback));
+        var rx2 = x + Math.cos(th) * rr0 * wob, ry2 = y + Math.sin(th) * rr0 * wob;
+        if (sg === 0) ctx.moveTo(rx2, ry2); else ctx.lineTo(rx2, ry2);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = bandCol; ctx.lineWidth = Math.max(1.2, Rr * 0.006); ctx.stroke();
+      ctx.restore();
       // tentative sector for young, unsolved assumptions
       if (!pos.solved && pin.samples < 3) {
         ctx.beginPath(); ctx.moveTo(c, c);
@@ -773,6 +813,17 @@
     ctx.strokeStyle = '#b6ffd0'; ctx.lineWidth = Math.max(2, Math.floor(R * 0.012)); ctx.stroke();
     // THE PINS — the product's core display (see pin engine above).
     drawPins(c, R, now);
+    // THE RING MAP, printed small on the glass (owner spec): the
+    // mapping is part of the instrument, not a manual page.
+    if (RF.snapAt && Date.now() - RF.snapAt <= SNAP_FRESH_MS) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(182,255,208,.78)';
+      ctx.font = '700 ' + Math.max(8, Math.floor(R * 0.044)) + 'px ui-monospace,Menlo,Consolas,monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('RINGS: COLOUR = BAND \u00b7 SIZE = RSSI', c, c + R * 0.79);
+      ctx.fillText('WOBBLE = JITTER + CROWDING', c, c + R * 0.875);
+      ctx.restore();
+    }
     // outer bezel ring
     ctx.beginPath(); ctx.arc(c, c, R - 2, 0, Math.PI * 2);
     ctx.strokeStyle = GREEN; ctx.lineWidth = Math.max(2, Math.floor(R * 0.014)); ctx.stroke();
@@ -1141,7 +1192,7 @@
             steps: null, sleep: null, gps: null, batt: null,
             resp: null, temp: null };
   var T = { hr: 0, spo2: 0, hrv: 0, steps: 0, sleep: 0, batt: 0 };
-  var NET = { transport: '', ssid: '', bssid: '', bandGhz: null, channel: null, rssi: null, gen: '', at: 0, sig: '', src: '' };
+  var NET = { transport: '', ssid: '', bssid: '', bandGhz: null, channel: null, rssi: null, gen: '', at: 0, sig: '', src: '', node: '' };
   var FB = { pulseMs: 180000, phaseMs: 0, at: 0, freshAt: 0, sig: '' };
   var BEAT = { src: 'TICK' };
   var PING = { series: [], lastAt: 0, lastRtt: null, src: '' };
@@ -1270,13 +1321,14 @@
   // bandwidth class and is deliberately never read here.
   function applyNet(n) {
     if (!n) return;
-    var sig = [n.transport, n.ssid, n.bssid, n.bandGhz, n.channel, n.rssi, n.gen, n.pingMs, n.src].join('|');
+    var sig = [n.transport, n.ssid, n.bssid, n.bandGhz, n.channel, n.rssi, n.gen, n.pingMs, n.src, n.node].join('|');
     if (sig === NET.sig && typeof n.at !== 'number') return; // set-once payload: let it age
     NET.sig = sig;
     NET.transport = n.transport || ''; NET.ssid = n.ssid || ''; NET.bssid = n.bssid || '';
     NET.bandGhz = num(n.bandGhz); NET.channel = num(n.channel); NET.rssi = num(n.rssi); NET.gen = n.gen || '';
     NET.at = (typeof n.at === 'number') ? n.at : Date.now();
     NET.src = n.src || 'CONTAINER';
+    NET.node = n.node || NET.node || '';
     if (n.sim) SIM.on = true;
     if (num(n.pingMs) !== null) applyPing({ rttMs: n.pingMs, at: NET.at, sim: n.sim, src: NET.src });
     if (typeof n.headingDeg === 'number') { FRAME.headingDeg = n.headingDeg; FRAME.headingAt = Date.now(); }
@@ -1284,7 +1336,9 @@
   }
   function readNet() { if (window.ApexNet) applyNet(window.ApexNet); }
   window.ApexNetPush = function (n) { window.ApexNet = n; applyNet(n); };
-  function srcSuffix() { return NET.src ? ' · SRC ' + NET.src : ''; }
+  function nodeLabel(n) { if (!n) return ''; var a = { WATCH: 'BT', HANDSET: 'WIFI', CYD: 'COMB' }[n]; return a ? n + '\u00b7' + a : n; }
+  function srcSuffix() { return (NET.src ? ' · SRC ' + NET.src : '') + (NET.node ? ' · ' + NET.node : ''); }
+  function rfSuffix() { return (RF.src ? ' · SRC ' + RF.src : '') + (RF.node ? ' · ' + RF.node : ''); }
   function netText() {
     if (fresh(NET.at, 30000) && NET.transport) {
       if (NET.transport === 'wifi') {
@@ -1374,7 +1428,7 @@
   // standing rule, printed on the panel: RSSI IS SIGNAL STRENGTH,
   // NOT DISTANCE — no emitter in this view is ever ranged.
   // ================================================================
-  var CENSUS = { on: false, bt: null, cell: null, session: null, at: 0, sig: '', src: '' };
+  var CENSUS = { on: false, bt: null, cell: null, session: null, at: 0, sig: '', src: '', node: '' };
   var CENSUS_SEEN_KEY = 'apex.census.seen.v1';
   var CENSUS_WATCH = /cam|drone|spy|track|record|hidden|listen/i;
   var seenStore = null;
@@ -1414,13 +1468,14 @@
       CENSUS.at = at;
     }
     if (snap.src) CENSUS.src = snap.src;
+    if (snap.node) CENSUS.node = snap.node;
     CENSUS.sig = '';
   }
   window.ApexCensusPush = function (c) {
     if (!c) return;
     if (typeof c.at !== 'number') c.at = Date.now();
     if (c.sim) SIM.on = true;
-    censusIngest({ at: c.at, bt: c.bt, cell: c.cell, session: c.session, src: c.src });
+    censusIngest({ at: c.at, bt: c.bt, cell: c.cell, session: c.session, src: c.src, node: c.node });
     if (CENSUS.on) renderCensus();
   };
   function esc(s) {
@@ -1538,7 +1593,7 @@
     var when = new Date(d.snapAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
     var html = '<div class="cen-h">EMITTER CENSUS</div>';
     html += '<div class="cen-sub">' + when + ' · SNAPSHOT ' + ageTxt + (stale ? ' · <span class="cen-sim">STALE</span>' : '') +
-      (SIM.on ? '<br><span class="cen-sim">SIM — DECLARED DEMO DATA, NOT A LIVE SCAN</span>' : '<br>LIVE SCAN SNAPSHOT · SOURCE: ' + (CENSUS.src || RF.src || 'CONTAINER')) + '</div>';
+      (SIM.on ? '<br><span class="cen-sim">SIM — DECLARED DEMO DATA, NOT A LIVE SCAN</span>' : '<br>LIVE SCAN SNAPSHOT · SOURCE: ' + (CENSUS.src || RF.src || 'CONTAINER') + ((CENSUS.node || RF.node) ? ' · NODE: ' + nodeLabel(CENSUS.node || RF.node) : '')) + '</div>';
     var ses = d.session || {};
     var sesTxt = (typeof ses.distMi === 'number' || typeof ses.durMin === 'number')
       ? '<span class="dim">SESSION</span> ' + (typeof ses.distMi === 'number' ? ses.distMi.toFixed(1) + ' MI' : '—') + (typeof ses.durMin === 'number' ? ' · ' + Math.round(ses.durMin) + ' MIN' : '')
@@ -1738,10 +1793,10 @@
     var n24 = 0, n5 = 0, i;
     for (i = 0; i < RF.aps.length; i++) { if (RF.aps[i].bandGhz >= 4.5) n5++; else n24++; }
     var hunt = (HUNT.bssid && RF.pins[HUNT.bssid]) ? ' · HUNT ' + (RF.pins[HUNT.bssid].ssid || 'AP') : '';
-    if (INVEST.on) return 'INVESTIGATING · ' + RF.order.length + ' AP · ' + (age >= 0 ? age + 'S' : '—') + hunt + (RF.src ? ' · SRC ' + RF.src : '');
+    if (INVEST.on) return 'INVESTIGATING · ' + RF.order.length + ' AP · ' + (age >= 0 ? age + 'S' : '—') + hunt + rfSuffix();
     if (!RF.snapAt) return 'NO FEED';
     if (age * 1000 > SNAP_FRESH_MS) return 'NO FEED · LAST ' + age + 'S';
-    return RF.order.length + ' AP · 2.4×' + n24 + ' 5×' + n5 + ' · ' + age + 'S' + hunt + (RF.src ? ' · SRC ' + RF.src : '');
+    return RF.order.length + ' AP · 2.4×' + n24 + ' 5×' + n5 + ' · ' + age + 'S' + hunt + rfSuffix();
   }
   function renderBios() {
     var d = new Date(), h = d.getHours() % 12; if (h === 0) h = 12;
@@ -1782,7 +1837,7 @@
     } else parts.push('TICK · NO HEARTBEAT FEED');
     if (INVEST.on) parts.push('INVESTIGATING');
     var age = RF.snapAt ? Math.floor((Date.now() - RF.snapAt) / 1000) : -1;
-    parts.push((RF.snapAt && age * 1000 <= SNAP_FRESH_MS) ? 'RF ' + RF.order.length + 'AP ' + age + 'S' + (RF.src ? ' · ' + RF.src : '') : 'RF NO FEED');
+    parts.push((RF.snapAt && age * 1000 <= SNAP_FRESH_MS) ? 'RF ' + RF.order.length + 'AP ' + age + 'S' + (RF.src ? ' · ' + RF.src : '') + (RF.node ? ' · ' + nodeLabel(RF.node) : '') : 'RF NO FEED');
     var txt = parts.join(' · ');
     var el = document.getElementById('mode');
     if (el.textContent !== txt) el.textContent = txt;
@@ -1827,6 +1882,7 @@
         course: FRAME.courseDeg,
         sim: SIM.on,
         netSrc: NET.src, rfSrc: RF.src, pingSrc: PING.src, censusSrc: CENSUS.src,
+        node: RF.node, netNode: NET.node,
         net: netText(),
         mode: document.getElementById('mode').textContent,
         tiles: document.getElementById('bios').textContent.replace(/\s+/g, ' ').trim()
@@ -1836,7 +1892,7 @@
       var out = [];
       for (var k in RF.pins) {
         var p = RF.pins[k];
-        out.push({ key: k, ssid: p.ssid, band: p.bandGhz, ch: p.channel, rssi: p.rssi, samples: p.samples, solved: !!p.solved, firm: Math.round(pinFirm(p) * 100) / 100, px: Math.round(p._px), py: Math.round(p._py) });
+        out.push({ key: k, ssid: p.ssid, band: p.bandGhz, ch: p.channel, rssi: p.rssi, samples: p.samples, solved: !!p.solved, firm: Math.round(pinFirm(p) * 100) / 100, deform: p.deform || 0, jitterDb: (p.jitterDb === undefined ? null : p.jitterDb), crowd: p.crowd || 1, px: Math.round(p._px), py: Math.round(p._py) });
       }
       return out;
     },

@@ -604,13 +604,14 @@ function drawMarker(e, x, y, nowMs){
   ctx.fillStyle = PAL.tag; ctx.textAlign = "left"; ctx.textBaseline = "middle";
   ctx.fillText(tag, tx + 4, ty + 7);
 }
+function nodeLabel19(n){ if (!n) return ""; var a = { WATCH: "BT", HANDSET: "WIFI", CYD: "COMB" }[n]; return a ? n + "\u00b7" + a : n; }
 function drawScanLayer(nowMs){
   var feed = readScanFeed();
-  scanBenchState = { on: feed.on, entries: feed.entries.length, src: feed.src || null };
+  scanBenchState = { on: feed.on, entries: feed.entries.length, src: feed.src || null, node: feed.node || null };
   scanPlotted = [];
   if (!feed.on){ drawScanState("SCAN — NO FEED"); return; }
   var bands = scanBands(feed);
-  if (!bands.length){ drawScanState("SCAN — NO SIGNALS" + (feed.src ? " · SRC " + feed.src : "")); return; }
+  if (!bands.length){ drawScanState("SCAN — NO SIGNALS" + (feed.src ? " · SRC " + feed.src : "") + (feed.node ? " · " + nodeLabel19(feed.node) : "")); return; }
   var W = innerW(), H = innerH();
   var fieldTop = H * 0.30, fieldBot = H * 0.80;
   var bandH = (fieldBot - fieldTop) / bands.length;
@@ -635,7 +636,7 @@ function drawScanLayer(nowMs){
     ctx.font = "600 " + Math.max(8, Math.round(W * 0.016)) + "px ui-monospace, Menlo, Consolas, monospace";
     ctx.fillStyle = PAL.glyph; ctx.globalAlpha = 0.9;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText("SRC " + feed.src, W / 2, H * 0.845);
+    ctx.fillText("SRC " + feed.src + (feed.node ? " · " + nodeLabel19(feed.node) : ""), W / 2, H * 0.845);
     ctx.globalAlpha = 1;
   }
 }
