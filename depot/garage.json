@@ -1063,16 +1063,16 @@
       "title": "APEX — Signal Watch · RADAR SCOPE",
       "package": "app.lovable.apexsignal.face.radarscope",
       "apkPath": "/depot/radar-scope.apk",
-      "apkSha256": "3f232f8910e7dbfb6e270fbd45ceb7174b7dff959e10e33f338b2c9dbff9b47c",
-      "apkSizeBytes": 29137,
+      "apkSha256": "6af4d69358b4b55ffad90e5c5866ce1828111dbb052d3f3f38bc06e10cffec9e",
+      "apkSizeBytes": 104801,
       "facePath": "/faces/radar-scope.html",
-      "faceSha256": "f33900edfb7f368e36168bfbd03191418a4b631bec324a89818f8228bfc5f943",
+      "faceSha256": "f7a84971149a12a8043e99ceee1f35366f495cccbcecabf41ba636f019926c82",
       "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "The owner's own design, scoped by him Nov 13-15, 2026 and never built until now: a sweeping radar scope whose contacts are the live Wi-Fi scape, a frequency/channel-occupancy graph along the bottom, and his vitals strip (battery, heart rate, steps, gateway-ping heartbeat, tap, time). Built on the pipe container (v3 lineage) that reads the analyzer's ApexWifi/1 ingest with the container's own scan as the named fallback; every value prints SRC ANALYZER / SRC CONTAINER. Range is the RSSI ring and is labelled an estimate on the glass; bearing is NO MEASURE and the angle around the ring is signal order, printed as such. O2/HRV/SLEEP are named NO MEASURE - not fed on this device class. Five-step scrub on the ingest, signal-lane mapping per the pipe contract.",
+      "note": "The owner's own design, scoped by him Nov 13-15, 2026 and never built until now: a sweeping radar scope whose contacts are the live Wi-Fi scape, a frequency/channel-occupancy graph along the bottom, and his vitals strip (battery, heart rate, steps, gateway-ping heartbeat, tap, time). Built on the pipe container (v3 lineage) that reads the analyzer's ApexWifi/1 ingest with the container's own scan as the named fallback; every value prints SRC ANALYZER / SRC CONTAINER. Range is the RSSI ring and is labelled an estimate on the glass; bearing is NO MEASURE and the angle around the ring is signal order, printed as such. O2/HRV/SLEEP are named NO MEASURE - not fed on this device class. Five-step scrub on the ingest, signal-lane mapping per the pipe contract. · Icon + glass deck (Nov 23, 2026): the APK now carries a real launcher icon — the scope itself, phosphor rings, sweep and contact blips, adaptive + legacy sets — where the first build shipped no icon resources and Android fell back to the stock robot; and the face now sits in a glass console deck — translucent plates, glass bolt heads, an edge-glow bezel — that frames the glass without covering a readout. Rebuilt on the same pipe container, versionCode 5 / 1.3.1, same house key, installs over the shipped build.",
       "bay": 62,
       "garageStatus": "IN THE GARAGE"
     }

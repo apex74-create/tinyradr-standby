@@ -6,7 +6,39 @@
 <title>APEX — Radar Scope · Wi-Fi Overlay</title>
 <style>
   html, body { margin:0; padding:0; background:#010402; color:#39ff7a; font-family:"Courier New", monospace; overflow:hidden; }
-  #stage { position:absolute; inset:0; display:flex; flex-direction:column; }
+  #stage { position:absolute; inset:14px 10px; display:flex; flex-direction:column; }
+  /* THE GLASS DECK (owner, Nov 23, 2026): the scope sits in a console
+     deck, and the deck is GLASS — translucent plates, glass bolt heads,
+     plate seams and a bezel line, depth from transparency and the
+     green edge-glow thick glass carries. The deck owns the frame band
+     (the stage is inset by it); it never covers a readout. */
+  #deck { position:absolute; inset:0; pointer-events:none; z-index:6;
+    background:linear-gradient(155deg, rgba(140,255,190,0.05), rgba(140,255,190,0) 26%, rgba(140,255,190,0) 74%, rgba(140,255,190,0.035)); }
+  #deck::before { content:''; position:absolute; inset:4px; border:1px solid rgba(140,255,190,0.30);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.65), inset 0 0 44px rgba(57,255,122,0.055), 0 0 9px rgba(57,255,122,0.13); }
+  #deck::after { content:''; position:absolute; inset:7px; border:1px solid rgba(140,255,190,0.10); }
+  #deck .plate { position:absolute; width:46px; height:46px;
+    background:linear-gradient(135deg, rgba(180,255,215,0.10), rgba(57,255,122,0.03) 55%, rgba(0,0,0,0.14));
+    border:1px solid rgba(150,255,195,0.20);
+    box-shadow: inset 0 0 12px rgba(57,255,122,0.05); }
+  #deck .plate.tl { top:4px; left:4px; border-right-color:rgba(150,255,195,0.38); border-bottom-color:rgba(150,255,195,0.38); }
+  #deck .plate.tr { top:4px; right:4px; border-left-color:rgba(150,255,195,0.38); border-bottom-color:rgba(150,255,195,0.38); }
+  #deck .plate.bl { bottom:4px; left:4px; border-right-color:rgba(150,255,195,0.38); border-top-color:rgba(150,255,195,0.38); }
+  #deck .plate.br { bottom:4px; right:4px; border-left-color:rgba(150,255,195,0.38); border-top-color:rgba(150,255,195,0.38); }
+  #deck .bolt { position:absolute; width:11px; height:11px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(235,255,243,0.80), rgba(150,255,195,0.20) 46%, rgba(8,38,18,0.40) 100%);
+    border:1px solid rgba(165,255,205,0.55);
+    box-shadow: 0 0 6px rgba(57,255,122,0.28), inset 0 0 3px rgba(255,255,255,0.28); }
+  #deck .bolt::after { content:''; position:absolute; left:2px; right:2px; top:50%; height:1.5px; margin-top:-1px;
+    background:rgba(6,32,14,0.55); }
+  #deck .bolt.tl { top:4px; left:12px; } #deck .bolt.tl::after { transform:rotate(24deg); }
+  #deck .bolt.tr { top:4px; right:12px; } #deck .bolt.tr::after { transform:rotate(71deg); }
+  #deck .bolt.bl { bottom:4px; left:12px; } #deck .bolt.bl::after { transform:rotate(43deg); }
+  #deck .bolt.br { bottom:4px; right:12px; } #deck .bolt.br::after { transform:rotate(108deg); }
+  #deck .seam { position:absolute; top:50%; width:1px; height:36px; margin-top:-18px;
+    background:linear-gradient(rgba(150,255,195,0), rgba(150,255,195,0.35), rgba(150,255,195,0)); }
+  #deck .seam.l { left:4px; } #deck .seam.r { right:4px; }
+  #deck .tag { position:absolute; right:36px; bottom:4px; font-size:7px; letter-spacing:2px; color:rgba(130,255,185,0.45); }
   #head { padding:4px 8px 2px; font-size:11px; letter-spacing:1px; display:flex; justify-content:space-between; gap:6px; white-space:nowrap; }
   #head .dim { color:#1d7a44; }
   #src { padding:0 8px 2px; font-size:10px; color:#ffb340; letter-spacing:1px; white-space:nowrap; overflow:hidden; }
@@ -31,6 +63,12 @@
   <div id="vitals">BATT — · HR — · STEPS — · PING — · TAP 0</div>
   <div id="unfed">O2 · HRV · SLEEP — NO MEASURE · NOT FED ON THIS DEVICE CLASS</div>
   <div id="list"><div class="row hd">CONTACTS — NO FEED</div></div>
+</div>
+<div id="deck">
+  <div class="plate tl"></div><div class="plate tr"></div><div class="plate bl"></div><div class="plate br"></div>
+  <div class="bolt tl"></div><div class="bolt tr"></div><div class="bolt bl"></div><div class="bolt br"></div>
+  <div class="seam l"></div><div class="seam r"></div>
+  <div class="tag">APEX CONSOLE · GLASS DECK 01</div>
 </div>
 <script>
 'use strict';
@@ -163,12 +201,12 @@ var graphCv = document.getElementById('graph'), gctx = graphCv.getContext('2d');
 var W = 400, H = 400;
 try { if (window.ApexBound) { W = ApexBound.getW(); H = ApexBound.getH(); } } catch (e) {}
 if (!window.ApexBound) { W = window.innerWidth; H = window.innerHeight; }
-var scopeSide = Math.max(180, Math.min(W - 8, Math.floor(H * 0.52)));
+var scopeSide = Math.max(180, Math.min(W - 28, Math.floor(H * 0.52)));
 scopeCv.width = scopeSide; scopeCv.height = scopeSide;
 scopeCv.style.width = scopeSide + 'px'; scopeCv.style.height = scopeSide + 'px';
 document.getElementById('scopeWrap').style.width = scopeSide + 'px';
-graphCv.width = W - 16; graphCv.height = Math.max(44, Math.floor(H * 0.13));
-graphCv.style.width = (W - 16) + 'px'; graphCv.style.height = graphCv.height + 'px';
+graphCv.width = W - 36; graphCv.height = Math.max(44, Math.floor(H * 0.13));
+graphCv.style.width = (W - 36) + 'px'; graphCv.style.height = graphCv.height + 'px';
 
 function ringFrac(rssi) { return Math.max(0, Math.min(1, (rssi + 95) / 60)); }
 
