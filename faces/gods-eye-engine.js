@@ -2,7 +2,7 @@
 const GodsEye = (() => {
   const SECRET = "GODS-EYE DEMO SECRET — held in-page at both ends";
   const BEAT_MS = 700;
-  const FILES = "ABCDEFGHIJ";
+  const FILES = "ABCDEFGHIJKL";
   const sqName = (x, y) => FILES[x] + (y + 1);
   const parseSq = s => [FILES.indexOf(s[0].toUpperCase()), parseInt(s.slice(1), 10) - 1];
 
@@ -274,8 +274,66 @@ const GodsEye = (() => {
       }
     }
     if (S.pack && S.pack.onBeat) S.pack.onBeat(api);
+    updateDiscs();
   }
-  setInterval(beatTick, BEAT_MS);
+  /* The lockstep beat is a parameter (BEAT_MS is the show pace). The series
+     bench shortens it and says so in its record — same pipes, same seals. */
+  S.beatMs = BEAT_MS;
+  (function beatLoop() { setTimeout(() => { beatTick(); beatLoop(); }, S.beatMs); })();
+
+  /* ── DISCS (v2): every board is a disc; the grid is drawn on it.
+     STATE-SPACE MEASURE (the bench formula, deterministic):
+       M = U + F + C
+       U = live units on the board
+       F = open fronts — units with an enemy (opposite seatSide) within
+           Chebyshev distance 2 on the same board (packs that deal no sides
+           honestly report F = 0)
+       C = calls in flight — journeys running for this board + orders queued
+           at its captain + orders pending/parked at its pieces
+     RADIUS: R = base + 0.18·M, capped at base + 4, where
+       base = half the board's diagonal + 0.6 (the disc always holds its grid).
+     Recomputed on every lockstep beat; a change ≥ 0.05 is logged as a DISC
+     EXPAND / CONTRACT event with the measure that caused it. */
+  function boardMeasure(b) {
+    const mine = S.pieces.filter(p => p.boardId === b.id);
+    const U = mine.length;
+    let F = 0;
+    for (const p of mine) {
+      if (!p.seatSide) continue;
+      if (mine.some(q => q !== p && q.seatSide && q.seatSide !== p.seatSide &&
+        Math.max(Math.abs(q.sq[0] - p.sq[0]), Math.abs(q.sq[1] - p.sq[1])) <= 2)) F++;
+    }
+    let C = 0;
+    for (const j of S.journeys) if (j.order.piece.boardId === b.id) C++;
+    for (const c of S.captains) if (c.boardId === b.id) C += c.queue.length;
+    for (const p of mine) C += p.pending.length + p.parkedAtLt.length;
+    return { U, F, C, M: U + F + C };
+  }
+  function discRadius(b, m) {
+    const base = Math.hypot(b.cols, b.rows) / 2 + 0.6;
+    return Math.round(Math.min(base + 4, base + 0.18 * m.M) * 1000) / 1000;
+  }
+  function updateDiscs() {
+    for (const b of S.boards) {
+      const m = boardMeasure(b);
+      const r = discRadius(b, m);
+      b.measure = m;
+      if (b.radius === undefined) { b.radius = r; continue; }
+      if (Math.abs(r - b.radius) >= 0.05) {
+        logLine("<b>DISC</b> · " + b.title + " · " + (r > b.radius ? "EXPAND" : "CONTRACT") +
+          " · measure M=" + m.M + " (units " + m.U + " · fronts " + m.F + " · in flight " + m.C + ")" +
+          " · radius " + b.radius.toFixed(2) + " → " + r.toFixed(2), "fly");
+        b.radius = r;
+      }
+    }
+  }
+  /* Polar-native coordinates inside a disc: a cell's address from the
+     board's centre — radius in cells, angle in degrees. */
+  function polarOf(b, sq) {
+    const dx = sq[0] + 0.5 - b.cols / 2, dy = sq[1] + 0.5 - b.rows / 2;
+    return { r: Math.round(Math.hypot(dx, dy) * 100) / 100,
+      deg: Math.round(((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360) };
+  }
 
   const cv = document.getElementById("board");
   const ctx = cv.getContext("2d");
@@ -306,6 +364,9 @@ const GodsEye = (() => {
     for (const b of S.boards) {
       probe(b.ox - 3.4, b.oy - 3.4); probe(b.ox + b.cols + 1, b.oy - 3.4);
       probe(b.ox - 3.4, b.oy + b.rows + 1); probe(b.ox + b.cols + 1, b.oy + b.rows + 1);
+      const R = b.radius || (Math.hypot(b.cols, b.rows) / 2 + 0.6);
+      probe(b.ox + b.cols / 2 - R, b.oy + b.rows / 2 - R);
+      probe(b.ox + b.cols / 2 + R, b.oy + b.rows / 2 + R);
     }
     for (const capt of S.captains) { const sp = capt.seat || S.plinth; probe(sp.x, sp.y); }
     S._scale = Math.min(W * 0.47 / mX, H * 0.42 / mY) * S.zoom;
@@ -378,6 +439,34 @@ const GodsEye = (() => {
       ctx.beginPath(); ctx.arc(c.x, c.y, (1 - S.pulse) * 130 + 12, 0, 7);
       ctx.strokeStyle = "rgba(110,231,255," + (S.pulse * 0.35) + ")"; ctx.lineWidth = 2; ctx.stroke();
     }
+    /* The discs themselves — glass plates under the grids. A board's disc
+       radius is its state-space measure made visible (see updateDiscs);
+       polar rings and spokes are the disc's native coordinate weave. */
+    for (const b of S.boards) {
+      const cxw = b.ox + b.cols / 2, cyw = b.oy + b.rows / 2;
+      const R = b.radius || (Math.hypot(b.cols, b.rows) / 2 + 0.6);
+      const ring = fr => {
+        ctx.beginPath();
+        for (let i = 0; i <= 56; i++) {
+          const a = i / 56 * Math.PI * 2;
+          const c = project(cxw + R * fr * Math.cos(a), cyw + R * fr * Math.sin(a), -0.02);
+          i ? ctx.lineTo(c.x, c.y) : ctx.moveTo(c.x, c.y);
+        }
+        ctx.closePath();
+      };
+      ring(1);
+      ctx.fillStyle = "rgba(110,231,255,.05)"; ctx.fill();
+      ctx.strokeStyle = "rgba(140,255,190,.14)"; ctx.lineWidth = 1;
+      ring(1 / 3); ctx.stroke(); ring(2 / 3); ctx.stroke();
+      for (let k = 0; k < 12; k++) {
+        const a = k * Math.PI / 6;
+        const c1 = project(cxw, cyw, -0.02), c2 = project(cxw + R * Math.cos(a), cyw + R * Math.sin(a), -0.02);
+        ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(c2.x, c2.y); ctx.stroke();
+      }
+      ring(1);
+      ctx.strokeStyle = "rgba(57,255,122,.5)"; ctx.lineWidth = 1.8;
+      ctx.shadowColor = "rgba(57,255,122,.85)"; ctx.shadowBlur = 8; ctx.stroke(); ctx.shadowBlur = 0;
+    }
     const drawables = [];
     for (const b of S.boards) for (let y = 0; y < b.rows; y++) for (let x = 0; x < b.cols; x++) {
       const c = project(b.ox + x + 0.5, b.oy + y + 0.5, 0);
@@ -404,9 +493,14 @@ const GodsEye = (() => {
       }
     }
     for (const b of S.boards) {
-      const c = project(b.ox + b.cols / 2, b.oy + b.rows + 0.6, 0);
+      const R = b.radius || (Math.hypot(b.cols, b.rows) / 2 + 0.6);
+      const c = project(b.ox + b.cols / 2, b.oy + b.rows / 2 + R + 0.7, 0);
       ctx.fillStyle = "rgba(160,220,255,.6)"; ctx.font = "bold 10px Courier New"; ctx.textAlign = "center";
       ctx.fillText(b.title, c.x, c.y);
+      ctx.fillStyle = "rgba(140,255,190,.55)"; ctx.font = "8px Courier New";
+      ctx.fillText("DISC R " + R.toFixed(1) + " · MEASURE " + (b.measure ? b.measure.M : 0) +
+        " (U" + (b.measure ? b.measure.U : 0) + " F" + (b.measure ? b.measure.F : 0) +
+        " C" + (b.measure ? b.measure.C : 0) + ")", c.x, c.y + 11);
     }
     const activeHops = new Set();
     for (const j of S.journeys) if (j.kind === "order" && j.phase === "fly") activeHops.add(j.order.piece.uid + ":" + j.idx);
@@ -479,8 +573,13 @@ const GodsEye = (() => {
       ctx.stroke(); ctx.shadowBlur = 0;
       ctx.fillStyle = p.color; ctx.font = (p.glyph.length > 1 ? "10px" : "17px") + " Courier New"; ctx.textAlign = "center";
       ctx.fillText(p.glyph, c.x, c.y + (p.glyph.length > 1 ? 3 : 6));
+      /* Mass pieces (stones, discs, checkers) carry no name plate — the
+         glyph and colour are the read, and thirty plates stacked on one
+         cluster say nothing. A selected mass piece still gets its plate. */
+      if ((p.cls === "STONE" || p.cls === "DISC" || p.cls === "CHECKER") && !sel) continue;
       const plate = p.name + " · " + p.cls;
-      const sub = p.seat + (p.tag ? " · " + p.tag : "") + " · " + sqName(p.sq[0], p.sq[1]) +
+      const sub = p.seat + (p.tag ? " · " + p.tag : "") + " · " +
+        (p.isBowl ? "BOWL · OFF-BOARD" : sqName(p.sq[0], p.sq[1])) +
         (p.parkedAtLt.length ? " · Q@LT " + p.parkedAtLt.length : "") + (p.pending.length ? " · Q " + p.pending.length : "");
       ctx.font = "bold 9px Courier New";
       const wdt = Math.max(ctx.measureText(plate).width, ctx.measureText(sub).width) + 12;
@@ -604,15 +703,18 @@ const GodsEye = (() => {
     const cands = S.pack.candidates ? S.pack.candidates(api) : [];
     if (!cands.length) { logLine("<b>COLLAPSE</b> · script complete", "dim"); autoStop(); return; }
     const chosen = cands.find(c => c.legal);
+    /* Step pacing is the show pace; S.turbo (series bench) shortens the
+       pause between steps only — the pipes and seals are untouched. */
+    const LONG = S.turbo ? 50 : 1600, SHORT = S.turbo ? 40 : 900;
     if (!chosen) {
       logLine("<b>COLLAPSE</b> · " + cands.length + " candidates → 0 legal · HOLD · deterministic: first legal in priority order — same state, same order", "q");
-      S.autoTimer = setTimeout(collapseStep, 1600);
+      S.autoTimer = setTimeout(collapseStep, LONG);
       return;
     }
     if (chosen.passOnly) {
       logLine(chosen.logText || "<b>COLLAPSE</b> · PASS", "q");
       if (S.pack.consume) S.pack.consume(api, chosen.key);
-      S.autoTimer = setTimeout(collapseStep, 900);
+      S.autoTimer = setTimeout(collapseStep, SHORT);
       return;
     }
     logLine("<b>COLLAPSE</b> · " + cands.length + " candidates → 1 · " + chosen.describe +
@@ -624,7 +726,7 @@ const GodsEye = (() => {
     } else {
       sendOrder(chosen.piece, chosen.action, chosen.targetSq, chosen.targetBoardId, true, chosen.describe, chosen.route, chosen.meta);
     }
-    S.autoTimer = setTimeout(collapseStep, 1600);
+    S.autoTimer = setTimeout(collapseStep, LONG);
   }
   function autoStart() {
     if (S.auto || !S.pack) return;
@@ -638,7 +740,9 @@ const GodsEye = (() => {
   }
 
   const api = {
-    S, addBoard, addCaptain, addLieutenant, addPiece, sendOrder,
+    S, addBoard, addCaptain, addLieutenant, addPiece, sendOrder, fitView,
+    boardMeasure: b => boardMeasure(b), discRadius: b => discRadius(b, boardMeasure(b)),
+    polarOf: (b, sq) => polarOf(b, sq),
     pieceByUid, boardById, captainById, ltById, chainOf, sqName, parseSq,
     refreshPanel, logLine,
     movePiece(piece, to) {
@@ -699,6 +803,12 @@ const GodsEye = (() => {
       to: e.to ? sqName(e.to[0], e.to[1]) : null })),
     logText: () => S.log.map(e => e.status + " " + e.chain + " " + (e.from || "") + "->" + (e.to || "")).join("\n"),
     loadPack, setUnits, autoStart, autoStop, autoRunning: () => S.auto,
+    setBeatMs: ms => { S.beatMs = Math.max(20, ms | 0); },
+    beatMs: () => S.beatMs,
+    setTurbo: on => { S.turbo = !!on; },
+    boardMeasure: id => { const b = boardById(id); if (!b) return null;
+      const m = boardMeasure(b); return { measure: m, radius: discRadius(b, m), liveRadius: b.radius || null }; },
+    polarOf: (id, sqStr) => { const b = boardById(id); return b ? polarOf(b, parseSq(sqStr)) : null; },
     send: (uid, sq) => { const p = pieceByUid(uid); return sendOrder(p, "MOVE", parseSq(sq), p.boardId, false, "MOVE " + sq); },
     cutCaptain: boardId => { const c = captainById("capt-" + boardId); setCaptainCut(c, true); },
     restoreCaptain: boardId => { const c = captainById("capt-" + boardId); setCaptainCut(c, false); },

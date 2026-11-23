@@ -65,6 +65,32 @@ GodsEye.registerPack({
       [{ key: "sniff", name: "SNIFFER", cls: "PAWN", glyph: "SN", seat: "R-02", color: "#c0c8ff", group: "anchor" }, [2, 6]]
     ]);
     api.S.selected = "ground:tk1";
+    /* Spectator stack homes (v2): where every board/captain/LT sits in the
+       spread, so the stack toggle can put it all back. */
+    this._stacked = false;
+    this._homes = api.S.boards.map(b => {
+      const capt = api.S.captains.find(c => c.boardId === b.id);
+      return { id: b.id, ox: b.ox, oy: b.oy,
+        capt: capt ? [capt.wx, capt.wy] : null,
+        lts: api.S.lieutenants.filter(l => l.boardId === b.id).map(l => [l.id, l.wx, l.wy]) };
+    });
+  },
+  /* THE SPECTATOR STACK (v2): the five domain discs stacked in one column —
+     grab the canvas and rotate/tilt the whole stack; every level plays at
+     once, live from board state. Spread restores the homes exactly. */
+  _setStack(api, stacked) {
+    this._stacked = !!stacked;
+    api.S.boards.forEach((b, i) => {
+      const home = this._homes.find(h => h.id === b.id);
+      const tx = stacked ? 0 : home.ox, ty = stacked ? i * 11 : home.oy;
+      const dx = tx - b.ox, dy = ty - b.oy;
+      b.ox = tx; b.oy = ty;
+      const capt = api.S.captains.find(c => c.boardId === b.id);
+      if (capt) { capt.wx += dx; capt.wy += dy; }
+      for (const lt of api.S.lieutenants) if (lt.boardId === b.id) { lt.wx += dx; lt.wy += dy; }
+    });
+    api.fitView();
+    api.refreshPanel();
   },
   onDeliver(order, api) {
     const piece = order.piece;
@@ -186,6 +212,18 @@ GodsEye.registerPack({
     sb.textContent = "SPECTATOR VIEW · 5D GO INFLUENCE";
     sb.onclick = () => document.body.classList.toggle("spectator");
     el.appendChild(sb);
+    const stb = document.createElement("button");
+    stb.className = "btn mini gold";
+    stb.textContent = this._stacked ? "SPREAD THE FIVE DISCS" : "STACK THE FIVE DISCS (SPECTATOR)";
+    stb.onclick = () => this._setStack(api, !this._stacked);
+    el.appendChild(stb);
+    const sn = document.createElement("div");
+    sn.className = "note";
+    sn.textContent = "THE STACK: five domain discs, one per level of war — drag to rotate/tilt the whole " +
+      "stack and watch every level play at once. Disc size is each board's state-space measure, live. " +
+      "Every level on this glass renders LIVE from board state; a level that ever cannot render live " +
+      "will render from the match log and say so on the glass.";
+    el.appendChild(sn);
     const fb = document.createElement("button");
     fb.className = "btn mini";
     fb.textContent = "CYCLE GROUND FORMATION";

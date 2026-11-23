@@ -26,7 +26,7 @@ GodsEye.registerPack({
       return { capt, ltM, ltA };
     };
     const red = mkSeat("red", "CAPT RED", { x: -7.6, y: -7.6 }, [-2.1, -2.1], null);
-    red.capt.seatLabel = "MAV · SUPERPOSITION";
+    red.capt.seatLabel = "HOUSE DRIVER · MAV";
     red.capt.seatSub = "RED SEAT · CONTROLLER";
     const blue = mkSeat("blue", "CAPT BLUE", { x: 11.6, y: 11.6 }, [10.1, 10.1], 9.4);
     blue.capt.seatLabel = "THE HOUSE MODEL";
@@ -82,11 +82,83 @@ GodsEye.registerPack({
     this._turn = piece.seatSide === "red" ? "blue" : "red";
     return { accept: true, extra };
   },
+  /* ── v2: seats dispatch through the SEAT CONTRACT (gods-eye-seat.js).
+     Defaults: RED = house-driver (called plays), BLUE = house-model
+     (shelf + referee + collapse); exhibition puts RED on the house model
+     too. A guest/member assignment overrides either side. The arena gate
+     validates every return; anything untestifiable becomes an honest
+     NO MEASURE pass, named in the log. ── */
+  _seatIdFor(side) {
+    const override = (typeof RoninSeat !== "undefined") ? RoninSeat.assignment(side) : null;
+    if (override) return override;
+    if (side === "blue") return "house-model";
+    return this._exhibition ? "house-model" : "house-driver";
+  },
+  _seatCtx(api, side) {
+    const self = this;
+    return { seat: side, turn: this._turn, plays: this._plays,
+      caps: Object.assign({}, this._caps),
+      board: { pieces: api.S.pieces.filter(p => p.boardId === "gd").map(p =>
+        ({ key: p.key, cls: p.cls, name: p.name, sq: p.sq.slice(), side: p.seatSide })) },
+      shelf: ShapeShelf.stats(),
+      host: {
+        shapeCall() {
+          const call = ShapeShelf.call(api, side);
+          if (call.nomatch) return { pass: true, bestId: call.bestId, bestName: call.bestName,
+            bestScore: call.bestScore, threshold: call.threshold,
+            reason: "no shelf shape matched (best: " + call.bestName + " " + call.bestScore + " < " + call.threshold + ")" };
+          return { move: { pieceKey: call.move.piece.key, dest: call.move.dest.slice(),
+            shapeId: call.shape.id, shapeName: call.shape.name, score: call.score } };
+        },
+        driverPlay() {
+          const head = self._redScript[0];
+          if (!head) return { pass: true, reason: "called plays complete" };
+          return { move: { pieceKey: head.key, dest: api.parseSq(head.dest), driver: true } };
+        }
+      } };
+  },
+  _seatCandidates(api, side, seatObj) {
+    let res = null, err = null;
+    try { res = seatObj.call(this._seatCtx(api, side)); } catch (e) { err = e; }
+    const nmPass = why => {
+      this._lastBestId = (res && res.bestId) || null;
+      this._lastSeatId = seatObj.id;
+      return [{ key: "pass", passOnly: true, legal: true, piece: null,
+        describe: side.toUpperCase() + " · SEAT " + seatObj.name + " · NO MEASURE · pass",
+        logText: "<b>REFEREE</b> · " + side.toUpperCase() + " · <b>NO MEASURE</b> · seat " +
+          seatObj.name + " · " + why + " · seat passes rather than fabricate" }];
+    };
+    if (err) return nmPass("threw (" + String((err && err.message) || err).slice(0, 60) + ") — return discarded at the arena gate");
+    if (!res || (res.pass !== true && !res.move)) return nmPass("untestifiable return — discarded at the arena gate");
+    if (res.pass) return nmPass(res.reason || "seat passes");
+    const mv = res.move;
+    const piece = api.S.pieces.find(p => p.key === mv.pieceKey && p.seatSide === side);
+    const dest = mv.dest;
+    if (!piece || !Array.isArray(dest) || dest.length !== 2 ||
+        !ChessRules.legal(piece.cls, piece.sq, dest, 8, 8) ||
+        api.S.pieces.some(p => p !== piece && p.boardId === "gd" &&
+          p.sq[0] === dest[0] && p.sq[1] === dest[1] && p.seatSide === side))
+      return nmPass("return failed validation at the arena gate — discarded");
+    this._lastSeatId = seatObj.id;
+    const isHouseModel = seatObj.id === "house-model";
+    return [{ key: "seat", piece, action: "MOVE", targetSq: dest.slice(), targetBoardId: "gd",
+      legal: true,
+      meta: mv.shapeId
+        ? { call: isHouseModel ? "SHAPE CALL" : "SEAT CALL", shape: mv.shapeName, shapeId: mv.shapeId, seat: seatObj.id }
+        : { call: "SEAT CALL", seat: seatObj.id },
+      describe: (isHouseModel && mv.shapeId
+          ? "SHAPE CALL · " + mv.shapeName + " · "
+          : "SEAT CALL · " + seatObj.name + (mv.shapeId ? " · " + mv.shapeName : "") + " · ") +
+        side.toUpperCase() + " " + piece.name + " → " + api.sqName(dest[0], dest[1]) +
+        (mv.score ? " · match " + Number(mv.score).toFixed(2) : "") }];
+  },
   candidates(api) {
     if (this._winner) return [];
     const seat = this._turn;
     if (api.S.pieces.some(p => p.seatSide === seat && p.busy))
       return [{ key: "hold", piece: null, legal: false, describe: seat.toUpperCase() + " call in flight" }];
+    const seatObj = (typeof RoninSeat !== "undefined") ? RoninSeat.get(this._seatIdFor(seat)) : null;
+    if (seatObj) return this._seatCandidates(api, seat, seatObj);
     if (seat === "red" && !this._exhibition) {
       return this._redScript.map((s, i) => {
         const piece = api.S.pieces.find(p => p.key === s.key);
@@ -113,7 +185,10 @@ GodsEye.registerPack({
         " → " + api.sqName(dest[0], dest[1]) + " · match " + call.score.toFixed(2) }];
   },
   consume(api, key) {
-    if (key === "pass") {
+    if (key === "seat") {
+      if (this._lastSeatId === "house-driver") this._redScript.splice(0, 1);
+    }
+    else if (key === "pass") {
       if (this._lastBestId) ShapeShelf.observe(this._lastBestId, "NO_MEASURE",
         { board: "gd", domain: "exhibition", turn: this._plays + 1, seat: this._turn });
       this._turn = this._turn === "red" ? "blue" : "red";
@@ -134,7 +209,8 @@ GodsEye.registerPack({
     note.textContent = "Strategy: 5D Go — shape across five domains, superposition until collapse. " +
       "RED is MAV in the red saddle — the superposition controller seat calling plays. BLUE is THE HOUSE MODEL — " +
       "shape shelf + referee + collapse, calling SHAPES never enumerated moves; the referee grades every call " +
-      "LANDED / FAILED / NO MEASURE, and a seat with no honest match passes. Same engine, same pipes — " +
+      "LANDED / FAILED / NO MEASURE, and a seat with no honest match passes. Both seats sit through the " +
+      "RoninSeat contract — the same door a guest house model uses in the drag race. Same engine, same pipes — " +
       "only the plays differ. Capturing the enemy KING ends the match; at 24 plays, captures decide. " +
       (this._winner ? "MATCH OVER — " + String(this._winner).toUpperCase() +
         (this._winner === "draw" ? "" : " WINS") + " · captures R" + this._caps.red + " B" + this._caps.blue + "." :
@@ -213,7 +289,10 @@ GodsEye.registerPack({
       plays: () => self._plays, turn: () => self._turn,
       setExhibition: v => { self._exhibition = !!v; },
       shelfStats: () => ShapeShelf.stats(), matchNo: () => self._matchNo,
-      seats: () => ({ red: "MAV · SUPERPOSITION (controller seat, called plays)",
-        blue: "THE HOUSE MODEL (shape shelf + referee + collapse)" }) };
+      matchResult: () => ({ winner: self._winner, caps: Object.assign({}, self._caps), plays: self._plays }),
+      seats: () => {
+        const nm = id => { const s = (typeof RoninSeat !== "undefined") && RoninSeat.get(id); return s ? s.name : id; };
+        return { red: nm(self._seatIdFor("red")), blue: nm(self._seatIdFor("blue")) };
+      } };
   }
 });

@@ -3,29 +3,59 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>APEX — God's Eye Sim · C2 Demonstrator</title>
+<title>APEX RONIN — The Drag Race · C2 Demonstrator</title>
 <style>
   html, body { margin:0; padding:0; height:100%; background:#04070c; color:#cfe8dd;
     font-family:"Courier New", monospace; overflow:hidden; }
   #stage { position:absolute; inset:0; display:flex; }
-  #boardWrap { position:relative; flex:1 1 auto; min-width:0; }
-  canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
-  canvas:active { cursor:grabbing; }
-  #hud { position:absolute; top:10px; left:12px; pointer-events:none; }
+  #boardWrap { position:relative; flex:1 1 auto; min-width:0;
+    box-shadow: inset 0 0 0 1px rgba(140,255,190,.14), inset 0 0 42px rgba(57,255,122,.05); }
+  #boardWrap::before { content:""; position:absolute; inset:6px; z-index:2; pointer-events:none;
+    border:1px solid rgba(110,231,255,.10); border-radius:10px;
+    background:
+      radial-gradient(circle 4px at 14px 14px, rgba(220,255,235,.85) 1.6px, rgba(120,160,140,.35) 2.6px, transparent 4px),
+      radial-gradient(circle 4px at calc(100% - 14px) 14px, rgba(220,255,235,.85) 1.6px, rgba(120,160,140,.35) 2.6px, transparent 4px),
+      radial-gradient(circle 4px at 14px calc(100% - 14px), rgba(220,255,235,.85) 1.6px, rgba(120,160,140,.35) 2.6px, transparent 4px),
+      radial-gradient(circle 4px at calc(100% - 14px) calc(100% - 14px), rgba(220,255,235,.85) 1.6px, rgba(120,160,140,.35) 2.6px, transparent 4px); }
+  #sweep { position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden;
+    background: repeating-linear-gradient(0deg, rgba(160,255,200,.014) 0 2px, transparent 2px 5px); }
+  #sweep::before { content:""; position:absolute; top:0; bottom:0; width:120px; left:-140px;
+    background: linear-gradient(90deg, transparent, rgba(120,255,180,.05), transparent);
+    animation: sweepmove 9s linear infinite; }
+  @keyframes sweepmove { to { transform: translateX(calc(100vw + 300px)); } }
+  #board { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+  #board:active { cursor:grabbing; }
+  #signalRings { width:100%; height:96px; display:block; }
+  #hud { position:absolute; top:10px; left:12px; pointer-events:none; z-index:5; }
   #hud .t { font-size:15px; letter-spacing:2px; color:#eafff3; }
   #hud .s { font-size:10px; letter-spacing:1px; color:#57b98a; margin-top:2px; }
-  #beat { position:absolute; top:10px; right:12px; font-size:11px; letter-spacing:2px; color:#6ee7ff;
+  #lamps { display:flex; gap:12px; margin-top:6px; font-size:9px; letter-spacing:1px; color:#7fa892; }
+  .lamp { display:flex; align-items:center; gap:5px; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#1d2b23; border:1px solid rgba(140,255,190,.25); }
+  .dot.on { background:#39ff7a; box-shadow:0 0 8px #39ff7a; }
+  .dot.amber.on { background:#ffb340; box-shadow:0 0 8px #ffb340; }
+  .dot.cyan.on { background:#6ee7ff; box-shadow:0 0 8px #6ee7ff; }
+  #beat { position:absolute; top:10px; right:12px; font-size:11px; letter-spacing:2px; color:#6ee7ff; z-index:5;
     background:rgba(10,16,22,.55); padding:4px 8px; border:1px solid rgba(110,231,255,.3);
     border-radius:6px; backdrop-filter:blur(6px); pointer-events:none; }
-  #honest { position:absolute; left:12px; bottom:10px; font-size:10px; letter-spacing:.5px;
+  #honest { position:absolute; left:12px; bottom:10px; font-size:10px; letter-spacing:.5px; z-index:5;
     color:#ffb340; background:rgba(10,16,12,.55); padding:5px 8px; border:1px solid rgba(255,179,64,.35);
     border-radius:6px; backdrop-filter:blur(6px); pointer-events:none; line-height:1.6; max-width:72%; }
   #hint { position:absolute; right:12px; bottom:10px; font-size:10px; letter-spacing:1px; color:#6f8f80;
-    pointer-events:none; }
+    pointer-events:none; z-index:5; }
   #panel { flex:0 0 330px; display:flex; flex-direction:column; gap:10px; padding:12px;
     background:rgba(8,14,20,.72); border-left:1px solid rgba(110,231,255,.18);
-    backdrop-filter:blur(10px); overflow:hidden; }
-  .card { background:rgba(16,26,34,.55); border:1px solid rgba(160,220,255,.14); border-radius:10px; padding:10px; }
+    backdrop-filter:blur(10px); overflow-y:auto; overflow-x:hidden; }
+  .card { border:1px solid rgba(160,220,255,.16); border-radius:10px; padding:10px;
+    background-color:rgba(16,26,34,.55);
+    background-image:
+      radial-gradient(circle 3px at 10px 10px, rgba(220,255,235,.8) 1.2px, rgba(120,160,140,.3) 2px, transparent 3px),
+      radial-gradient(circle 3px at calc(100% - 10px) 10px, rgba(220,255,235,.8) 1.2px, rgba(120,160,140,.3) 2px, transparent 3px),
+      radial-gradient(circle 3px at 10px calc(100% - 10px), rgba(220,255,235,.8) 1.2px, rgba(120,160,140,.3) 2px, transparent 3px),
+      radial-gradient(circle 3px at calc(100% - 10px) calc(100% - 10px), rgba(220,255,235,.8) 1.2px, rgba(120,160,140,.3) 2px, transparent 3px),
+      linear-gradient(160deg, rgba(200,240,255,.06), rgba(10,20,16,.10) 55%, rgba(57,255,122,.045));
+    box-shadow: inset 0 0 0 1px rgba(140,255,190,.05), inset 0 1px 0 rgba(220,255,240,.07), 0 0 16px rgba(57,255,122,.04);
+    backdrop-filter:blur(8px); }
   .card h3 { margin:0 0 8px; font-size:11px; letter-spacing:2px; color:#8fd8ff; font-weight:normal; }
   .row { display:flex; gap:6px; flex-wrap:wrap; }
   .btn { font:inherit; font-size:11px; letter-spacing:1px; padding:8px 10px; border-radius:7px;
@@ -37,6 +67,11 @@
   .btn.on { background:rgba(28,84,52,.8); border-color:#39ff7a; }
   .btn.mini { padding:4px 8px; font-size:10px; margin:2px 2px 2px 0; }
   .btn.sel, .pbtn.sel { border-color:#ffd75e; background:rgba(60,50,16,.5); }
+  .tin { font:inherit; font-size:11px; padding:7px 8px; border-radius:7px; width:100%;
+    background:rgba(10,18,24,.8); color:#eafff3; border:1px solid rgba(110,231,255,.3); }
+  .num { width:64px; }
+  select.tin { width:auto; }
+  label.chk { font-size:10px; letter-spacing:1px; color:#9fc4b2; display:flex; gap:6px; align-items:center; }
   #pieces { overflow-y:auto; max-height:300px; padding-right:2px; }
   .boardHead { font-size:10px; letter-spacing:1.5px; color:#8fd8ff; margin:8px 0 4px; }
   .pbtn { font:inherit; font-size:10px; letter-spacing:.5px; text-align:left; padding:6px 7px; width:100%;
@@ -47,14 +82,19 @@
   #selInfo { font-size:11px; line-height:1.7; min-height:40px; }
   #selInfo .k { color:#7fa892; }
   .note { font-size:10px; line-height:1.6; color:#9fc4b2; margin-top:6px; }
-  #logCard { flex:1 1 auto; display:flex; flex-direction:column; min-height:0; }
+  .mono { font-size:10px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
+  #seatLines { font-size:10px; line-height:1.65; color:#cfe8dd; }
+  #seriesTally { font-size:10px; line-height:1.65; color:#ffe9a3; margin-top:6px; }
+  #clubList { color:#9fc4b2; }
+  #clubMsg { color:#ffe9a3; }
+  #logCard { flex:1 1 auto; display:flex; flex-direction:column; min-height:120px; }
   #log { flex:1 1 auto; overflow-y:auto; font-size:10px; line-height:1.65; padding-right:2px; }
   #log .e { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   #log .ok { color:#39ff7a; } #log .q { color:#ffb340; } #log .bad { color:#ff7a6e; }
   #log .fly { color:#6ee7ff; } #log .dim { color:#7fa892; }
   body.spectator #panel { pointer-events:none; opacity:.35; }
   body.spectator #specBanner { display:block; }
-  #specBanner { display:none; position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  #specBanner { display:none; position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:5;
     font-size:12px; letter-spacing:3px; color:#ffd75e; background:rgba(10,16,12,.6);
     padding:6px 14px; border:1px solid rgba(255,215,94,.5); border-radius:6px; pointer-events:none; }
   @media (max-width:760px) {
@@ -67,10 +107,16 @@
 <div id="stage">
   <div id="boardWrap">
     <canvas id="board"></canvas>
+    <div id="sweep"></div>
     <div id="hud">
-      <div class="t">◎ GOD'S EYE SIM</div>
-      <div class="s">COMMAND &amp; CONTROL DEMONSTRATOR · HOUSE TRANSPORT, LIVE ON THE BOARD</div>
+      <div class="t">◎ APEX RONIN</div>
+      <div class="s">THE DRAG RACE · RUN WHAT YOU BRUNG · HOUSE TRANSPORT, LIVE ON THE BOARD</div>
       <div class="s" style="color:#c9a86a">A commercial gamification of the bench-proven end-to-end assembly — the saddle-and-workers machinery, orchestrated to make plays on the board.</div>
+      <div id="lamps">
+        <span class="lamp"><span class="dot" id="lampBeat"></span>BEAT</span>
+        <span class="lamp"><span class="dot cyan" id="lampPipe"></span>PIPE</span>
+        <span class="lamp"><span class="dot amber" id="lampSeat"></span>SEAT</span>
+      </div>
     </div>
     <div id="beat">LOCKSTEP · BEAT 0</div>
     <div id="specBanner">SPECTATOR — GOD'S EYE · NO CONTROLS</div>
@@ -80,17 +126,44 @@
   </div>
   <div id="panel">
     <div class="card">
-      <h3>BOARD PACK</h3>
+      <h3>BOARD PACK · EDITIONS</h3>
       <div class="row">
-        <button class="btn packBtn sel" data-pack="chess">CHESS BOARD</button>
+        <button class="btn packBtn sel" data-pack="chess">CHESS</button>
         <button class="btn packBtn" data-pack="battleship">5D BATTLESHIP</button>
         <button class="btn packBtn" data-pack="five">FIVE DOMAINS</button>
-        <button class="btn packBtn" data-pack="gameday">SUNDAY GAME DAY</button>
+        <button class="btn packBtn" data-pack="gameday">DRAG RACE · GAME DAY</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn packBtn" data-pack="go">GO</button>
+        <button class="btn packBtn" data-pack="othello">OTHELLO</button>
+        <button class="btn packBtn" data-pack="backgammon">BACKGAMMON</button>
       </div>
       <div class="row" id="unitRow" style="margin-top:6px">
         <button class="btn unitBtn sel" data-units="endpoints">HOUSE ENDPOINTS</button>
         <button class="btn unitBtn" data-units="military">MILITARY UNITS</button>
       </div>
+    </div>
+    <div class="card">
+      <h3>THE DRAG RACE — INVITATIONAL</h3>
+      <div class="note" style="margin-top:0">RUN WHAT YOU BRUNG. House models only — the seat you bring is the model
+      your house built and owns. Rented frontier seats don't stage here.<br>
+      BYO COMPUTE: a guest seat runs on the guest's own compute — their model, their meter.
+      The house meter runs the track, the referee, and the house seats only.</div>
+      <div id="seatLines" style="margin-top:6px"></div>
+      <canvas id="signalRings" width="296" height="96" style="width:100%;display:block;margin-top:8px;background:rgba(6,12,10,.5);border:1px solid rgba(57,255,122,.18);border-radius:6px"></canvas>
+      <div class="note">SIGNAL RINGS — the deformed donuts: one ring per board. Ring size = the board's
+      state-space measure; the wobble = calls in flight on that board, live.</div>
+      <h3 style="margin-top:10px">SERIES LADDER</h3>
+      <div class="row" style="align-items:center">
+        <label class="chk">MATCHES <input class="tin num" id="seriesN" type="number" value="100" min="1" max="1000"></label>
+        <label class="chk"><input type="checkbox" id="seriesTurbo"> BENCH PACE</label>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn gold" id="seriesStart">RUN THE SERIES</button>
+        <button class="btn warn" id="seriesStop">STOP</button>
+        <button class="btn" id="seriesExport">EXPORT RESULTS</button>
+      </div>
+      <div id="seriesTally">No series run yet this session.</div>
     </div>
     <div class="card">
       <h3>CONTROLLER SEAT — THE SADDLE · MAV · SUPERPOSITION</h3>
@@ -109,12 +182,38 @@
         <button class="btn" id="autoBtn">AUTO RUN</button>
       </div>
     </div>
+    <div class="card">
+      <h3>THE CLUB DOOR — RONIN CLUB</h3>
+      <div class="note" style="margin-top:0" id="clubFeeLine">ENTRANCE FEE · NOT YET SET — the door registers members and charges nothing.</div>
+      <div class="row" style="margin-top:6px">
+        <input class="tin" id="clubUser" type="text" placeholder="username — no email, no SIM" maxlength="24">
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn gold" id="clubRegister">REGISTER</button>
+      </div>
+      <div class="note" id="clubMsg"></div>
+      <div class="note mono" id="clubList">The roll is empty — no members yet.</div>
+      <div class="row" style="margin-top:6px;align-items:center">
+        <select class="tin" id="clubSeatSelect"></select>
+        <button class="btn" id="clubSeatBtn" disabled>SEAT MEMBER ON BLUE</button>
+      </div>
+      <div class="note">Members can be seated; the public can spectate. A member's seat is held by name
+      through the seat contract — their model runs on their own compute. Registration is held in this
+      browser in this pass; no payment is wired at this door.</div>
+    </div>
     <div class="card" id="logCard">
       <h3>MOVE LOG</h3>
       <div id="log"></div>
     </div>
   </div>
 </div>
+<script>
+"use strict";
+/* OWNER-SET CONFIG — the club door reads its entrance fee from here.
+   null = not yet set: the door registers members and charges nothing,
+   and the glass says so. Set a value (e.g. "$25") only by the owner's hand. */
+window.RONIN_CONFIG = { clubFee: null };
+</script>
 <script src="gods-eye-transport.js"></script>
 <script src="gods-eye-units.js"></script>
 <script src="gods-eye-engine.js"></script>
@@ -122,7 +221,13 @@
 <script src="gods-eye-pack-five.js"></script>
 <script src="gods-eye-pack-battleship.js"></script>
 <script src="gods-eye-shapes.js"></script>
+<script src="gods-eye-seat.js"></script>
 <script src="gods-eye-pack-gameday.js"></script>
+<script src="gods-eye-pack-go.js"></script>
+<script src="gods-eye-pack-othello.js"></script>
+<script src="gods-eye-pack-backgammon.js"></script>
+<script src="gods-eye-series.js"></script>
+<script src="gods-eye-club.js"></script>
 <script>
 "use strict";
 document.querySelectorAll(".packBtn").forEach(b =>
@@ -152,6 +257,54 @@ document.getElementById("jamBtn").onclick = e => {
 };
 document.getElementById("autoBtn").onclick = () =>
   GodsEye.S.auto ? window.__sim.autoStop() : window.__sim.autoStart();
+/* Status lamps — the mainframe dot lights, each with a real job:
+   BEAT blinks with the lockstep beat · PIPE lights while an order is on
+   the pipe · SEAT lights while the collapse is driving the seats. */
+setInterval(() => {
+  const S = GodsEye.S;
+  const lb = document.getElementById("lampBeat"), lp = document.getElementById("lampPipe"),
+    ls = document.getElementById("lampSeat");
+  if (!lb) return;
+  lb.className = "dot" + (S.beat % 2 ? " on" : "");
+  lp.className = "dot cyan" + (S.journeys.length ? " on" : "");
+  ls.className = "dot amber" + (S.auto ? " on" : "");
+}, 240);
+/* Signal rings — one deformed donut per board, drawn from the engine's
+   live state-space measure: size = M, wobble = calls in flight. */
+(function () {
+  const cv = document.getElementById("signalRings");
+  if (!cv) return;
+  const g = cv.getContext("2d");
+  let t = 0;
+  setInterval(() => {
+    t += 0.14;
+    const boards = GodsEye.S.boards.slice(0, 5);
+    g.clearRect(0, 0, cv.width, cv.height);
+    if (!boards.length) {
+      g.fillStyle = "rgba(159,182,201,.7)"; g.font = "10px Courier New"; g.textAlign = "center";
+      g.fillText("NO BOARDS ON THE TRACK", cv.width / 2, 50);
+      return;
+    }
+    boards.forEach((b, i) => {
+      const m = b.measure || GodsEye.api.boardMeasure(b);
+      const cx = (i + 0.5) * (cv.width / boards.length), cy = 42;
+      const base = Math.min(24, 7 + m.M * 0.6), wob = Math.min(5, m.C * 1.1);
+      g.beginPath();
+      for (let k = 0; k <= 40; k++) {
+        const a = k / 40 * Math.PI * 2;
+        const r = base + Math.sin(a * 3 + t + i * 1.7) * wob;
+        const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a) * 0.82;
+        k ? g.lineTo(x, y) : g.moveTo(x, y);
+      }
+      g.closePath();
+      g.strokeStyle = i % 2 ? "rgba(110,231,255,.85)" : "rgba(57,255,122,.85)";
+      g.lineWidth = 1.6; g.stroke();
+      g.fillStyle = "rgba(207,232,221,.75)"; g.font = "8px Courier New"; g.textAlign = "center";
+      g.fillText(b.id.toUpperCase(), cx, 86);
+      g.fillText("M" + m.M, cx, 76);
+    });
+  }, 120);
+})();
 GodsEye.loadPack("chess");
 </script>
 </body>
