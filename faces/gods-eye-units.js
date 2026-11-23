@@ -1,0 +1,25 @@
+"use strict";
+const UNIT_PACKS = {
+  endpoints: {
+    id: "endpoints", title: "HOUSE ENDPOINTS",
+    units: [
+      { key: "gateway", name: "GATEWAY", cls: "KING",   glyph: "♚", seat: "W-01", color: "#ffd75e", group: "anchor" },
+      { key: "handset", name: "HANDSET", cls: "QUEEN",  glyph: "♛", seat: "W-02", color: "#6ee7ff", group: "maneuver" },
+      { key: "drone",   name: "DRONE",   cls: "KNIGHT", glyph: "♞", seat: "W-03", color: "#9dff6e", group: "maneuver" },
+      { key: "truck",   name: "TRUCK",   cls: "ROOK",   glyph: "♜", seat: "W-04", color: "#ffb340", group: "anchor" },
+      { key: "watch",   name: "WATCH",   cls: "BISHOP", glyph: "♝", seat: "W-05", color: "#ff8ae2", group: "maneuver" },
+      { key: "cyd",     name: "CYD NODE", cls: "PAWN",  glyph: "♟", seat: "W-06", color: "#c0c8ff", group: "anchor" }
+    ]
+  },
+  military: {
+    id: "military", title: "MILITARY DEMONSTRATOR",
+    units: [
+      { key: "command",  name: "COMMAND POST", cls: "KING",   glyph: "CP", seat: "M-01", color: "#ffd75e", group: "anchor" },
+      { key: "relay",    name: "COMMS RELAY",  cls: "QUEEN",  glyph: "CR", seat: "M-02", color: "#6ee7ff", group: "maneuver" },
+      { key: "drone",    name: "DRONE",        cls: "KNIGHT", glyph: "DR", seat: "M-03", color: "#9dff6e", group: "maneuver" },
+      { key: "tank",     name: "TANK",         cls: "ROOK",   glyph: "TK", seat: "M-04", color: "#ffb340", group: "anchor" },
+      { key: "apc",      name: "APC",          cls: "BISHOP", glyph: "AP", seat: "M-05", color: "#ff8ae2", group: "maneuver" },
+      { key: "infantry", name: "INFANTRY",     cls: "PAWN",   glyph: "IN", seat: "M-06", color: "#c0c8ff", group: "anchor" }
+    ]
+  }
+};

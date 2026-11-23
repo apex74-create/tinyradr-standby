@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX — God's Eye Sim · C2 Demonstrator</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#04070c; color:#cfe8dd;
+    font-family:"Courier New", monospace; overflow:hidden; }
+  #stage { position:absolute; inset:0; display:flex; }
+  #boardWrap { position:relative; flex:1 1 auto; min-width:0; }
+  canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+  canvas:active { cursor:grabbing; }
+  #hud { position:absolute; top:10px; left:12px; pointer-events:none; }
+  #hud .t { font-size:15px; letter-spacing:2px; color:#eafff3; }
+  #hud .s { font-size:10px; letter-spacing:1px; color:#57b98a; margin-top:2px; }
+  #beat { position:absolute; top:10px; right:12px; font-size:11px; letter-spacing:2px; color:#6ee7ff;
+    background:rgba(10,16,22,.55); padding:4px 8px; border:1px solid rgba(110,231,255,.3);
+    border-radius:6px; backdrop-filter:blur(6px); pointer-events:none; }
+  #honest { position:absolute; left:12px; bottom:10px; font-size:10px; letter-spacing:.5px;
+    color:#ffb340; background:rgba(10,16,12,.55); padding:5px 8px; border:1px solid rgba(255,179,64,.35);
+    border-radius:6px; backdrop-filter:blur(6px); pointer-events:none; line-height:1.6; max-width:72%; }
+  #hint { position:absolute; right:12px; bottom:10px; font-size:10px; letter-spacing:1px; color:#6f8f80;
+    pointer-events:none; }
+  #panel { flex:0 0 330px; display:flex; flex-direction:column; gap:10px; padding:12px;
+    background:rgba(8,14,20,.72); border-left:1px solid rgba(110,231,255,.18);
+    backdrop-filter:blur(10px); overflow:hidden; }
+  .card { background:rgba(16,26,34,.55); border:1px solid rgba(160,220,255,.14); border-radius:10px; padding:10px; }
+  .card h3 { margin:0 0 8px; font-size:11px; letter-spacing:2px; color:#8fd8ff; font-weight:normal; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; }
+  .btn { font:inherit; font-size:11px; letter-spacing:1px; padding:8px 10px; border-radius:7px;
+    background:rgba(24,44,58,.75); color:#eafff3; border:1px solid rgba(110,231,255,.3); cursor:pointer; }
+  .btn:hover { background:rgba(34,64,84,.85); }
+  .btn:disabled { opacity:.4; cursor:default; }
+  .btn.warn { border-color:rgba(255,122,110,.5); color:#ffb3ab; }
+  .btn.gold { border-color:rgba(255,215,94,.55); color:#ffe9a3; }
+  .btn.on { background:rgba(28,84,52,.8); border-color:#39ff7a; }
+  .btn.mini { padding:4px 8px; font-size:10px; margin:2px 2px 2px 0; }
+  .btn.sel, .pbtn.sel { border-color:#ffd75e; background:rgba(60,50,16,.5); }
+  #pieces { overflow-y:auto; max-height:300px; padding-right:2px; }
+  .boardHead { font-size:10px; letter-spacing:1.5px; color:#8fd8ff; margin:8px 0 4px; }
+  .pbtn { font:inherit; font-size:10px; letter-spacing:.5px; text-align:left; padding:6px 7px; width:100%;
+    background:rgba(20,34,44,.6); color:#cfe8dd; border:1px solid rgba(160,220,255,.16);
+    border-radius:7px; cursor:pointer; line-height:1.5; margin-bottom:4px; display:block; }
+  .pbtn small { color:#7fa892; display:block; font-size:9px; }
+  .pbtn .cut { color:#ff7a6e; } .pbtn .live { color:#39ff7a; }
+  #selInfo { font-size:11px; line-height:1.7; min-height:40px; }
+  #selInfo .k { color:#7fa892; }
+  .note { font-size:10px; line-height:1.6; color:#9fc4b2; margin-top:6px; }
+  #logCard { flex:1 1 auto; display:flex; flex-direction:column; min-height:0; }
+  #log { flex:1 1 auto; overflow-y:auto; font-size:10px; line-height:1.65; padding-right:2px; }
+  #log .e { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #log .ok { color:#39ff7a; } #log .q { color:#ffb340; } #log .bad { color:#ff7a6e; }
+  #log .fly { color:#6ee7ff; } #log .dim { color:#7fa892; }
+  body.spectator #panel { pointer-events:none; opacity:.35; }
+  body.spectator #specBanner { display:block; }
+  #specBanner { display:none; position:absolute; top:10px; left:50%; transform:translateX(-50%);
+    font-size:12px; letter-spacing:3px; color:#ffd75e; background:rgba(10,16,12,.6);
+    padding:6px 14px; border:1px solid rgba(255,215,94,.5); border-radius:6px; pointer-events:none; }
+  @media (max-width:760px) {
+    #stage { flex-direction:column; } #panel { flex:0 0 48%; border-left:none;
+      border-top:1px solid rgba(110,231,255,.18); }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="boardWrap">
+    <canvas id="board"></canvas>
+    <div id="hud">
+      <div class="t">◎ GOD'S EYE SIM</div>
+      <div class="s">COMMAND &amp; CONTROL DEMONSTRATOR · HOUSE TRANSPORT, LIVE ON THE BOARD</div>
+      <div class="s" style="color:#c9a86a">A commercial gamification of the bench-proven end-to-end assembly — the saddle-and-workers machinery, orchestrated to make plays on the board.</div>
+    </div>
+    <div id="beat">LOCKSTEP · BEAT 0</div>
+    <div id="specBanner">SPECTATOR — GOD'S EYE · NO CONTROLS</div>
+    <div id="honest">House MTOF/2 envelope — same format and integrity construction as the estate reference implementation, running in-page (loopback) for demonstration. No RF bearer in this build.<br>
+    burst transport, encrypted at both ends, re-arranged at every hop, on a lockstep beat — in-page loopback demonstrator. Demo secret held in-page at both ends.</div>
+    <div id="hint">DRAG — SPIN · WHEEL — ZOOM · CLICK — SELECT / TARGET</div>
+  </div>
+  <div id="panel">
+    <div class="card">
+      <h3>BOARD PACK</h3>
+      <div class="row">
+        <button class="btn packBtn sel" data-pack="chess">CHESS BOARD</button>
+        <button class="btn packBtn" data-pack="battleship">5D BATTLESHIP</button>
+        <button class="btn packBtn" data-pack="five">FIVE DOMAINS</button>
+        <button class="btn packBtn" data-pack="gameday">SUNDAY GAME DAY</button>
+      </div>
+      <div class="row" id="unitRow" style="margin-top:6px">
+        <button class="btn unitBtn sel" data-units="endpoints">HOUSE ENDPOINTS</button>
+        <button class="btn unitBtn" data-units="military">MILITARY UNITS</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>CONTROLLER SEAT — THE SADDLE · MAV · SUPERPOSITION</h3>
+      <div id="pieces"></div>
+    </div>
+    <div class="card">
+      <h3>ORDER</h3>
+      <div id="selInfo"></div>
+      <div id="packPanel"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn gold" id="sendBtn">SEND ORDER</button>
+        <button class="btn warn" id="cutPieceBtn">CUT LT→PIECE PIPE</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn" id="jamBtn">JAM NEXT ENVELOPE</button>
+        <button class="btn" id="autoBtn">AUTO RUN</button>
+      </div>
+    </div>
+    <div class="card" id="logCard">
+      <h3>MOVE LOG</h3>
+      <div id="log"></div>
+    </div>
+  </div>
+</div>
+<script src="gods-eye-transport.js"></script>
+<script src="gods-eye-units.js"></script>
+<script src="gods-eye-engine.js"></script>
+<script src="gods-eye-pack-chess.js"></script>
+<script src="gods-eye-pack-five.js"></script>
+<script src="gods-eye-pack-battleship.js"></script>
+<script src="gods-eye-shapes.js"></script>
+<script src="gods-eye-pack-gameday.js"></script>
+<script>
+"use strict";
+document.querySelectorAll(".packBtn").forEach(b =>
+  b.onclick = () => GodsEye.loadPack(b.dataset.pack));
+document.querySelectorAll(".unitBtn").forEach(b =>
+  b.onclick = () => {
+    document.querySelectorAll(".unitBtn").forEach(x => x.classList.toggle("sel", x === b));
+    GodsEye.setUnits(b.dataset.units);
+  });
+document.getElementById("sendBtn").onclick = () => {
+  const api = GodsEye.api, S = GodsEye.S;
+  if (S.pack.onSend) { S.pack.onSend(api); api.refreshPanel(); return; }
+  const p = api.selectedPiece(), t = api.target();
+  if (!p || !t) return;
+  api.sendOrder(p, "MOVE", t.sq, t.boardId, false,
+    "MOVE " + api.sqName(t.sq[0], t.sq[1]));
+  S.target = null; api.refreshPanel();
+};
+document.getElementById("cutPieceBtn").onclick = () => {
+  const p = GodsEye.api.selectedPiece();
+  if (p) window.__sim[p.cut ? "restorePiece" : "cutPiece"](p.uid);
+};
+document.getElementById("jamBtn").onclick = e => {
+  window.__sim.jam();
+  e.target.classList.add("on"); e.target.textContent = "JAM ARMED";
+  setTimeout(() => { e.target.classList.remove("on"); e.target.textContent = "JAM NEXT ENVELOPE"; }, 4000);
+};
+document.getElementById("autoBtn").onclick = () =>
+  GodsEye.S.auto ? window.__sim.autoStop() : window.__sim.autoStart();
+GodsEye.loadPack("chess");
+</script>
+</body>
+</html>
