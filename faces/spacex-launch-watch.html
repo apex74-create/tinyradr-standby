@@ -49,68 +49,192 @@
   html,body{width:100%;height:100%;overflow:hidden;background:var(--void)}
   body{font-family:ui-monospace,Menlo,Consolas,monospace;
     -webkit-user-select:none;user-select:none}
-  #face{position:absolute;inset:0;background:var(--plate)}
+  /* LAYOUT — DIRECT PARAMETER LOAD (rebalance, Nov 23, 2026).
+     Every size below is computed from the LOADED bound parameter
+     (--bw/--bh/--u/--uh, set once by the bound loader from the
+     container's ApexBound, or the window's own size where no
+     container parameter exists) — never from viewport units at
+     paint time. vmin authored the old composition onto the
+     SHORTER side of the glass, so on a portrait bound the whole
+     board crammed into the top fraction over a black desert
+     (owner field exhibit, Nov 23, 03:10 EST). Two compositions
+     ride on the bound's shape: SQUARE (the original two-column
+     board, re-based on the bound, compass enlarged, feed bubble
+     de-clipped) and PORTRAIT (a single column distributed over
+     the full height of the frame — no void, a real-size compass,
+     the tower given the flexible middle of the board). */
+  #face{position:absolute;left:var(--ox,0px);top:var(--oy,0px);
+    width:var(--bw,100%);height:var(--bh,100%);background:var(--plate)}
   .lbl{position:absolute;width:100%;text-align:center;color:var(--cream);
     letter-spacing:.22em;font-weight:700}
-  #titleLbl{top:1.6vmin;font-size:3.6vmin;color:var(--brass-hi)}
-  #subLbl{top:5.8vmin;font-size:2.0vmin;color:var(--steel)}
+  #titleLbl{top:calc(var(--cy,0px) + var(--u,1vmin)*1.6);font-size:calc(var(--u,1vmin)*3.6);color:var(--brass-hi)}
+  #subLbl{top:calc(var(--cy,0px) + var(--u,1vmin)*5.8);font-size:calc(var(--u,1vmin)*2.0);color:var(--steel)}
   .panel{position:absolute;background:var(--panel);
-    border:2px solid var(--brass);border-radius:1.6vmin;
-    padding:1.2vmin 1.8vmin;overflow:hidden}
-  .pHead{font-size:1.9vmin;letter-spacing:.18em;color:var(--brass-hi);
-    font-weight:700;margin-bottom:0.7vmin}
+    border:2px solid var(--brass);border-radius:calc(var(--u,1vmin)*1.6);
+    padding:calc(var(--u,1vmin)*1.2) calc(var(--u,1vmin)*1.8);overflow:hidden}
+  .pHead{font-size:calc(var(--u,1vmin)*1.9);letter-spacing:.18em;color:var(--brass-hi);
+    font-weight:700;margin-bottom:calc(var(--u,1vmin)*0.7)}
   .row{display:flex;justify-content:space-between;align-items:baseline;
-    gap:1.2vmin;margin-top:0.45vmin}
-  .k{font-size:1.85vmin;color:var(--steel);letter-spacing:.1em;white-space:nowrap}
-  .v{font-size:2.05vmin;color:var(--cream);font-weight:700;text-align:right;
+    gap:calc(var(--u,1vmin)*1.2);margin-top:calc(var(--u,1vmin)*0.45)}
+  .k{font-size:calc(var(--u,1vmin)*1.85);color:var(--steel);letter-spacing:.1em;white-space:nowrap}
+  .v{font-size:calc(var(--u,1vmin)*2.05);color:var(--cream);font-weight:700;text-align:right;
     letter-spacing:.03em}
-  .v.no{color:var(--steel-lo);font-weight:400;font-size:1.8vmin}
+  .v.no{color:var(--steel-lo);font-weight:400;font-size:calc(var(--u,1vmin)*1.8)}
   .v.hot{color:var(--laser)}
   /* tower, left */
-  #towerWrap{position:absolute;left:1.2vmin;top:11vmin;width:45vmin;height:47vmin}
-  #tower{width:100%;height:41vmin;display:block;touch-action:none;cursor:grab}
-  #towerCap{text-align:center;font-size:1.8vmin;color:var(--steel);
-    letter-spacing:.14em;margin-top:0.4vmin}
+  #towerWrap{position:absolute;left:calc(var(--cx,0px) + var(--u,1vmin)*1.2);top:calc(var(--cy,0px) + var(--u,1vmin)*11);width:calc(var(--u,1vmin)*45);height:calc(var(--u,1vmin)*47)}
+  #tower{width:100%;height:calc(var(--u,1vmin)*41);display:block;touch-action:none;cursor:grab}
+  #towerCap{text-align:center;font-size:calc(var(--u,1vmin)*1.8);color:var(--steel);
+    letter-spacing:.14em;margin-top:calc(var(--u,1vmin)*0.4)}
   /* on the tower, right */
-  #towerPanel{left:48.3vmin;top:11vmin;width:50.5vmin;height:47vmin}
-  #mMission{font-size:3.3vmin;color:var(--cream);font-weight:800;
-    line-height:1.16;letter-spacing:.02em;min-height:7.6vmin}
-  #mCount{font-size:6.6vmin;font-weight:800;color:var(--digit);line-height:1.05;
-    letter-spacing:.02em;font-variant-numeric:tabular-nums;margin-top:0.8vmin}
-  #mCountLab{font-size:1.8vmin;color:var(--steel);letter-spacing:.16em}
-  #mWindow{font-size:1.85vmin;color:var(--steel-hi);margin-top:0.5vmin;
+  #towerPanel{left:calc(var(--cx,0px) + var(--u,1vmin)*48.3);top:calc(var(--cy,0px) + var(--u,1vmin)*11);width:calc(var(--u,1vmin)*50.5);height:calc(var(--u,1vmin)*47)}
+  #mMission{font-size:calc(var(--u,1vmin)*3.3);color:var(--cream);font-weight:800;
+    line-height:1.16;letter-spacing:.02em;min-height:calc(var(--u,1vmin)*7.6)}
+  #mCount{font-size:calc(var(--u,1vmin)*6.6);font-weight:800;color:var(--digit);line-height:1.05;
+    letter-spacing:.02em;font-variant-numeric:tabular-nums;margin-top:calc(var(--u,1vmin)*0.8)}
+  #mCountLab{font-size:calc(var(--u,1vmin)*1.8);color:var(--steel);letter-spacing:.16em}
+  #mWindow{font-size:calc(var(--u,1vmin)*1.85);color:var(--steel-hi);margin-top:calc(var(--u,1vmin)*0.5);
     letter-spacing:.05em}
-  /* feed bubble, bottom left */
-  #feedPanel{left:1.2vmin;top:59.5vmin;width:45vmin;height:23.5vmin}
-  #bubble{position:relative;width:100%;height:17.6vmin;background:#000;
-    border:1px solid var(--steel-lo);border-radius:1vmin;overflow:hidden}
+  /* feed bubble, bottom left — bubble sized so the plate's three
+     lines always fit inside it (the old fixed heights clipped the
+     coverage line at the panel edge) */
+  #feedPanel{left:calc(var(--cx,0px) + var(--u,1vmin)*1.2);top:calc(var(--cy,0px) + var(--u,1vmin)*59.5);width:calc(var(--u,1vmin)*45);height:calc(var(--u,1vmin)*23.5)}
+  #bubble{position:relative;width:100%;height:calc(var(--u,1vmin)*18.8);background:#000;
+    border:1px solid var(--steel-lo);border-radius:calc(var(--u,1vmin)*1);overflow:hidden}
   #bubble iframe{width:100%;height:100%;border:0;display:block}
   #bubblePlate{position:absolute;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:0.7vmin;text-align:center;
-    padding:0 2vmin}
-  #bubbleBig{font-size:2.9vmin;font-weight:800;color:var(--steel-hi);
+    align-items:center;justify-content:center;gap:calc(var(--u,1vmin)*0.6);text-align:center;
+    padding:0 calc(var(--u,1vmin)*2)}
+  #bubbleBig{font-size:calc(var(--u,1vmin)*2.7);font-weight:800;color:var(--steel-hi);
     letter-spacing:.14em}
-  #bubbleSub{font-size:1.8vmin;color:var(--steel);letter-spacing:.08em;line-height:1.35}
+  #bubbleSub{font-size:calc(var(--u,1vmin)*1.7);color:var(--steel);letter-spacing:.08em;line-height:1.32}
   /* flight data, bottom right */
-  #flightPanel{left:48.3vmin;top:59.5vmin;width:50.5vmin;height:23.5vmin}
-  /* bottom row */
-  #compassWrap{position:absolute;left:1.2vmin;top:83.2vmin;width:14vmin;height:14vmin}
-  #compass{width:14vmin;height:14vmin;display:block}
-  #hdgLbl{position:absolute;left:-3vmin;top:14.2vmin;width:20vmin;text-align:center;
-    font-size:1.4vmin;color:var(--steel);letter-spacing:.08em;white-space:nowrap}
-  #readPanel{position:absolute;left:50%;bottom:1.2vmin;transform:translateX(-50%);
-    background:var(--panel);border:2px solid var(--brass);border-radius:1.6vmin;
-    padding:0.6vmin 3.2vmin 1vmin;text-align:center}
-  #clock{font-size:9.2vmin;font-weight:800;color:var(--digit);line-height:1;
+  #flightPanel{left:calc(var(--cx,0px) + var(--u,1vmin)*48.3);top:calc(var(--cy,0px) + var(--u,1vmin)*59.5);width:calc(var(--u,1vmin)*50.5);height:calc(var(--u,1vmin)*23.5)}
+  /* bottom row — the compass is an instrument, not a postage
+     stamp: 21 units on the square board (was 14), 25 across on
+     the portrait board */
+  #bottomRow{display:contents}
+  #compassWrap{position:absolute;left:calc(var(--cx,0px) + var(--u,1vmin)*1.2);top:calc(var(--cy,0px) + var(--u,1vmin)*75.5);width:calc(var(--u,1vmin)*21);height:calc(var(--u,1vmin)*21)}
+  #compass{width:100%;height:100%;display:block}
+  #hdgLbl{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u,1vmin)*21.4);width:auto;text-align:center;
+    font-size:calc(var(--u,1vmin)*1.9);color:var(--steel);letter-spacing:.08em;white-space:nowrap}
+  #readPanel{position:absolute;left:50%;bottom:calc(var(--cy,0px) + var(--u,1vmin)*1.2);transform:translateX(-50%);
+    background:var(--panel);border:2px solid var(--brass);border-radius:calc(var(--u,1vmin)*1.6);
+    padding:calc(var(--u,1vmin)*0.6) calc(var(--u,1vmin)*3.2) calc(var(--u,1vmin)*1);text-align:center}
+  #clock{font-size:calc(var(--u,1vmin)*9.2);font-weight:800;color:var(--digit);line-height:1;
     letter-spacing:.04em;font-variant-numeric:tabular-nums}
-  #dateLine{font-size:2.3vmin;color:var(--cream);letter-spacing:.18em;margin-top:0.4vmin}
-  #lampWrap{position:absolute;right:1.6vmin;bottom:1.6vmin;text-align:right}
-  #stateLamp{font-size:2.0vmin;color:var(--laser);letter-spacing:.13em;font-weight:700}
-  #srcLine{text-align:center;font-size:1.5vmin;color:var(--steel-lo);
-    letter-spacing:.08em;margin-top:0.3vmin}
+  #dateLine{font-size:calc(var(--u,1vmin)*2.3);color:var(--cream);letter-spacing:.18em;margin-top:calc(var(--u,1vmin)*0.4)}
+  #lampWrap{position:absolute;right:calc(var(--cx,0px) + var(--u,1vmin)*1.6);bottom:calc(var(--cy,0px) + var(--u,1vmin)*1.6);text-align:right}
+  #stateLamp{font-size:calc(var(--u,1vmin)*2.0);color:var(--laser);letter-spacing:.13em;font-weight:700}
+  #srcLine{text-align:center;font-size:calc(var(--u,1vmin)*1.5);color:var(--steel-lo);
+    letter-spacing:.08em;margin-top:calc(var(--u,1vmin)*0.3)}
+  /* ============ PORTRAIT COMPOSITION ============
+     The bound is taller than wide: one column, distributed over
+     the FULL height by flex — header, the tower board, the
+     God's-eye tower on the flexible middle (it takes whatever
+     height the frame offers beyond the fixed panels), the feed
+     bubble, flight data, and the bottom row seated on the
+     frame's own bottom edge. No void desert anywhere. */
+  html[data-mode="portrait"] #face{display:flex;flex-direction:column;
+    padding:calc(var(--u)*2);gap:calc(var(--uh)*0.85)}
+  html[data-mode="portrait"] .lbl{position:relative;width:100%}
+  html[data-mode="portrait"] #titleLbl{top:auto;font-size:calc(var(--u)*4.8)}
+  html[data-mode="portrait"] #subLbl{top:auto;font-size:calc(var(--u)*2.5);margin-top:calc(var(--u)*0.8)}
+  html[data-mode="portrait"] .panel{position:relative;left:auto;top:auto;
+    width:100%;height:auto;flex:0 0 auto;
+    padding:calc(var(--u)*1.8) calc(var(--u)*2.4);
+    border-radius:calc(var(--u)*2)}
+  html[data-mode="portrait"] .pHead{font-size:calc(var(--u)*2.5);margin-bottom:calc(var(--u)*1)}
+  html[data-mode="portrait"] .row{gap:calc(var(--u)*1.6);margin-top:calc(var(--u)*0.7)}
+  html[data-mode="portrait"] .k{font-size:calc(var(--u)*2.4)}
+  html[data-mode="portrait"] .v{font-size:calc(var(--u)*2.7)}
+  html[data-mode="portrait"] .v.no{font-size:calc(var(--u)*2.3)}
+  html[data-mode="portrait"] #towerPanel{order:1;left:auto;top:auto;width:100%;height:auto}
+  html[data-mode="portrait"] #mMission{font-size:calc(var(--u)*4.3);min-height:0}
+  html[data-mode="portrait"] #mCount{font-size:calc(var(--u)*8.8);margin-top:calc(var(--u)*1)}
+  html[data-mode="portrait"] #mCountLab{font-size:calc(var(--u)*2.3)}
+  html[data-mode="portrait"] #mWindow{font-size:calc(var(--u)*2.4);margin-top:calc(var(--u)*0.8)}
+  html[data-mode="portrait"] #towerWrap{order:2;position:relative;left:auto;top:auto;
+    width:100%;height:auto;flex:1 1 auto;min-height:calc(var(--uh)*16);
+    display:flex;flex-direction:column}
+  html[data-mode="portrait"] #tower{flex:1 1 auto;height:auto;min-height:0;width:100%}
+  html[data-mode="portrait"] #towerCap{font-size:calc(var(--u)*2.2);margin-top:calc(var(--u)*0.8)}
+  html[data-mode="portrait"] #srcLine{font-size:calc(var(--u)*1.9)}
+  html[data-mode="portrait"] #feedPanel{order:3;left:auto;top:auto;width:100%;height:auto}
+  html[data-mode="portrait"] #bubble{height:calc(var(--uh)*10.5);min-height:calc(var(--u)*17)}
+  html[data-mode="portrait"] #bubblePlate{gap:calc(var(--u)*0.8);padding:0 calc(var(--u)*2.4)}
+  html[data-mode="portrait"] #bubbleBig{font-size:calc(var(--u)*3.3)}
+  html[data-mode="portrait"] #bubbleSub{font-size:calc(var(--u)*2.15);line-height:1.38}
+  html[data-mode="portrait"] #flightPanel{order:4;left:auto;top:auto;width:100%;height:auto}
+  html[data-mode="portrait"] #bottomRow{order:5;display:flex;align-items:flex-end;
+    justify-content:space-between;gap:calc(var(--u)*2);width:100%}
+  html[data-mode="portrait"] #compassWrap{position:relative;left:auto;top:auto;
+    width:calc(var(--u)*29);height:auto;flex:0 0 auto;
+    display:flex;flex-direction:column;align-items:center}
+  html[data-mode="portrait"] #compass{width:calc(var(--u)*25);height:calc(var(--u)*25)}
+  html[data-mode="portrait"] #hdgLbl{position:relative;left:auto;top:auto;transform:none;
+    width:100%;font-size:calc(var(--u)*2.3);margin-top:calc(var(--u)*0.7)}
+  html[data-mode="portrait"] #readPanel{position:relative;left:auto;bottom:auto;transform:none;
+    flex:1 1 auto;padding:calc(var(--u)*1) calc(var(--u)*2) calc(var(--u)*1.4)}
+  html[data-mode="portrait"] #clock{font-size:calc(var(--u)*10.5)}
+  html[data-mode="portrait"] #dateLine{font-size:calc(var(--u)*2.6)}
+  html[data-mode="portrait"] #lampWrap{position:relative;right:auto;bottom:auto;
+    flex:0 0 auto;padding-bottom:calc(var(--u)*1)}
+  html[data-mode="portrait"] #stateLamp{font-size:calc(var(--u)*2.4)}
 </style>
 </head>
 <body>
+<script>
+"use strict";
+/* BOUND — DIRECT PARAMETER LOAD (layout rebalance, Nov 23, 2026).
+   The display is sensed ONCE per bound (at load, and again only
+   when the window itself is resized — a new bound, never a
+   per-paint measurement) and loaded as the ApexBound parameter:
+   the container's sensed real metrics where the container offers
+   them, the window's own size where it does not. The composition
+   — square board or portrait column — is chosen from the loaded
+   bound's shape, and every size on the face derives from it.
+   window.__boundReport carries the bench record. */
+window.__applyBound = function(bw, bh, src){
+  var iw = window.innerWidth || bw, ih = window.innerHeight || bh;
+  var mode = bh > bw * 1.15 ? "portrait" : "square";
+  var u = (mode === "portrait" ? bw : Math.min(bw, bh)) / 100;
+  var root = document.documentElement;
+  root.style.setProperty("--bw", bw + "px");
+  root.style.setProperty("--bh", bh + "px");
+  root.style.setProperty("--u", u + "px");
+  root.style.setProperty("--uh", (bh / 100) + "px");
+  root.style.setProperty("--ox", Math.max(0, Math.round((iw - bw) / 2)) + "px");
+  root.style.setProperty("--oy", Math.max(0, Math.round((ih - bh) / 2)) + "px");
+  root.style.setProperty("--cx", Math.max(0, Math.round((bw - u * 100) / 2)) + "px");
+  root.style.setProperty("--cy", Math.max(0, Math.round((bh - u * 100) / 2)) + "px");
+  root.setAttribute("data-mode", mode);
+  window.__boundReport = { src: src, w: bw, h: bh, mode: mode,
+    u: Math.round(u * 100) / 100 };
+};
+window.__loadBound = function(){
+  var bw = window.innerWidth || 0, bh = window.innerHeight || 0, src = "window";
+  try {
+    if (window.ApexBound && ApexBound.getW() > 0 && ApexBound.getH() > 0) {
+      var aw = ApexBound.getW(), ah = ApexBound.getH();
+      /* rotation: if the window's orientation disagrees with the
+         sensed frame, the sensed frame is the stale one — swap it */
+      if ((bw > bh) !== (aw > ah) && aw !== ah) { var t = aw; aw = ah; ah = t; }
+      bw = aw; bh = ah; src = "container";
+    }
+  } catch (e) {}
+  if (bw && bh) window.__applyBound(bw, bh, src);
+};
+window.__loadBound();
+var __boundResizeT = null;
+window.addEventListener("resize", function(){
+  if (__boundResizeT) clearTimeout(__boundResizeT);
+  __boundResizeT = setTimeout(function(){
+    window.__loadBound();
+    if (window.__layoutTower) window.__layoutTower();
+  }, 180);
+});
+</script>
 <div id="face">
   <div id="titleLbl" class="lbl">SPACEX LAUNCH WATCH</div>
   <div id="subLbl" class="lbl">PHASE TWO · WHO IS ON THE TOWER</div>
@@ -153,6 +277,7 @@
     <div class="row"><span class="k">WINDOW T+</span><span class="v hot" id="fTplus">—</span></div>
   </div>
 
+  <div id="bottomRow">
   <div id="compassWrap">
     <svg id="compass" viewBox="0 0 120 120" aria-label="Compass dial with analog clock"></svg>
     <div id="hdgLbl">HDG NO MEASURE</div>
@@ -162,6 +287,7 @@
 
   <div id="lampWrap">
     <div id="stateLamp">READING</div>
+  </div>
   </div>
 </div>
 
@@ -502,7 +628,22 @@ setInterval(tick, 1000);
    (absolute time + the wearer's drag), projected from a God's-eye
    elevation, depth-sorted, and painted. Plain long-form JS. */
 var cvs = $("tower"), ctx = cvs.getContext("2d");
-var CW = cvs.width, CH = cvs.height, CCX = CW/2, CCY = CH/2 + 26, SCALE = 11.5;
+/* The canvas seats to its LAID-OUT box (which the bound-driven
+   composition sized), never to a fixed backing store: on the
+   portrait board the box is wide and flexible, on the square
+   board it is the original panel. layoutTower runs once at boot,
+   once on the verification pass, and once per bound change. */
+var CW = 0, CH = 0, CCX = 0, CCY = 0, SCALE = 11.5;
+function layoutTower(){
+  var w = cvs.clientWidth || 450, h = cvs.clientHeight || 410;
+  if (cvs.width !== w) cvs.width = w;
+  if (cvs.height !== h) cvs.height = h;
+  CW = w; CH = h; CCX = w / 2; CCY = Math.round(h * 0.56);
+  SCALE = Math.min(w / 34, h / 42);
+  window.__towerBox = { w: w, h: h, scale: Math.round(SCALE * 100) / 100 };
+}
+window.__layoutTower = layoutTower;
+layoutTower();
 var ELEV = 0.86; /* radians above horizon — the God's eye */
 var prims = [];
 function quad(p1, p2, p3, p4, fill, stroke){
@@ -711,6 +852,27 @@ function paintTime(now){
 }
 paintTime(new Date());
 setInterval(function(){ paintTime(new Date()); }, 250);
+
+/* ONE VERIFICATION PASS against the loaded bound: measure the
+   painted stage once; if it does not measure to the bound, the
+   bound is re-derived from the painted glass ONCE — a correction,
+   not a search — and the tower re-seats to its box. */
+requestAnimationFrame(function(){
+  if (window.__layoutTower) window.__layoutTower();
+  var rep = window.__boundReport; if (!rep) return;
+  var r = document.getElementById("face").getBoundingClientRect();
+  rep.rect = { w: Math.round(r.width), h: Math.round(r.height) };
+  rep.corr = 1;
+  if (rep.w && (Math.abs(r.width - rep.w) / rep.w > 0.02 ||
+                Math.abs(r.height - rep.h) / rep.h > 0.02) &&
+      !window.__boundCorrected) {
+    window.__boundCorrected = true;
+    window.__applyBound(Math.round(r.width), Math.round(r.height), rep.src + "+verify");
+    rep.corr = Math.round((rep.w / r.width) * 1000) / 1000;
+    rep.rect = { w: Math.round(r.width), h: Math.round(r.height) };
+    if (window.__layoutTower) window.__layoutTower();
+  }
+});
 
 window.__governor = { state:"live", enters:1, rests:0, lastSignal:"boot-live" };
 window.__faceRest = false;

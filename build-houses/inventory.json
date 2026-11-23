@@ -1052,7 +1052,7 @@
    "slug": "spacex-launch-watch",
    "name": "Apex Face \u2014 SpaceX Launch Watch",
    "title": "APEX \u2014 SpaceX Launch Watch \u00b7 Phase Two",
-   "note": "SpaceX Launch Watch \u00b7 Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE \u2014 the source publishes none and the face invents none. Compass dial and time, analog and digital.",
+   "note": "SpaceX Launch Watch \u00b7 Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE \u2014 the source publishes none and the face invents none. Compass dial and time, analog and digital. Layout rebalanced Nov 23, 2026: the composition is driven by the loaded bound parameter (Direct Parameter Load) \u2014 a portrait column distributed over the full frame on tall bounds, the square board retained on square bounds; compass at instrument size, feed-bubble plate unclipped. This build also lands the Nov 20 feed-resilience fix in the shipped package for the first time.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1060,8 +1060,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.spacexlaunchwatch",
     "apkPath": "/depot/spacex-launch-watch.apk",
-    "apkSha256": "2ff2fc5b1b45ad75799ad6541ead1e95b4e5f79db47b70d999ce3dcd19d97115",
-    "apkSizeBytes": 3211528,
+    "apkSha256": "e5100acaef460a1ff99e11f9f3bc42a89fa47a1cdb1526836f0f342642969e28",
+    "apkSizeBytes": 33233,
     "facePath": "/faces/spacex-launch-watch.html"
    },
    "apple": {
