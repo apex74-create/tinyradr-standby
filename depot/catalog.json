@@ -1,7 +1,7 @@
 {
   "depot": "Application Depot — tinyradr.com",
-  "priceUsd": 9.99,
-  "listingRule": "IN: any landed build that is a watch face when it lands — it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $9.99 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) — they keep their already-set pricing schemas.",
+  "priceUsd": 10,
+  "listingRule": "IN: any landed build that is a watch face when it lands — it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $10 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) — they keep their already-set pricing schemas.",
   "venue": "Interim estate-owned shelf on tinyradr.com, until the appropriate domain name is secured and the builds are pushed to the Play Store.",
   "checkoutState": "Posted shelf. Card checkout opens with the licensed launch; until then orders are reserved by email to sales@apexairsolutions.com and the house delivers the posted APK by link.",
   "faces": [
@@ -15,7 +15,7 @@
       "apkSizeBytes": 3365513,
       "facePath": "/faces/personal-face-solid.html",
       "faceSha256": "be72d8837b9d717a589747b975afc70ce0f335349e6d13375b9cd2420bb2b0ac",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -32,7 +32,7 @@
       "apkSizeBytes": 3240336,
       "facePath": "/faces/signal-scope-v4.html",
       "faceSha256": "6a3b4719f9ccd89d61302d55bc0a0de05401b035317b0a5b2f4cb87880a71117",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -49,7 +49,7 @@
       "apkSizeBytes": 25041,
       "facePath": "/faces/machinery-clock-square.html",
       "faceSha256": "113031adbcb1c4069a5d862c814148ba8c6af36cb806042e5552c80c6621900b",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -66,7 +66,7 @@
       "apkSizeBytes": 3167161,
       "facePath": "/faces/apex-weather.html",
       "faceSha256": "ec1f75889501c263ccab0ebbcef92c663a726658c2c18bb7819ca07febbbb2e2",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock",
         "weather-call"
@@ -84,7 +84,7 @@
       "apkSizeBytes": 3174705,
       "facePath": "/faces/betta-v2.html",
       "faceSha256": "059aa3bdf64d65cdb5e9065ebf45a6c97b53b5be51452bd94303d4f871966972",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -101,7 +101,7 @@
       "apkSizeBytes": 3168169,
       "facePath": "/faces/blocks.html",
       "faceSha256": "1578ed0e1847c95a4f828d6b96128c796e49428a05bf283a0530d59ea9b24ca7",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -118,7 +118,7 @@
       "apkSizeBytes": 3108585,
       "facePath": "/faces/glass-house-flagship.html",
       "faceSha256": "64a77cf226721f1fb613bf1dbe8c3e62a84f5011e4a785a198b24263b0cdfafa",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock",
         "weather-call"
@@ -136,7 +136,7 @@
       "apkSizeBytes": 3112681,
       "facePath": "/faces/glass-house-flagship-machinery.html",
       "faceSha256": "fa01b82264630e5aec1ea7b0d22562498b69c00b93871354c9e18244f99d51b5",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock",
         "weather-call"
@@ -154,7 +154,7 @@
       "apkSizeBytes": 3112681,
       "facePath": "/faces/glass-house-flagship-dark.html",
       "faceSha256": "61f6039d1aabe2c95279b536eee86c000c378669e16baaed406647202e83a5cf",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock",
         "weather-call"
@@ -172,7 +172,7 @@
       "apkSizeBytes": 2911977,
       "facePath": "/faces/barracuda.html",
       "faceSha256": "2c6f76e2f21cc7586aeedec9c574e949795442d89a27d83123a2df6b0e90ad06",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -189,7 +189,7 @@
       "apkSizeBytes": 2911977,
       "facePath": "/faces/dumb-agachi.html",
       "faceSha256": "c912ef3b29062808c459acb1c1ea20dc6e7acd2e8f5b1fb71859307232954447",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -206,7 +206,7 @@
       "apkSizeBytes": 2911977,
       "facePath": "/faces/j58.html",
       "faceSha256": "68126da3923296e04e925ceeeb3aae1727688981f3e9653a3fc18f5cf4b89e55",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -223,7 +223,7 @@
       "apkSizeBytes": 2911977,
       "facePath": "/faces/j79-blackbird.html",
       "faceSha256": "56c7b3ecb46f9184cf117e8ebb4d0582bb6674f6ab27cb4c9b7dd64a4d9351b8",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -240,7 +240,7 @@
       "apkSizeBytes": 3178241,
       "facePath": "/faces/lamborghini-v12.html",
       "faceSha256": "cb83f8098c70752d59334d4985c4f9109ff898a79b44ab7fb48f519fe4528107",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -257,7 +257,7 @@
       "apkSizeBytes": 2911977,
       "facePath": "/faces/raptor.html",
       "faceSha256": "f15e5681b98468fb17659a0a4778984751d80b845fe0dbb20bf09584b9fbfb7e",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -274,7 +274,7 @@
       "apkSizeBytes": 3377393,
       "facePath": "/faces/betta-city.html",
       "faceSha256": "b70b8be3568312d998f804acb8ec3fd8b63275b9afb477b4cfff34b22255f927",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -291,7 +291,7 @@
       "apkSizeBytes": 3408825,
       "facePath": "/faces/betta-globe.html",
       "faceSha256": "c571fa5bb8f569b6ff5cd7c1d5dd0279304e0431788c5db9e9a16ccef2883eff",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -308,7 +308,7 @@
       "apkSizeBytes": 3211069,
       "facePath": "/faces/betta-ultra-deluxe-gears.html",
       "faceSha256": "a1aaf8d067721c108989b33c618941254b84eb8d4d7b6c6c469d1c44cc7c360e",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -325,7 +325,7 @@
       "apkSizeBytes": 3210413,
       "facePath": "/faces/betta-ultra-deluxe-reef.html",
       "faceSha256": "7a9c39b7288f41e2154d8b35187988b12680d697ca97d6abe4d2f90bb6812f37",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -342,7 +342,7 @@
       "apkSizeBytes": 3303337,
       "facePath": "/faces/cast-net.html",
       "faceSha256": "943d50290d35790a39cc79e5dbb22c463aefa0324556a64edafcfd9fa599654b",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -359,7 +359,7 @@
       "apkSizeBytes": 3180413,
       "facePath": "/faces/deep-space-wallpaper.html",
       "faceSha256": "4beb95acb8b3cf854dea159dfd85061ba9f33299728cf3367756187a10560e40",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -376,7 +376,7 @@
       "apkSizeBytes": 3133161,
       "facePath": "/faces/globe-tracker.html",
       "faceSha256": "bc2e6c3663a2bef20d1fdb53cf610f6947f12c3e74dd47367e60a8e6e715ada8",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -393,7 +393,7 @@
       "apkSizeBytes": 3038953,
       "facePath": "/faces/the-19.html",
       "faceSha256": "454b71160bd03268de79064c449be0609c9084429e520531d237add8f1cdbb28",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -410,7 +410,7 @@
       "apkSizeBytes": 3174465,
       "facePath": "/faces/uap-space-scene.html",
       "faceSha256": "198a209ea6885c9cf28bd0b4c97c12adc6dc03e5e38f3cb1224037409969accd",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -427,7 +427,7 @@
       "apkSizeBytes": 3390941,
       "facePath": "/faces/glass-house-flagship-dark-suite.html",
       "faceSha256": "b974f0aed9fdf3de3406f1b4ea163a5fbc322459b6e0106b2d3257e724a8d7a7",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -444,7 +444,7 @@
       "apkSizeBytes": 49617,
       "facePath": "/faces/betta-ultra-deluxe.html",
       "faceSha256": "cc769bb342a1937ab5a1710b03dc1becff6c31c30615efcf21585acaf88aeeeb",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -461,7 +461,7 @@
       "apkSizeBytes": 29137,
       "facePath": "/faces/wish-face.html",
       "faceSha256": "d48d4c9c2646552935ac5ec289c6c38c91a57b6b0a452e7b7523eec3bd6c5ae7",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -478,7 +478,7 @@
       "apkSizeBytes": 12753,
       "facePath": "/faces/scope.html",
       "faceSha256": "ce7f9241402dba6abc8cc64fa232cc899ddb1ed86bd1328a33c98e397968f7f6",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -495,7 +495,7 @@
       "apkSizeBytes": 16849,
       "facePath": "/faces/signal-scope.html",
       "faceSha256": "1e9b82eb1cc9728db5a7e941ae7bdf8d0208a6b9ae14e4c66ccdab1366da32af",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -512,7 +512,7 @@
       "apkSizeBytes": 16849,
       "facePath": "/faces/signal-watch.html",
       "faceSha256": "abf6e6f31a8418da93c251823fb77b2ef3e04b11c316de1140a5c7039c9bbb21",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -529,7 +529,7 @@
       "apkSizeBytes": 16849,
       "facePath": "/faces/uap-hero-face.html",
       "faceSha256": "d19f4785868ad13c9185ed1225dd602595ce6a0fcb1d7c5a8c75f1c0626f1187",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -546,7 +546,7 @@
       "apkSizeBytes": 20945,
       "facePath": "/faces/uap-hero-face-v2.html",
       "faceSha256": "f2c4a278eaf7ce29b7b7c75e00d556ecc031d68d85be0260e2bb5a4803568a5a",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -563,7 +563,7 @@
       "apkSizeBytes": 20945,
       "facePath": "/faces/uap-iss-face.html",
       "faceSha256": "5023fdaa135746cbcdf5183810068558c05b791cee961c287f10d29134ce4a17",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock",
         "iss-telemetry"
@@ -581,7 +581,7 @@
       "apkSizeBytes": 20945,
       "facePath": "/faces/uap-iss-face-v2.html",
       "faceSha256": "69f6e29f46862494ab7972a23536a3974d86400bdb7f005df23fae7c469fda66",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock",
         "weather-call",
@@ -600,7 +600,7 @@
       "apkSizeBytes": 37329,
       "facePath": "/faces/betta-hyperdetail-freefloat.html",
       "faceSha256": "5b70ae45ae734f6fa1fd947bb74402fbb59d28bd3aec02be73098c669694d620",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -617,7 +617,7 @@
       "apkSizeBytes": 164305,
       "facePath": "/faces/machinery-clock.html",
       "faceSha256": "4cd359360c17c168fb31b727196516d74b15654f78dc71ab93c43f33cb10b553",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -634,7 +634,7 @@
       "apkSizeBytes": 16849,
       "facePath": "/faces/motion-wallpaper.html",
       "faceSha256": "d773ebd0aa87899a92e098e220c9e94e808124ad34b75b60422bde1f81723360",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -651,7 +651,7 @@
       "apkSizeBytes": 201169,
       "facePath": "/faces/condensed-engine-wallpaper.html",
       "faceSha256": "71cf87ca2a5e051c2609bb8bc0152f1bf59dcf7f0ffde145fe7750189f3fe85f",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -668,7 +668,7 @@
       "apkSizeBytes": 147921,
       "facePath": "/faces/hollys-face.html",
       "faceSha256": "8bade1200ffc9f60cae019905c39d2c351d5dd5f2bd6f2fd51514cd2e473c249",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -685,7 +685,7 @@
       "apkSizeBytes": 3180877,
       "facePath": "/faces/the-sextant.html",
       "faceSha256": "ad3d31af6c330d940e922584b4ca0373fe39cdb7ea13f215782067b746319a95",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -702,7 +702,7 @@
       "apkSizeBytes": 3209800,
       "facePath": "/faces/radiosphere.html",
       "faceSha256": "9cad6a0cdac90b7996c8fc58068e3238a14226bc68ab25ec567307815fc2907b",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
@@ -719,12 +719,12 @@
       "apkSizeBytes": 3204040,
       "facePath": "/faces/hero-p39.html",
       "faceSha256": "ee091c7bc09b0f027ea33c6e900db979806e4f4e8410714f71aa8f400e3a3fb6",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hero Line (Nov 20, 2026): the P-39D Airacobra, nose-on — the owner's favourite — in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs."
+      "note": "Hero Line: the P-39D Airacobra, nose-on — the owner's favourite — in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs."
     },
     {
       "slug": "hero-corsair",
@@ -736,12 +736,12 @@
       "apkSizeBytes": 3204040,
       "facePath": "/faces/hero-corsair.html",
       "faceSha256": "9a0efb84ab6aca394a79de08bb67309432ec04fa19476bf9fe791e5e02644f99",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hero Line (Nov 20, 2026): the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat."
+      "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat."
     },
     {
       "slug": "hero-f14",
@@ -753,12 +753,12 @@
       "apkSizeBytes": 3204080,
       "facePath": "/faces/hero-f14.html",
       "faceSha256": "fcc537a2bad0d5c4bf6eaf5b333a8bbcb17acceba8a4b49ec55ef6c655da530f",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hero Line (Nov 20, 2026): the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat."
+      "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat."
     },
     {
       "slug": "hotrod-ratrod",
@@ -770,12 +770,12 @@
       "apkSizeBytes": 3203868,
       "facePath": "/faces/hotrod-ratrod.html",
       "faceSha256": "19f1d7b1dcb0d900cb63843c52d60b926a0aaffe607455882727713fe5193da4",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line (Nov 20, 2026): an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital."
+      "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital."
     },
     {
       "slug": "hotrod-blown",
@@ -787,12 +787,12 @@
       "apkSizeBytes": 3203868,
       "facePath": "/faces/hotrod-blown.html",
       "faceSha256": "f89ed7d8fc4068207e58c94b436de2567d1adedad57f460f2b7d194bf28c9065",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line (Nov 20, 2026): an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital."
+      "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital."
     },
     {
       "slug": "hotrod-coupe",
@@ -804,12 +804,12 @@
       "apkSizeBytes": 3203884,
       "facePath": "/faces/hotrod-coupe.html",
       "faceSha256": "a255441f776471b08230e65a47a5a520a185940969f052e2be7db4bb743cabad",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line (Nov 20, 2026): an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital."
+      "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital."
     },
     {
       "slug": "spacex-launch-watch",
@@ -821,12 +821,12 @@
       "apkSizeBytes": 3211528,
       "facePath": "/faces/spacex-launch-watch.html",
       "faceSha256": "e2c990561fc90fe86cc2f0ceb11e67946d931157a502d6dcba2a0086d2a93f03",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "SpaceX Launch Watch · Phase Two (Nov 20, 2026): names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE — the source publishes none and the face invents none. Compass dial and time, analog and digital."
+      "note": "SpaceX Launch Watch · Phase Two: names the SpaceX vehicle and mission on the tower from the public Space Launch Schedule feed with a live T-minus countdown, a sandboxed live-feed bubble that mounts only inside the launch window (an honest NO LIVE FEED plate outside it), a spinnable God's-eye 3D tower, and flight fields (trajectory, apogee, Max-Q, stage separation) that read NO MEASURE — the source publishes none and the face invents none. Compass dial and time, analog and digital."
     },
     {
       "slug": "tesla-scope",
@@ -838,12 +838,12 @@
       "apkSizeBytes": 3213332,
       "facePath": "/faces/tesla-scope.html",
       "faceSha256": "3d1fa17bebd4327ac634b9c7c38b41c0457f3d5cbeb40c2e21d3f52cfe186e10",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Tesla Scope (Nov 20, 2026): a Tesla companion panel in the Scope pipe, wired field-by-field to Tesla's documented Fleet API shapes (charge level and state, range, charge limit, time-to-full; lock, odometer, software, climate). Ships unpaired — NO CAR PAIRED, every vehicle readout NO MEASURE, no token held, no Tesla calls made; pairing is Tesla's documented OAuth, inert until a real car is authorized. Vehicle location is deliberately never requested."
+      "note": "Tesla Scope: a Tesla companion panel in the Scope pipe, wired field-by-field to Tesla's documented Fleet API shapes (charge level and state, range, charge limit, time-to-full; lock, odometer, software, climate). Ships unpaired — NO CAR PAIRED, every vehicle readout NO MEASURE, no token held, no Tesla calls made; pairing is Tesla's documented OAuth, inert until a real car is authorized. Vehicle location is deliberately never requested."
     },
     {
       "slug": "j58-dark",
@@ -855,12 +855,12 @@
       "apkSizeBytes": 3217356,
       "facePath": "/faces/j58-dark.html",
       "faceSha256": "78d63ad366e586ecde463746c36bca152a610076e8e940af7b286ddf4b595f04",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole J58 machine — both views, flow and random ingest — carried onto blackened plates. The dark twin of the J58 seat."
+      "note": "Motors Under Glass, Dark Edition: the whole J58 machine — both views, flow and random ingest — carried onto blackened plates. The dark twin of the J58 seat."
     },
     {
       "slug": "j79-dark",
@@ -872,12 +872,12 @@
       "apkSizeBytes": 3211796,
       "facePath": "/faces/j79-dark.html",
       "faceSha256": "4c62e148385f503ba529c6384848a11c9c476f2f58b39819b1dd82d3c9dc35ae",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole J79 machine — both views, flow and random ingest — on a charcoal-burnt wood plate. The dark twin of the J79 Blackbird seat."
+      "note": "Motors Under Glass, Dark Edition: the whole J79 machine — both views, flow and random ingest — on a charcoal-burnt wood plate. The dark twin of the J79 Blackbird seat."
     },
     {
       "slug": "raptor-dark",
@@ -889,12 +889,12 @@
       "apkSizeBytes": 3213040,
       "facePath": "/faces/raptor-dark.html",
       "faceSha256": "fb5cc84d32433ebf120c130919edc312c5cfcff88bf93eeb9fab6cc53d45c6f9",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Motors Under Glass, Dark Edition (Nov 20, 2026): the whole Raptor machine — exploded and end views, flow and random ingest — on a deep-space plate. The dark twin of the Raptor seat."
+      "note": "Motors Under Glass, Dark Edition: the whole Raptor machine — exploded and end views, flow and random ingest — on a deep-space plate. The dark twin of the Raptor seat."
     },
     {
       "slug": "prop-gear",
@@ -906,12 +906,12 @@
       "apkSizeBytes": 3204476,
       "facePath": "/faces/prop-gear.html",
       "faceSha256": "c5606be79ff5c8bca067e0383cfe101678a36e24e49cc6eb9c7bc15525a67d0a",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "The Propeller Wing (Nov 20, 2026): a propeller on a 36T great gear, clock gears behind it meshing at true ratios 36:20:12, the 12T gear carrying real clock hands — propellers turning like clock gears, with clock gears behind them."
+      "note": "The Propeller Wing: a propeller on a 36T great gear, clock gears behind it meshing at true ratios 36:20:12, the 12T gear carrying real clock hands — propellers turning like clock gears, with clock gears behind them."
     },
     {
       "slug": "war-corsair",
@@ -923,12 +923,12 @@
       "apkSizeBytes": 3205472,
       "facePath": "/faces/war-corsair.html",
       "faceSha256": "42cdfc857eacc32ff3f8b94ef7741b58dee13b84ca8bc76dd6fc170dd456cf70",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "The Propeller Wing (Nov 20, 2026): the F4U Corsair seat — nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face."
+      "note": "The Propeller Wing: the F4U Corsair seat — nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face."
     },
     {
       "slug": "war-p51",
@@ -940,29 +940,12 @@
       "apkSizeBytes": 3205684,
       "facePath": "/faces/war-p51.html",
       "faceSha256": "e50b7ffd759d7912ca418fec3570333019d16e1281532be5b1ae43b07e69f698",
-      "priceUsd": 9.99,
+      "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "The Propeller Wing (Nov 20, 2026): the P-51 seat — tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face."
-    },
-    {
-      "slug": "ultralight-wireframe",
-      "name": "Apex Face — Ultralight Wireframe Helicopter",
-      "title": "APEX — Ultralight Wireframe Helicopter · The Propeller Wing · TENTATIVE",
-      "package": "app.lovable.apexsignal.face.ultralightwireframe",
-      "apkPath": "/depot/ultralight-wireframe.apk",
-      "apkSha256": "1538b041d5d8fa22784b1e82c574c81ebeb08a9c3568fc2b89d16ba32ac95da1",
-      "apkSizeBytes": 3204360,
-      "facePath": "/faces/ultralight-wireframe.html",
-      "faceSha256": "2794700d06349ba1272612f67d35b830718124818aa485cb0918dfa620c78897",
-      "priceUsd": 9.99,
-      "functions": [
-        "clock"
-      ],
-      "status": "BUILT",
-      "note": "The Propeller Wing (Nov 20, 2026) — TENTATIVE, the owner's 'maybe', flagged for his end-grade: a wireframe helicopter — open truss, mast gear, main rotor with blade-passage beat, tail rotor at 5x, skids."
+      "note": "The Propeller Wing: the P-51 seat — tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face."
     }
   ]
 }

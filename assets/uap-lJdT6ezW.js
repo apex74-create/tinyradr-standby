@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-NZYk81nU.js";import{t}from"./AnomalyStation-B5CMUpPJ.js";var n=e(),r=()=>(0,n.jsx)(t,{edition:`uap`});export{r as component};
