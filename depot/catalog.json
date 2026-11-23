@@ -372,16 +372,16 @@
    "title": "APEX \u2014 GLOBE TRACKER \u00b7 Hierographic 01",
    "package": "app.lovable.apexsignal.face.globetracker",
    "apkPath": "/depot/globe-tracker.apk",
-   "apkSha256": "c07b169e9714f1f4df4bc08a01715fa2d0b5d40c469363c746587de5829b496a",
-   "apkSizeBytes": 3133161,
+   "apkSha256": "bc1295308f8406a94eb86606ed499d3d087d0d8b724d362f6a14551eb66e4550",
+   "apkSizeBytes": 254417,
    "facePath": "/faces/globe-tracker.html",
-   "faceSha256": "bc2e6c3663a2bef20d1fdb53cf610f6947f12c3e74dd47367e60a8e6e715ada8",
+   "faceSha256": "0fd1932fc3248e8f93605a55268a8d8728643f6d7c97ef9a43abd3ae362ef8c4",
    "priceUsd": 10,
    "functions": [
     "clock"
    ],
    "status": "BUILT",
-   "note": "Globe Tracker (Nov 10, 2026) - Hierographic Series face 01, the owner's Tiny Radar hero-graphic idiom: the Casio readout (house DSEG7, hollow digits on a solid chip) and the one-pulse-per-second trace over a living sky. BACKDROP SLOT (apex-backdrop-slot v1): two plates ride it - GLOBE (default: the owner's supplied globe plate, squared, embedded) and CASTNET (the Tiny Radar hero plate, a protected asset used read-only; squared crop embedded), switched in-face by the BACKDROP button. WIREFRAME DRONES: three line-art craft fly closed patrol loops with lock brackets, trails and tags; tags read from the native-bucket contract - in the web build the bucket is EMPTY and the tags stay generic TRK-01/02/03; no SSID or reading is ever fabricated (a real scan feeds the same contract from the native container later). GPS LINE: real fix when the host grants geolocation, otherwise the honest 'GPS - NO FIX'; coordinates are never invented. APEX FRAME worn by default (FRAME ON/OFF button): the engine face family's LOKMAT FRAME ported to this face - case metal exists ONLY as a hollow ring (outer case minus glass window, even-odd), window genuinely open; frame ON seats the world into the glass by one uniform transform (translate(91.2px, 91.2px) scale(0.6438) at the 512 square), no clip, nothing stretched. Two Nov 10 build defects were found and fixed before this hang, with proof: (1) the world painted UNDER the z-1 case (its z-index was auto) and the case's opaque field covered the glass solid - fixed by giving the world its explicit place between case and trim, exactly Betta's insert order; (2) the case is now built as Betta's ring-only construction. Proof (headless Chromium 156, verified 512x512 captures): frame-ON pixel census over the glass interior - zero case-fill pixels, the world paints on both plates; 17/17 DOM checks (clock exact, drones moving on both plates, pulse phase locked, frame toggles, bucket empty, GPS honest); zero console exceptions. SQUARE build (shape-at-purchase)."
+   "note": "Globe Tracker (Nov 10, 2026) - Hierographic Series face 01, the owner's Tiny Radar hero-graphic idiom: the Casio readout (house DSEG7, hollow digits on a solid chip) and the one-pulse-per-second trace over a living sky. BACKDROP SLOT (apex-backdrop-slot v1): two plates ride it - GLOBE (default: the owner's supplied globe plate, squared, embedded) and CASTNET (the Tiny Radar hero plate, a protected asset used read-only; squared crop embedded), switched in-face by the BACKDROP button. WIREFRAME DRONES: three line-art craft fly closed patrol loops with lock brackets, trails and tags; tags read from the native-bucket contract - in the web build the bucket is EMPTY and the tags stay generic TRK-01/02/03; no SSID or reading is ever fabricated (a real scan feeds the same contract from the native container later). GPS LINE: real fix when the host grants geolocation, otherwise the honest 'GPS - NO FIX'; coordinates are never invented. APEX FRAME worn by default (FRAME ON/OFF button): the engine face family's LOKMAT FRAME ported to this face - case metal exists ONLY as a hollow ring (outer case minus glass window, even-odd), window genuinely open; frame ON seats the world into the glass by one uniform transform (translate(91.2px, 91.2px) scale(0.6438) at the 512 square), no clip, nothing stretched. Two Nov 10 build defects were found and fixed before this hang, with proof: (1) the world painted UNDER the z-1 case (its z-index was auto) and the case's opaque field covered the glass solid - fixed by giving the world its explicit place between case and trim, exactly Betta's insert order; (2) the case is now built as Betta's ring-only construction. Proof (headless Chromium 156, verified 512x512 captures): frame-ON pixel census over the glass interior - zero case-fill pixels, the world paints on both plates; 17/17 DOM checks (clock exact, drones moving on both plates, pulse phase locked, frame toggles, bucket empty, GPS honest); zero console exceptions. SQUARE build (shape-at-purchase). \u00b7 Signal-fleet rollout (Nov 23, 2026): rebuilt on pipe container v3 (versionCode 2 / 1.1) \u2014 the shell now publishes the scan feed this face always read (window.__apexIndex, from the analyzer's ApexWifi/1 set or the shell's own scan), so its markers plot on device; the scan layer names its pipe (SRC ANALYZER / SRC CONTAINER), the GPS line earns real fixes through the container's geolocation grant and labels them SRC CONTAINER, and the stage sizes from the loaded ApexBound parameter. Bench-proven on the fixture feed at the LOKMAT-class bound; on-device close is the owner's."
   },
   {
    "slug": "the-19",
@@ -491,16 +491,16 @@
    "title": "APEX \u2014 Signal Watch \u00b7 SIGNAL SCOPE V2",
    "package": "app.lovable.apexsignal.face.signalscope",
    "apkPath": "/depot/signal-scope.apk",
-   "apkSha256": "6443e0e967e35a639a68c232a5a4aa4fc8c8d7f77bf4ef2c43ad767e0086bc28",
-   "apkSizeBytes": 16849,
+   "apkSha256": "13243bb82dc5e42df10fca1b84b417497bd81e629a823ff0fabf78a174ca2d5b",
+   "apkSizeBytes": 33233,
    "facePath": "/faces/signal-scope.html",
-   "faceSha256": "1e9b82eb1cc9728db5a7e941ae7bdf8d0208a6b9ae14e4c66ccdab1366da32af",
+   "faceSha256": "e495cf5da06af37716e797185a76a5ec45915b0878293aff2cd70de46c69fd44",
    "priceUsd": 10,
    "functions": [
     "clock"
    ],
    "status": "BUILT",
-   "note": "Headline face: green radar scope + heartbeat pulse strip. Carries the D3 honesty rails on its face (signal presence only, no position fix). Supersedes Signal Scope V1."
+   "note": "Headline face: green radar scope + heartbeat pulse strip. Carries the D3 honesty rails on its face (signal presence only, no position fix). Supersedes Signal Scope V1. \u00b7 Signal-fleet rollout (Nov 23, 2026): rebuilt on pipe container v3 (versionCode 2 / 1.1) \u2014 the face now ingests the analyzer logic: ApexWifiPush snapshots (SRC ANALYZER via the ApexWifi/1 pipe, SRC CONTAINER from the shell's own scan) pass the five-step scrub (pre-treat, whip, narrow, speed tracks, hang stills) and paint FREQUENCY RINGS \u2014 one ring per band, colour-coded (amber 2.4 / green 5 / blue 6 GHz), angle = channel, peaks = RSSI, dents = co-channel crowding, ripple = RSSI wander, blip radius = RSSI; the pulse marker beats on real scan landings. Bound by Direct Parameter Load (ApexBound). Bench-proven on fixture payloads at the LOKMAT-class 400x400 bound; on-device close is the owner's."
   },
   {
    "slug": "signal-watch",

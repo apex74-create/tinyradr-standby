@@ -321,11 +321,16 @@ function innerH(){ return Math.max(1, VH - 2 * frameInsetY); }
 var frameWasOn = true;               /* seating state tracker */
 
 function sizeStage(){
-  /* measure: the viewport is the stage, capped to a square by
-     the size of the layout viewport's shorter side — the face's
-     canonical build is SQUARE (shape-at-purchase), and the frame
-     seats into the largest centred square the window offers. */
-  var nVW = Math.max(1, Math.round(Math.min(window.innerWidth, window.innerHeight)));
+  /* measure: Direct Parameter Load — the container's sensed bound
+     (window.ApexBound) governs when the shell offers it; the
+     viewport is the fallback. The stage is capped to a square by
+     the shorter side — the face's canonical build is SQUARE
+     (shape-at-purchase), and the frame seats into the largest
+     centred square the bound offers. */
+  var bw = window.innerWidth, bh = window.innerHeight;
+  var ab = window.ApexBound;
+  if (ab && typeof ab.getW === "function" && ab.getW() > 0 && ab.getH() > 0) { bw = ab.getW(); bh = ab.getH(); }
+  var nVW = Math.max(1, Math.round(Math.min(bw, bh)));
   var nVH = nVW;
   var moved = (nVW !== VW || nVH !== VH);
   VW = nVW; VH = nVH;
@@ -493,11 +498,11 @@ function drawMarker(e, x, y, nowMs){
 }
 function drawScanLayer(nowMs){
   var feed = readScanFeed();
-  scanBenchState = { on: feed.on, entries: feed.entries.length };
+  scanBenchState = { on: feed.on, entries: feed.entries.length, src: feed.src || null };
   scanPlotted = [];
   if (!feed.on){ drawScanState("SCAN — NO FEED"); return; }
   var bands = scanBands(feed);
-  if (!bands.length){ drawScanState("SCAN — NO SIGNALS"); return; }
+  if (!bands.length){ drawScanState("SCAN — NO SIGNALS" + (feed.src ? " · SRC " + feed.src : "")); return; }
   var W = innerW(), H = innerH();
   var fieldTop = H * 0.30, fieldBot = H * 0.80;
   var bandH = (fieldBot - fieldTop) / bands.length;
@@ -517,6 +522,14 @@ function drawScanLayer(nowMs){
       scanPlotted.push({ plane: e.plane, label: String(e.label || e.id || "?"),
                          strength: (typeof e.strength === "number") ? e.strength : null });
     }
+  }
+  /* the pipe that fed the field names itself over the bands */
+  if (feed.src){
+    ctx.font = "600 " + Math.max(8, Math.round(W * 0.016)) + "px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillStyle = PAL.glyph; ctx.globalAlpha = 0.9;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText("SRC " + feed.src, W * 0.915, fieldTop - H * 0.028);
+    ctx.globalAlpha = 1;
   }
 }
 
@@ -810,7 +823,8 @@ function drawGps(){
   var txt;
   if (gpsState.mode === "fix"){
     txt = "GPS " + gpsState.lat.toFixed(3) + ", " + gpsState.lon.toFixed(3) +
-          " ±" + gpsState.acc + "M";
+          " ±" + gpsState.acc + "M" +
+          ((window.__apexIndex || window.ApexBound) ? " · SRC CONTAINER" : "");
   } else if (gpsState.mode === "seeking"){ txt = "GPS — SEEKING"; }
   else if (gpsState.mode === "denied"){ txt = "GPS — NO FIX"; }
   else { txt = "GPS — NO FIX"; }

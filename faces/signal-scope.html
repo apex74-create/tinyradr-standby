@@ -15,6 +15,8 @@
   #clock { position:absolute; text-align:center; color:#eaffef; font-weight:800; line-height:1; text-shadow:0 0 10px rgba(57,255,106,.9), 0 0 42px rgba(57,255,106,.45); font-variant-numeric:tabular-nums; }
   #date { position:absolute; text-align:center; color:#8fd9a4; font-variant-numeric:tabular-nums; }
   #mode { position:absolute; text-align:center; color:#ffc95c; font-weight:700; letter-spacing:.18em; text-shadow:0 0 8px rgba(255,201,92,.35); }
+  #tag { position:absolute; text-align:center; color:#b6ffd0; font-weight:700; font-variant-numeric:tabular-nums; text-shadow:0 0 8px rgba(57,255,106,.5); }
+  #mapline { position:absolute; left:0; text-align:center; color:#3f6b4d; width:100%; }
   .strip { position:absolute; left:0; text-align:center; color:#3f6b4d; width:100%; }
 </style></head>
 <body>
@@ -27,7 +29,9 @@
   <div id="clock">--:--</div>
   <div id="date">—</div>
   <div id="mode">SCOPE STANDBY</div>
-  <div class="strip">APEX SIGNAL WATCH · SCOPE SHOWS SIGNAL PRESENCE ONLY · NO POSITION FIX · TINYRADAR.COM</div>
+  <div id="tag"></div>
+  <div id="mapline">FREQUENCY RINGS — AMBER 2.4 GHZ · GREEN 5 GHZ · BLUE 6 GHZ · ANGLE = CHANNEL · PEAK = RSSI · DENT = CO-CHANNEL CROWD · RIPPLE = RSSI WANDER</div>
+  <div class="strip">APEX SIGNAL WATCH · BLIP RADIUS = RSSI · NO POSITION FIX · SRC NAMES THE PIPE · TINYRADAR.COM</div>
 </div>
 <script>
 // SWEEP-CLOCK PRIMING (SWEEP FIX, Nov 11, 2026; corrected same day after a
@@ -62,9 +66,11 @@
   // from the video's other watch face (the dusk close-up): a green ECG pulse
   // trace running across the display's lower third, with green heart markers
   // in the field. HONESTY RAILS: the trace is a drawn STYLE element only —
-  // it measures nothing, shows NO BPM number, makes NO medical claim. The
-  // scope is presence furniture only. It plots NO targets, NO bearings, NO
-  // fix, NO scores. The battery readout rides the device's real battery hook
+  // it measures nothing, shows NO BPM number, makes NO medical claim; its
+  // marker swells on real scan landings and on nothing else. The scope's
+  // data layer (ingest script, end of body) plots scrubbed Wi-Fi returns:
+  // ANGLE = CHANNEL and RADIUS = RSSI — it claims NO bearing, NO position,
+  // NO fix. The battery readout rides the device's real battery hook
   // and hides itself where the hook does not exist.
   var stage = document.getElementById('stage');
   var cv = document.getElementById('scope');
@@ -76,6 +82,12 @@
   var GREEN = '#39ff6a', GREEN_DIM = '#166b32', GREEN_FAINT = 'rgba(57,255,106,.28)';
   var sweepNow = 0, sweepPrev = -1; // monotonic sweep clock (see SWEEP FIX in drawScope); sweepPrev -1 = unprimed
   function measure() {
+    // Direct Parameter Load: the container's sensed bound governs;
+    // the viewport is the fallback (web / bench), never the master.
+    var b = window.ApexBound;
+    if (b && typeof b.getW === 'function' && b.getW() > 0 && b.getH() > 0) {
+      W = Math.floor(b.getW()); H = Math.floor(b.getH()); return;
+    }
     var vv = window.visualViewport;
     W = Math.floor(vv ? vv.width : window.innerWidth);
     H = Math.floor(vv ? vv.height : window.innerHeight);
@@ -117,6 +129,13 @@
     mode.style.left = '0px'; mode.style.width = W + 'px';
     mode.style.top = Math.floor(CY + D * 0.352) + 'px';
     mode.style.fontSize = Math.max(10, Math.floor(D * 0.030)) + 'px';
+    var tag = document.getElementById('tag');
+    tag.style.left = '0px'; tag.style.width = W + 'px';
+    tag.style.top = Math.floor(CY + D * 0.398) + 'px';
+    tag.style.fontSize = Math.max(10, Math.floor(D * 0.032)) + 'px';
+    var mapline = document.getElementById('mapline');
+    mapline.style.fontSize = Math.max(8, Math.floor(H * 0.017)) + 'px';
+    mapline.style.bottom = Math.floor(H * 0.040) + 'px';
     var strip = document.querySelector('.strip');
     strip.style.fontSize = Math.max(9, Math.floor(H * 0.020)) + 'px';
     strip.style.bottom = Math.floor(H * 0.014) + 'px';
@@ -161,13 +180,9 @@
       ctx.lineTo(c + Math.cos(tt) * (R - 4 - (long ? R * 0.045 : R * 0.022)), c + Math.sin(tt) * (R - 4 - (long ? R * 0.045 : R * 0.022)));
       ctx.strokeStyle = long ? GREEN : GREEN_FAINT; ctx.stroke();
     }
-    // ring range labels up the top radius — scale furniture, as on the video face
-    ctx.fillStyle = 'rgba(182,255,208,.75)';
-    ctx.font = '700 ' + Math.max(10, Math.floor(R * 0.062)) + 'px ui-monospace,Menlo,Consolas,monospace';
-    var labels = ['10m', '20m', '30m', '40m', '50m'];
-    for (var j = 0; j < rings; j++) {
-      ctx.fillText(labels[j], c + R * 0.16, c - (R - 4) * (j + 1) / rings + R * 0.045);
-    }
+    // frequency rings + blips — the data layer, drawn from the
+    // scrubbed scan state (see the ingest script at the end of body).
+    if (typeof drawDataRings === 'function') drawDataRings(ctx, c, R);
     // sweep: bright leading edge + fading wedge trail (one turn per 4s).
     // SWEEP FIX (Nov 11, 2026): the bearing rides a MONOTONIC SWEEP CLOCK,
     // never the raw frame timestamp. The old code fed the rAF timestamp
@@ -238,6 +253,12 @@
     var off = (now % 1100) / 1100 * (span / 3);
     var headP = ((now % 1100) / 1100 - 0.43 + 1) % 1;
     var beat = Math.max(0, 1 - Math.abs(headP - 0.5) * 6); // 1 at the QRS moment
+    // the marker also swells on a REAL scan landing (ingest script
+    // stamps __scanBeatPerf); the trace itself stays a style element.
+    if (window.__scanBeatPerf) {
+      var lb = 1 - (performance.now() - window.__scanBeatPerf) / 700;
+      if (lb > beat) beat = Math.max(0, lb);
+    }
     pctx.lineWidth = Math.max(2, Math.floor(PH * 0.045));
     pctx.lineJoin = 'round'; pctx.lineCap = 'round';
     pctx.shadowColor = 'rgba(57,255,106,.8)'; pctx.shadowBlur = PH * 0.10;
@@ -288,5 +309,179 @@
       upd(); b.addEventListener('levelchange', upd);
     }).catch(function () { /* no battery hook — readout stays hidden */ });
   }
+</script>
+<script>
+  // ANALYZER LOGIC INGEST (signal-fleet rollout, Nov 23, 2026). The
+  // shell pushes ApexWifiPush snapshots — src ANALYZER (the Apex
+  // Wi-Fi Analyzer's ApexWifi/1 set, via the shell's pipe) or src
+  // CONTAINER (the shell's own scan). Each snapshot passes the
+  // five-step scrub on its way to the glass:
+  //   1 PRE-TREAT — tagged src required; an entry needs a BSSID and
+  //     an RSSI in [-100,-15]; dedupe by BSSID, strongest wins.
+  //   2 WHIP — band from bandGhz; channel -> dial angle; RSSI raw
+  //     for print, clamped copy for paint.
+  //   3 NARROW — per band, the 8 strongest paint.
+  //   4 ±SPEED TRACKS — per-BSSID RSSI history (last 6): variance
+  //     feeds the ring ripple, the last step feeds the tag arrow,
+  //     and a fresh snapshot timestamp is a scan LANDING — the
+  //     pulse marker's beat.
+  //   5 HANG STILLS — the last scrubbed picture holds; past 20 s
+  //     without a snapshot the mode line prints FEED STALE + the
+  //     last update clock. Nothing blanks, nothing invents motion.
+  var RING_BANDS = {
+    '2.4': { base: 0.90, color: '#ffc95c', label: '2.4' },
+    '5':   { base: 0.72, color: '#39ff6a', label: '5' },
+    '6':   { base: 0.54, color: '#57c8ff', label: '6' }
+  };
+  var ringState = { src: null, at: 0, aps: [] };
+  var apHistory = {};
+  var lastLandingAt = 0;
+  window.__scopeState = { src: null, aps: 0, bands: {}, strongest: null, stale: false, landings: 0 };
+
+  function bandOf(ghz) { return ghz >= 5.9 ? '6' : (ghz >= 4.9 ? '5' : '2.4'); }
+  function chanAngle(band, ch) {
+    if (band === '2.4') return (Math.min(14, Math.max(1, ch)) - 1) / 13 * Math.PI * 2;
+    if (band === '5') return (Math.min(177, Math.max(36, ch)) - 36) / 141 * Math.PI * 2;
+    return (Math.min(233, Math.max(1, ch)) - 1) / 232 * Math.PI * 2;
+  }
+  function clampRssi(r) { return Math.min(-35, Math.max(-95, r)); }
+
+  window.ApexWifiPush = function (p) {
+    if (!p || !Array.isArray(p.aps)) return;
+    if (p.src !== 'ANALYZER' && p.src !== 'CONTAINER') return;
+    var byBssid = {};
+    for (var i = 0; i < p.aps.length; i++) {
+      var a = p.aps[i];
+      if (!a || !a.bssid || typeof a.rssi !== 'number' || a.rssi < -100 || a.rssi > -15) continue;
+      if (!byBssid[a.bssid] || a.rssi > byBssid[a.bssid].rssi) byBssid[a.bssid] = a;
+    }
+    var clean = [];
+    for (var bssid in byBssid) {
+      var ap = byBssid[bssid];
+      var band = bandOf(ap.bandGhz || 0);
+      var h = apHistory[bssid] || (apHistory[bssid] = []);
+      h.push(ap.rssi); if (h.length > 6) h.shift();
+      var mean = 0, k;
+      for (k = 0; k < h.length; k++) mean += h[k];
+      mean /= h.length;
+      var variance = 0;
+      for (k = 0; k < h.length; k++) variance += (h[k] - mean) * (h[k] - mean);
+      variance = h.length > 1 ? variance / h.length : 0;
+      clean.push({
+        ssid: ap.ssid || '', bssid: bssid, band: band,
+        channel: ap.channel || 0, angle: chanAngle(band, ap.channel || 0),
+        rssi: ap.rssi, plot: clampRssi(ap.rssi), variance: variance,
+        delta: h.length > 1 ? ap.rssi - h[h.length - 2] : 0,
+        connected: !!p.connectedBssid && p.connectedBssid === bssid
+      });
+    }
+    clean.sort(function (x, y) { return y.rssi - x.rssi; });
+    var perBand = {}, kept = [];
+    for (var j = 0; j < clean.length; j++) {
+      perBand[clean[j].band] = (perBand[clean[j].band] || 0) + 1;
+      if (perBand[clean[j].band] <= 8) kept.push(clean[j]);
+    }
+    var at = (typeof p.at === 'number' && p.at > 0) ? p.at : Date.now();
+    if (at > lastLandingAt) {
+      lastLandingAt = at;
+      window.__scanBeatPerf = performance.now();
+      window.__scopeState.landings++;
+    }
+    ringState = { src: p.src, at: at, aps: kept };
+    var bands = {};
+    for (var q = 0; q < kept.length; q++) bands[kept[q].band] = (bands[kept[q].band] || 0) + 1;
+    window.__scopeState.src = p.src;
+    window.__scopeState.aps = kept.length;
+    window.__scopeState.bands = bands;
+    window.__scopeState.strongest = kept.length ? { ssid: kept[0].ssid, rssi: kept[0].rssi, delta: kept[0].delta } : null;
+    window.__scopeState.stale = false;
+  };
+
+  function angDiff(a, b) {
+    var d = (a - b) % (Math.PI * 2);
+    if (d > Math.PI) d -= Math.PI * 2;
+    if (d < -Math.PI) d += Math.PI * 2;
+    return d;
+  }
+
+  // One ring per band present. Radius offset at each angle: AP peaks
+  // (RSSI) minus co-channel dents (crowding) plus ripple (the band's
+  // worst RSSI variance). A clean band draws a near-perfect circle;
+  // a crowded, wandering band malforms. Blips: angle = channel,
+  // radius = RSSI (strong near the hub). No bearing is claimed.
+  function drawDataRings(g, c, R) {
+    if (!ringState.aps.length) return;
+    var maxR = R - 4;
+    var bandKeys = ['2.4', '5', '6'];
+    for (var bi = 0; bi < bandKeys.length; bi++) {
+      var bk = bandKeys[bi], spec = RING_BANDS[bk];
+      var inBand = [];
+      for (var i = 0; i < ringState.aps.length; i++) if (ringState.aps[i].band === bk) inBand.push(ringState.aps[i]);
+      if (!inBand.length) continue;
+      var chanCount = {};
+      for (var j = 0; j < inBand.length; j++) chanCount[inBand[j].channel] = (chanCount[inBand[j].channel] || 0) + 1;
+      var worstVar = 0;
+      for (var v = 0; v < inBand.length; v++) if (inBand[v].variance > worstVar) worstVar = inBand[v].variance;
+      var rippleAmp = Math.min(1, worstVar / 36) * R * 0.018;
+      var base = spec.base * maxR;
+      g.beginPath();
+      for (var s = 0; s <= 72; s++) {
+        var th = s / 72 * Math.PI * 2;
+        var r = base + Math.sin(th * 36) * rippleAmp;
+        for (var a = 0; a < inBand.length; a++) {
+          var dth = angDiff(th, inBand[a].angle);
+          r += ((inBand[a].plot + 95) / 60) * R * 0.085 * Math.exp(-(dth * dth) / (2 * 0.16 * 0.16));
+        }
+        for (var chKey in chanCount) {
+          if (chanCount[chKey] > 1) {
+            var dch = angDiff(th, chanAngle(bk, parseInt(chKey, 10)));
+            r -= (chanCount[chKey] - 1) * R * 0.028 * Math.exp(-(dch * dch) / (2 * 0.16 * 0.16));
+          }
+        }
+        var x = c + Math.cos(th - Math.PI / 2) * r, y = c + Math.sin(th - Math.PI / 2) * r;
+        if (s === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.closePath();
+      g.strokeStyle = spec.color; g.globalAlpha = 0.85;
+      g.lineWidth = Math.max(1.5, R * 0.008); g.stroke(); g.globalAlpha = 1;
+      g.fillStyle = spec.color;
+      g.font = '700 ' + Math.max(10, Math.floor(R * 0.062)) + 'px ui-monospace,Menlo,Consolas,monospace';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(spec.label, c + R * 0.16, c - base + R * 0.045);
+      for (var b2 = 0; b2 < inBand.length; b2++) {
+        var bp = inBand[b2];
+        var br = (1 - (bp.plot + 95) / 60) * 0.75 + 0.18;
+        var bx = c + Math.cos(bp.angle - Math.PI / 2) * maxR * br;
+        var by = c + Math.sin(bp.angle - Math.PI / 2) * maxR * br;
+        g.beginPath(); g.arc(bx, by, Math.max(2.5, R * 0.016), 0, Math.PI * 2);
+        g.fillStyle = spec.color; g.fill();
+        if (bp.connected) {
+          g.beginPath(); g.arc(bx, by, Math.max(5, R * 0.032), 0, Math.PI * 2);
+          g.strokeStyle = '#eaffef'; g.lineWidth = 1.5; g.stroke();
+        }
+      }
+    }
+  }
+
+  setInterval(function () {
+    var mode = document.getElementById('mode');
+    var tag = document.getElementById('tag');
+    if (!ringState.src) { mode.textContent = 'SCOPE STANDBY'; tag.textContent = ''; return; }
+    var stale = Date.now() - ringState.at > 20000;
+    window.__scopeState.stale = stale;
+    var n = ringState.aps.length;
+    if (stale) {
+      var d = new Date(ringState.at);
+      var p2 = function (x) { return (x < 10 ? '0' : '') + x; };
+      mode.textContent = 'FEED STALE · LAST ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds()) + ' · SRC ' + ringState.src;
+    } else {
+      mode.textContent = 'SCOPE LIVE · ' + n + ' AP · SRC ' + ringState.src;
+    }
+    if (n) {
+      var s0 = ringState.aps[0];
+      var arrow = s0.delta > 0 ? ' ▲' + s0.delta : (s0.delta < 0 ? ' ▼' + (-s0.delta) : '');
+      tag.textContent = (s0.ssid || '(HIDDEN)') + ' ' + s0.rssi + ' DBM' + arrow;
+    } else tag.textContent = '';
+  }, 500);
 </script>
 </body></html>
