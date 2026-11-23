@@ -475,23 +475,28 @@ function innerH(){ return Math.max(1, VH - 2 * frameInsetY); }
 var frameWasOn = true;               /* seating state tracker */
 
 function sizeStage(){
-  /* measure: the viewport is the stage, capped to a square by
-     the size of the layout viewport's shorter side — the face's
-     canonical build is SQUARE (shape-at-purchase), and the frame
-     seats into the largest centred square the window offers. */
-  var nVW = Math.max(1, Math.round(Math.min(window.innerWidth, window.innerHeight)));
+  /* measure: Direct Parameter Load — the container's sensed bound
+     (window.ApexBound) governs when the shell offers it; the
+     viewport is the fallback. The stage is capped to a square by
+     the shorter side — the face's canonical build is SQUARE
+     (shape-at-purchase), and the frame seats into the largest
+     centred square the bound offers. */
+  var bw = window.innerWidth, bh = window.innerHeight;
+  var ab = window.ApexBound;
+  if (ab && typeof ab.getW === "function" && ab.getW() > 0 && ab.getH() > 0) { bw = ab.getW(); bh = ab.getH(); }
+  var nVW = Math.max(1, Math.round(Math.min(bw, bh)));
   var nVH = nVW;
   var moved = (nVW !== VW || nVH !== VH);
   VW = nVW; VH = nVH;
   stage.style.width = VW + "px"; stage.style.height = VH + "px";
-  /* CENTRED IN THE VIEWPORT (owner field report, Nov 20, 2026):
+  /* CENTRED IN THE BOUND (owner field report, Nov 20, 2026):
      the square stage seats in the middle of the window, letterboxed
      — black strips left/right in landscape, black bands top/bottom
      in portrait — never hugged to the left or pushed to the top.
      The page behind the stage is the void colour, so the bands
      read as the letterbox they are. */
-  stage.style.left = Math.round((window.innerWidth - VW) / 2) + "px";
-  stage.style.top = Math.round((window.innerHeight - VH) / 2) + "px";
+  stage.style.left = Math.round((bw - VW) / 2) + "px";
+  stage.style.top = Math.round((bh - VH) / 2) + "px";
   document.documentElement.style.height = VH + "px";
   document.body.style.height = VH + "px";
   /* the stage is positioned, so html/body collapse to their
@@ -964,7 +969,8 @@ function drawGps(){
   var txt;
   if (gpsState.mode === "fix"){
     txt = "GPS " + gpsState.lat.toFixed(3) + ", " + gpsState.lon.toFixed(3) +
-          " ±" + gpsState.acc + "M";
+          " ±" + gpsState.acc + "M" +
+          ((window.__apexIndex || window.ApexBound) ? " · SRC CONTAINER" : "");
   } else if (gpsState.mode === "seeking"){ txt = "GPS — SEEKING"; }
   else if (gpsState.mode === "denied"){ txt = "GPS — NO FIX"; }
   else { txt = "GPS — NO FIX"; }

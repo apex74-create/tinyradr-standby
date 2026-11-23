@@ -321,7 +321,7 @@
           var hasFix = typeof lat === "number" && typeof lon === "number";
           var q = hasFix ? "?lat=" + lat.toFixed(3) + "&lon=" + lon.toFixed(3) : "";
           try {
-            fetch("/api/public/forecast" + q, {
+            fetch("https://tinyradr.com/api/public/forecast" + q, {
               headers: { Accept: "application/json" },
             })
               .then(function (res) {
@@ -346,28 +346,30 @@
                   var pt = null,
                     i;
                   for (i = 0; i < j.timeline.length; i++) {
-                    var q = j.timeline[i];
-                    if (!q || typeof q.temp !== "number" || !q.iso) continue;
-                    if (q.iso === today) {
-                      pt = q;
+                    var tp = j.timeline[i];
+                    if (!tp || typeof tp.temp !== "number" || !tp.iso) continue;
+                    if (tp.iso === today) {
+                      pt = tp;
                       break;
                     }
-                    if (q.iso < today) pt = q;
+                    if (tp.iso < today) pt = tp;
                     else if (!pt) {
-                      pt = q;
+                      pt = tp;
                       break;
                     }
                   }
                 if (pt) {
                     w.firstChild.nodeValue =
                       "WX " + Math.round(pt.temp) + "F" + (pt.observed ? " OBS" : "");
+                    var stEl = document.getElementById("status");
+                    if (stEl) stEl.firstChild.nodeValue = "WX · SRC HOUSE API";
                   }
                 }
                 // Now layer: the timeline point above is the DAY value (daily
                 // mean/high), which reads wildly wrong at night. Override with
                 // the live current reading from the conditions proxy (10-min
                 // server cache) so the face shows what it is right now.
-                fetch("/api/public/conditions" + q, {
+                fetch("https://tinyradr.com/api/public/conditions" + q, {
                   headers: { Accept: "application/json" },
                 })
                   .then(function (res) {
@@ -376,8 +378,11 @@
                   .then(function (c) {
                     var t =
                       c && c.current && typeof c.current.temp === "number" ? c.current.temp : null;
-                    if (t !== null)
+                    if (t !== null) {
                       w.firstChild.nodeValue = "WX " + Math.round(t) + "F NOW";
+                      var stEl2 = document.getElementById("status");
+                      if (stEl2) stEl2.firstChild.nodeValue = "WX LIVE · SRC HOUSE API";
+                    }
                   })
                   .catch(function () {
                     /* keep the day-value fallback */
@@ -533,14 +538,22 @@
           if (el) el.style.fontSize = Math.max(8, Math.round(v)) + "px";
         }
         function fit() {
-          var vv = window.visualViewport,
+          /* Direct Parameter Load first: the container's sensed
+             bound (window.ApexBound) governs when the shell offers
+             it; the viewport measure is the fallback. */
+          var ab = window.ApexBound,
+            bW = ab && typeof ab.getW === "function" ? ab.getW() : 0,
+            bH = ab && typeof ab.getH === "function" ? ab.getH() : 0,
+            vv = window.visualViewport,
             W = Math.round(
-              (vv && vv.width) ||
+              bW ||
+                (vv && vv.width) ||
                 window.innerWidth ||
                 document.documentElement.clientWidth,
             ),
             H = Math.round(
-              (vv && vv.height) ||
+              bH ||
+                (vv && vv.height) ||
                 window.innerHeight ||
                 document.documentElement.clientHeight,
             );
