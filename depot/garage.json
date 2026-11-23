@@ -30,16 +30,16 @@
       "title": "APEX — Signal Watch · SIGNAL SCOPE V4",
       "package": "app.lovable.apexsignal.face.signalscopev4",
       "apkPath": "/depot/signal-scope-v4.apk",
-      "apkSha256": "5f53033d37335838edf5c5d7c39ee319bd9e29230647966b485112b81456a303",
-      "apkSizeBytes": 53713,
+      "apkSha256": "cd9a15fe3b76bccf2d6163443ee3dc9d4db7c72d859c23c352c5971010deed05",
+      "apkSizeBytes": 57809,
       "facePath": "/faces/signal-scope-v4.html",
-      "faceSha256": "47610291679f7ef573a64a4e25119723cbe969bcd0313dc4cadaa9801804b7ce",
+      "faceSha256": "ad0dd3ff22f5a6dcc87bc74154e2144d31d1dce2dfc5caa37142c5f6669d9e47",
       "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Fox Hunt Edition. V8 (Nov 23, 2026): the bios reads only what the container now feeds — HR and steps from the watch's own sensors, WiFi scans, network state, gateway ping — and the O2/HRV/SLEEP rows are removed: this device class cannot measure them, and a field that cannot be fed does not ship.",
+      "note": "Fox Hunt Edition. V9 (Nov 23, 2026) — Phase 2 pipe: the container (v3) reads the Apex Wi-Fi Analyzer's ApexWifi/1 ingest set from its ContentProvider and feeds RF/NET/CENSUS from that dataset; the container's own scan is the named fallback. Every fed field prints its source (SRC ANALYZER / SRC CONTAINER); the census session line reads the analyzer's wardrive log; the heartbeat ladder climbs to AP PING on the analyzer's router-heartbeat series. O2/HRV/SLEEP stay removed (V8). V10 (Nov 23, 2026): FREQUENCY RINGS on the scope — one ring per AP around its pin: colour = band (2.4 amber, 5 cyan, 6 violet), size = RSSI, wobble = measured deformity (RSSI jitter across scans + channel crowding), the mapping printed small on the glass. Pod node stamps ride every payload (WATCH·BT / HANDSET·WIFI / CYD·COMB); container v4 (versionCode 4 / 1.3) runs the five-step intake scrub (contract gate, whip dedupe, narrow projection, track cadence, hung stills). Contract path: docs/wifi-pipe-contract.md.",
       "bay": 2,
       "garageStatus": "IN THE GARAGE"
     },
@@ -224,8 +224,8 @@
       "title": "APEX — P&W J58 · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.j58",
       "apkPath": "/depot/j58.apk",
-      "apkSha256": "81d5343d302979e0013d6779b276d864ea73c5336afe24012df14fe3aeffd0ad",
-      "apkSizeBytes": 2911977,
+      "apkSha256": "8071cec1cfc7aa565b2920fd80e5641d6248596096e4cd9a9de6f8e8c6f3d206",
+      "apkSizeBytes": 279059,
       "facePath": "/faces/j58.html",
       "faceSha256": "68126da3923296e04e925ceeeb3aae1727688981f3e9653a3fc18f5cf4b89e55",
       "priceUsd": 10,
@@ -233,7 +233,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Motors Under Glass series: the Pratt & Whitney J58, the SR-71 turbojet with its spike intake, with the clock.",
+      "note": "Motors Under Glass series: the Pratt & Whitney J58, the SR-71 turbojet with its spike intake, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero image load errors.",
       "bay": 12,
       "garageStatus": "IN THE GARAGE"
     },
@@ -243,8 +243,8 @@
       "title": "APEX — GE J79 · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.j79blackbird",
       "apkPath": "/depot/j79-blackbird.apk",
-      "apkSha256": "5fcec1656f835ac25955ec3861ae93332713a92dff87bf782cfe9c7587add8b9",
-      "apkSizeBytes": 2911977,
+      "apkSha256": "63af8d6ecf6777f89e51aaddcc739888e25faeb6f2572a4f7976899b1f1efa20",
+      "apkSizeBytes": 340499,
       "facePath": "/faces/j79-blackbird.html",
       "faceSha256": "56c7b3ecb46f9184cf117e8ebb4d0582bb6674f6ab27cb4c9b7dd64a4d9351b8",
       "priceUsd": 10,
@@ -252,7 +252,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Motors Under Glass series: the GE J79 single-spool turbojet, with the clock.",
+      "note": "Motors Under Glass series: the GE J79 single-spool turbojet, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero load errors.",
       "bay": 13,
       "garageStatus": "IN THE GARAGE"
     },
@@ -281,8 +281,8 @@
       "title": "APEX — Raptor · Motors Under Glass",
       "package": "app.lovable.apexsignal.face.raptor",
       "apkPath": "/depot/raptor.apk",
-      "apkSha256": "05e06e269eceb9be17840a8ec4ebb66216223d076b31304ce72be7ed79a26259",
-      "apkSizeBytes": 2911977,
+      "apkSha256": "e7680fa0cc46a5b69a3390566e98ff7dc290a8312c0872523cbc3930cbc32006",
+      "apkSizeBytes": 360982,
       "facePath": "/faces/raptor.html",
       "faceSha256": "f15e5681b98468fb17659a0a4778984751d80b845fe0dbb20bf09584b9fbfb7e",
       "priceUsd": 10,
@@ -290,7 +290,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Motors Under Glass series: the Raptor, full-flow staged combustion, with the clock.",
+      "note": "Motors Under Glass series: the Raptor, full-flow staged combustion, with the clock. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render decodes the image and paints it in the face's photo view, zero load errors.",
       "bay": 15,
       "garageStatus": "IN THE GARAGE"
     },
@@ -433,16 +433,16 @@
       "title": "APEX — THE 19 · Hierographic",
       "package": "app.lovable.apexsignal.face.the19",
       "apkPath": "/depot/the-19.apk",
-      "apkSha256": "5a479e972cdbf6ce024940e2808a70ad9a9b8e3fd10668734d80b303637da8c3",
-      "apkSizeBytes": 156113,
+      "apkSha256": "1aefbd477edb055d8a69e0f8678cb5b28d291407291131a54d82803b0888c04f",
+      "apkSizeBytes": 160209,
       "facePath": "/faces/the-19.html",
-      "faceSha256": "01ee49b19589fad3e8bcbcbd13c087c2d9d70ddd2836e7029cceecd2c8c1e112",
+      "faceSha256": "d4041cdc677791fb865f66977f3fa8d51d7baed660ba4d137a5c37e9aea2b1e2",
       "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "The 19 (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-1 (Specimen Zero, verdict PLUG): the estate's first LAUNCHER FACE. The Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) IS the product's own hero - and the steel 19 bezel in the art was never decoration: it is a BUTTON, pre-drawn. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE CALL - RUNG A (this build): a generous tap target (34% of stage) rides ON the plate's 19 dial (centre at stage fractions 0.059/0.574 - the dial hangs at the plate's left edge and the target with it; geometry grounded against the plate art and the rendered captures, delta 0.00 in both frame states) and OPENS ENCRYPTED CB (https://encryptedcb.com) - the COMMS-door pattern transplanted from the extension rail. The affordance is a soft pulse ring breathing on the dial's rim in the plate's mesh cyan - an outline only, never a fill or shade over the art. RUNG B (the same tap launching the installed Cryptid CB native companion) is NOT in this build: it inherits Cryptid v2.1's unproven on-device state; nothing here wires, fakes, or implies it. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) - big Casio readout (house DSEG7, hollow digits, OLED-black hearts, on a solid chip), the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS - NO FIX; coordinates never invented). ONE plate hangs - no backdrop switcher. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings - case metal only in the rim, the glass window genuinely open; frame-ON pixel census over the glass interior: 0 case-fill pixels in 126,225, 53,411 distinct colours (the world paints). PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 17/17 hard checks - clock exact (advanced 5 s over 4.6 s wall), drones moving, pulse phase locked to the wall second, frame toggles ON-OFF-ON, the call: window.__call19 carries Rung A + the URL, a synthetic click on the dial target fired the opener exactly once with https://encryptedcb.com, target centre delta 0.00 px seated and unseated; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness - the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase). BOUND FIX (Nov 23, 2026): Direct Parameter Load — the container senses the display once and loads it as ApexBound; the dial paints its square to the loaded bound at 15/16 with one verification pass, instead of measuring the viewport at paint time (owner field exhibit: dial painted off its frame on the LOKMAT).",
+      "note": "The 19 (Nov 10, 2026) - Package Scope Inspector BUILD ORDER BO-1 (Specimen Zero, verdict PLUG): the estate's first LAUNCHER FACE. The Castnet plate (Hierographic Plate 3: the wrist communicator casting the green mesh over drones at sunset; protected asset src/assets/hero-wrist-castnet.jpg used read-only, the house's squared 768x768 q80 crop embedded) IS the product's own hero - and the steel 19 bezel in the art was never decoration: it is a BUTTON, pre-drawn. THE TEAM LAW (owner): the face tells time and CALLS its teammate; the app is the working surface. THE CALL - RUNG A (this build): a generous tap target (34% of stage) rides ON the plate's 19 dial (centre at stage fractions 0.059/0.574 - the dial hangs at the plate's left edge and the target with it; geometry grounded against the plate art and the rendered captures, delta 0.00 in both frame states) and OPENS ENCRYPTED CB (https://encryptedcb.com) - the COMMS-door pattern transplanted from the extension rail. The affordance is a soft pulse ring breathing on the dial's rim in the plate's mesh cyan - an outline only, never a fill or shade over the art. RUNG B (the same tap launching the installed Cryptid CB native companion) is NOT in this build: it inherits Cryptid v2.1's unproven on-device state; nothing here wires, fakes, or implies it. ENGINE: inherited whole from Globe Tracker (Hierographic Series 01) - big Casio readout (house DSEG7, hollow digits, OLED-black hearts, on a solid chip), the one-pulse-per-second trace with millisecond shimmer, wireframe patrol drones with lock brackets/trails/tags from the native-bucket contract (web build bucket EMPTY, tags generic TRK-01/02/03, no SSID ever fabricated), Apex glyph edging, honest GPS line (real fix only, otherwise GPS - NO FIX; coordinates never invented). ONE plate hangs - no backdrop switcher. APEX FRAME worn by default (FRAME ON/OFF): the LOKMAT frame as hollow even-odd rings - case metal only in the rim, the glass window genuinely open; frame-ON pixel census over the glass interior: 0 case-fill pixels in 126,225, 53,411 distinct colours (the world paints). PROOF (headless Chromium 156, verified 512x512 captures, IHDR + sha256 per shot): 17/17 hard checks - clock exact (advanced 5 s over 4.6 s wall), drones moving, pulse phase locked to the wall second, frame toggles ON-OFF-ON, the call: window.__call19 carries Rung A + the URL, a synthetic click on the dial target fired the opener exactly once with https://encryptedcb.com, target centre delta 0.00 px seated and unseated; zero console exceptions attributable to this file. NO MEASURE: the headless popup target for the https URL (no loopback server in the bench harness - the opener call itself is the measured act), on-device rendering, real bucket, real GPS fix. SQUARE build (shape-at-purchase). BOUND FIX (Nov 23, 2026): Direct Parameter Load — the container senses the display once and loads it as ApexBound; the dial paints its square to the loaded bound at 15/16 with one verification pass, instead of measuring the viewport at paint time (owner field exhibit: dial painted off its frame on the LOKMAT). PHASE 2 PIPE (Nov 23, 2026): the container (v3) publishes the scan feed from the Apex Wi-Fi Analyzer's ApexWifi/1 ingest set (ContentProvider), its own scan as named fallback; the scan layer prints its source (SRC ANALYZER / SRC CONTAINER). Bound fix (V-prev) unchanged. Pod node stamps ride the scan feed and print with the source (container v4).",
       "bay": 23,
       "garageStatus": "IN THE GARAGE"
     },
@@ -781,13 +781,13 @@
       "apkSha256": "1f4a7f41062b2395bcbb4c1bfd4a9a8c197e688fcc69683d04ba8e26e4a744a2",
       "apkSizeBytes": 3209800,
       "facePath": "/faces/radiosphere.html",
-      "faceSha256": "9cad6a0cdac90b7996c8fc58068e3238a14226bc68ab25ec567307815fc2907b",
+      "faceSha256": "b004c29a0be838884df41f2ad8506fad95d909bdf367f6b8f69bfba07bead22b",
       "priceUsd": 10,
       "functions": [
         "clock"
       ],
       "status": "BUILT",
-      "note": "Radiosphere (Nov 16, 2026) - the signal-sphere face: the owner's bench proof of the same name (spinning sphere, height = strength, colour = plane) wired for production to the APEX SCAN FEED contract v1, the same contract Globe Tracker reads. The face paints ONLY what the shell publishes and re-reads the feed every frame: height is measured strength on the spec scale (h = 3 + (dBm + 95) x 30/65, floored at 2), colour is the plane (WIFI / BLE / RID / CELL / GNSS), width is a fixed footing stated on the face and never read as data, entries with no strength in the feed stand as footing dots and count as NO MEASURE, unknown planes are never plotted, and at most the 24 strongest are shown with the count stated on the face. Honest states hold in every build: SCAN - NO FEED (the web build has no shell and reports exactly that), SCAN - NO SIGNALS, and FEED STALE when the feed ages past 15 seconds. Receive-only: the face never connects, pairs, probes or transmits. No bench data ships in the production file. Vanilla single file; the clock rides the title box.",
+      "note": "Radiosphere (Nov 16, 2026) - the signal-sphere face: the owner's bench proof of the same name (spinning sphere, height = strength, colour = plane) wired for production to the APEX SCAN FEED contract v1, the same contract Globe Tracker reads. The face paints ONLY what the shell publishes and re-reads the feed every frame: height is measured strength on the spec scale (h = 3 + (dBm + 95) x 30/65, floored at 2), colour is the plane (WIFI / BLE / RID / CELL / GNSS), width is a fixed footing stated on the face and never read as data, entries with no strength in the feed stand as footing dots and count as NO MEASURE, unknown planes are never plotted, and at most the 24 strongest are shown with the count stated on the face. Honest states hold in every build: SCAN - NO FEED (the web build has no shell and reports exactly that), SCAN - NO SIGNALS, and FEED STALE when the feed ages past 15 seconds. Receive-only: the face never connects, pairs, probes or transmits. No bench data ships in the production file. Vanilla single file; the clock rides the title box. PHASE 2 (Nov 23, 2026): the face now prints the scan feed's source (SRC ANALYZER / SRC CONTAINER) on its state line and is bench-proven against the analyzer pipe feed; its framework container integration follows in its own build family — the shipped APK is unchanged in this pass. The state line now also prints the pod node with its assignment (e.g. HANDSET·WIFI).",
       "bay": 47,
       "garageStatus": "IN THE GARAGE"
     },
@@ -797,8 +797,8 @@
       "title": "APEX — Hero Line · P-39D Airacobra",
       "package": "app.lovable.apexsignal.face.herop39",
       "apkPath": "/depot/hero-p39.apk",
-      "apkSha256": "fb67a155d1133a6d3b0a0e36a9ff4b3333a40de5d9b9b9b789b43f83e3de6f56",
-      "apkSizeBytes": 3204040,
+      "apkSha256": "cf14790ec7753ca2065949a7ce3fb8a617af01e69c024c7eb03375f5407e8b1d",
+      "apkSizeBytes": 299607,
       "facePath": "/faces/hero-p39.html",
       "faceSha256": "ee091c7bc09b0f027ea33c6e900db979806e4f4e8410714f71aa8f400e3a3fb6",
       "priceUsd": 10,
@@ -806,7 +806,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hero Line: the P-39D Airacobra, nose-on — the owner's favourite — in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs.",
+      "note": "Hero Line: the P-39D Airacobra, nose-on — the owner's favourite — in 1950s airbrush nose-art flavour, with the APEX COBRAS patch inset (original house design), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) — the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors.",
       "bay": 48,
       "garageStatus": "IN THE GARAGE"
     },
@@ -816,8 +816,8 @@
       "title": "APEX — Hero Line · F4U Corsair",
       "package": "app.lovable.apexsignal.face.herocorsair",
       "apkPath": "/depot/hero-corsair.apk",
-      "apkSha256": "ba710eb1eff046549edd8be5d2b7cfda9b360872db6ff5b68c86a8070d94dcea",
-      "apkSizeBytes": 3204040,
+      "apkSha256": "fa048c0e592a0af4d65508e31c9c6e9d640abcbaf905f0309ab9247ac2d1508a",
+      "apkSizeBytes": 266846,
       "facePath": "/faces/hero-corsair.html",
       "faceSha256": "9a0efb84ab6aca394a79de08bb67309432ec04fa19476bf9fe791e5e02644f99",
       "priceUsd": 10,
@@ -825,7 +825,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat.",
+      "note": "Hero Line: the F4U Corsair (Vought), nose-on, with the APEX BLACK RAMS patch inset (house redraw of the VMF-214 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) — the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors.",
       "bay": 49,
       "garageStatus": "IN THE GARAGE"
     },
@@ -835,8 +835,8 @@
       "title": "APEX — Hero Line · F-14 Tomcat",
       "package": "app.lovable.apexsignal.face.herof14",
       "apkPath": "/depot/hero-f14.apk",
-      "apkSha256": "8479553269f9556e105886321128d0cde88a52fcd10fbf0a2e2a77f7cf004136",
-      "apkSizeBytes": 3204080,
+      "apkSha256": "8270bc576654f1e206318dc012826fb1d118478613019598042e18c62f49cf0c",
+      "apkSizeBytes": 283223,
       "facePath": "/faces/hero-f14.html",
       "faceSha256": "fcc537a2bad0d5c4bf6eaf5b333a8bbcb17acceba8a4b49ec55ef6c655da530f",
       "priceUsd": 10,
@@ -844,7 +844,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat.",
+      "note": "Hero Line: the F-14 Tomcat (Grumman), head-on, with the APEX ROGUES patch inset (house redraw of the VF-84 original, altered), a compass dial, and the time in analog and digital. Hero art generated on the house station from pooled photographic references — generated graphics, not photographs. Family provenance of record: the owner's Aunt Nancy worked on the F4U and the Tomcat. Image-asset fix (Nov 23, 2026): the hero art and patch inset now ship inside the APK (assets carried beside face.html) — the shipped 1.0 package referenced both pictures but contained neither, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints both images, zero load errors.",
       "bay": 50,
       "garageStatus": "IN THE GARAGE"
     },
@@ -854,8 +854,8 @@
       "title": "APEX — Hot Rod Line · Rat Rod",
       "package": "app.lovable.apexsignal.face.hotrodratrod",
       "apkPath": "/depot/hotrod-ratrod.apk",
-      "apkSha256": "01c883432693886d6bb8f210596543f6e55ca73c8571292b202107372fb2a483",
-      "apkSizeBytes": 3203868,
+      "apkSha256": "14e9e50e55171687ca5d3f40a9820dcda3cb58e2572d29517042882ef56208e8",
+      "apkSizeBytes": 455191,
       "facePath": "/faces/hotrod-ratrod.html",
       "faceSha256": "19f1d7b1dcb0d900cb63843c52d60b926a0aaffe607455882727713fe5193da4",
       "priceUsd": 10,
@@ -863,7 +863,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital.",
+      "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
       "bay": 51,
       "garageStatus": "IN THE GARAGE"
     },
@@ -873,8 +873,8 @@
       "title": "APEX — Hot Rod Line · Blown Drag",
       "package": "app.lovable.apexsignal.face.hotrodblown",
       "apkPath": "/depot/hotrod-blown.apk",
-      "apkSha256": "be208a5ec4533470f1093416e457a7067dde41587157bebf7982ef93cf23f480",
-      "apkSizeBytes": 3203868,
+      "apkSha256": "f6b37f276a83a72773e1fed3d085c571fc272b3188829ccd4375027faffe839c",
+      "apkSizeBytes": 442902,
       "facePath": "/faces/hotrod-blown.html",
       "faceSha256": "f89ed7d8fc4068207e58c94b436de2567d1adedad57f460f2b7d194bf28c9065",
       "priceUsd": 10,
@@ -882,7 +882,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital.",
+      "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
       "bay": 52,
       "garageStatus": "IN THE GARAGE"
     },
@@ -892,8 +892,8 @@
       "title": "APEX — Hot Rod Line · Full Coupe",
       "package": "app.lovable.apexsignal.face.hotrodcoupe",
       "apkPath": "/depot/hotrod-coupe.apk",
-      "apkSha256": "7ff6697fc90c1450743e6314c348389cdb6bf85b02897e34c7bd02219319a023",
-      "apkSizeBytes": 3203884,
+      "apkSha256": "d3ddee1026b56066589c9fba2bdf5979bc6ed7288dce912ecf226c589b5b4e34",
+      "apkSizeBytes": 479766,
       "facePath": "/faces/hotrod-coupe.html",
       "faceSha256": "a255441f776471b08230e65a47a5a520a185940969f052e2be7db4bb743cabad",
       "priceUsd": 10,
@@ -901,7 +901,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital.",
+      "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
       "bay": 53,
       "garageStatus": "IN THE GARAGE"
     },
@@ -1025,8 +1025,8 @@
       "title": "APEX — War Edition · Corsair Cowling · The Propeller Wing",
       "package": "app.lovable.apexsignal.face.warcorsair",
       "apkPath": "/depot/war-corsair.apk",
-      "apkSha256": "9e2ec15720f2382c8d0c1ca08e5a52efac69cea96d549c24bfa25b4acf876fb0",
-      "apkSizeBytes": 3205472,
+      "apkSha256": "97faa3f153ca67508cad8e10fadad777b6da38d2cb86ead966dbb0a256daaa8b",
+      "apkSizeBytes": 152091,
       "facePath": "/faces/war-corsair.html",
       "faceSha256": "42cdfc857eacc32ff3f8b94ef7741b58dee13b84ca8bc76dd6fc170dd456cf70",
       "priceUsd": 10,
@@ -1034,7 +1034,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "The Propeller Wing: the F4U Corsair seat — nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+      "note": "The Propeller Wing: the F4U Corsair seat — nose-on radial cowling (18 cylinders), inverted gull wings, dome spinner, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
       "bay": 60,
       "garageStatus": "IN THE GARAGE"
     },
@@ -1044,8 +1044,8 @@
       "title": "APEX — War Edition · P51 Cowling · The Propeller Wing",
       "package": "app.lovable.apexsignal.face.warp51",
       "apkPath": "/depot/war-p51.apk",
-      "apkSha256": "91e69ef51129b32dbc5824c6d583155a0d9d99b7704cf14f3557c03a955699a1",
-      "apkSizeBytes": 3205684,
+      "apkSha256": "24039dc7acad3f9710583ea338ed3cfe33f554ca322cc319b722724e041c85b6",
+      "apkSizeBytes": 164375,
       "facePath": "/faces/war-p51.html",
       "faceSha256": "e50b7ffd759d7912ca418fec3570333019d16e1281532be5b1ae43b07e69f698",
       "priceUsd": 10,
@@ -1053,8 +1053,27 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "The Propeller Wing: the P-51 seat — tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face.",
+      "note": "The Propeller Wing: the P-51 seat — tall narrow V-12 cowling, cheek exhaust stubs, tapered wings, 4-blade prop, pointed cone spinner (a different nose cone from the Corsair seat), chin intake scoop, random ingest at the viewer, and a photorealistic photo view (touch-flip) generated from pooled photographs. The drawn views are house-drawn, stated on the face. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
       "bay": 61,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "radar-scope",
+      "name": "Apex Face — Radar Scope · Wi-Fi Overlay",
+      "title": "APEX — Signal Watch · RADAR SCOPE",
+      "package": "app.lovable.apexsignal.face.radarscope",
+      "apkPath": "/depot/radar-scope.apk",
+      "apkSha256": "3f232f8910e7dbfb6e270fbd45ceb7174b7dff959e10e33f338b2c9dbff9b47c",
+      "apkSizeBytes": 29137,
+      "facePath": "/faces/radar-scope.html",
+      "faceSha256": "f33900edfb7f368e36168bfbd03191418a4b631bec324a89818f8228bfc5f943",
+      "priceUsd": 10,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The owner's own design, scoped by him Nov 13-15, 2026 and never built until now: a sweeping radar scope whose contacts are the live Wi-Fi scape, a frequency/channel-occupancy graph along the bottom, and his vitals strip (battery, heart rate, steps, gateway-ping heartbeat, tap, time). Built on the pipe container (v3 lineage) that reads the analyzer's ApexWifi/1 ingest with the container's own scan as the named fallback; every value prints SRC ANALYZER / SRC CONTAINER. Range is the RSSI ring and is labelled an estimate on the glass; bearing is NO MEASURE and the angle around the ring is signal order, printed as such. O2/HRV/SLEEP are named NO MEASURE - not fed on this device class. Five-step scrub on the ingest, signal-lane mapping per the pipe contract.",
+      "bay": 62,
       "garageStatus": "IN THE GARAGE"
     }
   ],
