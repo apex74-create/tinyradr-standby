@@ -30,7 +30,7 @@ GodsEye.registerPack({
     red.capt.seatSub = "RED SEAT · CONTROLLER";
     const blue = mkSeat("blue", "CAPT BLUE", { x: 11.6, y: 11.6 }, [10.1, 10.1], 9.4);
     blue.capt.seatLabel = "THE HOUSE MODEL";
-    blue.capt.seatSub = "BLUE SEAT · SHAPE + REFEREE + COLLAPSE";
+    blue.capt.seatSub = "BLUE SEAT · WAVE EVALUATOR + REFEREE";
     const R = "#ff8a7a", B = "#7ab8ff";
     const defs = [
       [red, { key: "rking", name: "RED KING", cls: "KING", glyph: "♚", seat: "R-K", color: R, group: "anchor" }, [0, 0]],
@@ -61,9 +61,23 @@ GodsEye.registerPack({
     this._plays++;
     let extra = "";
     if (order.meta && order.meta.shape) {
-      const grade = ShapeShelf.grade(api, piece.seatSide, piece, order.targetSq);
+      let grade = ShapeShelf.grade(api, piece.seatSide, piece, order.targetSq);
+      /* v3: a wave seat's best-guess is graded BEST-GUESS — its own grade,
+         never dressed as LANDED/FAILED. Gate-confirmed wave calls take the
+         referee's ordinary LANDED/FAILED on execution, like any call. */
+      if (order.meta.wave && order.meta.wave.mode === "guess") grade = "BEST-GUESS";
       extra += " · REFEREE " + grade + " · shape " + order.meta.shape;
-      if (order.meta.shapeId) ShapeShelf.observe(order.meta.shapeId, grade,
+      if (order.meta.wave) {
+        const w = order.meta.wave;
+        extra += " · WAVE " + (w.mode === "gate" ? "GATE 90" : "BEST-GUESS") +
+          " · congruence " + w.congruence.toFixed(1) + " · fulcrum " + w.shapeName +
+          " · pools " + w.scenarios + " scenarios / " + w.plies + " plies";
+        if (w.ws) extra += " · W'S — who " + w.ws.who + " · what " + w.ws.what +
+          " · when " + w.ws.when + " · where " + w.ws.where + " · why " + w.ws.why +
+          " · how " + w.ws.how;
+      }
+      if (order.meta.shapeId) ShapeShelf.observe(order.meta.shapeId,
+        grade === "BEST-GUESS" ? "BEST_GUESS" : grade,
         { board: piece.boardId, domain: "exhibition", turn: this._plays, seat: piece.seatSide });
     }
     if (victim) {
@@ -102,6 +116,11 @@ GodsEye.registerPack({
         ({ key: p.key, cls: p.cls, name: p.name, sq: p.sq.slice(), side: p.seatSide })) },
       shelf: ShapeShelf.stats(),
       host: {
+        waveCall() {
+          if (typeof WaveSeat === "undefined")
+            return { pass: true, reason: "wave evaluator not loaded" };
+          return WaveSeat.evaluate(api, side, { plays: self._plays });
+        },
         shapeCall() {
           const call = ShapeShelf.call(api, side);
           if (call.nomatch) return { pass: true, bestId: call.bestId, bestName: call.bestName,
@@ -141,12 +160,18 @@ GodsEye.registerPack({
       return nmPass("return failed validation at the arena gate — discarded");
     this._lastSeatId = seatObj.id;
     const isHouseModel = seatObj.id === "house-model";
+    const meta = mv.shapeId
+      ? { call: mv.wave ? "WAVE CALL" : isHouseModel ? "SHAPE CALL" : "SEAT CALL",
+          shape: mv.shapeName, shapeId: mv.shapeId, seat: seatObj.id }
+      : { call: "SEAT CALL", seat: seatObj.id };
+    if (mv.wave) meta.wave = mv.wave;
     return [{ key: "seat", piece, action: "MOVE", targetSq: dest.slice(), targetBoardId: "gd",
       legal: true,
-      meta: mv.shapeId
-        ? { call: isHouseModel ? "SHAPE CALL" : "SEAT CALL", shape: mv.shapeName, shapeId: mv.shapeId, seat: seatObj.id }
-        : { call: "SEAT CALL", seat: seatObj.id },
-      describe: (isHouseModel && mv.shapeId
+      meta,
+      describe: (mv.wave
+          ? "WAVE CALL · fulcrum " + mv.wave.shapeName + " · congruence " + mv.wave.congruence.toFixed(1) +
+            (mv.wave.mode === "gate" ? " · GATE 90" : " · BEST-GUESS") + " · "
+          : isHouseModel && mv.shapeId
           ? "SHAPE CALL · " + mv.shapeName + " · "
           : "SEAT CALL · " + seatObj.name + (mv.shapeId ? " · " + mv.shapeName : "") + " · ") +
         side.toUpperCase() + " " + piece.name + " → " + api.sqName(dest[0], dest[1]) +
@@ -208,8 +233,11 @@ GodsEye.registerPack({
     note.className = "note";
     note.textContent = "Strategy: 5D Go — shape across five domains, superposition until collapse. " +
       "RED is MAV in the red saddle — the superposition controller seat calling plays. BLUE is THE HOUSE MODEL — " +
-      "shape shelf + referee + collapse, calling SHAPES never enumerated moves; the referee grades every call " +
-      "LANDED / FAILED / NO MEASURE, and a seat with no honest match passes. Both seats sit through the " +
+      "the WAVE EVALUATOR (v3): on its turn it enumerates every legal move, runs simulated pools of played-out " +
+      "scenarios against the potential-win-shape shelf, and chooses at the 90 gate; if the chess clock spends " +
+      "first it plays its first best-guess toward the fulcrum win shape and the referee grades it BEST-GUESS. " +
+      "A seat with a legal move never passes — NO MEASURE remains only where no legal move exists. The referee " +
+      "grades confirmed calls LANDED / FAILED on execution, as before. Both seats sit through the " +
       "RoninSeat contract — the same door a guest house model uses in the drag race. Same engine, same pipes — " +
       "only the plays differ. Capturing the enemy KING ends the match; at 24 plays, captures decide. " +
       (this._winner ? "MATCH OVER — " + String(this._winner).toUpperCase() +

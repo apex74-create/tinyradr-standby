@@ -127,9 +127,59 @@ const ShapeShelf = (() => {
         return best;
       } }
   ];
+  /* ── WIN-STATE SHAPES (v3, the wave seat — Nov 24, 2026). The potential-
+     win-shape shelf: configurations a played-out scenario can END in, read
+     by evaluate(c) on a position, never move patterns — recognize() is
+     inert (score 0) and pattern() returns null, so the v2 shelf call never
+     selects them; ShapeShelf.call also skips them explicitly. The wave
+     evaluator scores its simulated pools against the whole shelf: the five
+     play shapes above (what a move aims at) plus these (what a line of
+     play can become). ── */
+  const WIN_SHELF = [
+    { id: "king-taken", name: "king taken", weight: 1.0, domains: ["gameday"], win: true,
+      recognize() { return { score: 0 }; }, pattern() { return null; },
+      evaluate(c) { return c.enemyKing ? 0 : 1; } },
+    { id: "king-cornered", name: "king cornered", weight: 1.1, domains: ["gameday"], win: true,
+      recognize() { return { score: 0 }; }, pattern() { return null; },
+      evaluate(c) {
+        if (!c.enemyKing) return 1;
+        const free = kingEscapes(c, c.enemyKing);
+        const attacked = c.mine.some(p => attacks(c.api, p, c.enemyKing.sq));
+        if (free === 0 && attacked) return 1;
+        if (free === 0) return 0.8;
+        if (free === 1 && attacked) return 0.6;
+        if (attacked) return 0.35;
+        return free <= 2 ? 0.25 : 0;
+      } },
+    { id: "double-attack", name: "double attack", weight: 1.2, domains: ["gameday"], win: true,
+      recognize() { return { score: 0 }; }, pattern() { return null; },
+      evaluate(c) {
+        if (!c.enemyKing) return 1;
+        const n = c.mine.filter(p => attacks(c.api, p, c.enemyKing.sq)).length;
+        return n >= 2 ? 1 : n === 1 ? 0.45 : 0;
+      } },
+    { id: "queen-wedged", name: "queen wedged", weight: 1.0, domains: ["gameday"], win: true,
+      recognize() { return { score: 0 }; }, pattern() { return null; },
+      evaluate(c) {
+        if (!c.enemyKing) return 1;
+        const q = c.mine.find(p => p.cls === "QUEEN");
+        if (!q) return 0;
+        if (attacks(c.api, q, c.enemyKing.sq)) return 0.9;
+        const dx = c.enemyKing.sq[0] - q.sq[0], dy = c.enemyKing.sq[1] - q.sq[1];
+        return (Math.abs(dx) === Math.abs(dy) && dx !== 0) || dx === 0 || dy === 0 ? 0.5 : 0;
+      } },
+    { id: "material-supremacy", name: "material supremacy", weight: 0.9, domains: ["gameday"], win: true,
+      recognize() { return { score: 0 }; }, pattern() { return null; },
+      evaluate(c) {
+        const sum = ps => ps.filter(p => p.cls !== "KING").reduce((n, p) => n + (VALUES[p.cls] || 0), 0);
+        const diff = sum(c.mine) - sum(c.theirs);
+        return diff >= 9 ? 1 : diff >= 5 ? 0.7 : diff >= 3 ? 0.45 : diff >= 1 ? 0.2 : 0;
+      } }
+  ];
+  for (const s of WIN_SHELF) SHELF.push(s);
   const THRESHOLD = 0.5;
   const REWEIGHT_AT = 10;
-  for (const s of SHELF) { s.obs = { LANDED: 0, FAILED: 0, NO_MEASURE: 0 }; s.sinceEval = 0; }
+  for (const s of SHELF) { s.obs = { LANDED: 0, FAILED: 0, NO_MEASURE: 0, BEST_GUESS: 0 }; s.sinceEval = 0; }
   const reweightLog = [];
   const reweightEvents = [];
   const DOMAIN_X = { gameday: 0.3, five: 0.7 };
@@ -144,12 +194,13 @@ const ShapeShelf = (() => {
     const events = [];
     for (const s of SHELF) {
       if (s.sinceEval < REWEIGHT_AT) continue;
-      const { LANDED, FAILED, NO_MEASURE } = s.obs;
+      const { LANDED, FAILED, NO_MEASURE, BEST_GUESS } = s.obs;
       const old = s.weight;
-      let action = "unchanged — no decisive majority (NO MEASURE never moves a weight)";
+      let action = "unchanged — no decisive majority (NO MEASURE and BEST-GUESS never move a weight)";
       if (LANDED > FAILED) { s.weight = Math.round((s.weight + 0.1) * 100) / 100; action = "UP (LANDED majority)"; }
       else if (FAILED > LANDED) { s.weight = Math.max(0.1, Math.round((s.weight - 0.1) * 100) / 100); action = "DOWN (FAILED majority)"; }
       const line = "RE-WEIGHT · " + s.name + " · observations L" + LANDED + " / F" + FAILED + " / NM" + NO_MEASURE +
+        " / BG" + (BEST_GUESS || 0) +
         " · weight " + old + " → " + s.weight + " · " + action;
       reweightLog.push(line); events.push(line);
       reweightEvents.push({ shapeId: s.id, name: s.name, domains: s.domains.slice(),
@@ -163,6 +214,7 @@ const ShapeShelf = (() => {
     const c = ctx(api, seat);
     let best = null, bestShape = null, bestRec = null;
     for (const shape of SHELF) {
+      if (shape.win) continue;   /* win-state shapes are readings, not move patterns */
       const rec = shape.recognize(c);
       const weighted = rec.score * shape.weight;
       if (!best || weighted > best) { best = weighted; bestShape = shape; bestRec = rec; }
@@ -189,6 +241,7 @@ const ShapeShelf = (() => {
       shapes: Object.fromEntries(SHELF.map(s => [s.id,
         { name: s.name, weight: s.weight, obs: Object.assign({}, s.obs), sinceEval: s.sinceEval }])) };
   }
-  return { SHELF, call, grade, VALUES, attacks, observe, evaluateAll, stats,
+  return { SHELF, WIN_SHELF, call, grade, VALUES, attacks, observe, evaluateAll, stats,
+    positionCtx: ctx,
     set onEvent(fn) { onEvent = fn; }, get onEvent() { return onEvent; } };
 })();

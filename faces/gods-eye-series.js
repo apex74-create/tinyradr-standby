@@ -1,9 +1,9 @@
 "use strict";
 /* ════════════════════════════════════════════════════════════════════════
-   APEX RONIN — THE SERIES LADDER (v2)
+   APEX RONIN — THE SERIES LADDER (v2; v3 seat noted Nov 24, 2026)
    N matches back to back on the exhibition board (the owner's number is
    100), same board, same seats, nothing alternating. The referee grades
-   every call LANDED / FAILED / NO MEASURE; graded calls accumulate as
+   every call LANDED / FAILED / NO MEASURE / BEST-GUESS (v3); graded calls accumulate as
    observations on the one shelf across the whole series, so the learning
    loop (threshold 10, NO MEASURE never moves a weight) trains on the
    series, not on single matches. Results export in the v1 bundle format.
@@ -17,11 +17,36 @@ const RoninSeries = (() => {
 
   function shelfTotals() {
     const st = ShapeShelf.stats();
-    const tot = { LANDED: 0, FAILED: 0, NO_MEASURE: 0 };
+    const tot = { LANDED: 0, FAILED: 0, NO_MEASURE: 0, BEST_GUESS: 0 };
     for (const s of Object.values(st.shapes)) {
       tot.LANDED += s.obs.LANDED; tot.FAILED += s.obs.FAILED; tot.NO_MEASURE += s.obs.NO_MEASURE;
+      tot.BEST_GUESS += s.obs.BEST_GUESS || 0;
     }
     return { tot, shapes: st.shapes, reweights: st.reweightEvents.length };
+  }
+  function waveSnap() {
+    return (typeof WaveSeat !== "undefined") ? WaveSeat.stats() : null;
+  }
+  function waveDelta(before, after) {
+    if (!after) return null;
+    const b = before || { gate90: 0, guess: 0, terminal: 0, nomeasure: 0, sides: {}, levels: {} };
+    const d = { gate90: after.gate90 - (b.gate90 || 0), guess: after.guess - (b.guess || 0),
+      terminal: after.terminal - (b.terminal || 0), nomeasure: after.nomeasure - (b.nomeasure || 0),
+      sides: {}, levels: {} };
+    for (const side of ["red", "blue"]) {
+      const a = after.sides[side] || { gate90: 0, guess: 0, terminal: 0, nomeasure: 0, fulcrum: {} };
+      const bb = b.sides[side] || { fulcrum: {} };
+      const ful = {};
+      for (const [k, v] of Object.entries(a.fulcrum || {})) ful[k] = v - ((bb.fulcrum || {})[k] || 0);
+      d.sides[side] = { gate90: a.gate90 - (bb.gate90 || 0), guess: a.guess - (bb.guess || 0),
+        terminal: a.terminal - (bb.terminal || 0), nomeasure: a.nomeasure - (bb.nomeasure || 0), fulcrum: ful };
+    }
+    for (const [lv, a] of Object.entries(after.levels || {})) {
+      const bb = (b.levels || {})[lv] || {};
+      d.levels[lv] = { gate90: a.gate90 - (bb.gate90 || 0), guess: a.guess - (bb.guess || 0),
+        terminal: a.terminal - (bb.terminal || 0), nomeasure: a.nomeasure - (bb.nomeasure || 0) };
+    }
+    return d;
   }
   function tally() {
     const t = { matches: results.length, red: 0, blue: 0, draw: 0, plays: 0, capsRed: 0, capsBlue: 0 };
@@ -48,6 +73,7 @@ const RoninSeries = (() => {
     const turbo = !!opts.turbo;
     if (turbo) { sim.setBeatMs(60); sim.setTurbo(true); }
     const before = shelfTotals();
+    const waveBefore = waveSnap();
     const seatsBefore = (() => {
       try { return GodsEye.api.S.packId === "gameday" ? GodsEye.api.S.pack.bench(GodsEye.api).seats() : null; }
       catch (e) { return null; }
@@ -84,7 +110,9 @@ const RoninSeries = (() => {
     const summary = { tally: tally(),
       grades: { LANDED: after.tot.LANDED - before.tot.LANDED,
         FAILED: after.tot.FAILED - before.tot.FAILED,
-        NO_MEASURE: after.tot.NO_MEASURE - before.tot.NO_MEASURE },
+        NO_MEASURE: after.tot.NO_MEASURE - before.tot.NO_MEASURE,
+        BEST_GUESS: after.tot.BEST_GUESS - before.tot.BEST_GUESS },
+      wave: waveDelta(waveBefore, waveSnap()),
       reweights: after.reweights - before.reweights,
       weightsBefore: Object.fromEntries(Object.entries(before.shapes).map(([k, v]) => [k, v.weight])),
       weightsAfter: Object.fromEntries(Object.entries(after.shapes).map(([k, v]) => [k, v.weight])),
@@ -92,6 +120,7 @@ const RoninSeries = (() => {
       results: results.slice() };
     renderTally("Series complete · referee grades LANDED " + summary.grades.LANDED +
       " · FAILED " + summary.grades.FAILED + " · NO MEASURE " + summary.grades.NO_MEASURE +
+      " · BEST-GUESS " + summary.grades.BEST_GUESS +
       " · re-weight evaluations " + summary.reweights + ".");
     lastSummary = summary;
     if (typeof window !== "undefined") { window.__ronin = window.__ronin || {}; window.__ronin.seriesLast = summary; }
@@ -99,7 +128,8 @@ const RoninSeries = (() => {
   }
   function stop() { stopFlag = true; }
   function exportMd(summary) {
-    summary = summary || lastSummary || { tally: tally(), grades: { LANDED: 0, FAILED: 0, NO_MEASURE: 0 },
+    summary = summary || lastSummary || { tally: tally(), grades: { LANDED: 0, FAILED: 0, NO_MEASURE: 0, BEST_GUESS: 0 },
+      wave: null,
       reweights: 0, weightsBefore: {}, weightsAfter: {}, obsAfter: {}, results: results.slice(), turbo: false };
     const t = summary.tally;
     const lines = [];
@@ -109,23 +139,52 @@ const RoninSeries = (() => {
     lines.push("");
     lines.push("## The seats");
     lines.push("");
-    lines.push("- **RED — HOUSE DRIVER / HOUSE MODEL** (exhibition ladder: both seats on the shape shelf through the RoninSeat contract).");
-    lines.push("- **BLUE — THE HOUSE MODEL**: shape shelf + referee + collapse. A seat with no honest shelf match passes NO MEASURE rather than fabricate.");
+    const seatNames = summary.seats || { red: "THE HOUSE MODEL", blue: "THE HOUSE MODEL" };
+    lines.push("- **RED — " + seatNames.red + "** and **BLUE — " + seatNames.blue + "** (exhibition ladder: the house model on both sides through the RoninSeat contract; the MAV saddle seat is not used).");
+    lines.push("- Both seats run the **WAVE EVALUATOR** (v3): every legal move is enumerated, simulated pools of played-out scenarios are scored at the fulcrum against the potential-win-shape shelf, and the seat chooses at the 90 gate — or, the clock spent, plays its first best-guess, graded BEST-GUESS. A seat with a legal move never passes; NO MEASURE remains only where no legal move exists.");
     lines.push("");
     lines.push("## The series");
     lines.push("");
     lines.push("- Matches: **" + t.matches + "** · RED wins **" + t.red + "** · BLUE wins **" + t.blue + "** · draws **" + t.draw + "**");
     lines.push("- Captures: RED " + t.capsRed + " · BLUE " + t.capsBlue + " · total plays " + t.plays);
     lines.push("- Referee grades across the series: LANDED " + summary.grades.LANDED +
-      " · FAILED " + summary.grades.FAILED + " · NO MEASURE " + summary.grades.NO_MEASURE);
+      " · FAILED " + summary.grades.FAILED + " · NO MEASURE " + summary.grades.NO_MEASURE +
+      " · BEST-GUESS " + (summary.grades.BEST_GUESS || 0));
     lines.push("- Re-weight evaluations during the series: " + summary.reweights);
     lines.push("");
+    if (summary.wave) {
+      const w = summary.wave;
+      lines.push("## The wave evaluator");
+      lines.push("");
+      lines.push("- Chose at the 90 gate: **" + w.gate90 + "** · terminal king-takes played at once (harness S1): **" + w.terminal + "** · fell back to first best-guess: **" + w.guess + "** · NO MEASURE passes: **" + w.nomeasure + "** (a pass is recorded only where no legal move existed).");
+      lines.push("- A confirmed configuration reads at most 99.9 — 100 is the win itself, recorded by the referee on the board, never claimed by the seat.");
+      lines.push("- The harness (IF-THEN controller statements, per seat and per level) ships as data in gods-eye-wave.js; in this run both seats ran the identical default table.");
+      lines.push("");
+      lines.push("### Overlay readings — which win shapes each side steered toward, per level");
+      lines.push("");
+      const shapeName = id => { const s = ShapeShelf.SHELF.find(x => x.id === id); return s ? s.name : id; };
+      for (const [lv, lw] of Object.entries(w.levels || {}))
+        lines.push("- Level **" + lv + "**: gate-90 choices " + lw.gate90 + " · terminal " + lw.terminal + " · best-guess " + lw.guess + " · NO MEASURE " + lw.nomeasure);
+      lines.push("");
+      lines.push("| Side | Fulcrum shape | Steering count |");
+      lines.push("|---|---|---|");
+      for (const side of ["red", "blue"]) {
+        const ful = (w.sides[side] && w.sides[side].fulcrum) || {};
+        const rows = Object.entries(ful).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+        if (!rows.length) lines.push("| " + side.toUpperCase() + " | — | 0 |");
+        for (const [id, n] of rows) lines.push("| " + side.toUpperCase() + " | " + shapeName(id) + " | " + n + " |");
+      }
+      lines.push("");
+      lines.push("Every chosen move's evaluation record carries its Five W's (Who · What · When · Where · Why → How) in the match log and in WaveSeat.records().");
+      lines.push("");
+    }
     lines.push("## The learning loop (series span)");
     lines.push("");
-    lines.push("| Shape | LANDED | FAILED | NO MEASURE | Weight |");
-    lines.push("|---|---|---|---|---|");
+    lines.push("| Shape | LANDED | FAILED | NO MEASURE | BEST-GUESS | Weight |");
+    lines.push("|---|---|---|---|---|---|");
     for (const [id, s] of Object.entries(summary.obsAfter || {})) {
       lines.push("| " + s.name + " | " + s.obs.LANDED + " | " + s.obs.FAILED + " | " + s.obs.NO_MEASURE +
+        " | " + (s.obs.BEST_GUESS || 0) +
         " | " + (summary.weightsBefore[id] !== undefined ? summary.weightsBefore[id] + " → " : "") + s.weight + " |");
     }
     lines.push("");

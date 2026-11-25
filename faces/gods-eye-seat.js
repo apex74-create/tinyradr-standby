@@ -60,13 +60,19 @@ const RoninSeat = (() => {
   function assign(side, id) { if (side in assignments) assignments[side] = id || null; }
   function assignment(side) { return assignments[side] || null; }
 
-  /* The house model — BLUE by default. Its whole machinery is the house
-     bridge: shelf + referee + collapse, mapped into the contract shape. */
+  /* The house model — BLUE by default. v3 (Nov 24, 2026): its brain is
+     the WAVE EVALUATOR (gods-eye-wave.js) wherever the arena provides
+     the wave bridge — it enumerates every legal move, runs simulated
+     pools against the potential-win-shape shelf, chooses at the 90
+     gate, and otherwise plays its first best-guess (graded BEST-GUESS).
+     It passes only where no legal move exists. Arenas without the wave
+     bridge fall back to the v2 shelf call, unchanged. */
   register({ id: "house-model", name: "THE HOUSE MODEL", kind: "house",
     call(ctx) {
-      if (!ctx.host || typeof ctx.host.shapeCall !== "function")
-        return { pass: true, reason: "house bridge unavailable" };
-      return ctx.host.shapeCall();
+      if (!ctx.host) return { pass: true, reason: "house bridge unavailable" };
+      if (typeof ctx.host.waveCall === "function") return ctx.host.waveCall();
+      if (typeof ctx.host.shapeCall === "function") return ctx.host.shapeCall();
+      return { pass: true, reason: "house bridge unavailable" };
     } });
   /* The house driver — RED by default. The controller seat's called plays,
      served by the arena through the same bridge. */
