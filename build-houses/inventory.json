@@ -4,10 +4,10 @@
   "catalogue": "public/depot/catalog.json",
   "appleStoreFeed": "public/apple-store/source.json"
  },
- "faces": 56,
+ "faces": 58,
  "planes": 2,
- "builds": 112,
- "androidOnShelf": 56,
+ "builds": 116,
+ "androidOnShelf": 58,
  "appleOnShelf": 0,
  "priceUsd": 10,
  "listingRule": "IN: any landed build that is a watch face when it lands \u2014 it carries a clock, a weather call, a camera call, or a Companion call from the screen. Posted at $10 at landing. OUT: containerized Android builds that are not watch faces (container products, CB-class builds) \u2014 they keep their already-set pricing schemas.",
@@ -986,7 +986,7 @@
    "slug": "hotrod-ratrod",
    "name": "Apex Face \u2014 Hot Rod Rat Rod",
    "title": "APEX \u2014 Hot Rod Line \u00b7 Rat Rod",
-   "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod \u2014 the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
+   "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod \u2014 the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors. \u00b7 Icon fix (Nov 26, 2026): the package now carries its own launcher icon \u2014 the face's own monster, cropped from its own art \u2014 where the shipped build carried no icon and Android showed the stock robot. VersionCode 3 / 1.2, same house key, installs over the shipped build. Face and art unchanged.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -994,8 +994,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.hotrodratrod",
     "apkPath": "/depot/hotrod-ratrod.apk",
-    "apkSha256": "14e9e50e55171687ca5d3f40a9820dcda3cb58e2572d29517042882ef56208e8",
-    "apkSizeBytes": 455191,
+    "apkSha256": "c081a6637ff2e57d38535c497d1574e66bf2e5d597d11f67d095ea71f8498672",
+    "apkSizeBytes": 623533,
     "facePath": "/faces/hotrod-ratrod.html"
    },
    "apple": {
@@ -1008,7 +1008,7 @@
    "slug": "hotrod-blown",
    "name": "Apex Face \u2014 Hot Rod Blown Drag",
    "title": "APEX \u2014 Hot Rod Line \u00b7 Blown Drag",
-   "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
+   "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors. \u00b7 Icon fix (Nov 26, 2026): the package now carries its own launcher icon \u2014 the face's own monster, cropped from its own art \u2014 where the shipped build carried no icon and Android showed the stock robot. VersionCode 3 / 1.2, same house key, installs over the shipped build. Face and art unchanged.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1016,8 +1016,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.hotrodblown",
     "apkPath": "/depot/hotrod-blown.apk",
-    "apkSha256": "f6b37f276a83a72773e1fed3d085c571fc272b3188829ccd4375027faffe839c",
-    "apkSizeBytes": 442902,
+    "apkSha256": "c597e1691849301bd085edf37fa4a4444d53e54d52fe03e22c8084697d7de63d",
+    "apkSizeBytes": 607148,
     "facePath": "/faces/hotrod-blown.html"
    },
    "apple": {
@@ -1030,7 +1030,7 @@
    "slug": "hotrod-coupe",
    "name": "Apex Face \u2014 Hot Rod Full Coupe",
    "title": "APEX \u2014 Hot Rod Line \u00b7 Full Coupe",
-   "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
+   "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe \u2014 era graphic style, a house-original monster \u2014 with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) \u2014 the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors. \u00b7 Icon fix (Nov 26, 2026): the package now carries its own launcher icon \u2014 the face's own monster, cropped from its own art \u2014 where the shipped build carried no icon and Android showed the stock robot. VersionCode 3 / 1.2, same house key, installs over the shipped build. Face and art unchanged.",
    "priceUsd": 10,
    "android": {
     "plane": "android",
@@ -1038,8 +1038,8 @@
     "catalogueStatus": "BUILT",
     "package": "app.lovable.apexsignal.face.hotrodcoupe",
     "apkPath": "/depot/hotrod-coupe.apk",
-    "apkSha256": "d3ddee1026b56066589c9fba2bdf5979bc6ed7288dce912ecf226c589b5b4e34",
-    "apkSizeBytes": 479766,
+    "apkSha256": "0c93d2db95f1f0b6f7a1f50a4fc6b66fdc9386e4da4fd53a143a71424a073873",
+    "apkSizeBytes": 660396,
     "facePath": "/faces/hotrod-coupe.html"
    },
    "apple": {
@@ -1243,6 +1243,50 @@
    "apple": {
     "plane": "apple",
     "bundleId": "app.lovable.apexsignal.formed.radarscope",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "isawauap-v2-4-spacing-evidencefix",
+   "name": "Apex Face \u2014 I Saw A UAP",
+   "title": "APEX \u2014 I Saw A UAP \u00b7 PHOTO & FILM EXAMINATION STATION",
+   "note": "I Saw A UAP is a watch face from Apex Air Solutions. It is a photo and film examination station for the footage you caught: it lays your stills out for a close look and keeps the PE clock on the glass. Price: $10. Find it at tinyradr.com, on the depot shelf. \u00b7 The end build of the ISAWAUAP line (the V2-4 spacing evidence fix), hung Nov 26, 2026 in the estate hang-and-label pass; the earlier generations stay unlisted, riding the owner's word.",
+   "priceUsd": 10,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.isawauapv24spacingevidencefix",
+    "apkPath": "/depot/isawauap-v2-4-spacing-evidencefix.apk",
+    "apkSha256": "e56f401aaaff837200e8a3eb018459eb72e2926f2f4b711680388a16d02d5696",
+    "apkSizeBytes": 29137,
+    "facePath": "/faces/isawauap-v2-4-spacing-evidencefix.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.isawauapv24spacingevidencefix",
+    "state": "not-formed"
+   }
+  },
+  {
+   "slug": "ultralight-wireframe",
+   "name": "Apex Face \u2014 Ultralight Wireframe",
+   "title": "APEX \u2014 Ultralight Wireframe Helicopter \u00b7 The Propeller Wing",
+   "note": "The Ultralight Wireframe is a watch face from Apex Air Solutions. It draws a wireframe helicopter \u2014 the propeller wing \u2014 over the clock, in clean lines. Price: $10. Find it at tinyradr.com, on the depot shelf. \u00b7 Hung Nov 26, 2026 in the estate hang-and-label pass; the package sat in the depot folder with no listing until now.",
+   "priceUsd": 10,
+   "android": {
+    "plane": "android",
+    "state": "on-shelf",
+    "catalogueStatus": "BUILT",
+    "package": "app.lovable.apexsignal.face.ultralightwireframe",
+    "apkPath": "/depot/ultralight-wireframe.apk",
+    "apkSha256": "1538b041d5d8fa22784b1e82c574c81ebeb08a9c3568fc2b89d16ba32ac95da1",
+    "apkSizeBytes": 3204360,
+    "facePath": "/faces/ultralight-wireframe.html"
+   },
+   "apple": {
+    "plane": "apple",
+    "bundleId": "app.lovable.apexsignal.formed.ultralightwireframe",
     "state": "not-formed"
    }
   }
