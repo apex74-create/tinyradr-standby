@@ -48,17 +48,29 @@
    ════════════════════════════════════════════════════════════════════════ */
 const RoninSeat = (() => {
   const seats = new Map();
-  const assignments = { red: null, blue: null };   // guest/member overrides
+  const assignments = { red: null, blue: null }; // guest/member overrides
   function register(def) {
     if (!def || !def.id || typeof def.call !== "function") return null;
-    seats.set(def.id, { id: def.id, name: def.name || def.id,
-      kind: def.kind === "house" ? "house" : "guest", call: def.call });
+    seats.set(def.id, {
+      id: def.id,
+      name: def.name || def.id,
+      kind: def.kind === "house" ? "house" : "guest",
+      call: def.call,
+    });
     return seats.get(def.id);
   }
-  function get(id) { return seats.get(id) || null; }
-  function list() { return [...seats.values()].map(s => ({ id: s.id, name: s.name, kind: s.kind })); }
-  function assign(side, id) { if (side in assignments) assignments[side] = id || null; }
-  function assignment(side) { return assignments[side] || null; }
+  function get(id) {
+    return seats.get(id) || null;
+  }
+  function list() {
+    return [...seats.values()].map((s) => ({ id: s.id, name: s.name, kind: s.kind }));
+  }
+  function assign(side, id) {
+    if (side in assignments) assignments[side] = id || null;
+  }
+  function assignment(side) {
+    return assignments[side] || null;
+  }
 
   /* The house model — BLUE by default. v3 (Nov 24, 2026): its brain is
      the WAVE EVALUATOR (gods-eye-wave.js) wherever the arena provides
@@ -67,30 +79,48 @@ const RoninSeat = (() => {
      gate, and otherwise plays its first best-guess (graded BEST-GUESS).
      It passes only where no legal move exists. Arenas without the wave
      bridge fall back to the v2 shelf call, unchanged. */
-  register({ id: "house-model", name: "THE HOUSE MODEL", kind: "house",
+  register({
+    id: "house-model",
+    name: "THE HOUSE MODEL",
+    kind: "house",
     call(ctx) {
       if (!ctx.host) return { pass: true, reason: "house bridge unavailable" };
       if (typeof ctx.host.waveCall === "function") return ctx.host.waveCall();
       if (typeof ctx.host.shapeCall === "function") return ctx.host.shapeCall();
       return { pass: true, reason: "house bridge unavailable" };
-    } });
+    },
+  });
   /* The house driver — RED by default. The controller seat's called plays,
      served by the arena through the same bridge. */
-  register({ id: "house-driver", name: "HOUSE DRIVER · CALLED PLAYS", kind: "house",
+  register({
+    id: "house-driver",
+    name: "HOUSE DRIVER · CALLED PLAYS",
+    kind: "house",
     call(ctx) {
       if (!ctx.host || typeof ctx.host.driverPlay !== "function")
         return { pass: true, reason: "house bridge unavailable" };
       return ctx.host.driverPlay();
-    } });
+    },
+  });
 
   /* A seat held by name for a club member whose model has not connected.
      It testifies honestly: NO MEASURE, every turn, until the member's own
      model registers under the same id from their own compute. */
   function holdSeatForMember(name) {
     const id = "member:" + name;
-    if (!seats.has(id)) register({ id, name: name.toUpperCase() + " · MEMBER SEAT", kind: "guest",
-      call() { return { pass: true,
-        reason: "guest model not connected — this seat is held by name; the model runs on the guest's own compute" }; } });
+    if (!seats.has(id))
+      register({
+        id,
+        name: name.toUpperCase() + " · MEMBER SEAT",
+        kind: "guest",
+        call() {
+          return {
+            pass: true,
+            reason:
+              "guest model not connected — this seat is held by name; the model runs on the guest's own compute",
+          };
+        },
+      });
     return id;
   }
 
@@ -98,15 +128,23 @@ const RoninSeat = (() => {
   function refreshFace() {
     const el = document.getElementById("seatLines");
     if (!el) return;
-    let red = "HOUSE DRIVER · CALLED PLAYS", blue = "THE HOUSE MODEL";
+    let red = "HOUSE DRIVER · CALLED PLAYS",
+      blue = "THE HOUSE MODEL";
     try {
       const api = GodsEye.api;
       if (api && api.S.packId === "gameday" && api.S.pack.bench) {
         const s = api.S.pack.bench(api).seats();
-        red = s.red; blue = s.blue;
+        red = s.red;
+        blue = s.blue;
       }
-    } catch (e) { /* face falls back to the default nameplates */ }
-    el.innerHTML = "RED SEAT · " + red + "<br>BLUE SEAT · " + blue +
+    } catch (e) {
+      /* face falls back to the default nameplates */
+    }
+    el.innerHTML =
+      "RED SEAT · " +
+      red +
+      "<br>BLUE SEAT · " +
+      blue +
       "<br><span style='color:#7fa892'>Guest seats register through RoninSeat — the contract is in gods-eye-seat.js, and it is the same door the house seats use.</span>";
   }
   if (typeof document !== "undefined") setInterval(refreshFace, 1200);
