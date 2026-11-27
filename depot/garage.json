@@ -854,8 +854,8 @@
       "title": "APEX — Hot Rod Line · Rat Rod",
       "package": "app.lovable.apexsignal.face.hotrodratrod",
       "apkPath": "/depot/hotrod-ratrod.apk",
-      "apkSha256": "14e9e50e55171687ca5d3f40a9820dcda3cb58e2572d29517042882ef56208e8",
-      "apkSizeBytes": 455191,
+      "apkSha256": "c081a6637ff2e57d38535c497d1574e66bf2e5d597d11f67d095ea71f8498672",
+      "apkSizeBytes": 623533,
       "facePath": "/faces/hotrod-ratrod.html",
       "faceSha256": "19f1d7b1dcb0d900cb63843c52d60b926a0aaffe607455882727713fe5193da4",
       "priceUsd": 10,
@@ -863,7 +863,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
+      "note": "Hot Rod Line: an original Apex monster in a rusty blown rat rod — the Rat Fink-era t-shirt graphic style, a house-original monster, never the copyrighted character — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors. · Icon fix (Nov 26, 2026): the package now carries its own launcher icon — the face's own monster, cropped from its own art — where the shipped build carried no icon and Android showed the stock robot. VersionCode 3 / 1.2, same house key, installs over the shipped build. Face and art unchanged.",
       "bay": 51,
       "garageStatus": "IN THE GARAGE"
     },
@@ -873,8 +873,8 @@
       "title": "APEX — Hot Rod Line · Blown Drag",
       "package": "app.lovable.apexsignal.face.hotrodblown",
       "apkPath": "/depot/hotrod-blown.apk",
-      "apkSha256": "f6b37f276a83a72773e1fed3d085c571fc272b3188829ccd4375027faffe839c",
-      "apkSizeBytes": 442902,
+      "apkSha256": "c597e1691849301bd085edf37fa4a4444d53e54d52fe03e22c8084697d7de63d",
+      "apkSizeBytes": 607148,
       "facePath": "/faces/hotrod-blown.html",
       "faceSha256": "f89ed7d8fc4068207e58c94b436de2567d1adedad57f460f2b7d194bf28c9065",
       "priceUsd": 10,
@@ -882,7 +882,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
+      "note": "Hot Rod Line: an original eye-stalk Apex monster, shifter in hand, on a bare blown drag motor — era graphic style, a house-original monster — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors. · Icon fix (Nov 26, 2026): the package now carries its own launcher icon — the face's own monster, cropped from its own art — where the shipped build carried no icon and Android showed the stock robot. VersionCode 3 / 1.2, same house key, installs over the shipped build. Face and art unchanged.",
       "bay": 52,
       "garageStatus": "IN THE GARAGE"
     },
@@ -892,8 +892,8 @@
       "title": "APEX — Hot Rod Line · Full Coupe",
       "package": "app.lovable.apexsignal.face.hotrodcoupe",
       "apkPath": "/depot/hotrod-coupe.apk",
-      "apkSha256": "d3ddee1026b56066589c9fba2bdf5979bc6ed7288dce912ecf226c589b5b4e34",
-      "apkSizeBytes": 479766,
+      "apkSha256": "0c93d2db95f1f0b6f7a1f50a4fc6b66fdc9386e4da4fd53a143a71424a073873",
+      "apkSizeBytes": 660396,
       "facePath": "/faces/hotrod-coupe.html",
       "faceSha256": "a255441f776471b08230e65a47a5a520a185940969f052e2be7db4bb743cabad",
       "priceUsd": 10,
@@ -901,7 +901,7 @@
         "clock"
       ],
       "status": "BUILT",
-      "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors.",
+      "note": "Hot Rod Line: an original wild-haired Apex monster bursting from a flamed coupe — era graphic style, a house-original monster — with a compass dial and the time in analog and digital. Image-asset fix (Nov 23, 2026): the picture now ships inside the APK (asset carried beside face.html) — the shipped 1.0 package referenced it but contained no image file, so the watch rendered the alt text. Rebuilt v1.1 on the proof container; bench render paints the image, zero load errors. · Icon fix (Nov 26, 2026): the package now carries its own launcher icon — the face's own monster, cropped from its own art — where the shipped build carried no icon and Android showed the stock robot. VersionCode 3 / 1.2, same house key, installs over the shipped build. Face and art unchanged.",
       "bay": 53,
       "garageStatus": "IN THE GARAGE"
     },
@@ -1074,6 +1074,44 @@
       "status": "BUILT",
       "note": "The owner's own design, scoped by him Nov 13-15, 2026 and never built until now: a sweeping radar scope whose contacts are the live Wi-Fi scape, a frequency/channel-occupancy graph along the bottom, and his vitals strip (battery, heart rate, steps, gateway-ping heartbeat, tap, time). Built on the pipe container (v3 lineage) that reads the analyzer's ApexWifi/1 ingest with the container's own scan as the named fallback; every value prints SRC ANALYZER / SRC CONTAINER. Range is the RSSI ring and is labelled an estimate on the glass; bearing is NO MEASURE and the angle around the ring is signal order, printed as such. O2/HRV/SLEEP are named NO MEASURE - not fed on this device class. Five-step scrub on the ingest, signal-lane mapping per the pipe contract. · Icon + glass deck (Nov 23, 2026): the APK now carries a real launcher icon — the scope itself, phosphor rings, sweep and contact blips, adaptive + legacy sets — where the first build shipped no icon resources and Android fell back to the stock robot; and the face now sits in a glass console deck — translucent plates, glass bolt heads, an edge-glow bezel — that frames the glass without covering a readout. Rebuilt on the same pipe container, versionCode 5 / 1.3.1, same house key, installs over the shipped build.",
       "bay": 62,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "isawauap-v2-4-spacing-evidencefix",
+      "name": "Apex Face — I Saw A UAP",
+      "title": "APEX — I Saw A UAP · PHOTO & FILM EXAMINATION STATION",
+      "package": "app.lovable.apexsignal.face.isawauapv24spacingevidencefix",
+      "apkPath": "/depot/isawauap-v2-4-spacing-evidencefix.apk",
+      "apkSha256": "e56f401aaaff837200e8a3eb018459eb72e2926f2f4b711680388a16d02d5696",
+      "apkSizeBytes": 29137,
+      "facePath": "/faces/isawauap-v2-4-spacing-evidencefix.html",
+      "faceSha256": "8583a103b95c2e447ceb8fad343e4a6d4d8e5d3a2c64479c194bae4c84279600",
+      "priceUsd": 10,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "I Saw A UAP is a watch face from Apex Air Solutions. It is a photo and film examination station for the footage you caught: it lays your stills out for a close look and keeps the PE clock on the glass. Price: $10. Find it at tinyradr.com, on the depot shelf. · The end build of the ISAWAUAP line (the V2-4 spacing evidence fix), hung Nov 26, 2026 in the estate hang-and-label pass; the earlier generations stay unlisted, riding the owner's word.",
+      "bay": 63,
+      "garageStatus": "IN THE GARAGE"
+    },
+    {
+      "slug": "ultralight-wireframe",
+      "name": "Apex Face — Ultralight Wireframe",
+      "title": "APEX — Ultralight Wireframe Helicopter · The Propeller Wing",
+      "package": "app.lovable.apexsignal.face.ultralightwireframe",
+      "apkPath": "/depot/ultralight-wireframe.apk",
+      "apkSha256": "1538b041d5d8fa22784b1e82c574c81ebeb08a9c3568fc2b89d16ba32ac95da1",
+      "apkSizeBytes": 3204360,
+      "facePath": "/faces/ultralight-wireframe.html",
+      "faceSha256": "2794700d06349ba1272612f67d35b830718124818aa485cb0918dfa620c78897",
+      "priceUsd": 10,
+      "functions": [
+        "clock"
+      ],
+      "status": "BUILT",
+      "note": "The Ultralight Wireframe is a watch face from Apex Air Solutions. It draws a wireframe helicopter — the propeller wing — over the clock, in clean lines. Price: $10. Find it at tinyradr.com, on the depot shelf. · Hung Nov 26, 2026 in the estate hang-and-label pass; the package sat in the depot folder with no listing until now.",
+      "bay": 64,
       "garageStatus": "IN THE GARAGE"
     }
   ],
